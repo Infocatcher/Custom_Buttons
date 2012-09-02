@@ -1,0 +1,1 @@
+Install <a href="https://addons.mozilla.org/firefox/addon/custom-buttons">Custom Buttons</a> to use these scripts!
