@@ -4,7 +4,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2010-2012
-// version 0.2.0pre8 - 2012-08-17
+// version 0.2.0pre9 - 2012-09-03
 
 var options = {
 	removeUnprotectedCookiesInterval: 30*60*1000, // -1 to disable
@@ -14,8 +14,9 @@ var options = {
 		openPermissions: false,
 		showCookies: true,
 		removeCurrentSiteCookies: true,
-		preserveCurrentSiteCookies: true
+		preserveCurrentSitesCookies: true
 	},
+	showDefaultPolicy: true,
 	prefillMode: 1, // 0 - move caret to start, 1 - select all, 2 - move caret to end
 };
 
@@ -29,6 +30,10 @@ function _localize(sid) {
 			notAvailableTooltiptext: "Cookies: n/a",
 			unknownTooltiptext: "Cookies: ???",
 			errorTooltiptext: "Cookies: Error!",
+
+			defaultDenyTooltiptext: "Cookies: Deny (Default)",
+			defaultAllowSessionTooltiptext: "Cookies: Allow Session (Default)",
+			defaultAllowTooltiptext: "Cookies: Allow (Default)",
 
 			defaultLabel: "Default",
 			defaultAccesskey: "f",
@@ -64,6 +69,10 @@ function _localize(sid) {
 			notAvailableTooltiptext: "Cookies: н/д",
 			unknownTooltiptext: "Cookies: ???",
 			errorTooltiptext: "Cookies: Ошибка!",
+
+			defaultDenyTooltiptext: "Cookies: Блокировать (по умолчанию)",
+			defaultAllowSessionTooltiptext: "Cookies: Разрешить на сессию (по умолчанию)",
+			defaultAllowTooltiptext: "Cookies: Разрешить (по умолчанию)",
 
 			defaultLabel: "По умолчанию",
 			defaultAccesskey: "у",
@@ -284,6 +293,38 @@ this.permissions = {
 		};
 		this.oSvc.addObserver(this.permissionsObserver, "perm-changed", false);
 
+		if(this.options.showDefaultPolicy) {
+			var po = this.prefsObserver = {
+				context: this,
+				get prefs() {
+					delete this.prefs;
+					return this.prefs = Components.classes["@mozilla.org/preferences-service;1"]
+						.getService(Components.interfaces.nsIPrefService)
+						.QueryInterface(Components.interfaces.nsIPrefBranch2 || Components.interfaces.nsIPrefBranch)
+						.getBranch("network.cookie.");
+				},
+				getIntPref: function(name) {
+					try { return this.prefs.getIntPref(name); }
+					catch(e) {}
+					return 0;
+				},
+				observe: function(subject, topic, data) {
+					if(topic != "nsPref:changed")
+						return;
+					if(data != "cookieBehavior" && data != "lifetimePolicy")
+						return;
+					this.context.prefs[data] = this.getIntPref(data);
+					this.context.updButtonState();
+				}
+			};
+			this.prefs = {
+				"cookieBehavior": po.getIntPref("cookieBehavior"),
+				"lifetimePolicy": po.getIntPref("lifetimePolicy"),
+				__proto__: null
+			};
+			po.prefs.addObserver("", po, false);
+		}
+
 		this.initCleanupTimer();
 		this.updButtonState();
 	},
@@ -294,7 +335,9 @@ this.permissions = {
 
 		gBrowser.removeProgressListener(this.progressListener);
 		this.oSvc.removeObserver(this.permissionsObserver, "perm-changed");
-		this.progressListener = this.permissionsObserver = null;
+		if(this.options.showDefaultPolicy)
+			this.prefsObserver.prefs.removeObserver("", this.prefsObserver);
+		this.progressListener = this.permissionsObserver = this.prefsObserver = null;
 	},
 	initCleanupTimer: function() {
 		//if(this.options.removeUnprotectedCookiesInterval > 0) {
@@ -389,7 +432,7 @@ this.permissions = {
 				}
 				if(!host)
 					continue;
-				if(this.options.useBaseDomain.preserveCurrentSiteCookies) try {
+				if(this.options.useBaseDomain.preserveCurrentSitesCookies) try {
 					host = this.tld.getBaseDomainFromHost(host);
 				}
 				catch(e) {
@@ -616,6 +659,15 @@ this.permissions = {
 			? this.pm.testPermission(this.getURI(host), this.permissionType)
 			: this.PERMISSIONS_NOT_SUPPORTED;
 	},
+	get defaultPermission() {
+		// http://kb.mozillazine.org/Network.cookie.cookieBehavior
+		// http://kb.mozillazine.org/Network.cookie.lifetimePolicy
+		if(this.prefs.cookieBehavior == 2)
+			return this.cp.ACCESS_DENY;
+		if(this.prefs.lifetimePolicy == 2)
+			return this.cp.ACCESS_SESSION;
+		return this.cp.ACCESS_ALLOW;
+	},
 	showCookies: function() {
 		var host = this.options.useBaseDomain.showCookies
 			? this.currentBaseDomain
@@ -727,12 +779,19 @@ this.permissions = {
 		var cp = this.cp;
 		var key;
 		switch(permission) {
-			case this.PERMISSIONS_NOT_SUPPORTED: key = "notAvailable"; break;
-			case this.PERMISSIONS_ERROR:         key = "error";        break;
-			case cp.ACCESS_DEFAULT:              key = "default";      break;
-			case cp.ACCESS_ALLOW:                key = "allow";        break;
-			case cp.ACCESS_DENY:                 key = "deny";         break;
-			case cp.ACCESS_SESSION:              key = "allowSession"; break;
+			case cp.ACCESS_DEFAULT:
+				key = "default";
+				if(this.options.showDefaultPolicy) switch(this.defaultPermission) {
+					case cp.ACCESS_ALLOW:        key = "defaultAllow";        break;
+					case cp.ACCESS_DENY:         key = "defaultDeny";         break;
+					case cp.ACCESS_SESSION:      key = "defaultAllowSession";
+				}
+			break;
+			case cp.ACCESS_ALLOW:                key = "allow";               break;
+			case cp.ACCESS_DENY:                 key = "deny";                break;
+			case cp.ACCESS_SESSION:              key = "allowSession";        break;
+			case this.PERMISSIONS_NOT_SUPPORTED: key = "notAvailable";        break;
+			case this.PERMISSIONS_ERROR:         key = "error";               break;
 			default:                             key = "unknown";
 		}
 		var btn = this.button;
@@ -760,16 +819,19 @@ var cssStr = '\
 	@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");\n\
 	@-moz-document url("%windowURL%") {\n\
 		%button% {\n\
-			list-style-image: url("data:image/png;base64,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") !important;\n\
+			list-style-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAAAgCAYAAADtwH1UAAAM/UlEQVR4Xu2Ze1CUV5rGn69pkaYbseWmCCqIQEZJIhgV8AoomUSzyWyCY7YcYyUVnayzmxhLkzEZMJWZoFH/SXayOsmY1Mx42XGTSeENbZBE4yXcVGhu2iANzbWBvt++7j57ztnYVVj5RMc/Ul3lU/XWd/o951enz4Wnu3kFSKhyg1whCJgHYC6AOHChH0A9IajJO+h1QlIP+Q0bNlBekOBJzcGDB6X5M+vlas1L47Y27F5aNnj6d13Wyx+5WbA2y7E+NuYh/+Nav369+qWXXtq6a9eushMnTnRduHDBzYK1WY710TGcl90Jn1wXovARbJy+uOjFpGW/XKWeNitBGRUTerWlLZS1WY71sTFs7EN+tNatW6cghGzMzc19cfHixasSqNRqdWhTU1Moa7Mc62Nj2FgZ7pDoR456ZlZedOoTc8MiIlBaugeOkRHMz8yE1+MBy7E+NoaNfciPls/ny0lOTs6bNWvWXKVSCXrjYTabkZWVBVEUwXKsj41hY+V3ep7bizfkxJs92KDBiGICNq59GqLTwSdnqv7mInIWLcCk5KxHu5tqcgFUPOQR8Hyv1/sGgOzGxkYoFAqsXbsWbrebbz5TXV0dcnJyQA/g0ebm5lz5bc/zE+HluEdylkY/snCZKjpBSQiB6DDD1NUGj12Lo+VabN6yCdnZ8yCTySAPU01y+0jSQx7c8+n4l9PT05empaUti46O5rzD4UB3dzdu3bqFyspKbN68GQsWLOB8WFjYJJ/PlyS/7XlJS4qKpmQsmhumUkE2bhy+++47ZM+fj/ETojGka8CaJwWILgf8Ph/YGJ/XJ3i8CH0Q/tvM9KyTita78r3eaLQabJiy6in8bxsQFy4iOZpAcY/zhw86QVq1KJ4yAzh8Gu7J0fCnzYBPdu/vf6D9M+rtN2Ee3AqntQCRsc8F1n/b8xctWlQ0e/ZsbjtyuZzxfLMjIiL4AeTn58PlcjGLQnh4OHsKXq83VM58LC414Hnwut3w2myjPG9CQiosxl6YezrQeNOExcvnw2YyWtw+9P+z/K9DrsmREp8halsl+Ss37OjzxmJ27nLQmwWm1tZWaLVahAwbxLHm933zPdyaCxjq6cFIfz/n1XFxmNaVDuWUSPFe37/or0HqGh3n2w7PRGhYfmD9zMdTU1MDns+sxm63j/L8+Ph4GI1G9PX18cOgH8IwmUwWyvbLRC9ymZ+F0lPxOBwo/cM+PrHTYoGLLuTcmXNgfYroRJj69ViavxAOqxXt2tpu0UfOS/F/1l+R5NcYy1FQUADql5DitR1mdDnVWLY8Hymz0lBdUwufH6zNc66oRxXu9F9K8u7a67CfrkLvrQ6MT0/BxN//B7yv5CM5IwNEocDEWwOK7PFJGGv91d/uhTr9FUAcYMHbJuOJwPrpJuYyP6d+z2/47t27+cbbKEsPglsP64uKikI/vQT0WxDLs0vUTdnz+NvzsoOG4yWe8r0byPA3+4j1+0+I8dwesmNVKn/a6Gtn/adEd3Qb0Wx/nLQfe5ucLVmp37NS+HRvoaCS4nM+z2FxJ89zpcOl5L2+93hbiv/9W5tJ/bVG4hQJj/379wfaNHjf7tIPTkvxdc9mkM4lCcTw8qLA/OTVAkK2v0BqksH7hp977PRY66/7EwixHiE1+0HorWZtnru9/ueff/5gWVmZZ+/eveTcuXPk4sWLpKKigjz77LPsyV9XV1eTo0ePkm3btpFjx46RkpIS/cqVKz8tLCxUyZiP+bxeIXfxfHhFEQ6TCT763PbWv/Onw2KB6HbD7/fBYrKIlzRft9ZcOFPpI3jnzXJik+C53z3zzDNYQldwm9+WJGM5/rXM6XTyMVK8XxmH5LTZ8PjAA2DPQPA+t+gtlOKnuj2cGbd2NZ8/uaIOUKtR+/e/42wyvgCV6HIV3m39g72nEJOyHHC2ISDaZrknComJrZ/5OA0hOzubW47FYuHPLVu2BP4S3Hz9ftYnajSaVvqjrJIQ8k55eblNznxsqLfLMj5cOQlUpb/7L2x991XYzGYwXbpQzz3bPNQvduk7mi1u8oEg4PjbGmIDlQTPJ+3t6UVRURGy//LH2z9SeI5JU6GB9j+1gnu1bN+P8x620QHV1tbS2MjZvMJVyH9yNZtDcn6fwwGFSoVvKy7jX4esgc0/NQNrBYLjtG+9y26HWy69/v7eCqTn/hvgbEVAtJ2QHA9dHd4EsJX5OPV2C7UZzu/Zswevv/46PwimK1eucM8fGhoSOzs7m+m+fADgOLUmvn8y5mPMz5iv05uA377/G/ZkwU4t4PmdLVebZQJK3q3EkXcqwGAuCZ77od1hx82bN9nGs2Btnjt+4jjf/Lvxk8NFXKuv5Ydw5lQZivfsD8TiFat5H13MSSlejI8B1ajNv5Qu/IK9/41hj3wJKrfTKcn39WjoRk9lN55H6mPp2P+OEHjN+sr/gBLm48zPma/TNqjNsM82Gnz/Ap7f0tLSLAhCCd34IzQC+yenCzzb0aZ9ekJ0vHrmnKxEj9sNAcB5TQ0WFcyD1WSCrrG2i46pFgScxR2S4nfqZ2H7qVNYtmwZGhoaAkBVVRUMxQZhLN7X046ay+cRHT8duQXURvwIyDRs5H0ej+evUnyLV8CM7m5ApYReo0FVivCZQMcOPTPnTGhYWN5AVxc8Lpck32P4FpnzYwF3J5jarg1g44Es1PxZD6aZyUDzNRTTTY9oa2t7mn73V8+ZMyfRzXhBYF9D2Q8ubkn0R1kXHVNN82fxY9q1Qpj8QQE+/9umn7V8//GvzK2Htnj1X+3wsjbLsT42BsB98zE7YsgLZ1/gwdr3w3/y7iuu90s/JGUVl4lumLDgbZZ77bXX3huLr33xMdfVtHFk+F8y2AcwC96+8UQUofm78l/uACE1dw82hvErVqyYTL/Vfb5p06aWjz/+2Hzo0CHvV1995WVtlmN9bAx+RIGb+H4+VIRgFQEKASSBCx0CUM48n9uOhMbi9z2hPsyAkV0jwv3yIzFLrPYJqakQZDTPdRLAXw8cOHD4XvgMI6xTbUiVAaP4ee24Kx87DTOmzsB0lQqIiAAUCnA5nYDVCthsvL2zaBdKGJ+Xl6cCKE/I6PULQnnA8yUO4AEU5PWAYFfw1wN+esnwgAr2ekDQH0DQ1wN+YsnxwAr+ekKQH0Dw1wOC+gAepB5wIz428eS6wbvyznHRGOjswsKfz0Jjv4CI8U7ETPTfcz0izDsOjpZGvPZ4KkLrm+GLjADi4wJ80B/AP1sPOOZuF/Xx0eFzhwYlef2AEw6ZGgmzE5Ak2hAyLgxNNwzw2+SwjXicY9YjdHoIegPEYSf6de2U74HFI0fGvMdARCvng/5DWKoe8P2ATrIecGikCeqoCItlvFwvxff0mzHskIH4BMTETcGgyQ6HzYxMunnx8VMx6AhxuCcv6JTiXR16OJva0FBbj9ApcYhYvRKOtCg8vjATot8PT9tNR3JIdGfQHwDzUaU6dtKFqkt8w9/cupn/W/eT8jL8ZfB6wHMFWRhs5iF8MXAVarXSPOS0GPpV43VS/BeHyum4KCTPTAKBgL7+QbicTjidLthtVrNyYpTBPX2FVYov++wInHY7Zs57HMqFmXz+mD4HPBDQfP6c2djRYcgQYq3BbkGj/p9/u3bAtCA7E7NSUnCg+SJembaQ1wPKwjy+1PCQkfZ+fbf30ZRK+yW9R4rPyVuOSHoALqcb8tBQEOKHw+Xx2fX6EY+PdGeterWy7k8HEqX4ny/Mgsthhz91Bs9F6gwYEGS+mq+PjdTKhk78wjdlUOYSE4PdggL1ALvJBOL3s3oAu4H89lnMZqgUkfhv3QUcHLzqS0yZYezwO6rMP5t+8uuqClvdprqdUryD8qLXj3ZdN1wuN9pv3vT9z5HDxoOHv6xqd0ScDImItbF6gCRvs0IWIuf1AOHyVbiJz3fjwnfGKxj6jY9gs1oVaXM7HAjyA5CuB3hYXZZGRGQ4HklPw7Skqcau8UKVKWFS43HNGQ+tB+y8G68MEdHXa0DijAS0ahuQlb3EuOaNXVVv/fF449Knijw/1ANuSPFepQKEEDw5OQaiTIaWyrNGfZzw6x/qAc/9UA+4EeQHEKgHVN9sqOlyORywW638JibXudDW1gq7zQat9ppZ29FmGFYrdadojUC3XbdzLL7jaiMM+lsYGR6GKnKS2e4hBtX0TJ3oBwaNgXrAdSm+9oYBNpMJJhpaTbm5PmT4uOf/6wHrwpTKJOvICKsHXEdwa+x6wJot0wY37Z1Xv/Yfqz+k9YDi++H/UbrB/tHbvxr8Yt9v67Ud/R/qhkkxrQcU03pAMa0HLB+Lr96+0q4piB28+NTUetvLSz6k9YBiWg8opvWAYloPoPxPLwEPrLHrAR9lTswQQwQPrQfsvF/eEZHaZIpeMOQPUSSCC8w2rtN6QOO98AlWNKWPYCjUj1H8vHZQ/qfX/wGEP/wXYXxlVAAAAABJRU5ErkJggg==") !important;\n\
 			-moz-image-region: rect(0, 16px, 16px, 0) !important;\n\
 		}\n\
-		%button%[cb_cookies="default"]      { -moz-image-region: rect(0, 16px, 16px, 0)    !important; }\n\
-		%button%[cb_cookies="allow"]        { -moz-image-region: rect(0, 32px, 16px, 16px) !important; }\n\
-		%button%[cb_cookies="allowSession"] { -moz-image-region: rect(0, 48px, 16px, 32px) !important; }\n\
-		%button%[cb_cookies="deny"]         { -moz-image-region: rect(0, 64px, 16px, 48px) !important; }\n\
+		%button%[cb_cookies="default"]             { -moz-image-region: rect(0, 16px, 16px, 0)    !important; }\n\
+		%button%[cb_cookies="allow"]               { -moz-image-region: rect(0, 32px, 16px, 16px) !important; }\n\
+		%button%[cb_cookies="allowSession"]        { -moz-image-region: rect(0, 48px, 16px, 32px) !important; }\n\
+		%button%[cb_cookies="deny"]                { -moz-image-region: rect(0, 64px, 16px, 48px) !important; }\n\
 		%button%[cb_cookies="unknown"],\n\
-		%button%[cb_cookies="error"]        { -moz-image-region: rect(0, 80px, 16px, 64px) !important; }\n\
-		%button%[cb_cookies="notAvailable"] { -moz-image-region: rect(0, 96px, 16px, 80px) !important; }\n\
+		%button%[cb_cookies="error"]               { -moz-image-region: rect(0, 80px, 16px, 64px) !important; }\n\
+		%button%[cb_cookies="notAvailable"]        { -moz-image-region: rect(0, 96px, 16px, 80px) !important; }\n\
+		%button%[cb_cookies="defaultAllow"]        { -moz-image-region: rect(16px, 32px, 32px, 16px) !important; }\n\
+		%button%[cb_cookies="defaultAllowSession"] { -moz-image-region: rect(16px, 48px, 32px, 32px) !important; }\n\
+		%button%[cb_cookies="defaultDeny"]         { -moz-image-region: rect(16px, 64px, 32px, 48px) !important; }\n\
 	}'
 	.replace(/%windowURL%/g, window.location.href)
 	.replace(/%button%/g, "#" + this.id);
