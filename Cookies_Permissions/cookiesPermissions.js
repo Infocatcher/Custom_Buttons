@@ -1,4 +1,4 @@
-﻿// http://infocatcher.ucoz.net/js/cb/cookiesPermissions.js
+// http://infocatcher.ucoz.net/js/cb/cookiesPermissions.js
 
 // Cookies Permissions button for Custom Buttons
 // (code for "initialization" section)
@@ -147,6 +147,8 @@ this.permissions = {
 	PERMISSIONS_NOT_SUPPORTED: -1,
 	PERMISSIONS_ERROR:         -2,
 
+	errPrefix: "[Custom Buttons :: Cookies Permissions] ",
+
 	get pm() {
 		delete this.pm;
 		return this.pm = Components.classes["@mozilla.org/permissionmanager;1"]
@@ -249,7 +251,7 @@ this.permissions = {
 		));
 		var cbPopup = document.getElementById(this.button.defaultContextId);
 		if(!cbPopup)
-			Components.utils.reportError("[Custom Buttons :: Cookies Permissions]: cb menu not found");
+			Components.utils.reportError(this.errPrefix + "cb menu not found");
 		else {
 			cbPopup = cbPopup.cloneNode(true);
 			let id = "-" + this.button.id.match(/\d*$/)[0] + "-cloned";
@@ -294,7 +296,7 @@ this.permissions = {
 		this.oSvc.addObserver(this.permissionsObserver, "perm-changed", false);
 
 		if(this.options.showDefaultPolicy) {
-			var po = this.prefsObserver = {
+			let po = this.prefsObserver = {
 				context: this,
 				get prefs() {
 					delete this.prefs;
@@ -304,8 +306,12 @@ this.permissions = {
 						.getBranch("network.cookie.");
 				},
 				getIntPref: function(name) {
-					try { return this.prefs.getIntPref(name); }
-					catch(e) {}
+					try {
+						return this.prefs.getIntPref(name);
+					}
+					catch(e) {
+						Components.utils.reportError(e);
+					}
 					return 0;
 				},
 				observe: function(subject, topic, data) {
@@ -458,7 +464,7 @@ this.permissions = {
 			return this.io.newURI("http://" + host, null, null);
 		}
 		catch(e) {
-			Components.utils.reportError("[Custom Buttons :: Cookies Permissions] Invalid host: \"" + host + "\"");
+			Components.utils.reportError(this.errPrefix + "Invalid host: \"" + host + "\"");
 			throw e;
 		}
 	},
