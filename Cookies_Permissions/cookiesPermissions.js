@@ -19,6 +19,7 @@ var options = {
 		preserveCurrentSitesCookies: true
 	},
 	showDefaultPolicy: true,
+	useCookiesManagerPlus: true, // https://addons.mozilla.org/firefox/addon/cookies-manager-plus/
 	prefillMode: 1, // 0 - move caret to start, 1 - select all, 2 - move caret to end
 };
 
@@ -680,6 +681,11 @@ this.permissions = {
 		var host = this.options.useBaseDomain.showCookies
 			? this.currentBaseDomain
 			: this.currentHost;
+		if("coomanPlus" in window && "coomanPlusCore" in window && this.options.useCookiesManagerPlus) {
+			// https://addons.mozilla.org/firefox/addon/cookies-manager-plus/
+			this.showCookiesCMP(host);
+			return;
+		}
 		if(this.isSeaMonkey) {
 			this.showCookiesSM(host);
 			return;
@@ -699,6 +705,29 @@ this.permissions = {
 			host && win.addEventListener("load", setFilter, false);
 		}
 		this.tweakWindow(win);
+	},
+	showCookiesCMP: function(host) {
+		// See openCMP() function in resource://cookiesmanagerplus/coomanPlusCore.jsm
+		var win = coomanPlusCore.aWindow;
+		var _this = this;
+		var setFilter = function setFilter(e) {
+			e && win.removeEventListener("load", setFilter, false);
+			var doc = win.document;
+			setTimeout(function() { // Just loaded window aren't ready
+				_this.setTextboxValue(doc.getElementById("lookupcriterium"), host);
+			}, 0);
+		};
+		if(win) {
+			win.focus();
+			host && setFilter();
+		}
+		else {
+			win = window.openDialog(
+				"chrome://cookiesmanagerplus/content/cookiesmanagerplus.xul",
+				"coomanPlusWindow", "chrome,resizable=yes,toolbar=no,statusbar=no,scrollbar=no,centerscreen"
+			);
+			host && win.addEventListener("load", setFilter, false);
+		}
 	},
 	showCookiesSM: function(host) {
 		var win = this.wm.getMostRecentWindow("mozilla:cookieviewer");
