@@ -57,7 +57,7 @@ function _localize(sid) {
 			removeAllUnprotectedCookiesLabel: "Remove All Unprotected Cookies",
 			removeAllUnprotectedCookiesAccesskey: "R",
 			removeCurrentSiteCookiesLabel: "Remove All Current Site Cookies",
-			removeCurrentSiteCookiesAccesskey: "A",
+			removeCurrentSiteCookiesAccesskey: "C",
 			removeAllCookiesLabel: "Remove ALL Cookies",
 			removeAllCookiesAccesskey: "L",
 
