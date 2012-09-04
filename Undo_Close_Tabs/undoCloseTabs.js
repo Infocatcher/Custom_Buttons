@@ -1,4 +1,5 @@
 ﻿// http://infocatcher.ucoz.net/js/cb/undoCloseTabs.js
+// https://github.com/Infocatcher/Custom_Buttons/tree/master/Undo_Close_Tabs
 
 // Undo Close Tabs button for Custom Buttons
 // (code for "initialization" section)
