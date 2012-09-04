@@ -9,16 +9,20 @@
 // version 0.2.0pre9 - 2012-09-03
 
 var options = {
-	removeUnprotectedCookiesInterval: 30*60*1000, // -1 to disable
+	removeUnprotectedCookiesInterval: 30*60*1000,
+	// Periodically remove unprotected cookies (leave only cookies with "Allow" permission)
+	// Time in milliseconds or -1 to disable
 	removeAllUnprotectedCookies: false,
+	// true  - periodically ("removeUnprotectedCookiesInterval" option) remove all unprotected cookies
+	// false - or exclude cookies from opened sites
 	useBaseDomain: { // If set to true, will use short domain like google.com instead of www.google.com
-		addPermission: false,
-		openPermissions: false,
-		showCookies: true,
-		removeCurrentSiteCookies: true,
-		preserveCurrentSitesCookies: true
+		addPermission: false, // Add (and toggle) permission action
+		openPermissions: false,  // Filter in "Show Exceptions" window
+		showCookies: true, // Filter in "Show Cookies" window
+		removeCurrentSiteCookies: true, // For "Remove All Current Site Cookies" action
+		preserveCurrentSitesCookies: true // For "removeAllUnprotectedCookies: false"
 	},
-	showDefaultPolicy: true,
+	showDefaultPolicy: true, // Show default cookies policy
 	useCookiesManagerPlus: true, // https://addons.mozilla.org/firefox/addon/cookies-manager-plus/
 	prefillMode: 1, // 0 - move caret to start, 1 - select all, 2 - move caret to end
 };
@@ -52,9 +56,10 @@ function _localize(sid) {
 			showCookiesLabel: "Show Cookies…",
 			showCookiesAccesskey: "h",
 			removeUnprotectedCookiesLabel: "Remove Unprotected Cookies",
-			removeUnprotectedCookiesTip: "Except cookies from opened sites",
+			removeUnprotectedCookiesTip: "Except cookies marked as “Allow” and except cookies from opened sites",
 			removeUnprotectedCookiesAccesskey: "U",
 			removeAllUnprotectedCookiesLabel: "Remove All Unprotected Cookies",
+			removeAllUnprotectedCookiesTip: "Except cookies marked as “Allow”; unprotected cookies from opened sites will be removed",
 			removeAllUnprotectedCookiesAccesskey: "R",
 			removeCurrentSiteCookiesLabel: "Remove All Current Site Cookies",
 			removeCurrentSiteCookiesAccesskey: "C",
@@ -91,9 +96,10 @@ function _localize(sid) {
 			showCookiesLabel: "Показать cookies…",
 			showCookiesAccesskey: "П",
 			removeUnprotectedCookiesLabel: "Удалить незащищённые cookies",
-			removeUnprotectedCookiesTip: "Исключая cookies открытых сайтов",
+			removeUnprotectedCookiesTip: "Исключая cookies, помеченные как «Разрешить», и исключая cookies из открытых сайтов",
 			removeUnprotectedCookiesAccesskey: "н",
 			removeAllUnprotectedCookiesLabel: "Удалить все незащищённые cookies",
+			removeAllUnprotectedCookiesTip: "Исключая cookies, помеченные как «Разрешить»; незащищённые cookies из открытых сайтов будут удалены",
 			removeAllUnprotectedCookiesAccesskey: "д",
 			removeCurrentSiteCookiesLabel: "Удалить все cookies текущего сайта",
 			removeCurrentSiteCookiesAccesskey: "в",
@@ -234,6 +240,7 @@ this.permissions = {
 				<menuitem\
 					oncommand="this.parentNode.parentNode.permissions.removeUnprotectedCookies(true);"\
 					label="' + _localize("removeAllUnprotectedCookiesLabel") + '"\
+					tooltiptext="' + _localize("removeAllUnprotectedCookiesTip") + '"\
 					accesskey="' + _localize("removeAllUnprotectedCookiesAccesskey") + '" />\
 				<menuseparator />\
 				<menuitem\
