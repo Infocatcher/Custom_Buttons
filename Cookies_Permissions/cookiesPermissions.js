@@ -372,6 +372,7 @@ this.permissions = {
 			timerId: timerId,
 			interval: interval,
 			permissions: this,
+			storage: Application.storage, // Object from closed window can be not available, so cache it
 			get timer() {
 				delete this.timer;
 				return this.timer = Components.classes["@mozilla.org/timer;1"]
@@ -385,7 +386,7 @@ this.permissions = {
 			destroy: function() {
 				this.permissions.oSvc.removeObserver(this, "quit-application-granted");
 				this.timer.cancel();
-				Application.storage.set(this.timerId, null);
+				this.storage.set(this.timerId, null);
 				this.permissions = null;
 			},
 			handleEvent: function(e) {
