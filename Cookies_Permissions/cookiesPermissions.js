@@ -1,4 +1,4 @@
-// http://infocatcher.ucoz.net/js/cb/cookiesPermissions.js
+﻿// http://infocatcher.ucoz.net/js/cb/cookiesPermissions.js
 // http://forum.mozilla-russia.org/viewtopic.php?pid=580201
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Cookies_Permissions
 
@@ -468,7 +468,6 @@ this.permissions = {
 			.name == "SeaMonkey";
 	},
 	getURI: function(host) {
-		//if(host == "www.google.ru") host += "::: malformed test";
 		if(host.indexOf(":") != -1 && /^[:\da-f.]+$/.test(host)) // IPv6
 			host = "[" + host + "]";
 		try {
@@ -508,9 +507,6 @@ this.permissions = {
 
 		var mi = this.mp.getElementsByAttribute("cb_id", "removeCurrentSiteCookies")[0];
 		mi.hidden = noPermissions;
-		//var sep = mi.previousSibling;
-		//if(sep && sep.localName == "menuseparator")
-		//	sep.hidden = noPermissions;
 		if(!noPermissions)
 			mi.tooltipText = this.removeCurrentSiteCookiesHost;
 
@@ -566,7 +562,6 @@ this.permissions = {
 			var doc = win.document;
 			doc.getElementById("tabbox").selectedTab = doc.getElementById("permissionsTab");
 			_this.setTextboxValue(doc.getElementById("cookie-site"), host);
-			//win.buttonEnabling(tb);
 		};
 		if(win) {
 			win.focus();
