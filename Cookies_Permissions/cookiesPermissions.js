@@ -9,9 +9,9 @@
 // version 0.2.0pre9 - 2012-09-03
 
 var options = {
-	removeUnprotectedCookiesInterval: 30*60*1000,
+	removeUnprotectedCookiesInterval: -1,
 	// Periodically remove unprotected cookies (leave only cookies with "Allow" permission)
-	// Time in milliseconds or -1 to disable
+	// Time in milliseconds like 30*60*1000 (30 minutes) or -1 to disable
 	removeAllUnprotectedCookies: false,
 	// true  - periodically ("removeUnprotectedCookiesInterval" option) remove all unprotected cookies
 	// false - or exclude cookies from opened sites
