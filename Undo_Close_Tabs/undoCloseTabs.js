@@ -4,7 +4,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2009-2012
-// version 0.3.0pre12 - 2012-08-14
+// version 0.3.0pre13 - 2012-09-04
 
 var options = {
 	menuTemplate: [
@@ -33,6 +33,8 @@ var options = {
 function _localize(sid) {
 	var strings = {
 		en: {
+			restoreTab: "Restore the most recently closed tab",
+
 			restoreAllTabs: "Restore all tabs",
 			restoreAllTabsAccesskey: "t",
 			clearTabsHistory: "Clear history of closed tabs",
@@ -55,6 +57,8 @@ function _localize(sid) {
 			buttonMenuAccesskey: "m"
 		},
 		ru: {
+			restoreTab: "Восстановить последнюю закрытую вкладку",
+
 			restoreAllTabs: "Восстановить все вкладки",
 			restoreAllTabsAccesskey: "л",
 			clearTabsHistory: "Очистить историю закрытых вкладок",
@@ -550,7 +554,8 @@ this.undoCloseTabsList = {
 		return "moz-anno:favicon:" + src; // https://bugzilla.mozilla.org/show_bug.cgi?id=467828
 	},
 	updUI: function() {
-		var dis = !this.closedTabCount && !this.closedWindowCount;
+		var tabsCount = this.closedTabCount;
+		var dis = !tabsCount && !this.closedWindowCount;
 		if(
 			dis
 			&& this.options.useMenu
@@ -559,6 +564,16 @@ this.undoCloseTabsList = {
 		)
 			dis = false;
 		this.button.disabled = dis;
+		var lastTabTip = "";
+		if(tabsCount) {
+			//~ todo: try optimize JSON.parse() usage (can we use cached this._undoTabItems here?)
+			// Or update tooltipText only on mouseover
+			let undoTabItems = JSON.parse(this.ss.getClosedTabData(window));
+			let lastItem = undoTabItems[0];
+			lastTabTip = " \n" + lastItem.title
+				+ " \n" + lastItem.state.entries[lastItem.state.index - 1].url;
+		}
+		this.button.tooltipText = _localize("restoreTab") + lastTabTip;
 	},
 	updUIGlobal: function() {
 		var ws = Components.classes["@mozilla.org/appshell/window-mediator;1"]
