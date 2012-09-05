@@ -1,5 +1,6 @@
-// http://forum.mozilla-russia.org/viewtopic.php?pid=470532#p470532
 // http://infocatcher.ucoz.net/js/cb/attrsInspector.js
+// http://forum.mozilla-russia.org/viewtopic.php?pid=470532#p470532
+// https://github.com/Infocatcher/Custom_Buttons/tree/master/Attributes_Inspector
 
 // (c) Infocatcher 2010-2012
 // version 0.6.0pre10 - 2012-08-17
