@@ -27,6 +27,11 @@ var options = {
 	prefillMode: 1, // 0 - move caret to start, 1 - select all, 2 - move caret to end
 };
 
+// Uncomment following to move button to Status Bar in SeaMonkey:
+// (Be careful, has some side-effects and button can't be edited w/o restart)
+//this.classList.remove("toolbarbutton-1");
+//document.getElementById("statusbar-display").appendChild(this);
+
 function _localize(sid) {
 	var strings = {
 		en: {
