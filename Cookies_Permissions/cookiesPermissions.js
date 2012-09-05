@@ -6,7 +6,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2010-2012
-// version 0.2.0pre9 - 2012-09-03
+// version 0.2.0pre10 - 2012-09-05
 
 var options = {
 	removeUnprotectedCookiesInterval: -1,
@@ -23,6 +23,8 @@ var options = {
 		preserveCurrentSitesCookies: true // For "removeAllUnprotectedCookies: false"
 	},
 	showDefaultPolicy: true, // Show default cookies policy
+	toggleMode: Components.interfaces.nsICookiePermission.ACCESS_ALLOW,
+	// ACCESS_DENY, ACCESS_SESSION or ACCESS_ALLOW
 	useCookiesManagerPlus: true, // https://addons.mozilla.org/firefox/addon/cookies-manager-plus/
 	prefillMode: 1, // 0 - move caret to start, 1 - select all, 2 - move caret to end
 };
@@ -128,7 +130,7 @@ this.onclick = function(e) {
 	var but = e.button;
 	var hasModifier = this.permissions.hasModifier(e);
 	if(but == 0 && !hasModifier) {
-		this.permissions.togglePermission(this.permissions.cp.ACCESS_ALLOW);
+		this.permissions.togglePermission(this.permissions.options.toggleMode);
 		// Allow use "command" section only from hotkey:
 		e.preventDefault();
 		e.stopPropagation();
