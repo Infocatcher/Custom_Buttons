@@ -1896,5 +1896,49 @@ function destroy() {
 //=== Attributes Inspector end
 };
 
+// Move focus back to previous active window
+var focusManager = {
+	button: this,
+	focusedWindow: null,
+	outTimer: 0,
+	handleEvent: function(e) {
+		switch(e.type) {
+			case "mouseover":
+				clearTimeout(this.outTimer);
+				if(e.target == this.button) {
+					var focusedWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+						.getService(Components.interfaces.nsIWindowMediator)
+						.getMostRecentWindow(null);
+					this.focusedWindow = focusedWindow != window.top && focusedWindow;
+				}
+			break;
+			case "mouseout":
+				clearTimeout(this.outTimer);
+				var rel = e.relatedTarget;
+				if(!rel || !this.isChild(rel)) {
+					this.outTimer = setTimeout(function(_this) {
+						_this.focusedWindow = null;
+					}, 500, this);
+				}
+			break;
+			case "command":
+				if(this.focusedWindow) {
+					this.focusedWindow.focus();
+					this.focusedWindow = null;
+					clearTimeout(this.outTimer);
+				}
+		}
+	},
+	isChild: function(node) {
+		for(; node; node = node.parentNode)
+			if(node == this.button)
+				return true;
+		return false;
+	}
+};
+addEventListener("mouseover", focusManager, true, this);
+addEventListener("mouseout", focusManager, true, this);
+addEventListener("command", focusManager, true, this);
+
 this.type = "menu";
 this.orient = "horizontal";
