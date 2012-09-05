@@ -221,7 +221,13 @@ var cmds = this.commands = {
 		var ss = this.ss;
 		var state = ss.getWindowState(window);
 
-		var win = OpenBrowserWindow();
+		// In SeaMonkey OpenBrowserWindow() doesn't return link to opened window
+		//var win = OpenBrowserWindow();
+		var win = window.openDialog(
+			getBrowserURL(),
+			"_blank",
+			"chrome,all,dialog=no"
+		);
 		win.addEventListener("load", function restoreSession() {
 			win.removeEventListener("load", restoreSession, false);
 			ss.setWindowState(win, state, true);
