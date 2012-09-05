@@ -4,7 +4,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011-2012
-// version 0.2.0pre32 - 2012-08-15
+// version 0.2.0pre33 - 2012-08-21
 
 // Usage:
 //   Use middle-click or left+click with any modifier to add current tab
@@ -124,9 +124,28 @@ this.setAttribute("ondraggesture", "return this.bookmarks.handleDragStart(event)
 this.setAttribute("ondragover",    "return this.bookmarks.handleDragOver(event);");
 this.setAttribute("ondragexit",    "return this.bookmarks.handleDragExit(event);");
 this.setAttribute("ondragdrop",    "return this.bookmarks.handleDrop(event);");
+
+function _log() {
+	var cs = Components.classes["@mozilla.org/consoleservice;1"]
+		.getService(Components.interfaces.nsIConsoleService);
+	function ts() {
+		var d = new Date();
+		var ms = d.getMilliseconds();
+		return d.toLocaleFormat("%M:%S:") + "000".substr(String(ms).length) + ms;
+	}
+	_log = function() {
+		cs.logStringMessage(
+			"[Custom Buttons :: Session Bookmarks]: " + ts() + " "
+			+ Array.map(arguments, String).join("\n")
+		);
+	};
+	return _log.apply(this, arguments);
+}
+
 this.bookmarks = {
 	button: this,
 	options: options,
+	errPrefix: "[Custom Buttons :: Session Bookmarks]: ",
 
 	get openAllLabel() {
 		var sb = this.$("bundle_browser");
@@ -176,8 +195,18 @@ this.bookmarks = {
 			.get("ProfD", Components.interfaces.nsILocalFile || Components.interfaces.nsIFile);
 		file.append("custombuttons");
 		file.append("bookmarks-" + this.btnNum + ".txt");
+		file.QueryInterface(Components.interfaces.nsILocalFile || Components.interfaces.nsIFile);
+		this.ensureFilePermissions(file, 0600);
 		delete this.file;
-		return this.file = file.QueryInterface(Components.interfaces.nsILocalFile || Components.interfaces.nsIFile);
+		return this.file = file;
+	},
+	get backupFile() {
+		var file = this.file.clone();
+		file.leafName += ".bak";
+		file.QueryInterface(Components.interfaces.nsILocalFile || Components.interfaces.nsIFile);
+		this.ensureFilePermissions(file, 0600);
+		delete this.backupFile;
+		return this.backupFile = file;
 	},
 	$: function(id) {
 		return document.getElementById(id);
@@ -185,8 +214,10 @@ this.bookmarks = {
 
 	init: function() {
 		var file = this.file;
-		if(file.exists())
+		if(file.exists()) {
+			_log("init()");
 			this.readFromFileAsync(file, this.load, this);
+		}
 		else
 			this.load("");
 	},
@@ -198,6 +229,7 @@ this.bookmarks = {
 	_sep:     "separator",
 
 	load: function(data) {
+		_log("load()");
 		//if(this.button.firstChild) // Already initialized
 		//	return;
 		this.initIds();
@@ -247,6 +279,7 @@ this.bookmarks = {
 		mp.addEventListener("DOMMenuItemActive",   this.showLink, false);
 		mp.addEventListener("DOMMenuItemInactive", this.showLink, false);
 		this.showOpenAll();
+		_log("load() done");
 	},
 	initIds: function() {
 		this.initIds = function() {};
@@ -363,7 +396,7 @@ this.bookmarks = {
 
 		var cbPopup = this.$(this.button.defaultContextId);
 		if(!cbPopup)
-			Components.utils.reportError("[Custom Buttons :: Session Bookmarks]: cb menu not found");
+			Components.utils.reportError(this.errPrefix + "cb menu not found");
 		else {
 			cbPopup = cbPopup.cloneNode(true);
 			let id = "-" + this.btnNum + "-cloned";
@@ -414,19 +447,30 @@ this.bookmarks = {
 			},
 			this
 		);
-		this.writeToFileAsync(data.join("\n\n"), this.file, function(status, data) {
+		_log("copyFileAsync()");
+		this.copyFileAsync(this.file, this.backupFile, function(status) {
 			if(!Components.isSuccessCode(status))
-				return;
-			var ws = this.wm.getEnumerator("navigator:browser");
-			while(ws.hasMoreElements()) {
-				let w = ws.getNext();
-				if(w == window)
-					continue;
-				let btn = w.document.getElementById(this.button.id);
-				btn && btn.bookmarks.reload(data);
-			}
+				Components.utils.reportError(this.errPrefix + "copyFileAsync() failed");
+			else // Backup failed? But we still can try save user data.
+				_log("copyFileAsync() done");
+			this.writeToFileAsync(data.join("\n\n"), this.file, function(status, data) {
+				if(!Components.isSuccessCode(status)) {
+					Components.utils.reportError(this.errPrefix + "writeToFileAsync() failed");
+					return;
+				}
+				_log("writeToFileAsync() done");
+				var ws = this.wm.getEnumerator("navigator:browser");
+				while(ws.hasMoreElements()) {
+					let w = ws.getNext();
+					if(w == window)
+						continue;
+					let btn = w.document.getElementById(this.button.id);
+					btn && btn.bookmarks.reload(data);
+				}
+			}, this);
 		}, this);
 		this.unsaved = false;
+		_log("save() done");
 	},
 	scheduleSave: function() {
 		if(this.button.open || this.button.getAttribute("open") == "true")
@@ -472,7 +516,7 @@ this.bookmarks = {
 				ssData = JSON.stringify(data);
 			}
 			catch(e) {
-				Components.utils.reportError("[Session Bookmarks] getTabData: clear history failed");
+				Components.utils.reportError(this.errPrefix + "getTabData: clear history failed");
 				Components.utils.reportError(e);
 			}
 		}
@@ -638,7 +682,7 @@ this.bookmarks = {
 			ssData = JSON.stringify(newData);
 		}
 		catch(e) {
-			Components.utils.reportError("[Session Bookmarks] setTabSession: merge history failed");
+			Components.utils.reportError(this.errPrefix + "setTabSession: merge history failed");
 			Components.utils.reportError(e);
 		}
 		try {
@@ -660,7 +704,7 @@ this.bookmarks = {
 		}
 		catch(e) {
 			if(e != "empty ssData") {
-				Components.utils.reportError("[Session Bookmarks] setTabSession: setTabState() failed");
+				Components.utils.reportError(this.errPrefix + "setTabSession: setTabState() failed");
 				Components.utils.reportError(e);
 			}
 			uri && tab.linkedBrowser.loadURI(uri);
@@ -796,7 +840,7 @@ this.bookmarks = {
 		}
 		catch(e) {
 			Components.utils.reportError(
-				"[Custom Buttons :: Session Bookmarks]: undoRedoAction failed"
+				this.errPrefix + "undoRedoAction failed"
 				+ "\nData: " + uneval(o) + "\nIndert: " + invert
 			);
 			Components.utils.reportError(e);
@@ -1189,6 +1233,7 @@ this.bookmarks = {
 	escapeString: function(s) {
 		return s.replace(/\n/g, "\r");
 	},
+
 	writeToFileAsync: function(str, file, callback, context) {
 		try {
 			Components.utils.import("resource://gre/modules/NetUtil.jsm");
@@ -1196,8 +1241,15 @@ this.bookmarks = {
 		}
 		catch(e) {
 			this.writeToFileAsync = function(str, file, callback, context) {
-				this.writeToFile(str, file);
-				callback && callback.call(context || this, 0, str);
+				var status = Components.results.NS_ERROR_FILE_ACCESS_DENIED;
+				try {
+					this.writeToFile(str, file);
+					status = Components.results.NS_OK;
+				}
+				catch(e) {
+					Components.utils.reportError(e);
+				}
+				callback && callback.call(context || this, status, str);
 			};
 			this.writeToFileAsync.apply(this, arguments);
 			return;
@@ -1229,7 +1281,14 @@ this.bookmarks = {
 		}
 		catch(e) {
 			this.readFromFileAsync = function(file, callback, context) {
-				var data = this.readFromFile(file);
+				var status = Components.results.NS_ERROR_FILE_ACCESS_DENIED;
+				try {
+					var data = this.readFromFile(file);
+					status = Components.results.NS_OK;
+				}
+				catch(e) {
+					Components.utils.reportError(e);
+				}
 				callback.call(context || this, data, 0);
 			};
 			this.readFromFileAsync.apply(this, arguments);
@@ -1239,7 +1298,13 @@ this.bookmarks = {
 			var data = "";
 			if(Components.isSuccessCode(status)) {
 				try { // Firefox 7.0a1 throws after istream.available() on empty files
-					data = this.convertToUnicode(NetUtil.readInputStreamToString(istream, istream.available()));
+					data = NetUtil.readInputStreamToString(
+						istream,
+						istream.available(),
+						{ charset: "UTF-8", replacement: "\ufffd" } // Only Gecko 11.0+
+					);
+					if(NetUtil.readInputStreamToString.length < 3)
+						data = this.convertToUnicode(data);
 				}
 				catch(e) {
 				}
@@ -1270,6 +1335,56 @@ this.bookmarks = {
 			Components.utils.reportError(e);
 		}
 		return str;
+	},
+	copyFileAsync: function(file, newFile, callback, context) {
+		try {
+			throw "test";
+			Components.utils.import("resource://gre/modules/NetUtil.jsm");
+		}
+		catch(e) {
+			this.copyFileAsync = function(file, newFile, callback, context) {
+				var status = Components.results.NS_ERROR_FILE_COPY_OR_MOVE_FAILED;
+				try {
+					if(newFile.exists())
+						newFile.remove(true);
+					file.copyTo(newFile.parent, newFile.leafName);
+					status = Components.results.NS_OK;
+				}
+				catch(e) {
+					Components.utils.reportError(e);
+				}
+				callback.call(context || this, status);
+			};
+			this.copyFileAsync.apply(this, arguments);
+			return;
+		}
+		try {
+			_log("copyFileAsync: init streams");
+			var fis = Components.classes["@mozilla.org/network/file-input-stream;1"]
+				.createInstance(Components.interfaces.nsIFileInputStream);
+			fis.init(file, 0x01, 0444, 0);
+			var fos = Components.classes["@mozilla.org/network/file-output-stream;1"]
+				.createInstance(Components.interfaces.nsIFileOutputStream);
+			fos.init(newFile, 0x02 | 0x08 | 0x20, 0644, 0);
+			_log("copyFileAsync: init streams done");
+
+			NetUtil.asyncCopy(fis, fos, this.bind(function(status) {
+				callback.call(context || this, status);
+			}, this));
+		}
+		catch(e) {
+			Components.utils.reportError(e);
+			callback.call(context || this, Components.results.NS_ERROR_FILE_ACCESS_DENIED);
+		}
+	},
+	ensureFilePermissions: function(file, mask) {
+		try {
+			if(file.exists() && !(file.permissions & mask))
+				file.permissions |= mask;
+		}
+		catch(e) {
+			Components.utils.reportError(e);
+		}
 	},
 	bind: function(func, context, args) {
 		return function() {
