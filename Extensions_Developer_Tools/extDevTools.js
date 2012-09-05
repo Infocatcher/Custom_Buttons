@@ -4,7 +4,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011-2012
-// version 0.1.0pre11 - 2012-08-06
+// version 0.1.0pre12 - 2012-08-06
 
 // Includes Attributes Inspector
 // http://forum.mozilla-russia.org/viewtopic.php?pid=470532#p470532
@@ -151,15 +151,58 @@ this.onmouseover = function(e) {
 		this
 	);
 };
+this.onclick = function(e) {
+	if(e.target != this || e.button != 1)
+		return;
+	var defaultAction = this.commands.defaultAction;
+	if(!defaultAction)
+		return;
+	var mi = this.getElementsByAttribute("cb_id", defaultAction);
+	if(mi.length)
+		mi[0].doCommand();
+};
 
 var cmds = this.commands = {
 	options: options,
 	button: this,
+	get btnNum() {
+		delete this.btnNum;
+		return this.btnNum = this.button.id.match(/\d*$/)[0];
+	},
 	get ss() {
 		return (
 			Components.classes["@mozilla.org/browser/sessionstore;1"]
 			|| Components.classes["@mozilla.org/suite/sessionstore;1"]
 		).getService(Components.interfaces.nsISessionStore);
+	},
+	get defaultActionPref() {
+		delete this.defaultActionPref;
+		return this.defaultActionPref = "extensions.custombuttons.button" + this.btnNum + ".defaultAction";
+	},
+	get defaultAction() {
+		return this.getPref(this.defaultActionPref);
+	},
+	set defaultAction(val) {
+		if(!val)
+			this.prefSvc.clearUserPref(this.defaultActionPref);
+		else
+			this.setPref(this.defaultActionPref, val);
+	},
+	initMenu: function(menu) {
+		var defaultAction = this.defaultAction;
+		Array.forEach(
+			menu.getElementsByAttribute("cb_id", "*"),
+			function(mi) {
+				mi.setAttribute("default", mi.getAttribute("cb_id") == defaultAction);
+			}
+		);
+	},
+	setDefaultAction: function(mi) {
+		var action = mi.getAttribute("cb_id");
+		if(!action)
+			return;
+		this.defaultAction = this.defaultAction == action ? "" : action;
+		this.initMenu(mi.parentNode);
 	},
 	get canReopenWindow() {
 		var ss = this.ss;
@@ -351,7 +394,9 @@ var cmds = this.commands = {
 };
 
 this.appendChild(parseXULFromString('\
-	<menupopup xmlns="' + xulns + '">\
+	<menupopup xmlns="' + xulns + '"\
+		onpopupshowing="if(event.target == this) this.parentNode.commands.initMenu(this);"\
+		onclick="if(event.button == 1) this.parentNode.commands.setDefaultAction(event.target);">\
 		<menuitem cb_id="reopenWindow"\
 			oncommand="this.parentNode.parentNode.commands.reopenWindow();"\
 			hidden="' + !cmds.canReopenWindow + '"\
