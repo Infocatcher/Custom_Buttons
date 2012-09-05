@@ -1,4 +1,5 @@
 ﻿// http://infocatcher.ucoz.net/js/cb/extDevTools.js
+// https://github.com/Infocatcher/Custom_Buttons/tree/master/Extensions_Developer_Tools
 
 // Extensions Developer Tools button for Custom Buttons
 // (code for "initialization" section)
