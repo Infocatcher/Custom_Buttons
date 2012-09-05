@@ -4,7 +4,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011-2012
-// version 0.1.0pre12 - 2012-08-06
+// version 0.1.0pre12 - 2012-09-05
 
 // Includes Attributes Inspector
 // http://forum.mozilla-russia.org/viewtopic.php?pid=470532#p470532
@@ -527,7 +527,7 @@ this.attrsInspector = function() {
 // http://infocatcher.ucoz.net/js/cb/attrsInspector.js
 
 // (c) Infocatcher 2010-2012
-// version 0.6.0pre7 - 2012-07-07
+// version 0.6.0pre10 - 2012-08-17
 
 //===================
 // Attributes Inspector button for Custom Buttons
@@ -568,8 +568,13 @@ function _log() {
 		return _log = function() {};
 	var cs = Components.classes["@mozilla.org/consoleservice;1"]
 		.getService(Components.interfaces.nsIConsoleService);
+	function ts() {
+		var d = new Date();
+		var ms = d.getMilliseconds();
+		return d.toLocaleFormat("%M:%S:") + "000".substr(String(ms).length) + ms;
+	}
 	_log = function() {
-		cs.logStringMessage("[Attributes Inspector]: " + Array.map(arguments, String).join("\n"));
+		cs.logStringMessage("[Attributes Inspector]: " + ts() + " " + Array.map(arguments, String).join("\n"));
 	};
 	return _log.apply(this, arguments);
 }
@@ -640,6 +645,9 @@ function init() {
 	var tt = this.tt = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "tooltip");
 	tt.id = ttId;
 	tt.setAttribute("orient", "vertical");
+	//if("pointerEvents" in tt.style)
+	//	tt.style.pointerEvents = "none";
+	tt.setAttribute("mousethrough", "always");
 	top.document.documentElement.appendChild(tt);
 
 	// Resolve -moz-* and system colors (for copy tooltip contents feature)
@@ -657,11 +665,11 @@ function init() {
 		var sss = this.sss = Components.classes["@mozilla.org/content/style-sheet-service;1"]
 			.getService(Components.interfaces.nsIStyleSheetService);
 		var cssStr = '\
-			/* Attributes Inspector highlight styles */\
-			@namespace ains url("%ns%");\
-			%priorityHack%[ains|%attr%="true"] {\
-				outline: %borderWidth%px %borderStyle% %borderColor% !important;\
-				outline-offset: -%borderWidth%px !important;\
+			/* Attributes Inspector highlight styles */\n\
+			@namespace ains url("%ns%");\n\
+			%priorityHack%[ains|%attr%="true"] {\n\
+				outline: %borderWidth%px %borderStyle% %borderColor% !important;\n\
+				outline-offset: -%borderWidth%px !important;\n\
 			}'
 			.replace(/%ns%/g, this.hlAttrNS)
 			.replace(/%attr%/g, this.hlAttr)
@@ -697,14 +705,21 @@ function init() {
 		action("mouseover", h, true, w);
 		action("mousemove", h, true, w);
 		action("mouseout",  h, true, w);
+
+		action("draggesture", h, true, w);
+		action("dragover",    h, true, w);
+		action("dragexit",    h, true, w);
+
 		action("keydown",   h, true, w);
 		action("keypress",  h, true, w);
 		action("keyup",     h, true, w);
+
 		//if(action == rel || this.inspector) {
 		action("mousedown", h, true, w);
 		action("mouseup",   h, true, w);
 		action("click",     h, true, w);
 		//}
+
 		action("popupshown", h, true, w);
 		if(_forbidTooltips) {
 			action("popupshowing", h, true, w);
@@ -728,7 +743,6 @@ function init() {
 		window: window,
 		_hl: null,
 		_node: null,
-		_attrsWatcher: null,
 		_nodes: [],
 		handleEvent: function(e) {
 			this[e.type + "Handler"](e);
@@ -743,7 +757,6 @@ function init() {
 		},
 		getHeader: function(v, state) {
 			var e = this.s(v, "strong");
-			//e.style.fontWeight = "bold";
 			e.className = "attrsInspector-header";
 			state && this.setState(e, state);
 			return e;
@@ -786,8 +799,8 @@ function init() {
 				e.className += " attrsInspector-changed";
 			}
 		},
-		getItem: function(header, value, spaceSep, state) {
-			var overflowBox = this.e("div");
+		get overflowBox() {
+			var overflowBox = this._overflowBox = this.e("div");
 			overflowBox.style.overflow = "hidden";
 			overflowBox.className = "attrsInspector-itemContainer";
 
@@ -795,27 +808,66 @@ function init() {
 			item.style.lineHeight = "1.25";
 			item.style.maxHeight = "12.5em";
 			item.className = "attrsInspector-item";
+
+			overflowBox.appendChild(item);
+
+			this.__defineGetter__("overflowBox", function() {
+				return this._overflowBox.cloneNode(true);
+			});
+			return this.overflowBox;
+		},
+		getItem: function(header, value, spaceSep, state) {
+			var overflowBox = this.overflowBox;
+			var item = overflowBox.firstChild;
 			item.appendChild(this.getHeader(header, state));
 			if(value) {
 				item.appendChild(spaceSep ? this.space : this.separator);
 				item.appendChild(this.getValue(value, state));
 			}
-
-			overflowBox.appendChild(item);
 			return overflowBox;
+		},
+		_setDataLast: [0, 0, 0, 0, 0],
+		_setDataMinDelay: 5*150,
+		_setDataScheduled: false,
+		setDataProxy: function(node) {
+			if(this._setDataScheduled)
+				return;
+			var dt = this._setDataLast[0] + this._setDataMinDelay - Date.now();
+			if(dt > 0) {
+				this._setDataScheduled = true;
+				this.timer(function(node) {
+					if(node == this._node) {
+						this.setData.apply(this, arguments);
+						this.setDataProxyTime();
+					}
+					this._setDataScheduled = false;
+				}, this, dt, arguments);
+				return;
+			}
+			this.setData.apply(this, arguments);
+			this.setDataProxyTime();
+		},
+		setDataProxyTime: function() {
+			var a = this._setDataLast;
+			a.push(Date.now());
+			a.shift();
 		},
 		_hasData: false,
 		setData: function(node) {
 			var tt = this.context.tt;
 			this._hasData = true;
 
-			while(tt.hasChildNodes())
-				tt.removeChild(tt.lastChild);
+			//while(tt.hasChildNodes())
+			//	tt.removeChild(tt.lastChild);
+			tt.textContent = "";
+
+			var df = tt.ownerDocument.createDocumentFragment();
 
 			if(node.nodeType == node.DOCUMENT_NODE) {
-				tt.appendChild(this.getItem(node.nodeName));
-				tt.appendChild(this.getItem("documentURI", node.documentURI));
-				node.title && tt.appendChild(this.getItem("title", node.title));
+				df.appendChild(this.getItem(node.nodeName));
+				df.appendChild(this.getItem("documentURI", node.documentURI));
+				node.title && df.appendChild(this.getItem("title", node.title));
+				tt.appendChild(df);
 				return;
 			}
 
@@ -831,21 +883,23 @@ function init() {
 			var w = rect.width;
 			var h = rect.height;
 			if(!w && !h)
-				tt.appendChild(this.getItem(node.nodeName));
+				df.appendChild(this.getItem(node.nodeName));
 			else {
 				if(Math.floor(w) != w)
 					w = w.toFixed(3);
 				if(Math.floor(h) != h)
 					h = h.toFixed(3);
-				tt.appendChild(this.getItem(node.nodeName, "[" + w + "\xd7" + h + "]", true));
+				df.appendChild(this.getItem(node.nodeName, "[" + w + "\xd7" + h + "]", true));
 			}
 
 			var nodeNS = node.namespaceURI;
 			if(_showNamespaceURI/* && node.nodeName.indexOf(":") == -1*/)
-				tt.appendChild(this.getItem("namespaceURI", this.getNS(nodeNS)));
+				df.appendChild(this.getItem("namespaceURI", this.getNS(nodeNS)));
 
-			if(!node.attributes)
+			if(!node.attributes) {
+				tt.appendChild(df);
 				return;
+			}
 
 			var topAttrs = ["id", "class"].reverse();
 			if(this._node) {
@@ -892,15 +946,13 @@ function init() {
 				}
 				if(_showNamespaceURI && ns && ns != nodeNS && name.indexOf(":") == -1)
 					name += " [" + this.getNS(ns) + "]";
-				tt.appendChild(this.getItem(name, val, false, {
+				df.appendChild(this.getItem(name, val, false, {
 					isAdded:   name in addedAttrs && addedAttrs[name] == ns,
 					isChanged: name in changedAttrs && changedAttrs[name] == ns,
 					isRemoved: name in removedAttrs && removedAttrs[name].namespaceURI == ns
 				}));
 			}, this);
-
-			if(this.fxVersion >= 16) //~ todo: check after Firefox 16 will be released
-				this.forceRedraw(tt);
+			tt.appendChild(df);
 		},
 		getNS: function(ns) {
 			if(_showNamespaceURI == 1)
@@ -966,6 +1018,34 @@ function init() {
 			"stopImmediatePropagation" in e && e.stopImmediatePropagation();
 			//_log("stopEvent: " + e.type);
 		},
+		_timers: [],
+		timer: function(callback, context, delay, args) {
+			var timer = Components.classes["@mozilla.org/timer;1"]
+				.createInstance(Components.interfaces.nsITimer);
+			var _timers = this._timers;
+			var id = _timers.push(timer) - 1;
+			timer.init({
+				observe: function(subject, topic, data) {
+					delete _timers[id];
+					callback.apply(context, args);
+				}
+			}, delay || 0, timer.TYPE_ONE_SHOT);
+			return id;
+		},
+		cancelTimer: function(id) {
+			var _timers = this._timers;
+			if(id in _timers) {
+				_timers[id].cancel();
+				delete _timers[id];
+			}
+		},
+		destroyTimers: function() {
+			var _timers = this._timers;
+			for(var id in _timers) if(_timers.hasOwnProperty(id))
+				_timers[id].cancel();
+			//_timers.length = 0;
+			_timers.splice(0);
+		},
 		get flasher() {
 			var flasher = Components.classes["@mozilla.org/inspector/flasher;1"]
 				.getService(Components.interfaces.inIFlasher);
@@ -986,7 +1066,7 @@ function init() {
 
 			if(_highlightUsingFlasher) {
 				this.flasher.drawElementOutline(node);
-				this._hlInterval = setInterval(function(_this) {
+				this._hlInterval = node.ownerDocument.defaultView.setInterval(function(_this) {
 					_this.flasher.drawElementOutline(node);
 				}, 10, this);
 				return;
@@ -999,9 +1079,6 @@ function init() {
 				//return;
 			}
 			node.setAttributeNS(this.context.hlAttrNS, this.context.hlAttr, "true");
-
-			if(this.fxVersion >= 16) //~ todo: check after Firefox 16 will be released
-				this.forceRedraw(node);
 		},
 		unhl: function() {
 			var node = this._hl;
@@ -1014,7 +1091,7 @@ function init() {
 			if(_highlightUsingFlasher) {
 				this.flasher.repaintElement(node);
 				this.flasher.repaintElement(node.ownerDocument.documentElement);
-				clearInterval(this._hlInterval);
+				node.ownerDocument.defaultView.clearInterval(this._hlInterval);
 				return;
 			}
 
@@ -1026,15 +1103,6 @@ function init() {
 				//return;
 			}
 			node.removeAttributeNS(this.context.hlAttrNS, this.context.hlAttr);
-		},
-		forceRedraw: function(node) {
-			//~ todo: not needed since 2012-07-04 ?
-			/*
-			var _this = this;
-			setTimeout(function() {
-				_this.flasher.repaintElement(node);
-			}, 50);
-			*/
 		},
 
 		get mutationObserver() {
@@ -1085,17 +1153,17 @@ function init() {
 		},
 		handleMutations: function(mutations) {
 			mutations.forEach(function(mutation) {
-				if(mutation.type != "attributes" || mutation.target != this._node)
+				var node = mutation.target;
+				if(mutation.type != "attributes" || node != this._node)
 					return;
-				this.handleMutation(
-					mutation.attributeName,
-					mutation.attributeNamespace,
-					mutation.oldValue === null, // isAdded
-					!mutation.target.hasAttributeNS(mutation.attributeNamespace, mutation.attributeName), // isRemoved
-					mutation.oldValue
-				);
+				var attrName = mutation.attributeName;
+				var attrNS = mutation.attributeNamespace;
+				var oldVal = mutation.oldValue;
+				var isAdded = oldVal === null;
+				var isRemoved = !node.hasAttributeNS(attrNS, attrName);
+				this.handleMutation(attrName, attrNS, isAdded, isRemoved, oldVal);
 			}, this);
-			this.setData(this._node);
+			this.setDataProxy(this._node);
 		},
 		DOMAttrModifiedHandler: function(e) {
 			if(e.originalTarget != this._node) // Ignore mutations in child nodes
@@ -1107,7 +1175,7 @@ function init() {
 				e.attrChange == e.REMOVAL,
 				e.prevValue
 			);
-			this.setData(this._node);
+			this.setDataProxy(this._node);
 		},
 		handleMutation: function(attrName, attrNS, isAdded, isRemoved, oldValue) {
 			if(isAdded) {
@@ -1146,11 +1214,13 @@ function init() {
 			cb.setData(ta, null, clipId === undefined ? cb.kGlobalClipboard : clipId);
 		},
 		_noMouseover: false,
-		_noMouseoverTimer: null,
+		_noMouseoverTimer: -1,
 		mouseoverHandler: function(e) {
 			if(this._noMouseover)
 				return;
 			var node = e.originalTarget;
+			if(node == this.context.tt)
+				return;
 			this._nodes = [node];
 			this.handleNodeFromEvent(node, e);
 		},
@@ -1164,22 +1234,15 @@ function init() {
 			// Tooltip with big height -> wrongly under cursor -> reposition -> mouseover
 			// And setTimeout() in parent window fail for modal child window
 			if(this._noMouseover)
-				this._noMouseoverTimer.cancel();
+				this.cancelTimer(this._noMouseoverTimer);
 			this._noMouseover = true;
 
 			this.handleNodeFromEvent(node);
 
-			var timer = this._noMouseoverTimer || (
-				this._noMouseoverTimer = Components.classes["@mozilla.org/timer;1"]
-					.createInstance(Components.interfaces.nsITimer)
-			);
-			var observer = {
-				context: this,
-				observe: function() {
-					this.context._noMouseover = false;
-				}
-			};
-			timer.init(observer, 200, timer.TYPE_ONE_SHOT);
+			this._noMouseoverTimer = this.timer(function() {
+				this._noMouseover = false;
+				this._noMouseoverTimer = null;
+			}, this, 200);
 		},
 		mousemoveHandler: function(e) {
 			var tt = this.context.tt;
@@ -1189,17 +1252,25 @@ function init() {
 				return;
 			}
 
+			var x, y;
 			if(e) {
-				this._lastScreenX = e.screenX;
-				this._lastScreenY = e.screenY;
+				x = e.screenX;
+				y = e.screenY;
+				if(
+					"_lastScreenX" in this
+					&& x == this._lastScreenX
+					&& y == this._lastScreenY
+				)
+					return;
+
+				this._lastScreenX = x;
+				this._lastScreenY = y;
 
 				this._shiftKey = e.shiftKey;
 			}
 			else {
-				e = {
-					screenX: this._lastScreenX || 0,
-					screenY: this._lastScreenY || 0
-				};
+				x = this._lastScreenX || 0;
+				y = this._lastScreenY || 0;
 			}
 
 			var fxVersion = this.fxVersion;
@@ -1209,28 +1280,24 @@ function init() {
 				var text = Array.map(tt.childNodes, function(node) {
 					return node.textContent;
 				}).join("\n");
-				while(tt.hasChildNodes())
-					tt.removeChild(tt.lastChild);
-				var d = top.document.createElementNS(
-					"http://www.w3.org/1999/xhtml",
-					"div"
-				);
+				//while(tt.hasChildNodes())
+				//	tt.removeChild(tt.lastChild);
+				tt.textContent = "";
+				var d = this.e("div");
 				d.style.whiteSpace = "-moz-pre-wrap";
 				d.textContent = text;
 				tt.height = null;
-				tt.insertBefore(d, tt.firstChild);
+				tt.appendChild(d);
 				tt.height = tt.boxObject.height;
 			}
 
 			if("openPopupAtScreen" in tt) // Firefox 3.0+
-				tt.openPopupAtScreen(e.screenX, e.screenY, false /*isContextMenu*/);
+				tt.openPopupAtScreen(x, y, false /*isContextMenu*/);
 			else
-				tt.showPopup(document.documentElement, e.screenX, e.screenY, "tooltip", null, null);
+				tt.showPopup(document.documentElement, x, y, "tooltip", null, null);
 
 			if(fxVersion <= 2)
 				return;
-			var x = e.screenX;
-			var y = e.screenY;
 			if(fxVersion <= 3.5) {
 				x = Math.min(screen.width  - tt.boxObject.width,  x);
 				y = Math.min(screen.height - tt.boxObject.height, y);
@@ -1247,6 +1314,21 @@ function init() {
 				this.context.tt.hidePopup();
 			this.unwatchAttrs();
 			this.unhl();
+		},
+		draggestureHandler: function(e) {
+			this.makeTooltipTopmost();
+			_log(e.type + " => make tooltip topmost");
+		},
+		dragoverHandler: function(e) {
+			var node = e.originalTarget || e.target;
+			if(node != this._node)
+				this.mouseoverHandler(e);
+			else
+				this.mousemoveHandler(e);
+		},
+		dragexitHandler: function(e) {
+			if(!e.relatedTarget && this._node)
+				this.mouseoutHandler(e);
 		},
 		keydownHandler: function(e) {
 			this._shiftKey = e.shiftKey;
@@ -1368,13 +1450,13 @@ function init() {
 				tt.className += " attrsInspector-copied";
 			//tt.style.opacity = "0.75";
 			tt.style.color = "grayText";
-			setTimeout(function() {
+			this.timer(function() {
 				tt.className = tt.className
 					.replace(/(?:^|\s)attrsInspector-copied(?:\s|$)/, " ")
 					.replace(/\s+$/, "");
 				//tt.style.opacity = "";
 				tt.style.color = "";
-			}, 150);
+			}, this, 150);
 		},
 		stopSingleEvent: function(target, type) {
 			target.addEventListener(type, {
@@ -1460,8 +1542,8 @@ function init() {
 				domiWindow: null,
 				window: top,
 				popup: popup,
-				ww: Components.classes["@mozilla.org/embedcomp/window-watcher;1"]
-					.getService(Components.interfaces.nsIWindowWatcher),
+				tt: this.context.tt,
+				ww: this.context.ww,
 				closeMenus: this.closeMenus,
 				stopEvent: this.stopEvent,
 				stopSingleEvent: this.stopSingleEvent,
@@ -1496,14 +1578,18 @@ function init() {
 				handleEvent: function(e) {
 					switch(e.type) {
 						case "popupshowing":
-							this.stopEvent(e);
 							var popup = e.originalTarget;
+							if(popup == this.tt)
+								break;
+							this.stopEvent(e);
 							_log("Popup locker: prevent popup showing: " + this._getPopupInfo(popup));
 						break;
 						case "popuphiding":
+							var popup = e.originalTarget;
+							if(popup == this.tt)
+								break;
 							//if(e.originalTarget == this.popup)
 							this.stopEvent(e);
-							var popup = e.originalTarget;
 							_log("Popup locker: prevent popup hiding: " + this._getPopupInfo(popup));
 							if(this._popups.indexOf(popup) == -1)
 								this._popups.push(popup);
@@ -1596,10 +1682,12 @@ function init() {
 			var tar = e.originalTarget;
 			if(tar.id == this.context.ttId || /*this._shiftKey && */tar.localName == "tooltip")
 				return;
-			// Make tooltip topmost
-			tt.hidePopup(); // Ugly with show/hide tooltips animation
-			this.mousemoveHandler();
-			_log("popupshown => make tooltip topmost");
+			this.makeTooltipTopmost(true);
+			_log(e.type + " => make tooltip topmost");
+		},
+		makeTooltipTopmost: function(restorePos) {
+			this.context.tt.hidePopup(); // Ugly with show/hide tooltips animation
+			restorePos && this.mousemoveHandler();
 		},
 		popuphidingHandler: function(e) {
 			if(!this._shiftKey)
@@ -1786,7 +1874,7 @@ function destroy() {
 	var ehg = this.evtHandlerGlobal;
 	ehg.unwatchAttrs();
 	ehg.unhl();
-	ehg._noMouseoverTimer && ehg._noMouseoverTimer.cancel();
+	ehg.destroyTimers();
 	if(!_highlightUsingFlasher) {
 		var sss = this.sss;
 		var cssURI = this.cssURI;
