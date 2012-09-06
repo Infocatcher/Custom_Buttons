@@ -30,7 +30,7 @@ var options = {
 	moveToSeaMonkeyStatusBar: {
 		// Move button to Status Bar, only for SeaMonkey
 		// Be careful, has some side-effects and button can't be edited w/o restart
-		enabled: true,
+		enabled: false,
 		insertAfter: "popupIcon,statusbar-progresspanel"
 		// Like https://developer.mozilla.org/en-US/docs/XUL/Attribute/insertafter
 		// Also looks for nodes with "cb_id" attribute
