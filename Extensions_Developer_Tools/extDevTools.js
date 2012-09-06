@@ -234,7 +234,9 @@ var cmds = this.commands = {
 			if("forgetClosedWindow" in ss) {
 				window.addEventListener("unload", function clearUndo(e) {
 					window.removeEventListener("unload", clearUndo, false);
-					var state = JSON.stringify(JSON.parse(ss.getWindowState(window)).windows[0]);
+					var stateObj = JSON.parse(ss.getWindowState(window)).windows[0];
+					delete stateObj._shouldRestore;
+					var state = JSON.stringify(stateObj);
 					win.setTimeout(function() {
 						var closed = JSON.parse(ss.getClosedWindowData());
 						for(var i = 0, l = closed.length; i < l; ++i) {
