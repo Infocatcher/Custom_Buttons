@@ -325,8 +325,8 @@ this.permissions = {
 					delete this.prefs;
 					return this.prefs = Components.classes["@mozilla.org/preferences-service;1"]
 						.getService(Components.interfaces.nsIPrefService)
-						.QueryInterface(Components.interfaces.nsIPrefBranch2 || Components.interfaces.nsIPrefBranch)
-						.getBranch("network.cookie.");
+						.getBranch("network.cookie.")
+						.QueryInterface(Components.interfaces.nsIPrefBranch2 || Components.interfaces.nsIPrefBranch);
 				},
 				getIntPref: function(name) {
 					try {
