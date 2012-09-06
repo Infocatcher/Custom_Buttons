@@ -82,11 +82,15 @@ function compactWindow(win) {
 		document.firstChild
 	);
 
-	var tabsAutoHide = cbu.getPrefs("browser.tabs.autoHide");
-	if(!tabsAutoHide) {
-		cbu.setPrefs("browser.tabs.autoHide", true);
-		setTimeout(function() {
+	var tc = win.gBrowser.tabContainer;
+	var origUpdateVisibility = tc.updateVisibility;
+	tc.updateVisibility = function() {
+		var tabsAutoHide = cbu.getPrefs("browser.tabs.autoHide");
+		if(!tabsAutoHide)
+			cbu.setPrefs("browser.tabs.autoHide", true);
+		var ret = origUpdateVisibility.apply(this, arguments);
+		if(!tabsAutoHide)
 			cbu.setPrefs("browser.tabs.autoHide", false);
-		}, 100);
-	}
+		return ret;
+	};
 }
