@@ -432,15 +432,8 @@ this.permissions = {
 			return;
 
 		var btn = this.button;
-		// Make <toolbarbutton> looks like <image>
-		btn.classList.remove("toolbarbutton-1");
-		btn.removeAttribute("label");
-		btn.setAttribute("style", '\
-			-moz-appearance: none !important;\
-			border: none !important;\
-			margin: 0 !important;\
-			padding: 0 !important;'
-		);
+		// Make <toolbarbutton> looks like <image>, see CSS
+		btn.className += " custombuttons-insideStatusbarpanel";
 		// And insert it into <statusbarpanel>
 		var spId = btn.id + "-statusbarpanel";
 		var sp = document.getElementById(spId);
@@ -918,6 +911,22 @@ var cssStr = '\
 		%button%[cb_cookies="defaultAllow"]        { -moz-image-region: rect(16px, 32px, 32px, 16px) !important; }\n\
 		%button%[cb_cookies="defaultAllowSession"] { -moz-image-region: rect(16px, 48px, 32px, 32px) !important; }\n\
 		%button%[cb_cookies="defaultDeny"]         { -moz-image-region: rect(16px, 64px, 32px, 48px) !important; }\n\
+		/* "moveToSeaMonkeyStatusBar" option */\n\
+		%button%.custombuttons-insideStatusbarpanel {\n\
+			-moz-appearance: none !important;\n\
+			border: none !important;\n\
+			margin: 0 !important;\n\
+			padding: 0 !important;\n\
+			min-width: 0 !important;\n\
+			max-width: none !important;\n\
+		}\n\
+		%button%.custombuttons-insideStatusbarpanel > .toolbarbutton-icon {\n\
+			margin: 0 !important;\n\
+			padding: 0 !important;\n\
+		}\n\
+		%button%.custombuttons-insideStatusbarpanel > .toolbarbutton-text {\n\
+			display: none !important;\n\
+		}\n\
 	}'
 	.replace(/%windowURL%/g, window.location.href)
 	.replace(/%button%/g, "#" + this.id);
