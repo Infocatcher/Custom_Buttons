@@ -27,11 +27,12 @@ var options = {
 	// ACCESS_DENY, ACCESS_SESSION or ACCESS_ALLOW
 	useCookiesManagerPlus: true, // https://addons.mozilla.org/firefox/addon/cookies-manager-plus/
 	prefillMode: 1, // 0 - move caret to start, 1 - select all, 2 - move caret to end
-	moveToSeaMonkeyStatusBar: {
+	confirmRemoval: true,
+	moveToStatusBar: {
 		// Move button to Status Bar, only for SeaMonkey
 		// Be careful, has some side-effects and button can't be edited w/o restart
 		enabled: false,
-		insertAfter: "popupIcon,statusbar-progresspanel"
+		insertAfter: "download-monitor,popupIcon,statusbar-progresspanel"
 		// Like https://developer.mozilla.org/en-US/docs/XUL/Attribute/insertafter
 		// Also looks for nodes with "cb_id" attribute
 	}
@@ -68,13 +69,17 @@ function _localize(sid) {
 			removeUnprotectedCookiesLabel: "Remove Unprotected Cookies",
 			removeUnprotectedCookiesTip: "Except cookies marked as “Allow” and except cookies from opened sites",
 			removeUnprotectedCookiesAccesskey: "U",
+			removeUnprotectedCookiesConfirm: "Remove unprotected cookies?",
 			removeAllUnprotectedCookiesLabel: "Remove All Unprotected Cookies",
 			removeAllUnprotectedCookiesTip: "Except cookies marked as “Allow”; unprotected cookies from opened sites will be removed",
 			removeAllUnprotectedCookiesAccesskey: "R",
+			removeAllUnprotectedCookiesConfirm: "Remove ALL unprotected cookies?",
 			removeCurrentSiteCookiesLabel: "Remove All Current Site Cookies",
 			removeCurrentSiteCookiesAccesskey: "C",
+			removeCurrentSiteCookiesConfirm: "Remove ALL current site cookies?",
 			removeAllCookiesLabel: "Remove ALL Cookies",
 			removeAllCookiesAccesskey: "L",
+			removeAllCookiesConfirm: "Remove ALL cookies?",
 
 			buttonMenu: "Button Menu",
 			buttonMenuAccesskey: "M"
@@ -108,13 +113,17 @@ function _localize(sid) {
 			removeUnprotectedCookiesLabel: "Удалить незащищённые cookies",
 			removeUnprotectedCookiesTip: "Исключая cookies, помеченные как «Разрешить», и исключая cookies из открытых сайтов",
 			removeUnprotectedCookiesAccesskey: "н",
+			removeUnprotectedCookiesConfirm: "Удалить незащищённые cookies?",
 			removeAllUnprotectedCookiesLabel: "Удалить все незащищённые cookies",
 			removeAllUnprotectedCookiesTip: "Исключая cookies, помеченные как «Разрешить»; незащищённые cookies из открытых сайтов будут удалены",
 			removeAllUnprotectedCookiesAccesskey: "д",
+			removeAllUnprotectedCookiesConfirm: "Удалить ВСЕ незащищённые cookies?",
 			removeCurrentSiteCookiesLabel: "Удалить все cookies текущего сайта",
 			removeCurrentSiteCookiesAccesskey: "в",
+			removeCurrentSiteCookiesConfirm: "Удалить все cookies текущего сайта?",
 			removeAllCookiesLabel: "Удалить ВСЕ cookies",
 			removeAllCookiesAccesskey: "Е",
+			removeAllCookiesConfirm: "Удалить ВСЕ cookies?",
 
 			buttonMenu: "Меню кнопки",
 			buttonMenuAccesskey: "М"
@@ -204,8 +213,8 @@ this.permissions = {
 			return;
 		this.initialized = true;
 
-		if(this.isSeaMonkey && this.options.moveToSeaMonkeyStatusBar.enabled)
-			this.moveToSeaMonkeyStatusBar();
+		if(this.options.moveToStatusBar.enabled)
+			this.moveToStatusBar();
 
 		this.mpId = this.button.id + "-context";
 		var cp = this.cp;
@@ -246,24 +255,24 @@ this.permissions = {
 					accesskey="' + _localize("showCookiesAccesskey") + '" />\
 				<menuseparator />\
 				<menuitem\
-					oncommand="this.parentNode.parentNode.permissions.removeUnprotectedCookies(false);"\
+					oncommand="this.parentNode.parentNode.permissions.confirm(\'removeUnprotectedCookiesConfirm\', \'removeUnprotectedCookies\', false);"\
 					label="' + _localize("removeUnprotectedCookiesLabel") + '"\
 					tooltiptext="' + _localize("removeUnprotectedCookiesTip") + '"\
 					accesskey="' + _localize("removeUnprotectedCookiesAccesskey") + '" />\
 				<menuitem\
-					oncommand="this.parentNode.parentNode.permissions.removeUnprotectedCookies(true);"\
+					oncommand="this.parentNode.parentNode.permissions.confirm(\'removeAllUnprotectedCookiesConfirm\', \'removeUnprotectedCookies\', true);"\
 					label="' + _localize("removeAllUnprotectedCookiesLabel") + '"\
 					tooltiptext="' + _localize("removeAllUnprotectedCookiesTip") + '"\
 					accesskey="' + _localize("removeAllUnprotectedCookiesAccesskey") + '" />\
 				<menuseparator />\
 				<menuitem\
 					cb_id="removeCurrentSiteCookies"\
-					oncommand="this.parentNode.parentNode.permissions.removeCurrentSiteCookies();"\
+					oncommand="this.parentNode.parentNode.permissions.confirm(\'removeCurrentSiteCookiesConfirm\', \'removeCurrentSiteCookies\');"\
 					label="' + _localize("removeCurrentSiteCookiesLabel") + '"\
 					accesskey="' + _localize("removeCurrentSiteCookiesAccesskey") + '" />\
 				<menuitem\
 					cb_id="removeAllCookies"\
-					oncommand="this.parentNode.parentNode.permissions.removeCookies();"\
+					oncommand="this.parentNode.parentNode.permissions.confirm(\'removeAllCookiesConfirm\', \'removeCookies\');"\
 					label="' + _localize("removeAllCookiesLabel") + '"\
 					accesskey="' + _localize("removeAllCookiesAccesskey") + '" />\
 				<menuseparator />\
@@ -419,9 +428,9 @@ this.permissions = {
 		Application.storage.set(timerId, timer);
 		timer.init();
 	},
-	moveToSeaMonkeyStatusBar: function() {
+	moveToStatusBar: function() {
 		var insPoint;
-		this.options.moveToSeaMonkeyStatusBar.insertAfter
+		this.options.moveToStatusBar.insertAfter
 			.split(/,\s*/)
 			.some(function(id) {
 				insPoint = document.getElementsByAttribute("cb_id", id)[0]
@@ -789,6 +798,15 @@ this.permissions = {
 			host && win.addEventListener("load", setFilter, false);
 		}
 	},
+	confirm: function(msg, method/*, arg1, arg2*/) {
+		if(
+			!this.options.confirmRemoval
+			|| Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
+				.getService(Components.interfaces.nsIPromptService)
+				.confirm(window, _localize("Cookies Permissions"), _localize(msg))
+		)
+			this[method].apply(this, Array.slice(arguments, 2));
+	},
 	removeUnprotectedCookies: function(removeAll) {
 		if(removeAll == undefined)
 			removeAll = this.options.removeAllUnprotectedCookies;
@@ -911,7 +929,7 @@ var cssStr = '\
 		%button%[cb_cookies="defaultAllow"]        { -moz-image-region: rect(16px, 32px, 32px, 16px) !important; }\n\
 		%button%[cb_cookies="defaultAllowSession"] { -moz-image-region: rect(16px, 48px, 32px, 32px) !important; }\n\
 		%button%[cb_cookies="defaultDeny"]         { -moz-image-region: rect(16px, 64px, 32px, 48px) !important; }\n\
-		/* "moveToSeaMonkeyStatusBar" option */\n\
+		/* "moveToStatusBar" option */\n\
 		%button%.custombuttons-insideStatusbarpanel {\n\
 			-moz-appearance: none !important;\n\
 			border: none !important;\n\
