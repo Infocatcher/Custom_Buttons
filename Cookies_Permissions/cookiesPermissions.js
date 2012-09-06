@@ -29,7 +29,7 @@ var options = {
 	prefillMode: 1, // 0 - move caret to start, 1 - select all, 2 - move caret to end
 	confirmRemoval: true,
 	moveToStatusBar: {
-		// Move button to Status Bar, only for SeaMonkey
+		// Move button to Status Bar, only for SeaMonkey or Firefox < 4.0
 		// Be careful, has some side-effects and button can't be edited w/o restart
 		enabled: false,
 		insertAfter: "download-monitor,popupIcon,statusbar-progresspanel"
