@@ -85,13 +85,4 @@ function compactWindow(win) {
 		),
 		document.firstChild
 	);
-
-	var tc = win.gBrowser.tabContainer;
-	//eval(
-	//	"tc.updateVisibility = " + tc.updateVisibility.toString()
-	//		.replace(/\s*&&\s*![\w.]+\("browser\.tabs\.autoHide"\)/, "")
-	//);
-	tc.updateVisibility = function() {
-		this.visible = false;
-	};
 }
