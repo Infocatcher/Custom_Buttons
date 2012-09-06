@@ -23,8 +23,11 @@ function detachTab() {
 	var opts = "chrome,dialog=no,all";
 	//var opts = "chrome,dialog=0,resizable=1,location=0";
 	var w = btn._detachedWindow = window.openDialog(getBrowserURL(), "_blank", opts, selectedTab);
-	var initDetachedWindow = function loader(e) {
-		w.removeEventListener(e.type, loader, false);
+	var autoHide = cbu.getPrefs("browser.tabs.autoHide");
+	if(!autoHide)
+		cbu.setPrefs("browser.tabs.autoHide", true);
+	var initDetachedWindow = function init(e) {
+		w.removeEventListener(e.type, init, false);
 		w.addEventListener("unload", destroyDetachedWindow, false);
 		compactWindow(w);
 	};
@@ -32,10 +35,11 @@ function detachTab() {
 		w.removeEventListener(e.type, destroy, false);
 		window.removeEventListener("unload", destroyParentWindow, false);
 		_attachTab();
+		if(!autoHide)
+			cbu.setPrefs("browser.tabs.autoHide", false);
 	};
 	var destroyParentWindow = function destroy(e) {
-		window.removeEventListener(e.type, initDetachedWindow, false);
-		w.removeEventListener("load", loader, false);
+		w.removeEventListener("load", initDetachedWindow, false);
 		destroyDetachedWindow(e);
 	};
 	w.addEventListener("load", initDetachedWindow, false);
@@ -83,14 +87,11 @@ function compactWindow(win) {
 	);
 
 	var tc = win.gBrowser.tabContainer;
-	var origUpdateVisibility = tc.updateVisibility;
+	//eval(
+	//	"tc.updateVisibility = " + tc.updateVisibility.toString()
+	//		.replace(/\s*&&\s*![\w.]+\("browser\.tabs\.autoHide"\)/, "")
+	//);
 	tc.updateVisibility = function() {
-		var tabsAutoHide = cbu.getPrefs("browser.tabs.autoHide");
-		if(!tabsAutoHide)
-			cbu.setPrefs("browser.tabs.autoHide", true);
-		var ret = origUpdateVisibility.apply(this, arguments);
-		if(!tabsAutoHide)
-			cbu.setPrefs("browser.tabs.autoHide", false);
-		return ret;
+		this.visible = false;
 	};
 }
