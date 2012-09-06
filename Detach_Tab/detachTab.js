@@ -7,6 +7,8 @@
 // (c) Infocatcher 2012
 // version 0.2.0
 
+var forceHideTabBar = false;
+
 var btn = this;
 if("_detachedWindow" in btn)
 	attachTab();
@@ -23,9 +25,11 @@ function detachTab() {
 	var opts = "chrome,dialog=no,all";
 	//var opts = "chrome,dialog=0,resizable=1,location=0";
 	var w = btn._detachedWindow = window.openDialog(getBrowserURL(), "_blank", opts, selectedTab);
-	var autoHide = cbu.getPrefs("browser.tabs.autoHide");
-	if(!autoHide)
-		cbu.setPrefs("browser.tabs.autoHide", true);
+	if(forceHideTabBar) {
+		var autoHide = cbu.getPrefs("browser.tabs.autoHide");
+		if(!autoHide)
+			cbu.setPrefs("browser.tabs.autoHide", true);
+	}
 	var initDetachedWindow = function init(e) {
 		w.removeEventListener(e.type, init, false);
 		w.addEventListener("unload", destroyDetachedWindow, false);
@@ -35,7 +39,7 @@ function detachTab() {
 		w.removeEventListener(e.type, destroy, false);
 		window.removeEventListener("unload", destroyParentWindow, false);
 		_attachTab();
-		if(!autoHide)
+		if(forceHideTabBar && !autoHide)
 			cbu.setPrefs("browser.tabs.autoHide", false);
 	};
 	var destroyParentWindow = function destroy(e) {
@@ -75,6 +79,9 @@ function compactWindow(win) {
 	// See styles for window[chromehidden~="*"] in chrome://global/content/xul.css
 	// But don't use "display: none;"
 	var style = '\
+		#TabsToolbar,\n\
+		.tabbrowser-strip,\n\
+		.treestyletab-splitter,\n\
 		.chromeclass-menubar,\n\
 		.chromeclass-directories,\n\
 		.chromeclass-status,\n\
