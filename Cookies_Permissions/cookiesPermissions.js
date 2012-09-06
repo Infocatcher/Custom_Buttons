@@ -27,12 +27,15 @@ var options = {
 	// ACCESS_DENY, ACCESS_SESSION or ACCESS_ALLOW
 	useCookiesManagerPlus: true, // https://addons.mozilla.org/firefox/addon/cookies-manager-plus/
 	prefillMode: 1, // 0 - move caret to start, 1 - select all, 2 - move caret to end
+	moveToSeaMonkeyStatusBar: {
+		// Move button to Status Bar, only for SeaMonkey
+		// Be careful, has some side-effects and button can't be edited w/o restart
+		enabled: true,
+		insertAfter: "popupIcon,statusbar-progresspanel"
+		// Like https://developer.mozilla.org/en-US/docs/XUL/Attribute/insertafter
+		// Also looks for nodes with "cb_id" attribute
+	}
 };
-
-// Uncomment following to move button to Status Bar in SeaMonkey:
-// (Be careful, has some side-effects and button can't be edited w/o restart)
-//this.classList.remove("toolbarbutton-1");
-//document.getElementById("statusbar-display").appendChild(this);
 
 function _localize(sid) {
 	var strings = {
@@ -200,6 +203,9 @@ this.permissions = {
 		if(this.initialized)
 			return;
 		this.initialized = true;
+
+		if(this.isSeaMonkey && this.options.moveToSeaMonkeyStatusBar.enabled)
+			this.moveToSeaMonkeyStatusBar();
 
 		this.mpId = this.button.id + "-context";
 		var cp = this.cp;
@@ -413,6 +419,38 @@ this.permissions = {
 		Application.storage.set(timerId, timer);
 		timer.init();
 	},
+	moveToSeaMonkeyStatusBar: function() {
+		var insPoint;
+		this.options.moveToSeaMonkeyStatusBar.insertAfter
+			.split(/,\s*/)
+			.some(function(id) {
+				insPoint = document.getElementsByAttribute("cb_id", id)[0]
+					|| document.getElementById(id);
+				return insPoint;
+			});
+		if(!insPoint)
+			return;
+
+		var btn = this.button;
+		// Make <toolbarbutton> looks like <image>
+		btn.classList.remove("toolbarbutton-1");
+		btn.removeAttribute("label");
+		btn.setAttribute("style", '\
+			-moz-appearance: none !important;\
+			border: none !important;\
+			margin: 0 !important;\
+			padding: 0 !important;'
+		);
+		// And insert it into <statusbarpanel>
+		var spId = btn.id + "-statusbarpanel";
+		var sp = document.getElementById(spId);
+		sp && sp.parentNode.removeChild(sp);
+		sp = document.createElement("statusbarpanel");
+		sp.id = spId;
+		sp.setAttribute("cb_id", "custombuttons-cookiesPermissionsSBPanel");
+		sp.appendChild(btn);
+		insPoint.parentNode.insertBefore(sp, insPoint.nextSibling);
+	},
 
 	get currentHost() {
 		var loc = content.location;
@@ -470,7 +508,8 @@ this.permissions = {
 		return hosts;
 	},
 	get isSeaMonkey() {
-		return Components.classes["@mozilla.org/xre/app-info;1"]
+		delete this.isSeaMonkey;
+		return this.isSeaMonkey = Components.classes["@mozilla.org/xre/app-info;1"]
 			.getService(Components.interfaces.nsIXULAppInfo)
 			.name == "SeaMonkey";
 	},
