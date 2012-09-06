@@ -196,7 +196,10 @@ this.undoCloseTabsList = {
 	},
 	get cm() {
 		delete this.cm;
-		if(!this.options.allowDeleteEntries || !("forgetClosedTab" in this.ss))
+		if(
+			!this.options.allowDeleteEntries
+			|| !("forgetClosedTab" in this.ss || "forgetClosedWindow" in this.ss)
+		)
 			return this.cm = null;
 		var cm = document.getElementById(this.cmId);
 		cm && cm.parentNode.removeChild(cm);
@@ -329,7 +332,11 @@ this.undoCloseTabsList = {
 		this.clearUndoWindowsList();
 	},
 	canDeleteUndoEntry: function(mi) {
-		return mi.hasAttribute("cb_index");
+		switch(mi.getAttribute("cb_type")) {
+			case "tab":    return "forgetClosedTab"    in this.ss;
+			case "window": return "forgetClosedWindow" in this.ss;
+		}
+		return false;
 	},
 	deleteUndoEntry: function(mi) {
 		var i = +mi.getAttribute("cb_index");
