@@ -367,12 +367,14 @@ var cmds = this.commands = {
 		delete this.canDisableE4X;
 		return this.canDisableE4X = this.getPref("javascript.options.xml.chrome") != undefined;
 	},
+
 	initPrefsMenu: function(popup) {
 		Array.forEach(
 			popup.getElementsByAttribute("cb_pref", "*"),
 			function(node) {
 				var pref = node.getAttribute("cb_pref");
-				node.setAttribute("checked", this.getPref(pref));
+				node.setAttribute("checked", !!this.getPref(pref));
+				this.hlPrefItem(node, pref);
 			},
 			this
 		);
@@ -380,6 +382,10 @@ var cmds = this.commands = {
 	doPrefsMenuCommand: function(node) {
 		var pref = node.getAttribute("cb_pref");
 		this.setPref(pref, node.getAttribute("checked") == "true");
+		this.hlPrefItem(node, pref);
+	},
+	hlPrefItem: function(node, pref) {
+		node.style.fontWeight = this.prefHasUserValue(pref) ? "bold" : "";
 	},
 
 	get prefSvc() {
@@ -388,14 +394,22 @@ var cmds = this.commands = {
 			.getService(Components.interfaces.nsIPrefService)
 			.QueryInterface(Components.interfaces.nsIPrefBranch2 || Components.interfaces.nsIPrefBranch);
 	},
+	get defaultBranch() {
+		delete this.defaultBranch;
+		return this.defaultBranch = this.prefSvc.getDefaultBranch("");
+	},
 	getPref: function(pName, defaultVal, prefBranch) {
 		var ps = prefBranch || this.prefSvc;
-		switch(ps.getPrefType(pName)) {
-			case ps.PREF_STRING: return ps.getComplexValue(pName, Components.interfaces.nsISupportsString).data;
-			case ps.PREF_INT:    return ps.getIntPref(pName);
-			case ps.PREF_BOOL:   return ps.getBoolPref(pName);
-			default:             return defaultVal;
+		try { // getPrefType() returns type of changed value for default branch
+			switch(ps.getPrefType(pName)) {
+				case ps.PREF_STRING: return ps.getComplexValue(pName, Components.interfaces.nsISupportsString).data;
+				case ps.PREF_INT:    return ps.getIntPref(pName);
+				case ps.PREF_BOOL:   return ps.getBoolPref(pName);
+			}
 		}
+		catch(e) {
+		}
+		return defaultVal;
 	},
 	setPref: function(pName, pVal) {
 		var ps = this.prefSvc;
@@ -412,6 +426,11 @@ var cmds = this.commands = {
 			str.data = pVal;
 			ps.setComplexValue(pName, Components.interfaces.nsISupportsString, str);
 		}
+	},
+	prefHasUserValue: function(pName) {
+		if(this.getPref(pName, null, this.defaultBranch) == null)
+			return !!this.getPref(pName);
+		return this.prefSvc.prefHasUserValue(pName);
 	}
 };
 
