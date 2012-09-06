@@ -231,6 +231,21 @@ var cmds = this.commands = {
 		win.addEventListener("load", function restoreSession() {
 			win.removeEventListener("load", restoreSession, false);
 			ss.setWindowState(win, state, true);
+			if("forgetClosedWindow" in ss) {
+				window.addEventListener("unload", function clearUndo(e) {
+					window.removeEventListener("unload", clearUndo, false);
+					var state = JSON.stringify(JSON.parse(ss.getWindowState(window)).windows[0]);
+					win.setTimeout(function() {
+						var closed = JSON.parse(ss.getClosedWindowData());
+						for(var i = 0, l = closed.length; i < l; ++i) {
+							if(JSON.stringify(closed[i]) == state) {
+								ss.forgetClosedWindow(i);
+								break;
+							}
+						}
+					}, 0);
+				}, false);
+			}
 			window.close();
 		}, false);
 	},
