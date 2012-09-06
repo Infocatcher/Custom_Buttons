@@ -27,11 +27,11 @@ var options = {
 	// ACCESS_DENY, ACCESS_SESSION or ACCESS_ALLOW
 	useCookiesManagerPlus: true, // https://addons.mozilla.org/firefox/addon/cookies-manager-plus/
 	prefillMode: 1, // 0 - move caret to start, 1 - select all, 2 - move caret to end
-	moveToSeaMonkeyStatusBar: {
+	moveToStatusBar: {
 		// Move button to Status Bar, only for SeaMonkey
 		// Be careful, has some side-effects and button can't be edited w/o restart
 		enabled: false,
-		insertAfter: "popupIcon,statusbar-progresspanel"
+		insertAfter: "download-monitor,popupIcon,statusbar-progresspanel"
 		// Like https://developer.mozilla.org/en-US/docs/XUL/Attribute/insertafter
 		// Also looks for nodes with "cb_id" attribute
 	}
@@ -204,8 +204,8 @@ this.permissions = {
 			return;
 		this.initialized = true;
 
-		if(this.isSeaMonkey && this.options.moveToSeaMonkeyStatusBar.enabled)
-			this.moveToSeaMonkeyStatusBar();
+		if(this.options.moveToStatusBar.enabled)
+			this.moveToStatusBar();
 
 		this.mpId = this.button.id + "-context";
 		var cp = this.cp;
@@ -419,9 +419,9 @@ this.permissions = {
 		Application.storage.set(timerId, timer);
 		timer.init();
 	},
-	moveToSeaMonkeyStatusBar: function() {
+	moveToStatusBar: function() {
 		var insPoint;
-		this.options.moveToSeaMonkeyStatusBar.insertAfter
+		this.options.moveToStatusBar.insertAfter
 			.split(/,\s*/)
 			.some(function(id) {
 				insPoint = document.getElementsByAttribute("cb_id", id)[0]
@@ -911,7 +911,7 @@ var cssStr = '\
 		%button%[cb_cookies="defaultAllow"]        { -moz-image-region: rect(16px, 32px, 32px, 16px) !important; }\n\
 		%button%[cb_cookies="defaultAllowSession"] { -moz-image-region: rect(16px, 48px, 32px, 32px) !important; }\n\
 		%button%[cb_cookies="defaultDeny"]         { -moz-image-region: rect(16px, 64px, 32px, 48px) !important; }\n\
-		/* "moveToSeaMonkeyStatusBar" option */\n\
+		/* "moveToStatusBar" option */\n\
 		%button%.custombuttons-insideStatusbarpanel {\n\
 			-moz-appearance: none !important;\n\
 			border: none !important;\n\
