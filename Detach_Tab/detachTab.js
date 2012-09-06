@@ -48,17 +48,24 @@ function detachTab() {
 function attachTab() {
 	if(!btn._detachedWindow.closed)
 		btn._detachedWindow.close();
+	else
+		delete btn._detachedWindow;
 }
 function _attachTab() {
 	var tab = btn._detachedWindow.gBrowser.selectedTab;
 	var newTab = gBrowser.selectedTab = gBrowser.addTab();
 	gBrowser.moveTabTo(newTab, btn._tabPos);
+	varwarnOnClose = cbu.getPrefs("browser.tabs.warnOnClose");
+	if(varwarnOnClose) // Strange bug...
+		cbu.setPrefs("browser.tabs.warnOnClose", false);
 	try {
 		gBrowser.swapBrowsersAndCloseOther(newTab, tab);
 	}
 	catch(e) {
 		Components.utils.reportError(e);
 	}
+	if(varwarnOnClose)
+		cbu.setPrefs("browser.tabs.warnOnClose", true);
 	delete btn._detachedWindow;
 	delete btn._tabPos;
 	btn.checked = false;
