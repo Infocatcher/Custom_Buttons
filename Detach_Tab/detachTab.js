@@ -21,6 +21,8 @@ function detachTab() {
 	btn._tabPos = "_tPos" in selectedTab
 		? selectedTab._tPos
 		: Array.indexOf(gBrowser.tabs || gBrowser.tabContainer.childNodes, selectedTab);
+	if("TreeStyleTabService" in window)
+		btn._parentTab = TreeStyleTabService.getParentTab(selectedTab);
 	// See replaceTabWithWindow() in chrome://browser/content/tabbrowser.xml
 	var opts = "chrome,dialog=no,all";
 	//var opts = "chrome,dialog=0,resizable=1,location=0";
@@ -60,6 +62,8 @@ function _attachTab() {
 	var tab = btn._detachedWindow.gBrowser.selectedTab;
 	var newTab = gBrowser.selectedTab = gBrowser.addTab();
 	gBrowser.moveTabTo(newTab, btn._tabPos);
+	if("_parentTab" in btn && btn._parentTab && btn._parentTab.parentNode)
+		gBrowser.treeStyleTab.attachTabTo(newTab, btn._parentTab);
 	varwarnOnClose = cbu.getPrefs("browser.tabs.warnOnClose");
 	if(varwarnOnClose) // Strange bug...
 		cbu.setPrefs("browser.tabs.warnOnClose", false);
@@ -74,6 +78,7 @@ function _attachTab() {
 	window.focus();
 	delete btn._detachedWindow;
 	delete btn._tabPos;
+	delete btn._parentTab;
 	btn.checked = false;
 }
 function compactWindow(win) {
