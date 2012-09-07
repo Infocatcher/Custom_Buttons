@@ -221,6 +221,7 @@ this.permissions = {
 		var mp = this.mp = this.button.appendChild(this.parseXULFromString('\
 			<menupopup xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"\
 				id="' + this.mpId + '"\
+				class="cbCookiesPermissionsPopup"\
 				onpopupshowing="\
 					if(event.target != this)\
 						return true;\
@@ -246,20 +247,24 @@ this.permissions = {
 					accesskey="' + _localize("allowAccesskey") + '" />\
 				<menuseparator />\
 				<menuitem\
+					cb_id="openCookiesPermissions"\
 					oncommand="this.parentNode.parentNode.permissions.openCookiesPermissions();"\
 					label="' + _localize("showPermissionsLabel") + '"\
 					accesskey="' + _localize("showPermissionsAccesskey") + '" />\
 				<menuitem\
+					cb_id="showCookies"\
 					oncommand="this.parentNode.parentNode.permissions.showCookies();"\
 					label="' + _localize("showCookiesLabel") + '"\
 					accesskey="' + _localize("showCookiesAccesskey") + '" />\
 				<menuseparator />\
 				<menuitem\
+					cb_id="removeUnprotectedCookies"\
 					oncommand="this.parentNode.parentNode.permissions.confirm(\'removeUnprotectedCookiesConfirm\', \'removeUnprotectedCookies\', false);"\
 					label="' + _localize("removeUnprotectedCookiesLabel") + '"\
 					tooltiptext="' + _localize("removeUnprotectedCookiesTip") + '"\
 					accesskey="' + _localize("removeUnprotectedCookiesAccesskey") + '" />\
 				<menuitem\
+					cb_id="removeAllUnprotectedCookies"\
 					oncommand="this.parentNode.parentNode.permissions.confirm(\'removeAllUnprotectedCookiesConfirm\', \'removeUnprotectedCookies\', true);"\
 					label="' + _localize("removeAllUnprotectedCookiesLabel") + '"\
 					tooltiptext="' + _localize("removeAllUnprotectedCookiesTip") + '"\
