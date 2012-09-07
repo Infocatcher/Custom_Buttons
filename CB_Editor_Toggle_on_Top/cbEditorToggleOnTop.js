@@ -10,6 +10,7 @@
 // Hotkey: Ctrl+T
 
 const watcherId = "customButtonsToggleOnTop_" + this.id;
+var {Application, Components} = window;
 var watcher = Application.storage.get(watcherId, null);
 if(!watcher) {
 	watcher = {
@@ -28,7 +29,7 @@ if(!watcher) {
 		naAttr: "cbOnTopNA",
 		styleId: "cbToggleOnTopStyle",
 		get btnTip() {
-			var locale = (cbu.getPrefs("general.useragent.locale") || "en").match(/^\w*/)[0];
+			var locale = (Application.prefs.getValue("general.useragent.locale", "") || "en").match(/^\w*/)[0];
 			if(locale == "ru")
 				return "Поверх всех окон (Ctrl+T)";
 			return "Always on top (Ctrl+T)";
