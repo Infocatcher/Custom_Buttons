@@ -9,8 +9,9 @@
 
 var forceHideTabBar = false;
 
+const ns = "_cbDetachTab_";
 var btn = this;
-if("_detachedWindow" in btn)
+if(ns + "detachedWindow" in btn)
 	attachTab();
 else
 	detachTab();
@@ -18,15 +19,15 @@ else
 function detachTab() {
 	btn.checked = true;
 	var selectedTab = gBrowser.selectedTab;
-	btn._tabPos = "_tPos" in selectedTab
+	btn[ns + "tabPos"] = "_tPos" in selectedTab
 		? selectedTab._tPos
 		: Array.indexOf(gBrowser.tabs || gBrowser.tabContainer.childNodes, selectedTab);
 	if("TreeStyleTabService" in window)
-		btn._parentTab = TreeStyleTabService.getParentTab(selectedTab);
+		btn[ns + "parentTab"] = TreeStyleTabService.getParentTab(selectedTab);
 	// See replaceTabWithWindow() in chrome://browser/content/tabbrowser.xml
 	var opts = "chrome,dialog=no,all";
 	//var opts = "chrome,dialog=0,resizable=1,location=0";
-	var w = btn._detachedWindow = window.openDialog(getBrowserURL(), "_blank", opts, selectedTab);
+	var w = btn[ns + "detachedWindow"] = window.openDialog(getBrowserURL(), "_blank", opts, selectedTab);
 	if(forceHideTabBar) {
 		var autoHide = cbu.getPrefs("browser.tabs.autoHide");
 		if(!autoHide)
@@ -46,24 +47,27 @@ function detachTab() {
 			cbu.setPrefs("browser.tabs.autoHide", false);
 	};
 	var destroyParentWindow = function destroy(e) {
-		w.removeEventListener("load", initDetachedWindow, false);
+		w.removeEventListener("DOMContentLoaded", initDetachedWindow, false);
 		destroyDetachedWindow(e, true);
 	};
-	w.addEventListener("load", initDetachedWindow, false);
+	w.addEventListener("DOMContentLoaded", initDetachedWindow, false);
 	window.addEventListener("unload", destroyParentWindow, false);
 }
 function attachTab() {
-	if(!btn._detachedWindow.closed)
-		btn._detachedWindow.close();
+	if(!btn[ns + "detachedWindow"].closed)
+		btn[ns + "detachedWindow"].close();
 	else
-		delete btn._detachedWindow;
+		delete btn[ns + "detachedWindow"];
 }
 function _attachTab() {
-	var tab = btn._detachedWindow.gBrowser.selectedTab;
+	var tab = btn[ns + "detachedWindow"].gBrowser.selectedTab;
 	var newTab = gBrowser.selectedTab = gBrowser.addTab();
-	gBrowser.moveTabTo(newTab, btn._tabPos);
-	if("_parentTab" in btn && btn._parentTab && btn._parentTab.parentNode)
-		gBrowser.treeStyleTab.attachTabTo(newTab, btn._parentTab);
+	gBrowser.moveTabTo(newTab, btn[ns + "tabPos"]);
+	if(ns + "parentTab" in btn) {
+		let parentTab = btn[ns + "parentTab"];
+		if(parentTab && parentTab.parentNode)
+			gBrowser.treeStyleTab.attachTabTo(newTab, parentTab);
+	}
 	varwarnOnClose = cbu.getPrefs("browser.tabs.warnOnClose");
 	if(varwarnOnClose) // Strange bug...
 		cbu.setPrefs("browser.tabs.warnOnClose", false);
@@ -76,9 +80,9 @@ function _attachTab() {
 	if(varwarnOnClose)
 		cbu.setPrefs("browser.tabs.warnOnClose", true);
 	window.focus();
-	delete btn._detachedWindow;
-	delete btn._tabPos;
-	delete btn._parentTab;
+	delete btn[ns + "detachedWindow"];
+	delete btn[ns + "tabPos"];
+	delete btn[ns + "parentTab"];
 	btn.checked = false;
 }
 function compactWindow(win) {
@@ -106,4 +110,5 @@ function compactWindow(win) {
 		),
 		document.firstChild
 	);
+	document.documentElement.offsetHeight; // Force reflow
 }
