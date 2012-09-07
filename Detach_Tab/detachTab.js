@@ -70,6 +70,7 @@ function _attachTab() {
 	}
 	if(varwarnOnClose)
 		cbu.setPrefs("browser.tabs.warnOnClose", true);
+		window.focus();
 	delete btn._detachedWindow;
 	delete btn._tabPos;
 	btn.checked = false;
