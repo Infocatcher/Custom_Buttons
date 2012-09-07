@@ -5,12 +5,12 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2012
-// version 0.1.8 - 2012-08-18
+// version 0.1.9 - 2012-09-08
 
 // Hotkey: Ctrl+T
 
 const watcherId = "customButtonsToggleOnTop_" + this.id;
-var {Application, Components} = window;
+var {Application, Components} = window; // Prevent garbage collection in Firefox 3.6 and older
 var watcher = Application.storage.get(watcherId, null);
 if(!watcher) {
 	watcher = {
