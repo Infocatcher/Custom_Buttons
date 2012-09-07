@@ -8,6 +8,8 @@
 // (c) Infocatcher 2010-2012
 // version 0.2.0pre10 - 2012-09-05
 
+var {Application, Components} = window; // Prevent garbage collection in Firefox 3.6 and older
+
 var options = {
 	removeUnprotectedCookiesInterval: -1,
 	// Periodically remove unprotected cookies (leave only cookies with "Allow" permission)
@@ -399,7 +401,6 @@ this.permissions = {
 			timerId: timerId,
 			interval: interval,
 			permissions: this,
-			storage: Application.storage, // Object from closed window can be not available, so cache it
 			get timer() {
 				delete this.timer;
 				return this.timer = Components.classes["@mozilla.org/timer;1"]
@@ -413,7 +414,7 @@ this.permissions = {
 			destroy: function() {
 				this.permissions.oSvc.removeObserver(this, "quit-application-granted");
 				this.timer.cancel();
-				this.storage.set(this.timerId, null);
+				Application.storage.set(this.timerId, null);
 				this.permissions = null;
 			},
 			handleEvent: function(e) {
