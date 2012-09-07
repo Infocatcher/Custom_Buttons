@@ -35,16 +35,17 @@ function detachTab() {
 		w.addEventListener("unload", destroyDetachedWindow, false);
 		compactWindow(w);
 	};
-	var destroyDetachedWindow = function destroy(e) {
+	var destroyDetachedWindow = function destroy(e, parentDestroy) {
 		w.removeEventListener(e.type, destroy, false);
 		window.removeEventListener("unload", destroyParentWindow, false);
-		_attachTab();
+		if(!parentDestroy)
+			_attachTab();
 		if(forceHideTabBar && !autoHide)
 			cbu.setPrefs("browser.tabs.autoHide", false);
 	};
 	var destroyParentWindow = function destroy(e) {
 		w.removeEventListener("load", initDetachedWindow, false);
-		destroyDetachedWindow(e);
+		destroyDetachedWindow(e, true);
 	};
 	w.addEventListener("load", initDetachedWindow, false);
 	window.addEventListener("unload", destroyParentWindow, false);
@@ -70,7 +71,7 @@ function _attachTab() {
 	}
 	if(varwarnOnClose)
 		cbu.setPrefs("browser.tabs.warnOnClose", true);
-		window.focus();
+	window.focus();
 	delete btn._detachedWindow;
 	delete btn._tabPos;
 	btn.checked = false;
