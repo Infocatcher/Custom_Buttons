@@ -5,7 +5,7 @@
 // (code for "code" section)
 
 // (c) Infocatcher 2012
-// version 0.2.0
+// version 0.2.0 - 2012-09-08
 
 var forceHideTabBar = false;
 
@@ -110,5 +110,15 @@ function compactWindow(win) {
 		),
 		document.firstChild
 	);
-	document.documentElement.offsetHeight; // Force reflow
+	var root = document.documentElement;
+	// See #main-window[disablechrome] ... in chrome://browser/content/browser.css
+	// User may want override this styles
+	var origSetAttribute = root.setAttribute;
+	root.setAttribute = function(attr, val) {
+		if(attr == "disablechrome")
+			return undefined;
+		return origSetAttribute.apply(this, arguments);
+	};
+	root.removeAttribute("disablechrome");
+	root.offsetHeight; // Force reflow
 }
