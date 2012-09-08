@@ -5,7 +5,7 @@
 // (code for "code" section)
 
 // (c) Infocatcher 2012
-// version 0.1.0 - 2012-09-09
+// version 0.1.1 - 2012-09-09
 
 // Button just open hidden tab with about:addons and trigger built-in "Check for Updates" function.
 // And show tab, if found updates.
@@ -17,6 +17,7 @@ btn.image = "chrome://browser/skin/tabbrowser/connecting.png";
 btn.tooltipText = "Open about:addons…";
 var tab = gBrowser.addTab("about:addons");
 tab.collapsed = true;
+tab.closing = true; // See "visibleTabs" getter in chrome://browser/content/tabbrowser.xml
 
 var browser = tab.linkedBrowser;
 browser.addEventListener("load", function load(e) {
@@ -47,13 +48,14 @@ browser.addEventListener("load", function load(e) {
 		clearInterval(wait);
 		btn.image = image;
 		btn.tooltipText = tip;
+		tab.closing = false;
 
 		if(!updEnabled)
 			cbu.setPrefs(updEnabledPref, false);
 
 		if(!notFound.hidden) {
-			gBrowser.removeTab(tab);
 			//tab.collapsed = false;
+			gBrowser.removeTab(tab);
 			Components.classes["@mozilla.org/alerts-service;1"]
 				.getService(Components.interfaces.nsIAlertsService)
 				.showAlertNotification(
