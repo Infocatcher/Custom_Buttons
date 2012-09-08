@@ -1338,7 +1338,6 @@ this.bookmarks = {
 	},
 	copyFileAsync: function(file, newFile, callback, context) {
 		try {
-			throw "test";
 			Components.utils.import("resource://gre/modules/NetUtil.jsm");
 		}
 		catch(e) {
