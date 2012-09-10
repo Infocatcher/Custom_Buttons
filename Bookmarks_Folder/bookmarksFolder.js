@@ -4,9 +4,14 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011-2012
-// version 0.1.0pre9 - 2012-08-06
+// version 0.1.0pre10 - 2012-09-10
 
 // Compatibility: Firefox 4.0+
+// Button works in SeaMonkey, but missing GUI for select bookmarks folder
+
+// Icon by FatCow Web Hosting: http://www.iconfinder.com/icondetails/36059/16/
+
+var hideDropMarker = true;
 
 function _localize(s, key) {
 	var strings = {
@@ -274,3 +279,8 @@ this.onDestroy = function() {
 };
 this.type = "menu";
 this.orient = "horizontal";
+if(hideDropMarker) setTimeout(function(btn) { // Wait for menu XBL binding
+	let dm = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-menu-dropmarker");
+	if(dm)
+		dm.hidden = true;
+}, 0, this);
