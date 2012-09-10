@@ -4,7 +4,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011-2012
-// version 0.2.0pre33 - 2012-08-21
+// version 0.2.0pre34 - 2012-09-10
 
 // Usage:
 //   Use middle-click or left+click with any modifier to add current tab
@@ -12,7 +12,11 @@
 
 // Compatibility: Firefox 3.0+, SeaMonkey 2.0+
 
+// Icon by FatCow Web Hosting: http://www.iconfinder.com/icondetails/36059/16/
+// + Diagona Icons http://www.iconfinder.com/icondetails/14111/10/087_icon
+
 var options = {
+	hideDropMarker: true,
 	addToEnd: true,
 	loadInBackground: false,
 	leftClickCloseMenu: true,
@@ -1413,3 +1417,8 @@ this.onDestroy = function() {
 };
 this.type = "menu";
 this.orient = "horizontal";
+if(options.hideDropMarker) setTimeout(function(btn) { // Wait for menu XBL binding
+	let dm = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-menu-dropmarker");
+	if(dm)
+		dm.hidden = true;
+}, 0, this);
