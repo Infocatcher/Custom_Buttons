@@ -300,10 +300,13 @@ this.bookmarks = {
 		if(this.mp) {
 			this.mp.removeEventListener("DOMMenuItemActive",   this.showLink, false);
 			this.mp.removeEventListener("DOMMenuItemInactive", this.showLink, false);
+			if(!force)
+				this.closePropertiesWindows();
 		}
-
-		this.closeAllPropertiesWindows();
-		force && this.markInsertionPoint(false);
+		if(force) {
+			this.closeAllPropertiesWindows();
+			this.markInsertionPoint(false);
+		}
 	},
 	addContextMenu: function() {
 		this.addContextMenu = function() {};
@@ -959,6 +962,15 @@ this.bookmarks = {
 	closePropertiesWindow: function(mi) {
 		var w = this.getPropertiesWindow(mi);
 		w && w.close();
+	},
+	closePropertiesWindows: function() {
+		var mis = Array.slice(this.mp.getElementsByAttribute("cb_uri", "*"));
+		var ws = this.propertiesWindows;
+		while(ws.hasMoreElements()) {
+			let w = ws.getNext();
+			if(mis.indexOf(w.mi) != -1)
+				w.close();
+		}
 	},
 	closeAllPropertiesWindows: function() {
 		var ws = this.propertiesWindows;
