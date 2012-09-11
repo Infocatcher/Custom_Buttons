@@ -4,7 +4,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011-2012
-// version 0.2.0pre34 - 2012-09-10
+// version 0.2.0pre35 - 2012-09-11
 
 // Usage:
 //   Use middle-click or left+click with any modifier to add current tab
@@ -129,23 +129,6 @@ this.setAttribute("ondragover",    "return this.bookmarks.handleDragOver(event);
 this.setAttribute("ondragexit",    "return this.bookmarks.handleDragExit(event);");
 this.setAttribute("ondragdrop",    "return this.bookmarks.handleDrop(event);");
 
-function _log() {
-	var cs = Components.classes["@mozilla.org/consoleservice;1"]
-		.getService(Components.interfaces.nsIConsoleService);
-	function ts() {
-		var d = new Date();
-		var ms = d.getMilliseconds();
-		return d.toLocaleFormat("%M:%S:") + "000".substr(String(ms).length) + ms;
-	}
-	_log = function() {
-		cs.logStringMessage(
-			"[Custom Buttons :: Session Bookmarks]: " + ts() + " "
-			+ Array.map(arguments, String).join("\n")
-		);
-	};
-	return _log.apply(this, arguments);
-}
-
 this.bookmarks = {
 	button: this,
 	options: options,
@@ -218,10 +201,8 @@ this.bookmarks = {
 
 	init: function() {
 		var file = this.file;
-		if(file.exists()) {
-			_log("init()");
+		if(file.exists())
 			this.readFromFileAsync(file, this.load, this);
-		}
 		else
 			this.load("");
 	},
@@ -233,9 +214,6 @@ this.bookmarks = {
 	_sep:     "separator",
 
 	load: function(data) {
-		_log("load()");
-		//if(this.button.firstChild) // Already initialized
-		//	return;
 		this.initIds();
 		this.addContextMenu();
 
@@ -283,7 +261,6 @@ this.bookmarks = {
 		mp.addEventListener("DOMMenuItemActive",   this.showLink, false);
 		mp.addEventListener("DOMMenuItemInactive", this.showLink, false);
 		this.showOpenAll();
-		_log("load() done");
 	},
 	initIds: function() {
 		this.initIds = function() {};
@@ -451,18 +428,15 @@ this.bookmarks = {
 			},
 			this
 		);
-		_log("copyFileAsync()");
 		this.copyFileAsync(this.file, this.backupFile, function(status) {
 			if(!Components.isSuccessCode(status))
 				Components.utils.reportError(this.errPrefix + "copyFileAsync() failed");
-			else // Backup failed? But we still can try save user data.
-				_log("copyFileAsync() done");
+			// Backup failed? But we still can try save user data.
 			this.writeToFileAsync(data.join("\n\n"), this.file, function(status, data) {
 				if(!Components.isSuccessCode(status)) {
 					Components.utils.reportError(this.errPrefix + "writeToFileAsync() failed");
 					return;
 				}
-				_log("writeToFileAsync() done");
 				var ws = this.wm.getEnumerator("navigator:browser");
 				while(ws.hasMoreElements()) {
 					let w = ws.getNext();
@@ -474,7 +448,6 @@ this.bookmarks = {
 			}, this);
 		}, this);
 		this.unsaved = false;
-		_log("save() done");
 	},
 	scheduleSave: function() {
 		if(this.button.open || this.button.getAttribute("open") == "true")
@@ -996,10 +969,6 @@ this.bookmarks = {
 		if(!show)
 			this.mp.hidePopup();
 		this.$(this.deleteAllId).disabled = !show;
-		//var dropmarker = this.button.ownerDocument
-		//	.getAnonymousElementByAttribute(this.button, "class", "toolbarbutton-menu-dropmarker");
-		//if(dropmarker)
-		//	dropmarker.style.visibility = show ? "" : "hidden";
 		this.button.disabled = !show;
 	},
 	initContextMenu: function(mi) {
@@ -1362,14 +1331,12 @@ this.bookmarks = {
 			return;
 		}
 		try {
-			_log("copyFileAsync: init streams");
 			var fis = Components.classes["@mozilla.org/network/file-input-stream;1"]
 				.createInstance(Components.interfaces.nsIFileInputStream);
 			fis.init(file, 0x01, 0444, 0);
 			var fos = Components.classes["@mozilla.org/network/file-output-stream;1"]
 				.createInstance(Components.interfaces.nsIFileOutputStream);
 			fos.init(newFile, 0x02 | 0x08 | 0x20, 0644, 0);
-			_log("copyFileAsync: init streams done");
 
 			NetUtil.asyncCopy(fis, fos, this.bind(function(status) {
 				callback.call(context || this, status);
