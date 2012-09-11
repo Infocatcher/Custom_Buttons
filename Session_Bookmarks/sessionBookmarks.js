@@ -16,17 +16,20 @@
 // + Diagona Icons http://www.iconfinder.com/icondetails/14111/10/087_icon
 
 var options = {
-	hideDropMarker: true,
-	addToEnd: true,
-	loadInBackground: false,
-	leftClickCloseMenu: true,
-	middleClickCloseMenu: true,
+	hideDropMarker: true, // Hide "v" after button icon
+	addToEnd: true, // Add to end of list by default
+	loadInBackground: false, // Load tabs in background
+	leftClickCloseMenu: true, // Close menu after left-click
+	middleClickCloseMenu: true, // Close menu after middle-click
 	invertLoadBehavior: false, // true => left-click open bookmark in new tab
-	checkDuplicates: true,
-	useSessions: true,
+	checkDuplicates: true, // Forbid duplicates
+	// Note: session data are checked too
+	useSessions: true, // Save and restore session data
 	saveTabHistory: true, // Only for "useSessions: true"
+	// Save back/forward history of tab
 	reloadSessions: true, // Only for "useSessions: true"
-	undoLimit: 10
+	// Ignore cache during session restore (otherwise may be opened obsolete cached version of page)
+	undoLimit: 10 // Max length of undo/redo history
 };
 
 function _localize(s, key) {
