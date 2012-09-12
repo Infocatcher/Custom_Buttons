@@ -519,7 +519,7 @@ this.bookmarks = {
 				if(
 					mi.getAttribute("label") == td.label
 					&& mi.getAttribute("image") == td.icon
-					&& (this.options.useSessions ? mi.getAttribute("cb_ssData") == td.ssData : true)
+					&& (!this.options.useSessions || mi.getAttribute("cb_ssData") == td.ssData)
 				) {
 					this.blink(mi, "0.5");
 					return null;
@@ -858,12 +858,12 @@ this.bookmarks = {
 				title="' + _localize("Session Bookmark Properties") + '"\n\
 				buttons="accept,cancel"\n\
 				ondialogaccept="return dialogCallback();"\n\
-				style="min-width: 460px;"\n\
-				persist="screenX screenY">\n\
+				width="460"\n\
+				persist="screenX screenY width height">\n\
 				<grid>\n\
 					<columns>\n\
 						<column />\n\
-						<column flex="1" />\n\
+						<column flex="1" style="min-width: 160px;" />\n\
 					</columns>\n\
 					<rows>\n\
 						<row align="center">\n\
@@ -893,6 +893,11 @@ this.bookmarks = {
 				</keyset>\n\
 				<script type="application/javascript"><![CDATA[\n\
 				var [mi, bookmarks, _localize] = window.arguments;\n\
+				window.onload = function() {\n\
+					\// Don\'t use saved height\n\
+					document.documentElement.removeAttribute("height");\n\
+					window.sizeToContent();\n\
+				};\n\
 				function init() {\n\
 					$("label").value = mi.getAttribute("label");\n\
 					$("uri").value = mi.getAttribute("cb_uri");\n\
