@@ -10,6 +10,8 @@
 // Based on Cookies Permissions button
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Cookies_Permissions
 
+// Note: plugins.click_to_play in about:config should be enabled
+
 var options = {
 	useBaseDomain: { // If set to true, will use short domain like google.com instead of www.google.com
 		addPermission: false, // Add (and toggle) permission action
