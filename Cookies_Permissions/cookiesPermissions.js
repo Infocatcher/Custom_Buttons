@@ -472,13 +472,7 @@ this.permissions = {
 		return "";
 	},
 	get currentBaseDomain() {
-		var host = this.currentHost;
-		if(host) try {
-			return this.tld.getBaseDomainFromHost(host);
-		}
-		catch(e) {
-		}
-		return host;
+		return this.getBaseDomain(this.currentHost);
 	},
 	get currentHosts() { // returns hosts from all visible tabs in all windows
 		var tmp = { __proto__: null };
@@ -504,11 +498,8 @@ this.permissions = {
 				}
 				if(!host)
 					continue;
-				if(this.options.useBaseDomain.preserveCurrentSitesCookies) try {
-					host = this.tld.getBaseDomainFromHost(host);
-				}
-				catch(e) {
-				}
+				if(this.options.useBaseDomain.preserveCurrentSitesCookies)
+					host = this.getBaseDomain(host);
 				tmp[host] = true;
 			}
 		}
@@ -533,6 +524,14 @@ this.permissions = {
 			Components.utils.reportError(this.errPrefix + "Invalid host: \"" + host + "\"");
 			throw e;
 		}
+	},
+	getBaseDomain: function(host) {
+		if(host) try {
+			return this.tld.getBaseDomainFromHost(host);
+		}
+		catch(e) {
+		}
+		return host;
 	},
 
 	showMenu: function(e, isContext, mp) {
