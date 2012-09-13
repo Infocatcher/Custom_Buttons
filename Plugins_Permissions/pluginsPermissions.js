@@ -18,8 +18,8 @@ var options = {
 	showDefaultPolicy: true, // Show default policy
 	toggleMode: Components.interfaces.nsIPermissionManager.ALLOW_ACTION,
 	// ALLOW_ACTION or DENY_ACTION
-	//~ todo: EXPIRE_SESSION
-	// https://developer.mozilla.org/en-US/docs/XPCOM_Interface_Reference/nsIPermissionManager#Permission_expiration_constants
+	reusePermissionsWindow: false, // Use any already opened permissions window
+	// E.g. "Show Exceptions" may convert "Exceptions - Cookies" to "Exceptions — Plugins"
 	prefillMode: 1, // 0 - move caret to start, 1 - select all, 2 - move caret to end
 	moveToStatusBar: {
 		// Move button to Status Bar, only for SeaMonkey or Firefox < 4.0
@@ -174,6 +174,9 @@ this.permissions = {
 
 		this.mpId = this.button.id + "-context";
 		var pm = this.pm;
+
+		//~ todo: try add temporary permissions, see
+		// https://developer.mozilla.org/en-US/docs/XPCOM_Interface_Reference/nsIPermissionManager#Permission_expiration_constants
 		var mp = this.mp = this.button.appendChild(this.parseXULFromString('\
 			<menupopup xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"\
 				id="' + this.mpId + '"\
@@ -427,6 +430,12 @@ this.permissions = {
 					   windowTitle    : _localize("exceptionsTitle"),
 					   introText      : _localize("exceptionsDesc") };
 		var win = this.wm.getMostRecentWindow("Browser:Permissions");
+		if(
+			win
+			&& !this.options.reusePermissionsWindow
+			&& "gPermissionManager" in win && win.gPermissionManager._type != this.permissionType
+		)
+			win = null;
 		var _this = this;
 		var setFilter = function setFilter(e) {
 			e && win.removeEventListener("load", setFilter, false);
