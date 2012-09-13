@@ -28,6 +28,8 @@ var options = {
 	toggleMode: Components.interfaces.nsICookiePermission.ACCESS_ALLOW,
 	// ACCESS_DENY, ACCESS_SESSION or ACCESS_ALLOW
 	useCookiesManagerPlus: true, // https://addons.mozilla.org/firefox/addon/cookies-manager-plus/
+	reusePermissionsWindow: false, // Use any already opened permissions window
+	// E.g. "Show Exceptions" may convert "Allowed Sites - Add-ons Installation" to "Exceptions - Cookies"
 	prefillMode: 1, // 0 - move caret to start, 1 - select all, 2 - move caret to end
 	confirmRemoval: true,
 	moveToStatusBar: {
@@ -592,6 +594,12 @@ this.permissions = {
 					   windowTitle    : bundle.GetStringFromName("cookiepermissionstitle"),
 					   introText      : bundle.GetStringFromName("cookiepermissionstext") };
 		var win = this.wm.getMostRecentWindow("Browser:Permissions");
+		if(
+			win
+			&& !this.options.reusePermissionsWindow
+			&& "gPermissionManager" in win && win.gPermissionManager._type != this.permissionType
+		)
+			win = null;
 		var _this = this;
 		var setFilter = function setFilter(e) {
 			e && win.removeEventListener("load", setFilter, false);
