@@ -321,14 +321,16 @@ this.permissions = {
 				if(topic != "perm-changed")
 					return;
 				var permission = subject.QueryInterface(Components.interfaces.nsIPermission);
-				if(permission.type != this.context.permissionType)
+				var type = this.context.permissionType;
+				if(permission.type != type)
 					return;
 				this.context.updButtonState();
 				if(data == "deleted") {
 					// See chrome://browser/content/preferences/permissions.js
 					// observe: function (aSubject, aTopic, aData)
 					let win = this.context.wm.getMostRecentWindow("Browser:Permissions");
-					win && win.gPermissionManager._loadPermissions();
+					if(win && "gPermissionManager" in win && win.gPermissionManager._type == type)
+						win.gPermissionManager._loadPermissions();
 				}
 			}
 		};
@@ -598,6 +600,9 @@ this.permissions = {
 			}, 0);
 		};
 		if(win) {
+			// See <method name="openWindow"> in chrome://global/content/bindings/preferences.xml#prefwindow
+			if("initWithParams" in win)
+				win.initWithParams(params);
 			win.focus();
 			host && setFilter();
 		}
