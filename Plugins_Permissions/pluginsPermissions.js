@@ -111,7 +111,7 @@ this.onclick = function(e) {
 		e.stopPropagation();
 	}
 	else if(but == 1 || but == 0 && hasModifier)
-		this.permissions.openPluginsPermissions();
+		this.permissions.openPermissions();
 };
 if(!this.hasOwnProperty("defaultContextId"))
 	this.defaultContextId = this.getAttribute("context") || "custombuttons-contextpopup";
@@ -128,6 +128,7 @@ this.oncontextmenu = function(e) {
 
 this.permissions = {
 	permissionType: "plugins",
+	popupClass: "cbPluginsPermissionsPopup",
 
 	button: this,
 	options: options,
@@ -176,7 +177,7 @@ this.permissions = {
 		var mp = this.mp = this.button.appendChild(this.parseXULFromString('\
 			<menupopup xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"\
 				id="' + this.mpId + '"\
-				class="cbPluginsPermissionsPopup"\
+				class="' + this.popupClass + '"\
 				onpopupshowing="\
 					if(event.target != this)\
 						return true;\
@@ -198,8 +199,8 @@ this.permissions = {
 					accesskey="' + _localize("allowAccesskey") + '" />\
 				<menuseparator />\
 				<menuitem\
-					cb_id="openPluginsPermissions"\
-					oncommand="this.parentNode.parentNode.permissions.openPluginsPermissions();"\
+					cb_id="openPermissions"\
+					oncommand="this.parentNode.parentNode.permissions.openPermissions();"\
 					label="' + _localize("showPermissionsLabel") + '"\
 					accesskey="' + _localize("showPermissionsAccesskey") + '" />\
 				<menuseparator />\
@@ -411,7 +412,7 @@ this.permissions = {
 		return true;
 	},
 
-	openPluginsPermissions: function() {
+	openPermissions: function() {
 		var host = this.options.useBaseDomain.openPermissions
 			? this.currentBaseDomain
 			: this.currentHost;
@@ -448,9 +449,9 @@ this.permissions = {
 		this.tweakWindow(win);
 	},
 	tweakWindow: function(win) {
-		if("__cbPluginsPermissionsTweaked" in win)
+		if("__cbPermissionsTweaked" in win)
 			return;
-		win.__cbPluginsPermissionsTweaked = true;
+		win.__cbPermissionsTweaked = true;
 		var keypressHandler = function(e) {
 			if(e.keyCode == e.DOM_VK_ESCAPE)
 				win.close();

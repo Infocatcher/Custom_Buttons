@@ -150,7 +150,7 @@ this.onclick = function(e) {
 		e.stopPropagation();
 	}
 	else if(but == 1 || but == 0 && hasModifier)
-		this.permissions.openCookiesPermissions();
+		this.permissions.openPermissions();
 };
 if(!this.hasOwnProperty("defaultContextId"))
 	this.defaultContextId = this.getAttribute("context") || "custombuttons-contextpopup";
@@ -169,6 +169,7 @@ this.permissions = {
 	permissionType: "cookie",
 	timerId: "customButtonsCookiesCleanupTimer",
 	timer: null,
+	popupClass: "cbCookiesPermissionsPopup",
 
 	button: this,
 	options: options,
@@ -223,7 +224,7 @@ this.permissions = {
 		var mp = this.mp = this.button.appendChild(this.parseXULFromString('\
 			<menupopup xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"\
 				id="' + this.mpId + '"\
-				class="cbCookiesPermissionsPopup"\
+				class="' + this.popupClass + '"\
 				onpopupshowing="\
 					if(event.target != this)\
 						return true;\
@@ -249,8 +250,8 @@ this.permissions = {
 					accesskey="' + _localize("allowAccesskey") + '" />\
 				<menuseparator />\
 				<menuitem\
-					cb_id="openCookiesPermissions"\
-					oncommand="this.parentNode.parentNode.permissions.openCookiesPermissions();"\
+					cb_id="openPermissions"\
+					oncommand="this.parentNode.parentNode.permissions.openPermissions();"\
 					label="' + _localize("showPermissionsLabel") + '"\
 					accesskey="' + _localize("showPermissionsAccesskey") + '" />\
 				<menuitem\
@@ -568,13 +569,13 @@ this.permissions = {
 		return true;
 	},
 
-	openCookiesPermissions: function() {
+	openPermissions: function() {
 		var host = this.options.useBaseDomain.openPermissions
 			? this.currentBaseDomain
 			: this.currentHost;
 
 		if(this.isSeaMonkey) {
-			this.openCookiesPermissionsSM(host);
+			this.openPermissionsSM(host);
 			return;
 		}
 
@@ -612,7 +613,7 @@ this.permissions = {
 
 		this.tweakWindow(win);
 	},
-	openCookiesPermissionsSM: function(host) {
+	openPermissionsSM: function(host) {
 		var win = this.wm.getMostRecentWindow("mozilla:cookieviewer");
 		var _this = this;
 		var setFilter = function setFilter(e) {
@@ -631,9 +632,9 @@ this.permissions = {
 		}
 	},
 	tweakWindow: function(win) {
-		if("__cbCookiesPermissionsTweaked" in win)
+		if("__cbPermissionsTweaked" in win)
 			return;
-		win.__cbCookiesPermissionsTweaked = true;
+		win.__cbPermissionsTweaked = true;
 		var keypressHandler = function(e) {
 			if(e.keyCode == e.DOM_VK_ESCAPE)
 				win.close();
