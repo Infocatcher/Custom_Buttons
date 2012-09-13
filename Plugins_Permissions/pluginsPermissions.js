@@ -5,7 +5,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2012
-// version 0.1.0pre2 - 2012-09-13
+// version 0.1.0pre3 - 2012-09-14
 
 // Based on Cookies Permissions button
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Cookies_Permissions
@@ -422,6 +422,11 @@ this.permissions = {
 			? this.currentBaseDomain
 			: this.currentHost;
 
+		if(this.isSeaMonkey) {
+			this.openPermissionsSM(host);
+			return;
+		}
+
 		// chrome://browser/content/preferences/privacy.js
 		// Like gPrivacyPane.showCookieExceptions()
 		var params = { blockVisible   : true,
@@ -458,6 +463,32 @@ this.permissions = {
 		}
 
 		this.tweakWindow(win);
+	},
+	openPermissionsSM: function(host) {
+		if(!this.options.useBaseDomain.openPermissions)
+			host = this.getBaseDomain(host);
+
+		//gBrowser.selectedTab = gBrowser.addTab("about:data");
+		//toDataManager("|permissions");
+		// See chrome://communicator/content/tasksOverlay.js
+		var _this = this;
+		switchToTabHavingURI("about:data", true, function(browser) {
+			var content = browser.contentWindow.wrappedJSObject;
+			_this.oSvc.addObserver(function observer(subject, topic, data) {
+				_this.oSvc.removeObserver(observer, topic);
+
+				var gDomains = content.gDomains;
+				var domains = gDomains.displayedDomains;
+				for(var i = 0, l = domains.length; i < l; ++i) {
+					var domain = domains[i];
+					if(domain.title == host) {
+						gDomains.tree.view.selection.select(i);
+						break;
+					}
+				}
+			}, "dataman-loaded", false);
+			content.gDataman.loadView("|permissions");
+		});
 	},
 	tweakWindow: function(win) {
 		if("__cbPermissionsTweaked" in win)
