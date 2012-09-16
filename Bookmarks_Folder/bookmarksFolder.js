@@ -273,16 +273,24 @@ this.bookmarks = {
 			PlacesMenuDNDHandler.onDrop(e);
 	}
 };
+
+this.type = "menu";
+this.orient = "horizontal";
+if(hideDropMarker) {
+	let btn = this;
+	let stopTime = Date.now() + 500;
+	setTimeout(function hideDropMarker() { // Wait for menu XBL binding
+		var dm = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-menu-dropmarker");
+		if(dm)
+			dm.hidden = true;
+		else if(Date.now() < stopTime)
+			setTimeout(hideDropMarker, 10);
+	}, 0);
+}
+
 setTimeout(function(_this) { // Don't show modal "Select folder" dialog during initialization
 	_this.bookmarks.init();
 }, 0, this);
 this.onDestroy = function() {
 	this.bookmarks.destroy();
 };
-this.type = "menu";
-this.orient = "horizontal";
-if(hideDropMarker) setTimeout(function(btn) { // Wait for menu XBL binding
-	let dm = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-menu-dropmarker");
-	if(dm)
-		dm.hidden = true;
-}, 0, this);

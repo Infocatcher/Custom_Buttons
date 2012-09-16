@@ -1404,8 +1404,14 @@ this.onDestroy = function() {
 };
 this.type = "menu";
 this.orient = "horizontal";
-if(options.hideDropMarker) setTimeout(function(btn) { // Wait for menu XBL binding
-	let dm = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-menu-dropmarker");
-	if(dm)
-		dm.hidden = true;
-}, 0, this);
+if(options.hideDropMarker) {
+	let btn = this;
+	let stopTime = Date.now() + 500;
+	setTimeout(function hideDropMarker() { // Wait for menu XBL binding
+		var dm = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-menu-dropmarker");
+		if(dm)
+			dm.hidden = true;
+		else if(Date.now() < stopTime)
+			setTimeout(hideDropMarker, 10);
+	}, 0);
+}
