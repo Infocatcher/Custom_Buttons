@@ -273,7 +273,9 @@ this.bookmarks = {
 			PlacesMenuDNDHandler.onDrop(e);
 	}
 };
-this.bookmarks.init();
+setTimeout(function(_this) { // Don't show modal "Select folder" dialog during initialization
+	_this.bookmarks.init();
+}, 0, this);
 this.onDestroy = function() {
 	this.bookmarks.destroy();
 };
