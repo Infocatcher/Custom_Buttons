@@ -4,10 +4,9 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011-2012
-// version 0.1.0pre10 - 2012-09-10
+// version 0.1.0pre11 - 2012-09-16
 
-// Compatibility: Firefox 4.0+
-// Button works in SeaMonkey, but missing GUI for select bookmarks folder
+// Compatibility: Firefox 4.0+, SeaMonkey 2.1+
 
 // Icon by FatCow Web Hosting: http://www.iconfinder.com/icondetails/36059/16/
 
@@ -90,7 +89,9 @@ this.bookmarks = {
 		btn.setAttribute("ondragexit",  "PlacesMenuDNDHandler.onDragExit(event);");
 		//btn.setAttribute("ondrop",      "PlacesMenuDNDHandler.onDrop(event);");
 		btn.setAttribute("ondrop",      "this.bookmarks.onDrop(event);");
-		var mp = document.createElement("menupopup");
+		var mp = btn.getElementsByTagName("menupopup");
+		mp.length && mp[0].parentNode.removeChild(mp[0]);
+		mp = document.createElement("menupopup");
 		mp.setAttribute("context", "placesContext");
 		mp.setAttribute("placespopup", "true");
 		var placeURI = "place:folder=" + folder + "&amp;excludeItems=0&amp;expandQueries=0";
