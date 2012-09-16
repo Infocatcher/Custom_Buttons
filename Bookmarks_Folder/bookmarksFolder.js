@@ -123,89 +123,96 @@ this.bookmarks = {
 	selectFolder: function() {
 		// https://developer.mozilla.org/en/Displaying_Places_information_using_views
 		var rootFolder = PlacesUIUtils.allBookmarksFolderId;
+		var placesOverlay = Application.name == "SeaMonkey"
+			? '\n\
+			<?xml-stylesheet href="chrome://communicator/skin/bookmarks/bookmarks.css"?>\n\
+			<?xml-stylesheet href="chrome://communicator/content/places/places.css"?>\n\
+			<?xul-overlay href="chrome://communicator/content/bookmarks/placesOverlay.xul"?>'
+			: '\n\
+			<?xml-stylesheet href="chrome://browser/content/places/places.css"?>\n\
+			<?xml-stylesheet href="chrome://browser/skin/places/places.css"?>\n\
+			<?xul-overlay href="chrome://browser/content/places/placesOverlay.xul"?>';
 		var winSrc = '\
-			<?xml version="1.0"?>\
-			<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>\
-			<?xml-stylesheet href="chrome://browser/content/places/places.css"?>\
-			<?xml-stylesheet href="chrome://browser/skin/places/places.css"?>\
-			<?xul-overlay href="chrome://browser/content/places/placesOverlay.xul"?>\
-			<dialog xmlns="' + xulns + '"\
-				id="' + this.button.id + "-dialog" + '"\
-				windowtype="' + this.button.id + ":dialog" + '"\
-				title="' + _localize("Select folder") + '"\
-				buttons="accept,cancel"\
-				onload="init();"\
-				ondialogaccept="return dialogCallback();"\
-				width="400"\
-				height="350">\
-				<keyset>\
-					<key id="key-accept" keycode="VK_RETURN" modifiers="control"\
-						oncommand="document.documentElement.acceptDialog();" />\
-				</keyset>\
-				<tree id="tree" type="places"\
-					place="' + "place:excludeItems=1&amp;excludeQueries=1&amp;folder=" + rootFolder + '"\
-					hidecolumnpicker="true" seltype="single" flex="1"\
-					onselect="onSelect();">\
-					<treecols>\
-						<treecol id="title" flex="1" primary="true" hideheader="true" />\
-					</treecols>\
-					<treechildren />\
-				</tree>\
-				<checkbox id="root" label="' + _localize("Root folder") + '" oncommand="onSelect();" />\
-				<script type="application/javascript"><![CDATA[\
-				var [folderId, rootFolder, callback, context] = window.arguments;\
-				var tree = document.getElementById("tree");\
-				var root = document.getElementById("root");\
-				function init() {\
-					if(folderId == rootFolder)\
-						root.checked = true;\
-					else if(folderId != undefined) {\
-						tree.selectItems([folderId]);\
-						var i = tree.view.selection.currentIndex;\
-						if(i != -1) {\
-							setTimeout(function() {\
-								tree.treeBoxObject.ensureRowIsVisible(i);\
-							}, 0);\
-						}\
-					}\
-					onSelect();\
-				}\
-				function onSelect(dis) {\
-					if(!arguments.length)\
-						dis = !root.checked && !tree.view.selection.getRangeCount();\
-					document.documentElement.getButton("accept").disabled = dis;\
-					disableTree(root.checked);\
-				}\
-				function disableTree(dis) {\
-					if(dis) {\
-						tree.style.opacity = "0.6";\
-						tree.setAttribute("disabled", "true");\
-					}\
-					else {\
-						tree.style.opacity = "";\
-						tree.removeAttribute("disabled");\
-					}\
-				}\
-				function dialogCallback() {\
-					if(root.checked)\
-						var id = rootFolder;\
-					else {\
-						var view = tree.view;\
-						var i = view.selection.currentIndex;\
-						if(i == -1)\
-							return false;\
-						var item = view.nodeForTreeIndex(i);\
-						if(item) {\
-							var id = /place:folder=(\\w+)/.test(item.uri)\
-								? RegExp.$1\
-								: item.itemId;\
-						}\
-					}\
-					callback.call(context, id);\
-					return true;\
-				}\
-				onSelect(false);\
-				]]></script>\
+			<?xml version="1.0"?>\n\
+			<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>'
+			+ placesOverlay + '\n\
+			<dialog xmlns="' + xulns + '"\n\
+				id="' + this.button.id + "-dialog" + '"\n\
+				windowtype="' + this.button.id + ":dialog" + '"\n\
+				title="' + _localize("Select folder") + '"\n\
+				buttons="accept,cancel"\n\
+				onload="init();"\n\
+				ondialogaccept="return dialogCallback();"\n\
+				width="400"\n\
+				height="350">\n\
+				<keyset>\n\
+					<key id="key-accept" keycode="VK_RETURN" modifiers="control"\n\
+						oncommand="document.documentElement.acceptDialog();" />\n\
+				</keyset>\n\
+				<tree id="tree" type="places"\n\
+					place="' + "place:excludeItems=1&amp;excludeQueries=1&amp;folder=" + rootFolder + '"\n\
+					hidecolumnpicker="true" seltype="single" flex="1"\n\
+					onselect="onSelect();">\n\
+					<treecols>\n\
+						<treecol id="title" flex="1" primary="true" hideheader="true" />\n\
+					</treecols>\n\
+					<treechildren />\n\
+				</tree>\n\
+				<checkbox id="root" label="' + _localize("Root folder") + '" oncommand="onSelect();" />\n\
+				<script type="application/javascript"><![CDATA[\n\
+				var [folderId, rootFolder, callback, context] = window.arguments;\n\
+				var tree = document.getElementById("tree");\n\
+				var root = document.getElementById("root");\n\
+				function init() {\n\
+					if(folderId == rootFolder)\n\
+						root.checked = true;\n\
+					else if(folderId != undefined) {\n\
+						tree.selectItems([folderId]);\n\
+						var i = tree.view.selection.currentIndex;\n\
+						if(i != -1) {\n\
+							setTimeout(function() {\n\
+								tree.treeBoxObject.ensureRowIsVisible(i);\n\
+							}, 0);\n\
+						}\n\
+					}\n\
+					onSelect();\n\
+				}\n\
+				function onSelect(dis) {\n\
+					if(!arguments.length)\n\
+						dis = !root.checked && !tree.view.selection.getRangeCount();\n\
+					document.documentElement.getButton("accept").disabled = dis;\n\
+					disableTree(root.checked);\n\
+				}\n\
+				function disableTree(dis) {\n\
+					if(dis) {\n\
+						tree.style.opacity = "0.6";\n\
+						tree.setAttribute("disabled", "true");\n\
+					}\n\
+					else {\n\
+						tree.style.opacity = "";\n\
+						tree.removeAttribute("disabled");\n\
+					}\n\
+				}\n\
+				function dialogCallback() {\n\
+					if(root.checked)\n\
+						var id = rootFolder;\n\
+					else {\n\
+						var view = tree.view;\n\
+						var i = view.selection.currentIndex;\n\
+						if(i == -1)\n\
+							return false;\n\
+						var item = view.nodeForTreeIndex(i);\n\
+						if(item) {\n\
+							var id = /place:folder=(\\w+)/.test(item.uri)\n\
+								? RegExp.$1\n\
+								: item.itemId;\n\
+						}\n\
+					}\n\
+					callback.call(context, id);\n\
+					return true;\n\
+				}\n\
+				onSelect(false);\n\
+				]]></script>\n\
 			</dialog>';
 		var folder;
 		var callback = function(folderId) {
