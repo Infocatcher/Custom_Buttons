@@ -205,12 +205,13 @@ this.bookmarks = {
 					return false;\n\
 				}\n\
 				function disableTree(dis) {\n\
+					var treechildren = tree.getElementsByTagName("treechildren")[0];\n\
 					if(dis) {\n\
-						tree.style.opacity = "0.6";\n\
+						treechildren.style.opacity = "0.6";\n\
 						tree.setAttribute("disabled", "true");\n\
 					}\n\
 					else {\n\
-						tree.style.opacity = "";\n\
+						treechildren.style.opacity = "";\n\
 						tree.removeAttribute("disabled");\n\
 					}\n\
 				}\n\
