@@ -122,6 +122,14 @@ this.bookmarks = {
 		delete btn._placesMenu;
 	},
 	selectFolder: function() {
+		var winType = this.button.id + ":dialog";
+		var win = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+			.getService(Components.interfaces.nsIWindowMediator)
+			.getMostRecentWindow(winType);
+		if(win) {
+			win.focus();
+			return null;
+		}
 		// https://developer.mozilla.org/en/Displaying_Places_information_using_views
 		var rootFolder = PlacesUIUtils.allBookmarksFolderId;
 		var placesOverlay = Application.name == "SeaMonkey"
@@ -142,7 +150,7 @@ this.bookmarks = {
 			+ placesOverlay + '\n\
 			<dialog xmlns="' + xulns + '"\n\
 				id="' + this.button.id + "-dialog" + '"\n\
-				windowtype="' + this.button.id + ":dialog" + '"\n\
+				windowtype="' + winType + '"\n\
 				title="' + _localize("Select folder") + '"\n\
 				buttons="accept,cancel"\n\
 				onload="init();"\n\
