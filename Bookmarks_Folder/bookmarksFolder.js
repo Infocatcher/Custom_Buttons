@@ -74,6 +74,11 @@ this.bookmarks = {
 	set folder(val) {
 		cbu.setPrefs(this.pref, String(val));
 	},
+	get wm() {
+		delete this.wm;
+		return this.wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+			.getService(Components.interfaces.nsIWindowMediator);
+	},
 	initialized: false,
 	init: function() {
 		var folder = this.folder;
@@ -121,11 +126,19 @@ this.bookmarks = {
 		delete btn._placesView;
 		delete btn._placesMenu;
 	},
+	initWithFolder: function(folder) {
+		this.destroy();
+		this.folder = folder;
+		var mp = this.button.firstChild;
+		mp.setAttribute(
+			"onpopupshowing",
+			mp.getAttribute("onpopupshowing")
+				.replace(/(place:folder=)\w+/, "$1" + folder)
+		);
+	},
 	selectFolder: function() {
 		var winType = this.button.id + ":dialog";
-		var win = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-			.getService(Components.interfaces.nsIWindowMediator)
-			.getMostRecentWindow(winType);
+		var win = this.wm.getMostRecentWindow(winType);
 		if(win) {
 			win.focus();
 			return null;
@@ -265,14 +278,16 @@ this.bookmarks = {
 		var folder = this.selectFolder();
 		if(!folder)
 			return;
-		this.folder = folder;
-		this.destroy();
-		var mp = this.button.firstChild;
-		mp.setAttribute(
-			"onpopupshowing",
-			mp.getAttribute("onpopupshowing")
-				.replace(/(place:folder=)\w+/, "$1" + folder)
-		);
+		this.initWithFolder(folder);
+
+		var ws = this.wm.getEnumerator("navigator:browser");
+		while(ws.hasMoreElements()) {
+			let w = ws.getNext();
+			if(w == window)
+				continue;
+			let btn = w.document.getElementById(this.button.id);
+			btn && btn.bookmarks.initWithFolder(folder);
+		}
 	},
 	getFolderId: function(folder) {
 		if(/^\d+$/.test(folder))
