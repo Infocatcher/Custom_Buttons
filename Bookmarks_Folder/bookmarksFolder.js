@@ -132,6 +132,9 @@ this.bookmarks = {
 			<?xml-stylesheet href="chrome://browser/content/places/places.css"?>\n\
 			<?xml-stylesheet href="chrome://browser/skin/places/places.css"?>\n\
 			<?xul-overlay href="chrome://browser/content/places/placesOverlay.xul"?>';
+		// Note: <property name="view"> from chrome://communicator/content/places/tree.xml#places-tree
+		// are null sometimes.
+		// We are trying to re-apply binding as a workaround.
 		var winSrc = '\
 			<?xml version="1.0"?>\n\
 			<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>'
@@ -164,6 +167,8 @@ this.bookmarks = {
 				var tree = document.getElementById("tree");\n\
 				var root = document.getElementById("root");\n\
 				function init() {\n\
+					if(!ensurePlacesBinding(init, this, arguments))\n\
+						return;\n\
 					if(folderId == rootFolder)\n\
 						root.checked = true;\n\
 					else if(folderId != undefined) {\n\
@@ -178,10 +183,25 @@ this.bookmarks = {
 					onSelect();\n\
 				}\n\
 				function onSelect(dis) {\n\
+					if(!ensurePlacesBinding(onSelect, this, arguments))\n\
+						return;\n\
 					if(!arguments.length)\n\
 						dis = !root.checked && !tree.view.selection.getRangeCount();\n\
 					document.documentElement.getButton("accept").disabled = dis;\n\
 					disableTree(root.checked);\n\
+				}\n\
+				function ensurePlacesBinding(func, context, args) {\n\
+					if(tree.view)\n\
+						return true;\n\
+					\// Try re-apply binding, hack for SeaMonkey\n\
+					tree.removeAttribute("type");\n\
+					setTimeout(function() {\n\
+						tree.setAttribute("type", "places");\n\
+						setTimeout(function() {\n\
+							func.apply(context, args);\n\
+						}, 0);\n\
+					}, 0);\n\
+					return false;\n\
 				}\n\
 				function disableTree(dis) {\n\
 					if(dis) {\n\
