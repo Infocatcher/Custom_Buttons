@@ -192,7 +192,7 @@ this.bookmarks = {
 					disableTree(root.checked);\n\
 				}\n\
 				function ensurePlacesBinding(func, context, args) {\n\
-					if(tree.view)\n\
+					if(tree.view && tree.selectItems)\n\
 						return true;\n\
 					\// Try re-apply binding, hack for SeaMonkey\n\
 					tree.removeAttribute("type");\n\
