@@ -5,7 +5,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2012
-// version 0.1.2 - 2012-09-15
+// version 0.1.3 - 2012-09-18
 
 var options = {
 	pluginName: "Shockwave Flash", // Or name of any other plugin
@@ -61,6 +61,8 @@ AddonManager.getAddonsByTypes(["plugin"], function(addons) {
 		btn.initAddonListener();
 		return true;
 	});
+	if(!addonId)
+		btn.pluginEnabled = false;
 });
 
 this.onclick = function(e) {
