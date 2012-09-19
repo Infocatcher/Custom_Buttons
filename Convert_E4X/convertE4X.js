@@ -76,7 +76,8 @@ function convertCode(s) {
 		if(/\WXML\s*\.\s*\w/.test(orig))
 			s = 'var XML = window.XML || {};\n\n' + s;
 		// Add new parse function
-		s += "\n\n" + e4xConv_parseXULFromString + "\n" + e4xConv_encodeHTML;
+		s += "\n\n" + e4xConv_parseXULFromString
+			+ (s.indexOf("e4xConv_encodeHTML") != -1 ? "\n" + e4xConv_encodeHTML : "");
 
 		out(s);
 	}
