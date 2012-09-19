@@ -1,6 +1,6 @@
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Convert_E4X
 
-// Conver E4X button for Custom Buttons
+// Convert E4X button for Custom Buttons
 // Code for "code" section
 
 // (c) Infocatcher 2012
