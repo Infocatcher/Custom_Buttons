@@ -72,7 +72,7 @@ function convertCode(s) {
 
 	if(s != orig) {
 		if(/\WXML\s*\.\s*\w/.test(orig))
-			s = 'if(typeof XML == "undefined")\n\tvar XML = {};\n\n' + s;
+			s = 'var XML = window.XML || {};\n\n' + s;
 		// Add new parse function
 		s += "\n\n" + e4xConv_parseXULFromString + "\n" + e4xConv_encodeHTML;
 
