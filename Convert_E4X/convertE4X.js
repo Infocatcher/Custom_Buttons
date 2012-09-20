@@ -9,6 +9,8 @@
 // Tries convert deprecated E4X to string literals.
 // Click on button and then click on another button with E4X in code (or click on opened page with *.js file).
 
+var btn = this;
+btn.checked = true;
 addEventListener("click", function getButton(e) {
 	var trg = e.target;
 
@@ -26,7 +28,9 @@ addEventListener("click", function getButton(e) {
 	removeEventListener(e.type, getButton, true);
 	e.preventDefault();
 	e.stopPropagation();
-	codes.forEach(convertCode);
+	btn.checked = false;
+	if(trg != btn)
+		codes.forEach(convertCode);
 }, true);
 
 function convertCode(s) {
