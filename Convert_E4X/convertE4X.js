@@ -156,7 +156,7 @@ function e4xConv_parseXULFromString(xul) {
 	return new DOMParser().parseFromString(xul, "application/xml").documentElement;
 }
 function e4xConv_encodeHTML(s) {
-	return s
+	return String(s)
 		.replace(/&/g, "&amp;")
 		.replace(/</g, "&lt;")
 		.replace(/>/g, "&gt;")
