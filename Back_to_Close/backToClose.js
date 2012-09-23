@@ -74,22 +74,29 @@ document.insertBefore(
 	document.firstChild
 );
 
-var stopTime = Date.now() + 500;
-var fixSizeInterval = setInterval(function() {
-	var backBtnIcon = backBtn.ownerDocument.getAnonymousElementByAttribute(backBtn, "class", "toolbarbutton-icon");
-	if(!backBtnIcon)
-		return;
-	var backToClose = backBtn.hasAttribute("_cb_backToClose");
-	if(backToClose)
-		backBtn.removeAttribute("_cb_backToClose");
+function fixIconSize() {
+	var stopTime = Date.now() + 500;
+	setTimeout(function fixIconSize() { // Wait for applying of XBL binding
+		var btnIcon = backBtn.ownerDocument.getAnonymousElementByAttribute(backBtn, "class", "toolbarbutton-icon");
+		if(!btnIcon) {
+			if(Date.now() < stopTime)
+				setTimeout(fixIconSize, 10);
+			return;
+		}
 
-	var s = backBtnIcon.style;
-	var bo = backBtnIcon.boxObject;
-	s.setProperty("width", bo.width + "px", "important");
-	s.setProperty("height", bo.height + "px", "important");
+		var backToClose = backBtn.hasAttribute("_cb_backToClose");
+		if(backToClose)
+			backBtn.removeAttribute("_cb_backToClose");
 
-	if(backToClose)
-		backBtn.setAttribute("_cb_backToClose", "true");
+		var s = btnIcon.style;
+		s.width = s.height = "";
+		var bo = btnIcon.boxObject;
+		s.setProperty("width",  bo.width  + "px", "important");
+		s.setProperty("height", bo.height + "px", "important");
 
-	clearInterval(fixSizeInterval);
-}, 0);
+		if(backToClose)
+			backBtn.setAttribute("_cb_backToClose", "true");
+	}, 0);
+}
+fixIconSize();
+addEventListener("aftercustomization", fixIconSize, false);
