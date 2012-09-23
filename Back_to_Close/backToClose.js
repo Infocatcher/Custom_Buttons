@@ -73,10 +73,22 @@ document.insertBefore(
 	document.firstChild
 );
 
-var backBtnIcon = backBtn.ownerDocument.getAnonymousElementByAttribute(backBtn, "class", "toolbarbutton-icon");
-if(backBtnIcon) {
-	let s = backBtnIcon.style;
-	let bo = backBtnIcon.boxObject;
+var stopTime = Date.now() + 500;
+var fixSizeInterval = setInterval(function() {
+	var backBtnIcon = backBtn.ownerDocument.getAnonymousElementByAttribute(backBtn, "class", "toolbarbutton-icon");
+	if(!backBtnIcon)
+		return;
+	var backToClose = backBtn.hasAttribute("_cb_backToClose");
+	if(backToClose)
+		backBtn.removeAttribute("_cb_backToClose");
+
+	var s = backBtnIcon.style;
+	var bo = backBtnIcon.boxObject;
 	s.setProperty("width", bo.width + "px", "important");
 	s.setProperty("height", bo.height + "px", "important");
-}
+
+	if(backToClose)
+		backBtn.setAttribute("_cb_backToClose", "true");
+
+	clearInterval(fixSizeInterval);
+}, 0);
