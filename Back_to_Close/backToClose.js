@@ -52,6 +52,7 @@ eval(
 		)
 );
 
+// Used images from this style: http://userstyles.org/styles/15313
 var style = '\
 	@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");\n\
 	#back-button[_cb_backToClose] > .toolbarbutton-icon {\n\
