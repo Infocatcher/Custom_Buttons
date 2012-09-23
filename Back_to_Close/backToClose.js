@@ -20,7 +20,8 @@ backBroadcaster.setAttribute = function(attr, val) {
 	return origSetAttribute.apply(this, arguments);
 };
 
-var origUpdateBackForwardCommands = UpdateBackForwardCommands;
+// Why eval? At least Tree Style Tab patch BrowserBack() function.
+// Wrapper will break any patches.
 eval(
 	"UpdateBackForwardCommands = "
 	+ UpdateBackForwardCommands.toString()
@@ -38,7 +39,6 @@ eval(
 		)
 );
 
-var origBrowserBack = BrowserBack;
 eval(
 	"BrowserBack = "
 	+ BrowserBack.toString()
@@ -48,7 +48,7 @@ eval(
 			if(gBrowser.canGoBack)\n\
 				gBrowser.goBack();\n\
 			else\n\
-				gBrowser.removeTab(gBrowser.selectedTab);'
+				gBrowser.removeCurrentTab();'
 		)
 );
 
