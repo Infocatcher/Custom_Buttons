@@ -4,7 +4,10 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2009-2010, 2012
-// version 0.2.0a1 - 2012-09-23
+// version 0.2.0a2 - 2012-09-24
+
+if(UpdateBackForwardCommands.toString().indexOf("_cb_backToClose") != -1)
+	return; // Don't patch twice
 
 var backBtn = document.getElementById("back-button");
 
@@ -22,23 +25,24 @@ backBroadcaster.setAttribute = function(attr, val) {
 
 // Why eval? At least Tree Style Tab patch BrowserBack() function.
 // Wrapper will break any patches.
+var origUpdateBackForwardCommands = UpdateBackForwardCommands;
 eval(
 	"UpdateBackForwardCommands = "
 	+ UpdateBackForwardCommands.toString()
 		.replace(
-			/[ \t]*if \(backDisabled == aWebNavigation\.canGoBack\)/,
-			'\
-			var backBtn = document.getElementById("back-button");\n\
+			/\}$/,
+			'\n\n\
 			var backToClose = backBtn.hasAttribute("_cb_backToClose");\n\
 			if(aWebNavigation.canGoBack == backToClose) {\n\
 				if(backToClose)\n\
 					backBtn.removeAttribute("_cb_backToClose");\n\
 				else\n\
 					backBtn.setAttribute("_cb_backToClose", "true");\n\
-			}\n$&'
+			}\n}'
 		)
 );
 
+var origBrowserBack = BrowserBack;
 eval(
 	"BrowserBack = "
 	+ BrowserBack.toString()
@@ -65,7 +69,7 @@ var style = '\
 	#back-button[_cb_backToClose]:active > .toolbarbutton-icon {\n\
 		list-style-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAYCAMAAAAmopZHAAAB6VBMVEX////+8/MJAQH86OiCDw8UAwMyBgYUAwNaCgoNAgIJAQENAgIkBAQJAQFcCwtuDQ18Dg6JDw+ADg6FDw+FDw8OAgJFCAgLAgJwDQ30m5v4wsJqDAwbAwOHDw93DQ361NRuDQ2NEBB+Dg4bAwNXCgr73d3sUlJlDAyNEBCHDw/85OT61NRnDAyNEBDtWFj85OTsT09nDAwQAgISAgL84eH84+OADg5+Dg5sDAyHDw/85ub84eFnDAyOEBB1DQ384+N3DQ1RCQn98fFuDQ2oExO4FRW6FRWiEhKbERHMFxetExO2FBSrExNaCgq9FRWSEBC/FRXVGBj2ra28FRXrRETKFxf4v7/3tLT729v739/60tKfEhLYGBhgCwuvFBSkEhKQEBBeCwuEDw+ZERFOCQmJDw+pExPOFxeCDw9PCQlqDAx5Dg6gEhJ3DQ1+Dg7pMjKLEBBuDQ3GFhaxFBSOEBC0FBTXGBhVCgqXERFRCQmFDw9jCwvrSEjPFxfrRkbBFhaUERGADg7qPz/pNzdsDAzoMDCdEhJpDAx1DQ3RFxeHDw9zDQ1YCgrqOzvqQkJMCQmNEBDgGRncGRmzFBR7Dg6mExPqPT2WERHmHh58Dg7pNDRnDAxcCwvIFhbjGRlyDQ31pKTeGRn5yMgz7SLnAAAARHRSTlMAo0hCeh4jBEA0PRUgHB7w2fridvUyIhz8OUOxKZobQ3cZtBc2M0fcke4JU5WQKkRT0wYsDlx08NfbMWWJ9/Bqj+mM/BkShYgAAAGUSURBVHheXcpjkyUxFIDhM7bWtm17kzRxbdvG2Nba3l863ZkP03Wfqpy36uSApq+7uRGo9ndduDjTAAB69l4d4vLf9fLq/tbt3XsymBDzDkLUfVvnw+kqxkQglFaME9Bx5GjI94EIyI2wLMtYqxmPwukzu6ZFASP2M4uIgdBiEoXe1pyfN5czFtdkOCbHwpMuS6YsR6H91KifJ2jc4XCMh2NhWqTe7xusMKIgshan02n5QicrCqvQ/0xxI1/ZHdhQL+kLuH18CI4dUFgGiUgJLbg0CyHlE2JycPJ1ff1n0BtMRkr/NaVIMhiU0nBtYOxHan7eK/2y2Wz0Sd7U0hocfPDnY24mW+TsdjuXorOY/VaEQ4ezhUAgMWEymSbSiTRt4u0SHD+xzKDYYsX411gYRsMFtZVF/xicPXfeLxtknvnH8PLUdgn2wqXLV6JWLm41VA3WeHy7pSkJ4PqNm76ax1OrqcNDa1yx1gHu3L13n/ut9+69cQQAHj1+8vTrps7sXD4CqpbnL16O6CUjb4B+vGpqtAUlaregregFbwAAAABJRU5ErkJggg==") !important;\n\
 	}';
-document.insertBefore(
+var styleNode = document.insertBefore(
 	document.createProcessingInstruction(
 		"xml-stylesheet",
 		'href="' + "data:text/css,"
@@ -74,10 +78,13 @@ document.insertBefore(
 	document.firstChild
 );
 
+function getIcon() {
+	return backBtn.ownerDocument.getAnonymousElementByAttribute(backBtn, "class", "toolbarbutton-icon");
+}
 function fixIconSize() {
 	var stopTime = Date.now() + 500;
 	setTimeout(function fixIconSize() { // Wait for applying of XBL binding
-		var btnIcon = backBtn.ownerDocument.getAnonymousElementByAttribute(backBtn, "class", "toolbarbutton-icon");
+		var btnIcon = getIcon();
 		if(!btnIcon) {
 			if(Date.now() < stopTime)
 				setTimeout(fixIconSize, 10);
@@ -100,3 +107,18 @@ function fixIconSize() {
 }
 fixIconSize();
 addEventListener("aftercustomization", fixIconSize, false);
+
+this.onDestroy = function(reason) {
+	// Note: we don't restore patches from another extensions!
+	if(reason == "update" || reason == "delete") {
+		backBroadcaster.setAttribute = origSetAttribute;
+		UpdateBackForwardCommands = origUpdateBackForwardCommands;
+		BrowserBack = origBrowserBack;
+		styleNode.parentNode.removeChild(styleNode);
+		let btnIcon = getIcon();
+		if(btnIcon) {
+			let s = btnIcon.style;
+			s.width = s.height = "";
+		}
+	}
+};
