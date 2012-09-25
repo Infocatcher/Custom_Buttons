@@ -14,6 +14,51 @@ if(UpdateBackForwardCommands.toString().indexOf("_cb_backToClose") != -1) {
 //	LOG("Initialization");
 
 var backBtn = document.getElementById("back-button");
+var backToClose = {
+	enabled: false,
+	set: function(enable) {
+		if(enable == this.enabled)
+			return;
+		this.enabled = enable;
+		if(enable)
+			backBtn.setAttribute("_cb_backToClose", "true");
+		else
+			backBtn.removeAttribute("_cb_backToClose");
+		setTimeout(function(_this) { // Don't block main thread
+			_this.setTip(enable);
+		}, 0, this);
+	},
+	setTip: function(enable) {
+		var tt = document.getElementById("back-button-tooltip");
+		if(!tt) {
+			this.setTip = function() {};
+			return;
+		}
+		var ttLabel = tt.firstChild;
+		var baseTip = ttLabel.getAttribute("value");
+		var closeTab = document.getElementById("tabs-closebutton")
+			|| document.getElementById("context_closeTab")
+			|| document.getElementById("menu_close");
+		var closeLabel = closeTab && closeTab.getAttribute("label") || "Close Tab";
+		var end = closeLabel.substr(1);
+		var endLower = end.toLowerCase();
+		var closeTip = closeLabel[0] + endLower;
+		var closeAdd = " (" + (end == endLower ? closeLabel.toLowerCase() : closeLabel) + ")";
+
+		var backContext = document.getElementById("context-back");
+		var backMenu = document.getElementById("historyMenuBack");
+		if(backContext) var backContextLabel = backContext.getAttribute("label");
+		if(backMenu)    var backMenuLabel    = backMenu   .getAttribute("label");
+
+		this.setTip = function(enable) {
+			ttLabel.setAttribute("value", enable ? closeTip : baseTip);
+			var addLabel = enable ? closeAdd : "";
+			backContext && backContext.setAttribute("label", backContextLabel + addLabel);
+			backMenu    && backMenu   .setAttribute("label", backMenuLabel    + addLabel);
+		};
+		this.setTip(enable);
+	}
+};
 
 // See UpdateBackForwardCommands() in chrome://browser/content/browser.js
 // Now we always can go back
@@ -36,13 +81,7 @@ eval(
 		.replace(
 			/\}$/,
 			'\n\n\
-			var backToClose = backBtn.hasAttribute("_cb_backToClose");\n\
-			if(aWebNavigation.canGoBack == backToClose) {\n\
-				if(backToClose)\n\
-					backBtn.removeAttribute("_cb_backToClose");\n\
-				else\n\
-					backBtn.setAttribute("_cb_backToClose", "true");\n\
-			}\n}'
+			backToClose.set(!aWebNavigation.canGoBack);\n}'
 		)
 );
 UpdateBackForwardCommands(gBrowser.webNavigation);
@@ -74,9 +113,8 @@ function fixIconSize() {
 			return;
 		}
 
-		var backToClose = backBtn.hasAttribute("_cb_backToClose");
-		if(backToClose)
-			backBtn.removeAttribute("_cb_backToClose");
+		var btc = backToClose.enabled;
+		btc && backToClose.set(false);
 
 		// Fix button size and allow use small icons (like 16x16 instead of 18x18)
 		var sb = backBtn.style;
@@ -93,8 +131,7 @@ function fixIconSize() {
 		si.setProperty("max-width",  bo.width  + "px", "important");
 		si.setProperty("max-height", bo.height + "px", "important");
 
-		if(backToClose)
-			backBtn.setAttribute("_cb_backToClose", "true");
+		btc && backToClose.set(true);
 	})();
 }
 fixIconSize();
@@ -127,6 +164,8 @@ this.onDestroy = function(reason) {
 	// Note: we don't restore patches from another extensions!
 	if(reason == "update" || reason == "delete" || reason == "constructor") {
 		// Button changed, removed or opened customize toolbar dialog
+		backToClose.set(false);
+
 		backBroadcaster.setAttribute = origSetAttribute;
 		UpdateBackForwardCommands = origUpdateBackForwardCommands;
 		BrowserBack = origBrowserBack;
