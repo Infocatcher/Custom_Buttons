@@ -3,71 +3,89 @@
 // Title Bar button for Custom Buttons
 // (code for "initialization" section)
 
-// (c) Infocatcher 2010
-// version 0.1.0 - 2010-05-14
+// (c) Infocatcher 2010, 2012
+// version 0.2.0 - 2012-09-25
 
+// Flexible width:
+var titleWidth = "auto";
+var titleWidthMin = "100px";
+var titleWidthMax = "none";
+/*
+// Fixed width:
+var titleWidth = "350px";
+var titleWidthMin = titleWidth;
+var titleWidthMax = titleWidth;
+*/
+
+var root = document.documentElement;
+this.__savedTitle = null;
 this.__defineSetter__("title", function(val) {
-	if(val == this.__savedTitle)
-		return;
-	this.__savedTitle = val;
-	this.setAttribute("label", val);
-	this.tooltipText = val;
+	if(val != this.__savedTitle)
+		this.label = this.tooltipText = this.__savedTitle = val;
 });
 
 var titleUpdater = {
 	button: this,
+	handleMutations: function(mutations) {
+		this.button.title = document.title;
+	},
 	handleEvent: function(e) {
-		if(e.attrName != "title" || e.originalTarget != document.documentElement)
-			return;
-		this.button.title = e.newValue;
-		//setTimeout(function() { throw new Error(">> " + e.newValue); }, 0);
+		if(e.attrName == "title" && e.originalTarget == root)
+			this.button.title = e.newValue;
 	}
 };
-document.documentElement.addEventListener("DOMAttrModified", titleUpdater, true);
-this.__savedTitle = this.title = document.title;
+if("MutationObserver" in window) {
+	var mo = new MutationObserver(titleUpdater);
+	// http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#mutation-observers
+	mo.observe(root, {
+		attributes: true,
+		attributeFilter: ["title"]
+	});
+}
+else {
+	root.addEventListener("DOMAttrModified", titleUpdater, true);
+}
 
-
-var sId = "__customButtonsStyle__" + this.id; // Unique style "id"
-var cssStr = <><![CDATA[
-	%button% {
-		color: windowText !important;
-		text-shadow: window 2px -2px 4px, window -2px 2px 4px, window -2px -4px 4px, window 2px 4px 4px !important;
-		-moz-box-align: start !important;
-
-		background: transparent !important;
-		-moz-box-shadow: none !important;
-		-moz-appearance: none !important;
-		border: none !important;
-		/* width: auto !important; */
-		width: 350px !important;
-	}
-	%button% > image {
-		display: none !important;
-	}
-	%button% > label {
-		display: -moz-box !important;
-	}
-	]]></>.toString()
+var cssStr = ('\
+	@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");\n\
+	@-moz-document url("' + window.location.href + '") {\n\
+		%button% {\n\
+			color: windowText !important;\n\
+			text-shadow: window 2px -2px 4px, window -2px 2px 4px, window -2px -4px 4px, window 2px 4px 4px !important;\n\
+			width: ' + titleWidth + ' !important;\n\
+			min-width: ' + titleWidthMin + ' !important;\n\
+			max-width: ' + titleWidthMax + ' !important;\n\
+			-moz-box-flex: 1 !important;\n\
+			background: transparent !important;\n\
+			-moz-box-shadow: none !important;\n\
+			-moz-appearance: none !important;\n\
+			border: none !important;\n\
+		}\n\
+		%button% > .toolbarbutton-icon {\n\
+			display: none !important;\n\
+		}\n\
+		%button% > .toolbarbutton-text {\n\
+			display: -moz-box !important;\n\
+			text-align: left !important;\n\
+		}\n\
+		toolbarpaletteitem > %button% {\n\
+			min-width: 200px !important;\n\
+			max-width: 200px !important;\n\
+		}\n\
+	}')
 	.replace(/%button%/g, "#" + this.id);
 
-function sheet(cssStr, removeFlag) {
-	var cc = Components.classes;
-	var sss = cc["@mozilla.org/content/style-sheet-service;1"]
-		.getService(Components.interfaces.nsIStyleSheetService);
-	var ios = cc["@mozilla.org/network/io-service;1"]
-		.getService(Components.interfaces.nsIIOService);
-	var data = "data:text/css," + encodeURIComponent(cssStr);
-	var uri = ios.newURI(data, null, null);
-	if(sss.sheetRegistered(uri, sss.USER_SHEET))
-		sss.unregisterSheet(uri, sss.USER_SHEET);
-	if(removeFlag)
-		return;
-	sss.loadAndRegisterSheet(uri, sss.USER_SHEET);
-	window[sId] = cssStr;
-}
-if(!(sId in window))
-	sheet(cssStr);
-else if(window[sId] != cssStr) {
-	sheet(window[sId], true);
-	sheet(cssStr);
-}
+var cssURI = makeURI("data:text/css," + encodeURIComponent(cssStr));
+var sss = Components.classes["@mozilla.org/content/style-sheet-service;1"]
+	.getService(Components.interfaces.nsIStyleSheetService);
+if(!sss.sheetRegistered(cssURI, sss.USER_SHEET))
+	sss.loadAndRegisterSheet(cssURI, sss.USER_SHEET);
+
+this.title = document.title;
+
+this.onDestroy = function(reason) {
+	if(reason == "update" || reason == "delete") {
+		if(sss.sheetRegistered(cssURI, sss.USER_SHEET))
+			sss.unregisterSheet(cssURI, sss.USER_SHEET);
+	}
+};
