@@ -4,12 +4,14 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2009-2010, 2012
-// version 0.2.0a2 - 2012-09-24
+// version 0.2.0a3 - 2012-09-25
 
 if(UpdateBackForwardCommands.toString().indexOf("_cb_backToClose") != -1) {
 	LOG("!!! Second initialization !!!");
 	return; // Don't patch twice
 }
+//else
+//	LOG("Initialization");
 
 var backBtn = document.getElementById("back-button");
 
@@ -96,7 +98,7 @@ function fixIconSize() {
 	})();
 }
 fixIconSize();
-addEventListener("aftercustomization", fixIconSize, false);
+//addEventListener("aftercustomization", fixIconSize, false);
 
 // Used images from this style: http://userstyles.org/styles/15313
 var cssStr = '\
@@ -121,19 +123,25 @@ if(!sss.sheetRegistered(cssURI, sss.USER_SHEET))
 	sss.loadAndRegisterSheet(cssURI, sss.USER_SHEET);
 
 this.onDestroy = function(reason) {
+	//LOG("Destroy: " + reason);
 	// Note: we don't restore patches from another extensions!
-	if(reason == "update" || reason == "delete") {
+	if(reason == "update" || reason == "delete" || reason == "constructor") {
+		// Button changed, removed or opened customize toolbar dialog
 		backBroadcaster.setAttribute = origSetAttribute;
 		UpdateBackForwardCommands = origUpdateBackForwardCommands;
 		BrowserBack = origBrowserBack;
-		if(sss.sheetRegistered(cssURI, sss.USER_SHEET))
-			sss.unregisterSheet(cssURI, sss.USER_SHEET);
+
 		let s = backBtn.style;
 		s.width = s.height = "";
 		let btnIcon = getIcon();
 		if(btnIcon) {
 			s = btnIcon.style;
 			s.maxWidth = s.maxHeight = "";
+		}
+
+		if(reason != "constructor") {
+			if(sss.sheetRegistered(cssURI, sss.USER_SHEET))
+				sss.unregisterSheet(cssURI, sss.USER_SHEET);
 		}
 	}
 };
