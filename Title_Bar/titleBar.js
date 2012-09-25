@@ -56,6 +56,10 @@ var cssStr = ('\
 			min-width: ' + titleWidthMin + ' !important;\n\
 			max-width: ' + titleWidthMax + ' !important;\n\
 			-moz-box-flex: 1 !important;\n\
+			padding-top: 1px !important;\n\
+			padding-bottom: 1px !important;\n\
+			-moz-box-pack: center !important;\n\
+			-moz-box-orient: horizontal !important;\n\
 			background: transparent !important;\n\
 			-moz-box-shadow: none !important;\n\
 			-moz-appearance: none !important;\n\
