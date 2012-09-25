@@ -41,6 +41,7 @@ eval(
 			}\n}'
 		)
 );
+UpdateBackForwardCommands(gBrowser.webNavigation);
 
 var origBrowserBack = BrowserBack;
 eval(
