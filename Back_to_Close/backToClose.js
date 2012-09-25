@@ -4,49 +4,50 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2009-2010, 2012
-// version 0.2.0a3 - 2012-09-25
+// version 0.2.0b1 - 2012-09-25
 
 if(UpdateBackForwardCommands.toString().indexOf("_cb_backToClose") != -1) {
 	LOG("!!! Second initialization !!!");
 	return; // Don't patch twice
 }
-//else
-//	LOG("Initialization");
 
-var backBtn = document.getElementById("back-button");
+var backBtn = $("back-button");
 var backToClose = {
 	enabled: false,
 	set: function(enable) {
 		if(enable == this.enabled)
 			return;
 		this.enabled = enable;
-		if(enable)
-			backBtn.setAttribute("_cb_backToClose", "true");
-		else
-			backBtn.removeAttribute("_cb_backToClose");
+		this.setStyle(enable);
 		setTimeout(function(_this) { // Don't block main thread
 			_this.setTip(enable);
 		}, 0, this);
 	},
+	setStyle: function(enable) {
+		if(enable)
+			backBtn.setAttribute("_cb_backToClose", "true");
+		else
+			backBtn.removeAttribute("_cb_backToClose");
+	},
 	setTip: function(enable) {
-		var tt = document.getElementById("back-button-tooltip");
+		var tt = $("back-button-tooltip");
 		if(!tt) {
 			this.setTip = function() {};
 			return;
 		}
 		var ttLabel = tt.firstChild;
 		var baseTip = ttLabel.getAttribute("value");
-		var closeTab = document.getElementById("tabs-closebutton")
-			|| document.getElementById("context_closeTab")
-			|| document.getElementById("menu_close");
+		var closeTab = $("tabs-closebutton")
+			|| $("context_closeTab")
+			|| $("menu_close");
 		var closeLabel = closeTab && closeTab.getAttribute("label") || "Close Tab";
 		var end = closeLabel.substr(1);
 		var endLower = end.toLowerCase();
 		var closeTip = closeLabel[0] + endLower;
 		var closeAdd = " (" + (end == endLower ? closeLabel.toLowerCase() : closeLabel) + ")";
 
-		var backContext = document.getElementById("context-back");
-		var backMenu = document.getElementById("historyMenuBack");
+		var backContext = $("context-back");
+		var backMenu = $("historyMenuBack");
 		if(backContext) var backContextLabel = backContext.getAttribute("label");
 		if(backMenu)    var backMenuLabel    = backMenu   .getAttribute("label");
 
@@ -59,10 +60,13 @@ var backToClose = {
 		this.setTip(enable);
 	}
 };
+function $(id) {
+	return document.getElementById(id);
+}
 
 // See UpdateBackForwardCommands() in chrome://browser/content/browser.js
 // Now we always can go back
-var backBroadcaster = document.getElementById("Browser:Back");
+var backBroadcaster = $("Browser:Back");
 if(backBroadcaster.getAttribute("disabled") == "true")
 	backBroadcaster.removeAttribute("disabled");
 var origSetAttribute = backBroadcaster.setAttribute;
@@ -114,7 +118,7 @@ function fixIconSize() {
 		}
 
 		var btc = backToClose.enabled;
-		btc && backToClose.set(false);
+		btc && backToClose.setStyle(false);
 
 		// Fix button size and allow use small icons (like 16x16 instead of 18x18)
 		var sb = backBtn.style;
@@ -131,7 +135,7 @@ function fixIconSize() {
 		si.setProperty("max-width",  bo.width  + "px", "important");
 		si.setProperty("max-height", bo.height + "px", "important");
 
-		btc && backToClose.set(true);
+		btc && backToClose.setStyle(true);
 	})();
 }
 fixIconSize();
@@ -143,7 +147,6 @@ var cssStr = '\
 	@-moz-document url("' + window.location.href + '") {\n\
 		#back-button[_cb_backToClose] > .toolbarbutton-icon {\n\
 			list-style-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAYCAMAAAAmopZHAAAB7FBMVEUAAAD+8/MJAQH86OgOAgJpDAzqOzskBATVGBiNEBDnICAJAQHcGRkQAgISAgLpNzftWFi9FRUJAQEUAwMLAgLoLS3mHh70m5u2FBQNAgIUAwMbAwPmGhqvFBTXGBjVGBgbAwOrExPnJCR3DQ3OFxcNAgL73d3wdXWkEhLGFhbqQED85OT61NSgEhIyBgbeGRn85OTwdXWfEhJyDQ384eH84+O2FBSvFBRFCAj85ub84eGbERG6FRX4wsL84+OrExOHDw9cCwv98fH61NTmHBzYGBjsTU3pMjLsVlaNEBCWERGvFBS9FRXoKyuiEhKdEhLoLi6oExPvbW3vb2/nJyfrRET97e3mGhr5yMj61NT86Oj5zc3qOzutExP+8/PuY2OJDw/sUVHwdnbOFxfnJSXrSUnuaGjyhYXrRkaUERHyjIzsUlLqPT3rSEiLEBDoLS2kEhK2FBTlGRnGFha/FRXMFxfuZmbtWlqrExOzFBT+9vb0l5fqPz/DFha4FRWOEBDweHjmHh7pNjbXGBjPFxfhGRnzkpLcGRnoKSnsVFTzkJD72tqbERGCDw+ADg7tX1/tXV2pExPnIiLKFxf4v7/pOTnjGRnvbGz84eHzjo6gEhLoMDDnJCS8FRXpNDSFDw/4wsK0FBTVGBjxfn7SC4CzAAAARHRSTlMAo0hCMi/YIFoZaz26BiznKt4cHhy6bTm6FQQpdY5X3hdaxhv2NDNBxPbzCVN1I45ES7c1Dlxb4iIxZWzvQ2pz2B6MQ/MoKJkAAAF4SURBVHheXcljjyRhFIbhM7Ztrm37LaNt29bYtmfNP7rVlUlPuq7kOfeHA3mtdaVSIGi/0lkZlgCAnvLam19Oip0CNDQONtkWJH4CtD3qwFUqpfJcqVQV+g16+/qXvN6sjYyQtmyhHAxXjEb2D3IaYprQ5PYvevAdqqrdJLmp4bam1txmh9m9NrXFaTYX4e49tcfjjwWtVmsQEUhszH8Gz+tjMzNhedKn1Wp9q+JNysPr8GGIIwhCjrB/RqNRHIbkxF8YG3erBUfYsfNznvMYO1KrXVBzY54SRHf38O08fG83SlEpaG7ZoWk6QNlxg8Egzk4FaBa6uhU8z8to3GQy4QHx0jI+AW8GGIaxxB16vd4hi8vExi0MfBphWJZNTIR+hw4nf0weCp1IsAq4eu36rMuVSc+Rc+lMoV/h1u07fzAMW15JrSxfdgfg/oOHLoSQTqdDqNAAwOMnT58lNyTmAeDFy1evI85iURCUvX33/pcEiI+PJVL/AVfFvH3AyAjJAAAAAElFTkSuQmCC") !important;\n\
-			/*list-style-image: url("http://cdn1.iconfinder.com/data/icons/musthave/16/Delete.png") !important;*/\n\
 			-moz-image-region: auto !important;\n\
 		}\n\
 		#back-button[_cb_backToClose]:hover > .toolbarbutton-icon {\n\
@@ -160,7 +163,6 @@ if(!sss.sheetRegistered(cssURI, sss.USER_SHEET))
 	sss.loadAndRegisterSheet(cssURI, sss.USER_SHEET);
 
 this.onDestroy = function(reason) {
-	//LOG("Destroy: " + reason);
 	// Note: we don't restore patches from another extensions!
 	if(reason == "update" || reason == "delete" || reason == "constructor") {
 		// Button changed, removed or opened customize toolbar dialog
@@ -169,6 +171,7 @@ this.onDestroy = function(reason) {
 		backBroadcaster.setAttribute = origSetAttribute;
 		UpdateBackForwardCommands = origUpdateBackForwardCommands;
 		BrowserBack = origBrowserBack;
+		UpdateBackForwardCommands(gBrowser.webNavigation);
 
 		let s = backBtn.style;
 		s.width = s.height = "";
