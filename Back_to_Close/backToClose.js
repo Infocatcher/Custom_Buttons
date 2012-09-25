@@ -6,8 +6,10 @@
 // (c) Infocatcher 2009-2010, 2012
 // version 0.2.0a2 - 2012-09-24
 
-if(UpdateBackForwardCommands.toString().indexOf("_cb_backToClose") != -1)
+if(UpdateBackForwardCommands.toString().indexOf("_cb_backToClose") != -1) {
+	LOG("!!! Second initialization !!!");
 	return; // Don't patch twice
+}
 
 var backBtn = document.getElementById("back-button");
 
@@ -57,12 +59,52 @@ eval(
 		)
 );
 
+function getIcon() {
+	return backBtn.ownerDocument.getAnonymousElementByAttribute(backBtn, "class", "toolbarbutton-icon");
+}
+function fixIconSize() {
+	var stopTime = Date.now() + 500;
+	(function fixIconSize() {
+		var btnIcon = getIcon();
+		if(!btnIcon) {
+			if(Date.now() < stopTime)
+				setTimeout(fixIconSize, 10); // Wait for applying of XBL binding
+			return;
+		}
+
+		var backToClose = backBtn.hasAttribute("_cb_backToClose");
+		if(backToClose)
+			backBtn.removeAttribute("_cb_backToClose");
+
+		// Fix button size and allow use small icons (like 16x16 instead of 18x18)
+		var sb = backBtn.style;
+		sb.width = sb.height = "";
+
+		var si = btnIcon.style;
+		si.maxWidth = si.maxHeight = "";
+
+		var bo = backBtn.boxObject;
+		sb.setProperty("width",  bo.width  + "px", "important");
+		sb.setProperty("height", bo.height + "px", "important");
+
+		bo = btnIcon.boxObject;
+		si.setProperty("max-width",  bo.width  + "px", "important");
+		si.setProperty("max-height", bo.height + "px", "important");
+
+		if(backToClose)
+			backBtn.setAttribute("_cb_backToClose", "true");
+	})();
+}
+fixIconSize();
+addEventListener("aftercustomization", fixIconSize, false);
+
 // Used images from this style: http://userstyles.org/styles/15313
 var cssStr = '\
 	@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");\n\
 	@-moz-document url("' + window.location.href + '") {\n\
 		#back-button[_cb_backToClose] > .toolbarbutton-icon {\n\
 			list-style-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAYCAMAAAAmopZHAAAB7FBMVEUAAAD+8/MJAQH86OgOAgJpDAzqOzskBATVGBiNEBDnICAJAQHcGRkQAgISAgLpNzftWFi9FRUJAQEUAwMLAgLoLS3mHh70m5u2FBQNAgIUAwMbAwPmGhqvFBTXGBjVGBgbAwOrExPnJCR3DQ3OFxcNAgL73d3wdXWkEhLGFhbqQED85OT61NSgEhIyBgbeGRn85OTwdXWfEhJyDQ384eH84+O2FBSvFBRFCAj85ub84eGbERG6FRX4wsL84+OrExOHDw9cCwv98fH61NTmHBzYGBjsTU3pMjLsVlaNEBCWERGvFBS9FRXoKyuiEhKdEhLoLi6oExPvbW3vb2/nJyfrRET97e3mGhr5yMj61NT86Oj5zc3qOzutExP+8/PuY2OJDw/sUVHwdnbOFxfnJSXrSUnuaGjyhYXrRkaUERHyjIzsUlLqPT3rSEiLEBDoLS2kEhK2FBTlGRnGFha/FRXMFxfuZmbtWlqrExOzFBT+9vb0l5fqPz/DFha4FRWOEBDweHjmHh7pNjbXGBjPFxfhGRnzkpLcGRnoKSnsVFTzkJD72tqbERGCDw+ADg7tX1/tXV2pExPnIiLKFxf4v7/pOTnjGRnvbGz84eHzjo6gEhLoMDDnJCS8FRXpNDSFDw/4wsK0FBTVGBjxfn7SC4CzAAAARHRSTlMAo0hCMi/YIFoZaz26BiznKt4cHhy6bTm6FQQpdY5X3hdaxhv2NDNBxPbzCVN1I45ES7c1Dlxb4iIxZWzvQ2pz2B6MQ/MoKJkAAAF4SURBVHheXcljjyRhFIbhM7Ztrm37LaNt29bYtmfNP7rVlUlPuq7kOfeHA3mtdaVSIGi/0lkZlgCAnvLam19Oip0CNDQONtkWJH4CtD3qwFUqpfJcqVQV+g16+/qXvN6sjYyQtmyhHAxXjEb2D3IaYprQ5PYvevAdqqrdJLmp4bam1txmh9m9NrXFaTYX4e49tcfjjwWtVmsQEUhszH8Gz+tjMzNhedKn1Wp9q+JNysPr8GGIIwhCjrB/RqNRHIbkxF8YG3erBUfYsfNznvMYO1KrXVBzY54SRHf38O08fG83SlEpaG7ZoWk6QNlxg8Egzk4FaBa6uhU8z8to3GQy4QHx0jI+AW8GGIaxxB16vd4hi8vExi0MfBphWJZNTIR+hw4nf0weCp1IsAq4eu36rMuVSc+Rc+lMoV/h1u07fzAMW15JrSxfdgfg/oOHLoSQTqdDqNAAwOMnT58lNyTmAeDFy1evI85iURCUvX33/pcEiI+PJVL/AVfFvH3AyAjJAAAAAElFTkSuQmCC") !important;\n\
+			/*list-style-image: url("http://cdn1.iconfinder.com/data/icons/musthave/16/Delete.png") !important;*/\n\
 			-moz-image-region: auto !important;\n\
 		}\n\
 		#back-button[_cb_backToClose]:hover > .toolbarbutton-icon {\n\
@@ -78,36 +120,6 @@ var sss = Components.classes["@mozilla.org/content/style-sheet-service;1"]
 if(!sss.sheetRegistered(cssURI, sss.USER_SHEET))
 	sss.loadAndRegisterSheet(cssURI, sss.USER_SHEET);
 
-function getIcon() {
-	return backBtn.ownerDocument.getAnonymousElementByAttribute(backBtn, "class", "toolbarbutton-icon");
-}
-function fixIconSize() {
-	var stopTime = Date.now() + 500;
-	setTimeout(function fixIconSize() { // Wait for applying of XBL binding
-		var btnIcon = getIcon();
-		if(!btnIcon) {
-			if(Date.now() < stopTime)
-				setTimeout(fixIconSize, 10);
-			return;
-		}
-
-		var backToClose = backBtn.hasAttribute("_cb_backToClose");
-		if(backToClose)
-			backBtn.removeAttribute("_cb_backToClose");
-
-		var s = btnIcon.style;
-		s.width = s.height = "";
-		var bo = btnIcon.boxObject;
-		s.setProperty("width",  bo.width  + "px", "important");
-		s.setProperty("height", bo.height + "px", "important");
-
-		if(backToClose)
-			backBtn.setAttribute("_cb_backToClose", "true");
-	}, 0);
-}
-fixIconSize();
-addEventListener("aftercustomization", fixIconSize, false);
-
 this.onDestroy = function(reason) {
 	// Note: we don't restore patches from another extensions!
 	if(reason == "update" || reason == "delete") {
@@ -116,10 +128,12 @@ this.onDestroy = function(reason) {
 		BrowserBack = origBrowserBack;
 		if(sss.sheetRegistered(cssURI, sss.USER_SHEET))
 			sss.unregisterSheet(cssURI, sss.USER_SHEET);
+		let s = backBtn.style;
+		s.width = s.height = "";
 		let btnIcon = getIcon();
 		if(btnIcon) {
-			let s = btnIcon.style;
-			s.width = s.height = "";
+			s = btnIcon.style;
+			s.maxWidth = s.maxHeight = "";
 		}
 	}
 };
