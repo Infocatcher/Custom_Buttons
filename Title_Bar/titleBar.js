@@ -4,7 +4,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2010, 2012
-// version 0.2.0 - 2012-09-25
+// version 0.2.1 - 2012-09-27
 
 // Flexible width:
 var titleWidth = "auto";
@@ -91,6 +91,18 @@ var dragHandler = {
 	}
 };
 addEventListener("mousedown", dragHandler, true, this);
+this.ondblclick = function(e) {
+	if(e.button != 0)
+		return;
+	if("fullScreen" in window && window.fullScreen) {
+		window.fullScreen = false;
+		return;
+	}
+	if(window.windowState != window.STATE_NORMAL)
+		window.restore();
+	else
+		window.maximize();
+};
 
 var cssStr = ('\
 	@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");\n\
