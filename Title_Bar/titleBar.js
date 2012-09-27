@@ -90,11 +90,13 @@ var dragHandler = {
 				};
 			break;
 			case "mouseup":
+				this.stopEvent(e);
 				this.cancel();
 			break;
 			case "keypress":
 				if(e.keyCode != e.DOM_VK_ESCAPE)
 					break;
+				this.stopEvent(e);
 				window.moveTo(this.winPos.x, this.winPos.y);
 				this.cancel();
 			break;
@@ -117,6 +119,10 @@ var dragHandler = {
 		window.removeEventListener("keypress", this, true);
 		window.removeEventListener("mousemove", this, true);
 		this.pos = this.winPos = null;
+	},
+	stopEvent: function(e) {
+		e.preventDefault();
+		e.stopPropagation();
 	}
 };
 addEventListener("mousedown", dragHandler, true, this);
