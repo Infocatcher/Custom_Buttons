@@ -47,6 +47,11 @@ else {
 }
 
 var dragHandler = {
+	get sm() {
+		delete this.sm;
+		return this.sm = Components.classes["@mozilla.org/gfx/screenmanager;1"]
+			.getService(Components.interfaces.nsIScreenManager);
+	},
 	handleEvent: function(e) {
 		switch(e.type) {
 			case "mousedown":
@@ -74,9 +79,13 @@ var dragHandler = {
 				this.cancel();
 			break;
 			case "mousemove":
-				let edge = 10;
-				let x = Math.max(screen.availLeft + edge, Math.min(screen.availLeft + screen.availWidth - edge, e.screenX));
-				let y = Math.max(screen.availTop + edge, Math.min(screen.availTop + screen.availHeight - edge, e.screenY));
+				let x = e.screenX;
+				let y = e.screenY;
+				if(this.sm.numberOfScreens == 1) {
+					let edge = 10;
+					x = Math.max(screen.availLeft + edge, Math.min(screen.availLeft + screen.availWidth  - edge, x));
+					y = Math.max(screen.availTop  + edge, Math.min(screen.availTop  + screen.availHeight - edge, y));
+				}
 				window.moveTo(
 					this.winPos.x + x - this.pos.x,
 					this.winPos.y + y - this.pos.y
