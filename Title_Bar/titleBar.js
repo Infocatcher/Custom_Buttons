@@ -4,18 +4,38 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2010, 2012
-// version 0.2.1 - 2012-09-27
+// version 0.2.2 - 2012-09-27
 
-// Flexible width:
-var titleWidth = "auto";
-var titleWidthMin = "100px";
-var titleWidthMax = "none";
-/*
-// Fixed width:
-var titleWidth = "350px";
-var titleWidthMin = titleWidth;
-var titleWidthMax = titleWidth;
-*/
+var flexibleWidth = true;
+
+if(
+	flexibleWidth
+	&& Array.some(
+		this.parentNode.childNodes,
+		function(node) {
+			if(node == this)
+				return false;
+			var flex = node.getAttribute("flex")
+				|| node.ownerDocument.defaultView.getComputedStyle(node, null).MozBoxFlex;
+			return flex > 0;
+		},
+		this
+	)
+) {
+	LOG("Detected flexible nodes in the button level, will use fixed width");
+	flexibleWidth = false;
+}
+
+var titleWidth, titleWidthMin, titleWidthMax, titleWidthCustomize;
+if(flexibleWidth) {
+	titleWidth = "auto";
+	titleWidthMin = "100px";
+	titleWidthMax = "none";
+	titleWidthCustomize = titleWidthMin;
+}
+else {
+	titleWidth = titleWidthMin = titleWidthMax = titleWidthCustomize = "350px";
+}
 
 var root = document.documentElement;
 this.__savedTitle = null;
@@ -150,12 +170,16 @@ var sss = Components.classes["@mozilla.org/content/style-sheet-service;1"]
 	.getService(Components.interfaces.nsIStyleSheetService);
 if(!sss.sheetRegistered(cssURI, sss.USER_SHEET))
 	sss.loadAndRegisterSheet(cssURI, sss.USER_SHEET);
+function removeStyles() {
+	if(sss.sheetRegistered(cssURI, sss.USER_SHEET))
+		sss.unregisterSheet(cssURI, sss.USER_SHEET);
+}
 
 this.title = document.title;
 
 this.onDestroy = function(reason) {
-	if(reason == "update" || reason == "delete") {
-		if(sss.sheetRegistered(cssURI, sss.USER_SHEET))
-			sss.unregisterSheet(cssURI, sss.USER_SHEET);
-	}
+	if(reason == "update" || reason == "delete")
+		removeStyles()
+	else if(reason == "constructor" && this.parentNode.nodeName == "toolbar")
+		setTimeout(removeStyles, 0); // Only for "flexibleWidth = false" hack
 };
