@@ -46,6 +46,52 @@ else {
 	root.addEventListener("DOMAttrModified", titleUpdater, true);
 }
 
+var dragHandler = {
+	handleEvent: function(e) {
+		switch(e.type) {
+			case "mousedown":
+				if(e.button != 0)
+					break;
+				window.addEventListener("mouseup", this, true);
+				window.addEventListener("keypress", this, true);
+				window.addEventListener("mousemove", this, true);
+				this.pos = {
+					x: e.screenX,
+					y: e.screenY
+				};
+				this.winPos = {
+					x: window.screenX,
+					y: window.screenY
+				};
+			break;
+			case "mouseup":
+				this.cancel();
+			break;
+			case "keypress":
+				if(e.keyCode != e.DOM_VK_ESCAPE)
+					break;
+				window.moveTo(this.winPos.x, this.winPos.y);
+				this.cancel();
+			break;
+			case "mousemove":
+				let edge = 10;
+				let x = Math.max(screen.availLeft + edge, Math.min(screen.availLeft + screen.availWidth - edge, e.screenX));
+				let y = Math.max(screen.availTop + edge, Math.min(screen.availTop + screen.availHeight - edge, e.screenY));
+				window.moveTo(
+					this.winPos.x + x - this.pos.x,
+					this.winPos.y + y - this.pos.y
+				);
+		}
+	},
+	cancel: function() {
+		window.removeEventListener("mouseup", this, true);
+		window.removeEventListener("keypress", this, true);
+		window.removeEventListener("mousemove", this, true);
+		this.pos = this.winPos = null;
+	}
+};
+addEventListener("mousedown", dragHandler, true, this);
+
 var cssStr = ('\
 	@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");\n\
 	@-moz-document url("' + window.location.href + '") {\n\
