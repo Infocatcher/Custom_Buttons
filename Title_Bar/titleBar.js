@@ -159,8 +159,8 @@ var cssStr = ('\
 			text-align: left !important;\n\
 		}\n\
 		toolbarpaletteitem > %button% {\n\
-			min-width: 200px !important;\n\
-			max-width: 200px !important;\n\
+			min-width: ' + titleWidthCustomize + ' !important;\n\
+			max-width: ' + titleWidthCustomize + ' !important;\n\
 		}\n\
 	}')
 	.replace(/%button%/g, "#" + this.id);
