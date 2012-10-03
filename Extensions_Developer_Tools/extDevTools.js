@@ -5,7 +5,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011-2012
-// version 0.1.0pre13 - 2012-10-03
+// version 0.1.0pre14 - 2012-10-03
 
 // Includes Attributes Inspector
 // http://forum.mozilla-russia.org/viewtopic.php?pid=470532#p470532
@@ -29,7 +29,10 @@ var images = {
 	// Fugue Icons by Yusuke Kamiyamane, http://www.iconfinder.com/icondetails/11449/16/135_arrow_circle_double_icon
 	restart: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAuZJREFUeNqkU0lPU1EUPvcNHaCUWlpsERGooIhxwQPFSNUgKpEYTRQXhpi44g+48W8YFy7cmOgC4hRjDEGjosEQpQRRKQQoFmgZSqGldHrDvZ7XohJWJr7kyx3e/b57vnPOJYwx+J9POHpnJj8RRRAEATietxFCvLh1CtGEKERMIQbxsqeU0jDP81249r67Wdot7BCsFjh2rarMfKS81FxnLRSqcc+aSKp1C6uZlpn55BXK2KCmqu2/CdwfKmNug8C8HcedrspSs9VAiFGRKegQCSnY5zCVn29ynFaR3HnGLeGYj5xqGmDIBgJa3blGl3U9mgGNAzoRjIfmllIR3UKFq9DWULvLE19X4LLXJW3Esygs5wU0RdHHkkqX1RJdSQLlCXnzOTyOoh84QXil4sFAMHs3EFxrvtpWKS0vxMFiNYKazeYF5PzEYi8QDHJWod/nY4uo3k8IjKiplB5dF6L5eketlIhlQDTorhnIvwX0G9C/YjbyEVXVVoNz0YRGtZG8NQ5EUfTqpX7wZMy3PdsomlsL6WRSX9x+/vqHtLPGlKk+JHdj2SB3ESFSq/dAkYil6ns7HvwbAYDUfrFJSmXymS0pNsKzx0M+FP6Idc+RRYOhYXeZ/Ww0QxNUTi8r2Ww4J6BseVnMAKwmGFQ4TND7aEAPbwjJDzW0gg12AfNy0uHZa46CkEyFF2XkbW5PIsR5A9icJhiLKVBzqVVa+TJmi8yGhvFXsniPQ3bW16TDnCngLhLAPzW/qSlqdLsFMFpM8Olej6/yRqc0LzPgpUaP+5jeybCRUVkoRFnAVciBr+flhpJM+7Hlc0TCOQ8C33JreCtvfcRoPOE4XLtf9FTZid1eoAuw6FpAnp7xx/zTY8rCt146+SJAVyZAr45AIxPlsOwfh2x8lPruD3Clh94v/WxrgZKaeuBE/S1sgpr5Cqv+UTbdP8nWZ02450SsITSiPxaEqNtB8P/wgvXWTSHSGAH9JcAAMrRspwHKXNQAAAAASUVORK5CYII=",
 	// Tango icons, http://www.iconfinder.com/icondetails/15273/16/
-	cleanAndRestart: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAKXSURBVDiNlZJLaJRnFIaf75uZ6EwSm9tIQpNIvNWoFCsmiwrSgotKS3aCl4WL0Y2CIvwLBV0YFwYckFIQhI7GhWBLdaEL6Y0WMS20aTQxijGNmnFGSZPJZcw/80/+//uOK0VjIfisz/twzstRR75gczjEBRGixrL31A35kfdAhzTfr22OrdqworwxpLl6dJva+l4CYHFFVLO0KsLHLbFYSHP29H6lU0nVmUqq2gUFVugcfFJ0fSPU15QRXazqqxrpBY4DSxcUiPCN65mLtwbz7kzJp6mdypWtGzfE400vgLqFBEpEAOjap07EV3L8k7bPVXNLOz2nu73pf8Zy7FSTxsglEc4nHBn/X0EqqXZprb79dHNHtK6ugX+//punVx+y/ux2atdVkR7t9+7f/UOM9b4zRo4lHMnOF+zRmmRTfWs5lyRqJl22dG9lUY0GFYVQNX5Qzr3BX/2B/t8N4v9gDCng5usTUkm1KHKOOxXNtas6Lh8Oaf0cQg1gxsBksUEez7bgzdWQyQzI45EBd2oyW9SvVkk4UvJ301V7sLGkI2VgZyEYAZMF8x9e4RmzuevMjJ0jXo3a1P5VhVZKwm81UsHP2UxaW6tQ/ggiPv6ch1eapViYoVCYRkTQ4UrST3oDlPym38wnHHnmz02PpNN3mXFjTEyMksulmcxlcN0pRIRY9TYKRc3Qg/6SMThvCQACI4f6en8p+qzGdT2KxTzWBuhwDZXxHeTdmNy6eSVvTPBlwpHM6xLfpPuM6ln9UXvb8hWtES//J2WxNejIMh4N9wRDQ33j1vJZwpGHAOF30oAxdAw9+Ot25ZKGDz+oatOjo/f84eGfAmu869ZyIOHIxDufOJ9UUi1Tij6lEOCatZxMOPJ4/txLfgdDCCiEEtoAAAAASUVORK5CYII=",
+	//cleanAndRestart: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAABqlBMVEX///9Vu1V8SwB4SABHrUd4SAB4SAB7SgB7SgB7SgCKaQB7SgBHrUd7SgB5SQCGUgOEUgGahQBVu1UfhR94SAB7SgCATgG+rjJWlCERdxERdxGHZACciABecBNUWAigjwF+nyOciwCejQGciwCejQC7pSkzmDKciwChJACtQhNkkR2djACcfwDAsC+fjQGciwCllBEzmTPGtjOfjgCgjgGfjgSciwCciwCrmxrWyFagjwWciwCfjgDFtTbFtDKejQCciwCciwCejQDSw0/GtTChkAifjQCciwCciwCdjACejQCejQCciwCI7ogfhR9Vu1VHrUfawgMzmTMRdxHBfRCydgupawrr3ne8eg/NvUH77Yv85Tz75Df23i/u1yPlzRTbwwT974rm1laycgz96l/962Hdz17t2kbn0BjjyxHcxAfk00zczVjYyE/s3GjIbTOrGw3o2mzcxRDcxhXn11vXsWLB0Gdv1G/96VLByjHn2F/fyibl1E7n2W27Sii4OB322GHK1VahiAF7oxTh01vcxhDk0kn76oT97Gv974TF0lmmaQqrbQvi1GcsT/8kAAAATXRSTlMAgNpEgEc77fXaAuNw5W/08s5AQAKV9P7BgECB/vvy0pla9l/r9oEH1/z56l/16Rr3QPuo1PQcQ/b+8T/F+vvmJhPi/fr2qRQf7eyeIXNWOwoAAADfSURBVHhePcyDcsRgAIDBL6Vt27Zt/EhyV9u2bfede5PpdB9g8fMK9sVhqCiA0K/vAG/w0VoLHQL4L7lGA4MSLCHEmbAqISx83BURKYWUUsloICY2zv0Yb9uQaCdhGEByysRYalp6hjJAKcjM2tnd2z851cJ5ITsn9/bu/sHynEJYeUB+QeHb+8en55SyqBigpHRheeX8wn56ef0pAyivmJyanpmdmzcXq6oBqFldW9/YNM2t7do6AOobDg5N8+i4sakZBy2tl1fXN23tHfzp7Op+7unt6+ffwODQ8AgAvxF5NOfaFCP2AAAAAElFTkSuQmCC",
+	cleanAndRestart: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3AoDDQYmfaJwkwAAAyxJREFUOMulk21oU2cUx//PTXLTNPFqF61pV1zaElmXbYq3hVYNCrqtVdSNrbKXWsVBM6afFDaYKCgYWAXHpMIUFd+G22jrRBGRKXauo2yNG1XnWBO1Tfpia2PitVmel3sfP9iq69edjwfOD87/dw7wP4tMbSw5PDyDEBICsARAFQA3gF4AnVLK9o6PfYNLj9xrABC6snF2+D+A0MGBMtWhrC0tzn+9pNBVobntZQA0Y1xkk/dzqXhiPMaF1QmgFgCuNr1YqUwO1+y/W6TaZWhlzSyfv9ClqYQ4ObPAmQUHIfkvzcwreatq5lIhRG39siJdCAEAsANA5Vf/qARmxZuVPu3BWA6mAuvvvsxA/3B2FIB7js89Y8HcgvLMA463Qz79YYaCM/YMIBjz+n2aZ2xkHJaNkJ9+G/yLEPLzH58FzwOA+PJGy+2+VPV7y/36vWQGHs0JQekzAKPU80K+XWWUWzcS6SHO2MWb2xdcA4CKnd0NjNLqD1fO1Y10Dg5VASDBngcISrnLaRsVwrzf1z9m9EYWXZvMxmQsJKXEsbaeaKDvlvvl29en9ZS+aojSYPSpxjlbLh0ghOhTlUopo/17l4UB4KwSqB7wFq9vOrnnk+Obdx3tt9RzO+LtbXYA4JTqtauq9GzuSbLe6U6cbu2KEkKuAsAZJVCTKJi9vunI7vDYyAgaW3ZsOFC/iZ5SykeVCQCGckDckOBOJ374tiPKKe0abKk7GYlE5v34+acfbEhcDI8OD0MKgVh3N1bv2hzmkGsIAGjrvusOrq3T3Q4Fd9Mcs9w2jPzeE7cN9NIi1XCca94YoBOhDX59HB6PB5e/aN5PpNk+qRFOTx5+/eb7qL+xXk8wCZteWe4vNtH2/nwYhgEASCaT0D5agbPz3jmaJ83TYevO5ScrMIbOfSeinLELsROtV6yb15PIGtlxISClBGMMsVgMqqpixbsN22zi31Nh686lSQslysKtEdDMn1b0UIdS+EoBypYvhjcQzBepoIcO2dsjjQFFUfBG3arm3KN0F+f8FwApACYBoAFwTNyEbYpJr8vlek1KWcI5h2ma8YnPTAFIA8g9Bl0WdNxWEAyoAAAAAElFTkSuQmCC",
+	// Tango icons http://www.iconfinder.com/icondetails/15273/16/ + Diagona Icons http://www.iconfinder.com/icondetails/14146/10/arrows_refresh_reload_icon
+	flushCaches: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAKXSURBVDiNlZJLaJRnFIaf75uZ6EwSm9tIQpNIvNWoFCsmiwrSgotKS3aCl4WL0Y2CIvwLBV0YFwYckFIQhI7GhWBLdaEL6Y0WMS20aTQxijGNmnFGSZPJZcw/80/+//uOK0VjIfisz/twzstRR75gczjEBRGixrL31A35kfdAhzTfr22OrdqworwxpLl6dJva+l4CYHFFVLO0KsLHLbFYSHP29H6lU0nVmUqq2gUFVugcfFJ0fSPU15QRXazqqxrpBY4DSxcUiPCN65mLtwbz7kzJp6mdypWtGzfE400vgLqFBEpEAOjap07EV3L8k7bPVXNLOz2nu73pf8Zy7FSTxsglEc4nHBn/X0EqqXZprb79dHNHtK6ugX+//punVx+y/ux2atdVkR7t9+7f/UOM9b4zRo4lHMnOF+zRmmRTfWs5lyRqJl22dG9lUY0GFYVQNX5Qzr3BX/2B/t8N4v9gDCng5usTUkm1KHKOOxXNtas6Lh8Oaf0cQg1gxsBksUEez7bgzdWQyQzI45EBd2oyW9SvVkk4UvJ301V7sLGkI2VgZyEYAZMF8x9e4RmzuevMjJ0jXo3a1P5VhVZKwm81UsHP2UxaW6tQ/ggiPv6ch1eapViYoVCYRkTQ4UrST3oDlPym38wnHHnmz02PpNN3mXFjTEyMksulmcxlcN0pRIRY9TYKRc3Qg/6SMThvCQACI4f6en8p+qzGdT2KxTzWBuhwDZXxHeTdmNy6eSVvTPBlwpHM6xLfpPuM6ln9UXvb8hWtES//J2WxNejIMh4N9wRDQ33j1vJZwpGHAOF30oAxdAw9+Ot25ZKGDz+oatOjo/f84eGfAmu869ZyIOHIxDufOJ9UUi1Tij6lEOCatZxMOPJ4/txLfgdDCCiEEtoAAAAASUVORK5CYII=",
 	// Flags by Mark James
 	// http://www.iconfinder.com/icondetails/4778/16/america_american_flag_united_states_of_america_us_icon
 	// http://www.iconfinder.com/icondetails/4737/16/ru_russia_icon
@@ -67,6 +70,12 @@ function _localize(s, key) {
 		},
 		cleanAndRestartKey: {
 			ru: "С"
+		},
+		"Flush caches": {
+			ru: "Сбросить кэш"
+		},
+		flushCachesKey: {
+			ru: "б"
 		},
 		"Switch locale to “%S”": {
 			ru: "Переключить локаль на «%S»"
@@ -385,6 +394,13 @@ var cmds = this.commands = {
 		}
 		this.restart();
 	},
+	flushCaches: function() {
+		var obs = Components.classes["@mozilla.org/observer-service;1"]
+			.getService(Components.interfaces.nsIObserverService);
+		obs.notifyObservers(null, "startupcache-invalidate", null);
+		obs.notifyObservers(null, "chrome-flush-skin-caches", null);
+		obs.notifyObservers(null, "chrome-flush-caches", null);
+	},
 	switchLocale: function(onlyGet) {
 		const localePref = "general.useragent.locale";
 		var prefs = this.prefs;
@@ -554,6 +570,12 @@ this.appendChild(parseXULFromString('\
 			accesskey="' + _localize("C", "cleanAndRestartKey") + '"\
 			class="menuitem-iconic"\
 			image="' + images.cleanAndRestart + '" />\
+		<menuitem cb_id="flushCaches"\
+			oncommand="this.parentNode.parentNode.commands.flushCaches();"\
+			label="' + _localize("Flush caches") + '"\
+			accesskey="' + _localize("F", "flushCachesKey") + '"\
+			class="menuitem-iconic"\
+			image="' + images.flushCaches + '" />\
 		<menuitem cb_id="switchLocale"\
 			oncommand="this.parentNode.parentNode.commands.switchLocale();"\
 			label="' + _localize("Switch locale to “%S”").replace("%S", cmds.switchLocale(true)) + '"\
