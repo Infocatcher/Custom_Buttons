@@ -279,7 +279,8 @@ var cmds = this.commands = {
 		win.addEventListener("load", function reopenWindow() {
 		win.removeEventListener("load", reopenWindow, false);
 
-			win.moveTo(window.screenX, window.screenY);
+			if(window.windowState == window.STATE_NORMAL)
+				win.moveTo(window.screenX, window.screenY);
 			var tabs = Array.filter(
 				gBrowser.tabs || gBrowser.tabContainer.childNodes,
 				function(tab) {
