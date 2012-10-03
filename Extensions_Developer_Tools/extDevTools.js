@@ -180,7 +180,8 @@ var cmds = this.commands = {
 		return this.btnNum = this.button.id.match(/\d*$/)[0];
 	},
 	get ss() {
-		return (
+		delete this.ss;
+		return this.ss = (
 			Components.classes["@mozilla.org/browser/sessionstore;1"]
 			|| Components.classes["@mozilla.org/suite/sessionstore;1"]
 		).getService(Components.interfaces.nsISessionStore);
