@@ -5,7 +5,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011-2012
-// version 0.1.0pre12 - 2012-09-05
+// version 0.1.0pre13 - 2012-10-03
 
 // Includes Attributes Inspector
 // http://forum.mozilla-russia.org/viewtopic.php?pid=470532#p470532
@@ -23,6 +23,8 @@ var options = {
 var images = {
 	// Fugue Icons by Yusuke Kamiyamane, http://www.iconfinder.com/icondetails/25550/16/applications_blue_icon
 	reopenWindow: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAZtJREFUeNqUk79Lw1AQxy/pxUqFoLZg7SAiFqy6OOlWxFnByUFwcXBT8B8RJ3HRzdHF3f9ApEPRgoMIKo2VUK22fS8v8e6lEQc16cGXHO/H993n8p5RPqlDFIZhrNBnj1SA+HgiHSJnge/rkYA2L85my6NDaCupwBMKBKnt+fBOk68pA+pWCupphG5XFadqLiCdCmCaoKRkj0Kz0bJdxwefTD3PA6WUFueUQI40TDnN29cPzQL2SgccGKASAjheHYGksXzqABt8c1OVpZ0Ll3yCXzfkMiaszwzCQh71oVwV+kol5rYYp9qC+WyGqE1aK7RBP9xwRb0SS0VARJBsgJbVF/f2uUMVCo0pOx3A6MS/uH9GxC1EoHOhDcjN65UXF8ytuHGY1gbddhtQ9gw0b0wwd+Xe/Zzer97oi9eoVZA5JDVGhhfp32BMw/fuWmeba+HFhTeTOUIuESteJ6WSE1tH/A6eSR8mc+ibSOXFKeJOjZUgv3EQYjmVy8rk7mPi38jc/sutzq3xOaCXBBmSzU1Osp+5ufRo4EuAAQB5oyk+Ipyd+wAAAABJRU5ErkJggg==",
+	// Oxygen Icons, http://www.iconfinder.com/icondetails/9469/16/breakoff_tab_icon
+	moveTabsToNewWindow: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAe1BMVEUAAAD///8AAADo6OgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD7+/vx8fHv7+/w8PD19fX29vakpKT39/fz8/P09PTy8vKmpqbp6emnp6fT09Po6Oj6+vq5ubmlpaXq6uq4uLj8/PyQkJB+YnRlAAAAEnRSTlNSAD7xCSSLaWBbJ2VrbW5sZFQ8gZOKAAAAhElEQVR4XkXNxxLDMAhF0RdZbulB1SW9/v8XRqCMchYMcxcArZAovfiBqmxSqRJgXWJbsJqDY1eZAziYWRgmYcyerxhjozQwZfdTPg74y4N97C2xAMJxyHc5OAB0NrySMECNZqZiBD+aqJgk+HfhJYR/CBJoKIjDsu9W68121+67/lB/ASRHEVtnjo8SAAAAAElFTkSuQmCC",
 	// Fugue Icons by Yusuke Kamiyamane, http://www.iconfinder.com/icondetails/11449/16/135_arrow_circle_double_icon
 	restart: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAuZJREFUeNqkU0lPU1EUPvcNHaCUWlpsERGooIhxwQPFSNUgKpEYTRQXhpi44g+48W8YFy7cmOgC4hRjDEGjosEQpQRRKQQoFmgZSqGldHrDvZ7XohJWJr7kyx3e/b57vnPOJYwx+J9POHpnJj8RRRAEATietxFCvLh1CtGEKERMIQbxsqeU0jDP81249r67Wdot7BCsFjh2rarMfKS81FxnLRSqcc+aSKp1C6uZlpn55BXK2KCmqu2/CdwfKmNug8C8HcedrspSs9VAiFGRKegQCSnY5zCVn29ynFaR3HnGLeGYj5xqGmDIBgJa3blGl3U9mgGNAzoRjIfmllIR3UKFq9DWULvLE19X4LLXJW3Esygs5wU0RdHHkkqX1RJdSQLlCXnzOTyOoh84QXil4sFAMHs3EFxrvtpWKS0vxMFiNYKazeYF5PzEYi8QDHJWod/nY4uo3k8IjKiplB5dF6L5eketlIhlQDTorhnIvwX0G9C/YjbyEVXVVoNz0YRGtZG8NQ5EUfTqpX7wZMy3PdsomlsL6WRSX9x+/vqHtLPGlKk+JHdj2SB3ESFSq/dAkYil6ns7HvwbAYDUfrFJSmXymS0pNsKzx0M+FP6Idc+RRYOhYXeZ/Ww0QxNUTi8r2Ww4J6BseVnMAKwmGFQ4TND7aEAPbwjJDzW0gg12AfNy0uHZa46CkEyFF2XkbW5PIsR5A9icJhiLKVBzqVVa+TJmi8yGhvFXsniPQ3bW16TDnCngLhLAPzW/qSlqdLsFMFpM8Olej6/yRqc0LzPgpUaP+5jeybCRUVkoRFnAVciBr+flhpJM+7Hlc0TCOQ8C33JreCtvfcRoPOE4XLtf9FTZid1eoAuw6FpAnp7xx/zTY8rCt146+SJAVyZAr45AIxPlsOwfh2x8lPruD3Clh94v/WxrgZKaeuBE/S1sgpr5Cqv+UTbdP8nWZ02450SsITSiPxaEqNtB8P/wgvXWTSHSGAH9JcAAMrRspwHKXNQAAAAASUVORK5CYII=",
 	// Tango icons, http://www.iconfinder.com/icondetails/15273/16/
@@ -47,6 +49,12 @@ function _localize(s, key) {
 		reopenWindowKey: {
 			ru: "о"
 		},
+		"Move tabs to new window": {
+			ru: "Перенести вкладки в новое окно"
+		},
+		moveTabsToNewWindowKey: {
+			ru: "в"
+		},
 		"Restart": {
 			ru: "Перезапустить"
 		},
@@ -69,7 +77,7 @@ function _localize(s, key) {
 			ru: "Сохранить сессию и выйти"
 		},
 		saveSessionAndExitKey: {
-			ru: "в"
+			ru: "ы"
 		},
 		"Error console": {
 			ru: "Консоль ошибок"
@@ -221,13 +229,7 @@ var cmds = this.commands = {
 		var ss = this.ss;
 		var state = ss.getWindowState(window);
 
-		// In SeaMonkey OpenBrowserWindow() doesn't return link to opened window
-		//var win = OpenBrowserWindow();
-		var win = window.openDialog(
-			getBrowserURL(),
-			"_blank",
-			"chrome,all,dialog=no"
-		);
+		var win = this.openBrowserWindow();
 		win.addEventListener("load", function restoreSession() {
 			win.removeEventListener("load", restoreSession, false);
 			ss.setWindowState(win, state, true);
@@ -250,6 +252,78 @@ var cmds = this.commands = {
 			}
 			window.close();
 		}, false);
+	},
+	get canMoveTabsToNewWindow() {
+		delete this.canMoveTabsToNewWindow;
+		return this.canMoveTabsToNewWindow = "swapBrowsersAndCloseOther" in gBrowser;
+	},
+	moveTabsToNewWindow: function() {
+		var win = this.openBrowserWindow();
+		win.addEventListener("load", function reopenWindow() {
+		win.removeEventListener("load", reopenWindow, false);
+
+			win.moveTo(window.screenX, window.screenY);
+			var tabs = Array.filter(
+				gBrowser.tabs || gBrowser.tabContainer.childNodes,
+				function(tab) {
+					return tab.linkedBrowser && !tab.closing;
+				}
+			);
+			var selectedTab = gBrowser.selectedTab;
+			var newBrowser = win.gBrowser;
+
+			tabs.forEach(function(tab) {
+				if(!tab.linkedBrowser) // What?
+					return;
+				// We can't swap unloaded tabs! :(
+				// Error: NS_ERROR_NOT_IMPLEMENTED: Component returned failure code:
+				// 0x80004001 (NS_ERROR_NOT_IMPLEMENTED) [nsIFrameLoaderOwner.swapFrameLoaders]
+				// (chrome://global/content/bindings/browser.xml, <method name="swapDocShells">)
+				if(
+					tab.getAttribute("pending") == "true" // Gecko >= 9.0
+					|| tab.linkedBrowser.contentDocument.readyState == "uninitialized"
+				)
+					tab.linkedBrowser.reload();
+			});
+
+			if("treeStyleTab" in gBrowser) {
+				var selectedTabPos = "_tPos" in selectedTab //~ todo: don't use with "closing" tabs?
+					? selectedTab._tPos
+					: tabs.indexOf(selectedTab);
+				(function tstMoveTabs() {
+					if("treeStyleTab" in newBrowser) {
+						newBrowser.treeStyleTab.moveTabs(tabs);
+
+						var initialTab = newBrowser.selectedTab;
+						newBrowser.selectedTab = (newBrowser.tabs || newBrowser.tabContainer.childNodes)[selectedTabPos + 1];
+						newBrowser.removeTab(initialTab);
+					}
+					else {
+						setTimeout(tstMoveTabs, 10);
+					}
+				})();
+				return;
+			}
+
+			tabs.forEach(function(tab) {
+				var newTab = newBrowser.addTab();
+				newBrowser.swapBrowsersAndCloseOther(newTab, tab);
+				if(tab == selectedTab) {
+					var initialTab = newBrowser.selectedTab;
+					newBrowser.selectedTab = newTab;
+					newBrowser.removeTab(initialTab);
+				}
+			});
+		}, false);
+	},
+	openBrowserWindow: function() {
+		// In SeaMonkey OpenBrowserWindow() doesn't return link to opened window
+		//return OpenBrowserWindow();
+		return window.openDialog(
+			getBrowserURL(),
+			"_blank",
+			"chrome,all,dialog=no"
+		);
 	},
 	restart: function() {
 		const pId = "browser.tabs.warnOnClose";
@@ -447,6 +521,13 @@ this.appendChild(parseXULFromString('\
 			accesskey="' + _localize("w", "reopenWindowKey") + '"\
 			class="menuitem-iconic"\
 			image="' + images.reopenWindow + '" />\
+		<menuitem cb_id="moveTabsToNewWindow"\
+			oncommand="this.parentNode.parentNode.commands.moveTabsToNewWindow();"\
+			hidden="' + !cmds.canMoveTabsToNewWindow + '"\
+			label="' + _localize("Move tabs to new window") + '"\
+			accesskey="' + _localize("t", "moveTabsToNewWindowKey") + '"\
+			class="menuitem-iconic"\
+			image="' + images.moveTabsToNewWindow + '" />\
 		<menuitem cb_id="restart"\
 			oncommand="this.parentNode.parentNode.commands.restart();"\
 			label="' + _localize("Restart") + '"\
@@ -468,7 +549,7 @@ this.appendChild(parseXULFromString('\
 		<menuitem cb_id="saveSessionAndExit"\
 			oncommand="this.parentNode.parentNode.commands.saveSessionAndExit();"\
 			label="' + _localize("Save session and exit") + '"\
-			accesskey="' + _localize("e", "saveSessionAndExitKey") + '"\
+			accesskey="' + _localize("x", "saveSessionAndExitKey") + '"\
 			class="menuitem-iconic"\
 			image="' + images.saveSessionAndExit + '"\
 			hidden="' + !cmds.canSaveSessionAndExit + '" />\
