@@ -18,7 +18,8 @@
 // http://infocatcher.ucoz.net/js/cb/extDevTools-ru.png
 
 var options = {
-	locales: ["ru", "en-US"]
+	locales: ["ru", "en-US"],
+	forceRestartOnLocaleChange: false
 };
 var images = {
 	// Fugue Icons by Yusuke Kamiyamane, http://www.iconfinder.com/icondetails/25550/16/applications_blue_icon
@@ -183,6 +184,12 @@ var cmds = this.commands = {
 			Components.classes["@mozilla.org/browser/sessionstore;1"]
 			|| Components.classes["@mozilla.org/suite/sessionstore;1"]
 		).getService(Components.interfaces.nsISessionStore);
+	},
+	get platformVersion() {
+		delete this.platformVersion;
+		return this.platformVersion = Components.classes["@mozilla.org/xre/app-info;1"]
+			.getService(Components.interfaces.nsIXULAppInfo)
+			.platformVersion;
 	},
 	get defaultActionPref() {
 		delete this.defaultActionPref;
@@ -389,7 +396,13 @@ var cmds = this.commands = {
 		if(onlyGet)
 			return locale;
 		this.setPref(localePref, locale);
-		this.restart();
+		if(
+			!this.options.forceRestartOnLocaleChange
+			&& parseFloat(this.platformVersion) >= 18
+		)
+			this.reopenWindow();
+		else
+			this.restart();
 		return locale;
 	},
 	get canSaveSessionAndExit() {
@@ -599,12 +612,7 @@ this.appendChild(parseXULFromString('\
 					hidden="' + (
 						Components.classes["@mozilla.org/xpcom/version-comparator;1"]
 							.getService(Components.interfaces.nsIVersionComparator)
-							.compare(
-								Components.classes["@mozilla.org/xre/app-info;1"]
-									.getService(Components.interfaces.nsIXULAppInfo)
-									.platformVersion,
-								"1.9a1pre"
-							) < 0
+							.compare(cmds.platformVersion, "1.9a1pre") < 0
 					) + '"\
 					closemenu="none" />\
 				<menuitem cb_pref="extensions.logging.enabled"\
