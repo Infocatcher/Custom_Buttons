@@ -227,7 +227,12 @@ var cmds = this.commands = {
 			menu.getElementsByAttribute("cb_id", "*"),
 			function(mi) {
 				mi.setAttribute("default", mi.getAttribute("cb_id") == defaultAction);
-			}
+				if(mi.getAttribute("cb_id") == "attrsInspector") {
+					mi.style.color = "inspectDOMNode" in window ? "" : "grayText";
+					this.setAttrsInspectorActive(mi);
+				}
+			},
+			this
 		);
 	},
 	setDefaultAction: function(mi) {
@@ -464,6 +469,19 @@ var cmds = this.commands = {
 	},
 	attrsInspector: function() {
 		this.button.attrsInspector();
+		this.setAttrsInspectorActive();
+	},
+	setAttrsInspectorActive: function(mi) {
+		if(!mi)
+			mi = this.button.getElementsByAttribute("cb_id", "attrsInspector")[0];
+		if("__attributesInspector" in window) {
+			mi.setAttribute("type", "checkbox");
+			mi.setAttribute("checked", "true");
+		}
+		else {
+			mi.removeAttribute("type");
+			mi.removeAttribute("checked");
+		}
 	},
 	get isDebugBuild() { //~ todo: find another way
 		delete this.isDebugBuild;
@@ -608,8 +626,7 @@ this.appendChild(parseXULFromString('\
 			label="' + _localize("Attributes Inspector") + '"\
 			accesskey="' + _localize("A", "attrsInspectorKey") + '"\
 			class="menuitem-iconic"\
-			image="' + images.attrsInspector + '"\
-			hidden="' + !("inspectDOMNode" in window) + '" />\
+			image="' + images.attrsInspector + '" />\
 		<menuseparator />\
 		<menu\
 			label="' + _localize("Options") + '"\
