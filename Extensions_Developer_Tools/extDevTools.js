@@ -5,7 +5,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011-2012
-// version 0.1.0pre15 - 2012-10-04
+// version 0.1.0pre16 - 2012-10-04
 
 // Includes Attributes Inspector
 // http://forum.mozilla-russia.org/viewtopic.php?pid=470532#p470532
