@@ -425,10 +425,13 @@ var cmds = this.commands = {
 		if(onlyGet)
 			return locale;
 		this.setPref(localePref, locale);
-		if(!this.options.forceRestartOnLocaleChange && this.platformVersion >= 18)
+		if(!this.options.forceRestartOnLocaleChange && this.platformVersion >= 18) {
+			this.flushCaches();
 			this.reopenWindow();
-		else
+		}
+		else {
 			this.restart();
+		}
 		return locale;
 	},
 	get canSaveSessionAndExit() {
