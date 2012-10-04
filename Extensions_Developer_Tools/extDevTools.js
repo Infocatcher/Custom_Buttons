@@ -5,7 +5,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011-2012
-// version 0.1.0pre14 - 2012-10-03
+// version 0.1.0pre15 - 2012-10-04
 
 // Includes Attributes Inspector
 // http://forum.mozilla-russia.org/viewtopic.php?pid=470532#p470532
@@ -19,7 +19,8 @@
 
 var options = {
 	locales: ["ru", "en-US"],
-	forceRestartOnLocaleChange: false
+	forceRestartOnLocaleChange: false,
+	closeOptionsMenu: false
 };
 var images = {
 	// Fugue Icons by Yusuke Kamiyamane, http://www.iconfinder.com/icondetails/25550/16/applications_blue_icon
@@ -206,6 +207,7 @@ var cmds = this.commands = {
 				.platformVersion
 		);
 	},
+
 	get defaultActionPref() {
 		delete this.defaultActionPref;
 		return this.defaultActionPref = "extensions.custombuttons.button" + this.btnNum + ".defaultAction";
@@ -235,6 +237,7 @@ var cmds = this.commands = {
 		this.defaultAction = this.defaultAction == action ? "" : action;
 		this.initMenu(mi.parentNode);
 	},
+
 	get canReopenWindow() {
 		var ss = this.ss;
 		delete this.canReopenWindow;
@@ -479,11 +482,13 @@ var cmds = this.commands = {
 	},
 
 	initPrefsMenu: function(popup) {
+		var closeMenu = this.options.closeOptionsMenu ? "auto" : "none";
 		Array.forEach(
 			popup.getElementsByAttribute("cb_pref", "*"),
 			function(node) {
 				var pref = node.getAttribute("cb_pref");
 				node.setAttribute("checked", !!this.getPref(pref));
+				node.setAttribute("closemenu", closeMenu);
 				this.hlPrefItem(node, pref);
 			},
 			this
@@ -619,60 +624,50 @@ this.appendChild(parseXULFromString('\
 				<menuitem cb_pref="javascript.options.showInConsole"\
 					tooltiptext="javascript.options.showInConsole"\
 					type="checkbox"\
-					label="' + _localize("Show errors in chrome files") + '"\
-					closemenu="none" />\
+					label="' + _localize("Show errors in chrome files") + '" />\
 				<menuitem cb_pref="javascript.options.strict"\
 					tooltiptext="javascript.options.strict"\
 					type="checkbox"\
-					label="' + _localize("Show strict warnings") + '"\
-					closemenu="none" />\
+					label="' + _localize("Show strict warnings") + '" />\
 				<menuitem cb_pref="javascript.options.strict.debug"\
 					tooltiptext="javascript.options.strict.debug"\
 					type="checkbox"\
 					label="' + _localize("Show strict warnings in debug builds") + '"\
-					hidden="' + !this.commands.isDebugBuild + '"\
-					closemenu="none" />\
+					hidden="' + !this.commands.isDebugBuild + '" />\
 				<menuitem cb_pref="dom.report_all_js_exceptions"\
 					tooltiptext="dom.report_all_js_exceptions"\
 					type="checkbox"\
 					label="' + _localize("Show all exceptions") + '"\
-					hidden="' + (cmds.platformVersion < 1.9) + '"\
-					closemenu="none" />\
+					hidden="' + (cmds.platformVersion < 1.9) + '" />\
 				<menuitem cb_pref="extensions.logging.enabled"\
 					tooltiptext="extensions.logging.enabled"\
 					type="checkbox"\
-					label="' + _localize("Show information about extensions update") + '"\
-					closemenu="none" />\
+					label="' + _localize("Show information about extensions update") + '" />\
 				<menuseparator />\
 				<menuitem cb_pref="browser.dom.window.dump.enabled"\
 					tooltiptext="browser.dom.window.dump.enabled"\
 					type="checkbox"\
-					label="' + _localize("Enable window.dump()") + '"\
-					closemenu="none" />\
+					label="' + _localize("Enable window.dump()") + '" />\
 				<menuitem cb_pref="nglayout.debug.disable_xul_cache"\
 					tooltiptext="nglayout.debug.disable_xul_cache"\
 					type="checkbox"\
-					label="' + _localize("Disable XUL cache") + '"\
-					closemenu="none" />\
+					label="' + _localize("Disable XUL cache") + '" />\
 				<menuitem cb_pref="dom.allow_XUL_XBL_for_file"\
 					tooltiptext="dom.allow_XUL_XBL_for_file"\
 					type="checkbox"\
 					label="' + _localize("Allow XUL and XBL for file://") + '"\
-					hidden="' + (cmds.platformVersion < 2) + '"\
-					closemenu="none" />\
+					hidden="' + (cmds.platformVersion < 2) + '" />\
 				<menuseparator hidden="' + !this.commands.canDisableE4X + '" />\
 				<menuitem cb_pref="javascript.options.xml.chrome"\
 					tooltiptext="javascript.options.xml.chrome"\
 					type="checkbox"\
 					label="' + _localize("Enable E4X for chrome") + '"\
-					hidden="' + !this.commands.canDisableE4X + '"\
-					closemenu="none" />\
+					hidden="' + !this.commands.canDisableE4X + '" />\
 				<menuitem cb_pref="javascript.options.xml.content"\
 					tooltiptext="javascript.options.xml.content"\
 					type="checkbox"\
 					label="' + _localize("Enable E4X for content") + '"\
-					hidden="' + !this.commands.canDisableE4X + '"\
-					closemenu="none" />\
+					hidden="' + !this.commands.canDisableE4X + '" />\
 			</menupopup>\
 		</menu>\
 	</menupopup>'
