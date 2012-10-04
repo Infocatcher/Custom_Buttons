@@ -43,7 +43,9 @@ var images = {
 	// https://addons.mozilla.org/firefox/addon/console%C2%B2/
 	errorConsole: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAz1JREFUeNpMU11oVEcYPTP33uy9m5sN5gdLtYkvgjQgaEKVPBgoxR9okCoV7Yu1T30vFEqlFYUgYi1U+lRqiZZKIxFjobUtJoYm0RcRi1KtQRKzu7nJ7ia7m937s/fOTL+7WyUD8zDDnHO+75z5mFIK61d8ruRXWhUUB1j9jjEGKQQ0ziu1hBG2pVKv3uvrwaHn4t7Zc4dEduG8aScTxAb1P0HkVpF/Mvv45/TiRx//9GN6YNeuBvnLCkQY4s7nJ4805dLf9/Vus/WgQpcCiOJdAzcM5Moefrv2x4Ph3Oqhz26Oze0bGGgQhJ6HyS9PHU0sL/zQ+1aPyZbTkKSoogiu69V5LBXB7OhEVTfxy8jv94czy4dPT9yeZwRm00NDB9ncsyt9u3ts5DJ1MJPkRdUD238E2mubEVy+iJZSHlrnRlSaLNwavf1gxI8Oc7/qpkT6xTd9O7fazFmArFLpUkL5PqpGEvaevTDf6EawViEvNARODpbr4uB7b+9oK5dPcikVt5qThrFWgCgXqd+IdghVC4BmGyyRwNLYCMzCIiSZLCtVuE+fo8kPoCetFKWgKKJIyoDMDGsA16DCiMhK4O2bEORzCG6Noq1SRkh3IqREPIGovTUOXTayjpOIVclMuVKAzDkQTpYUbJTu3kGzMx+7DUnFSTJUyFi28Uf0OERFYLm6ArnkNPjIwBigiEhmXsCmN5GsW1NPREhW14z/h67oFJaKCd5CPVPfisd/S8HnBtzZJ7Cob6YlCMga6oIq4QRMaLFIEzd07hed/MOCbkNv7wAjklqRzHz/BLaM3UXUtRVh1afeY38VIsXQ2tMNxw9R8WuPdE/j7rXF5ePFbObGu/v6epMigj/vwZuZxvN//oUxOwulmQhDBRIncBcKzMCViYeXfi2uXmDkP8anpjA0OLjleOeG6wfe2bnDdDJYezaHKBDQLRsCHJJxpN7sJrCOyxN/f/ets/gpOtqLr2ZhfGYGZ/bu7/7w9Y7RwT3bey1qRZCZikqOzdNNHUteDcN/Pbr0VTb7SWhZpanJScXWj/P49DQuHPuga6PnfaF03vJylBtTB+o5ePpnufy1tXnT6sjVq+jv78d/AgwAz5rMGbA9L4wAAAAASUVORK5CYII=",
 	// nuove by Alexander Moore, http://www.iconsearch.ru/detailed/278/1/
-	attrsInspector: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACW0lEQVQ4jW2TQUsbQRiG3/l2ui4hPaSbCBZPsR6kMXrwYP9AK+JJKOJZKPgD1KMXf0ELPffsoRDpxUv2aLUHKamHikJxi1gQktXNzrqbna+HJJPE9oNhGJh55n3f+UYwM7a2tuzNzc13RETMTADAzOjN/bVGr7Isw+rq6vuzszMtAWB8fDxXKBQ+EBHSNIXWGpZlGYgQAkIIEBGEENBaw3XdjwASCQCO41Cr1YLv+8jlchBCIAxDFItFlEolc5CZDaxarUoDsG3nme//xuLiK3NDlmmcn/9EEAQoFAp4XBMTExIACAB8/2ppbm4OzAytu1YtizA19QI3Nzf/HBZCoFgsSgCQXdrz6bSjIZIEJGhkY5p2Rtb9yufztlHQaDR81hpRO0a7raDUA1T8gLCtcHd3Z3wPB+o4DhnA/X3wpV73kKYdPCQJokihHUb40WjAdV0T4jDEtu2BhbW1tbhUKuHgoIby1DSeSImLi3Ocnn7DwsICZmcrBtCHSCkHCpgZlUoF6+tv8TRvQ4gUKytL2N7eRr1eR61WGwH0eoKMAgDUk4X5+Xkws2mi3d1d7O3twXEcLC8v97pTQAgxUNAHDHskIhARJicnsbOzA8/z4HketGZkWpvnpu6bW3I4qMejXC5jY2MDx8fHODr6CtYZkiQZAIiIhrz9FzIz8xKv3yzh6uoXpLRwcnISoh/g4eFhNY5jVkqxUoqjKBoZYdjmZjPgZrPFSim+vLz87rquw8zdEJVSrevr60+9L6uZWQshNDNrZuhMs+50Eu2MjSVBEPzZ39//fHt7GwPAX9zKMQVPs/QoAAAAAElFTkSuQmCC"
+	attrsInspector: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACW0lEQVQ4jW2TQUsbQRiG3/l2ui4hPaSbCBZPsR6kMXrwYP9AK+JJKOJZKPgD1KMXf0ELPffsoRDpxUv2aLUHKamHikJxi1gQktXNzrqbna+HJJPE9oNhGJh55n3f+UYwM7a2tuzNzc13RETMTADAzOjN/bVGr7Isw+rq6vuzszMtAWB8fDxXKBQ+EBHSNIXWGpZlGYgQAkIIEBGEENBaw3XdjwASCQCO41Cr1YLv+8jlchBCIAxDFItFlEolc5CZDaxarUoDsG3nme//xuLiK3NDlmmcn/9EEAQoFAp4XBMTExIACAB8/2ppbm4OzAytu1YtizA19QI3Nzf/HBZCoFgsSgCQXdrz6bSjIZIEJGhkY5p2Rtb9yufztlHQaDR81hpRO0a7raDUA1T8gLCtcHd3Z3wPB+o4DhnA/X3wpV73kKYdPCQJokihHUb40WjAdV0T4jDEtu2BhbW1tbhUKuHgoIby1DSeSImLi3Ocnn7DwsICZmcrBtCHSCkHCpgZlUoF6+tv8TRvQ4gUKytL2N7eRr1eR61WGwH0eoKMAgDUk4X5+Xkws2mi3d1d7O3twXEcLC8v97pTQAgxUNAHDHskIhARJicnsbOzA8/z4HketGZkWpvnpu6bW3I4qMejXC5jY2MDx8fHODr6CtYZkiQZAIiIhrz9FzIz8xKv3yzh6uoXpLRwcnISoh/g4eFhNY5jVkqxUoqjKBoZYdjmZjPgZrPFSim+vLz87rquw8zdEJVSrevr60+9L6uZWQshNDNrZuhMs+50Eu2MjSVBEPzZ39//fHt7GwPAX9zKMQVPs/QoAAAAAElFTkSuQmCC",
+	// FatCow icons, http://www.iconfinder.com/icondetails/36398/16/code_script_icon
+	scratchpad: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAArBJREFUeNqMU11IFFEU/vbO7Iyuums/GvmXhISBiOWWGFgGiyaC0UMkWRT11FNPQbEl9iNb0mtgUEQW+xjUQ5RrlClZ5IbaQ0bpw+paSGLGbrs7O3emc2d/kKjowBnm3HvnO9/5vju2Tb4ARJiUOjcQ1fhizUZnkVORsBzXMT7/HZLNZp0RT8ZssEuUjEGVWZWMdJimibhuXO4/UFvUWVeKf0Xg0yJcOXa03359i2UWDQKIackTmY91qkXyVWmmz/qezyBBbCvX5TXLGfpUo7mquETUEY1bgKtD0JeIvsMu4cXsNxz2R6DIDHJGAOqQX6CmyjjnEN/bfqPuYJIFrPLY5Ly346RYyzLQE/Hq7SUu66CWNFJd0+KZaTYFioxgeAV2mKH1vYPBfFVCWgOa0eB76stcpHwSmmFAQMiktkjxLpJUR2glBtlIzArsn9QoxYAaGJxXr8lVECHruGHSrEDxhccWfLinLcXozEM4cmTkJmITWVuzNkpKQ32pC1GuW1039DzB6OlWSCQaSUoacTCJYfiUB2ZRxR3RRAzGLAeIQmFeTrkAUumCVF4ZxMCR3bg0HLaU13UDMaJr0GjnhkLoP9gIjXNT1CxJUHT7zKhuFO68MYKqa8/g62jEgw/LePP5I3ZVroV/cgGin9m3HyPT0/BPLcHbskOMasoJQl+52Ja1ip19hIWoBofKLG2ut29Fp/8duraVIvwjBiGe2AtHEpYIjGnRt30vZxCizTnKJRLs7qsp5NOdONRQi703x9Dt2QInWbj56hC6GutQoNpxb+w9vpzf57Y5Pcc9SlNngEaxRJFpZoVEFN4fbarDwMhkyiXaFYofo7X7oxP42t3mrvAFgsIJlbLmTz9NWe/TcRvxnPO2uEVd3js4LrSY97a66S8O4j+iPp1/q/FLgAEAGto2bg8Nx1UAAAAASUVORK5CYII="
 };
 
 function _localize(s, key) {
@@ -102,6 +104,12 @@ function _localize(s, key) {
 		attrsInspectorKey: {
 			ru: "И"
 		},
+		"Scratchpad": {
+			ru: "Простой редактор JavaScript"
+		},
+		scratchpadKey: {
+			ru: "р"
+		},
 		"Options": {
 			ru: "Настройки"
 		},
@@ -131,6 +139,9 @@ function _localize(s, key) {
 		},
 		"Allow XUL and XBL for file://": {
 			ru: "Разрешить XUL и XBL для file://"
+		},
+		"Enable developer tools for chrome": {
+			ru: "Включить инструменты разработчика для chrome"
 		},
 		"Enable E4X for chrome": {
 			ru: "Включить E4X для chrome"
@@ -227,9 +238,13 @@ var cmds = this.commands = {
 			menu.getElementsByAttribute("cb_id", "*"),
 			function(mi) {
 				mi.setAttribute("default", mi.getAttribute("cb_id") == defaultAction);
-				if(mi.getAttribute("cb_id") == "attrsInspector") {
+				var cbId = mi.getAttribute("cb_id");
+				if(cbId == "attrsInspector") {
 					mi.style.color = "inspectDOMNode" in window ? "" : "grayText";
 					this.setAttrsInspectorActive(mi);
+				}
+				else if(cbId == "scratchpad") {
+					mi.style.color = this.getPref("devtools.chrome.enabled") ? "" : "grayText";
 				}
 			},
 			this
@@ -486,6 +501,41 @@ var cmds = this.commands = {
 			mi.removeAttribute("checked");
 		}
 	},
+	get hasScratchpad() {
+		delete this.hasScratchpad;
+		return this.hasScratchpad = "Scratchpad" in window
+			&& "openScratchpad" in Scratchpad;
+	},
+	openScratchpad: function() {
+		var win = Scratchpad.openScratchpad();
+		var _this = this;
+		win.addEventListener("load", function tweak(e) {
+			win.removeEventListener("load", tweak, false);
+			if(_this.getPref("devtools.chrome.enabled"))
+				win.document.getElementById("sp-menu-browser").doCommand();
+			var stopTime = Date.now() + 3000;
+			if(_this.getPref("devtools.editor.component") != "orion") {
+				var textbox = win.Scratchpad.textbox;
+				if(textbox) {
+					textbox.value = "";
+					textbox.focus();
+					return;
+				}
+			}
+			(function clear() {
+				try {
+					win.Scratchpad.setText("");
+				}
+				catch(e) { // Not yet initialized!
+					if(Date.now() < stopTime)
+						setTimeout(clear, 10);
+					else
+						Components.utils.reportError(e);
+				}
+			})();
+		}, false);
+	},
+
 	get isDebugBuild() { //~ todo: find another way
 		delete this.isDebugBuild;
 		return this.isDebugBuild = this.getPref(
@@ -516,6 +566,8 @@ var cmds = this.commands = {
 		var pref = node.getAttribute("cb_pref");
 		this.setPref(pref, node.getAttribute("checked") == "true");
 		this.hlPrefItem(node, pref);
+		if(pref == "devtools.chrome.enabled")
+			this.initMenu(this.button.lastChild);
 	},
 	hlPrefItem: function(node, pref) {
 		node.style.fontWeight = this.prefHasUserValue(pref) ? "bold" : "";
@@ -630,6 +682,13 @@ this.appendChild(parseXULFromString('\
 			accesskey="' + _localize("A", "attrsInspectorKey") + '"\
 			class="menuitem-iconic"\
 			image="' + images.attrsInspector + '" />\
+		<menuitem cb_id="scratchpad"\
+			oncommand="this.parentNode.parentNode.commands.openScratchpad();"\
+			label="' + _localize("Scratchpad") + '"\
+			accesskey="' + _localize("p", "scratchpadKey") + '"\
+			class="menuitem-iconic"\
+			image="' + images.scratchpad + '"\
+			hidden="' + !cmds.hasScratchpad + '" />\
 		<menuseparator />\
 		<menu\
 			label="' + _localize("Options") + '"\
@@ -674,6 +733,11 @@ this.appendChild(parseXULFromString('\
 					type="checkbox"\
 					label="' + _localize("Allow XUL and XBL for file://") + '"\
 					hidden="' + (cmds.platformVersion < 2) + '" />\
+				<menuitem cb_pref="devtools.chrome.enabled"\
+					tooltiptext="devtools.chrome.enabled"\
+					type="checkbox"\
+					label="' + _localize("Enable developer tools for chrome") + '"\
+					hidden="' + (cmds.platformVersion < 4) + '" />\
 				<menuseparator hidden="' + !this.commands.canDisableE4X + '" />\
 				<menuitem cb_pref="javascript.options.xml.chrome"\
 					tooltiptext="javascript.options.xml.chrome"\
