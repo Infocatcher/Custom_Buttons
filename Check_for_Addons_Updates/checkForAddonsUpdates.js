@@ -5,16 +5,19 @@
 // (code for "code" section)
 
 // (c) Infocatcher 2012
-// version 0.1.1 - 2012-09-09
+// version 0.1.2 - 2012-10-04
 
 // Button just open hidden tab with about:addons and trigger built-in "Check for Updates" function.
 // And show tab, if found updates.
 
 var btn = this;
+if("_cb_disabled" in btn)
+	return;
 var image = btn.image;
 var tip = btn.tooltipText;
 btn.image = "chrome://browser/skin/tabbrowser/connecting.png";
 btn.tooltipText = "Open about:addons…";
+btn._cb_disabled = true;
 var tab = gBrowser.addTab("about:addons");
 tab.collapsed = true;
 tab.closing = true; // See "visibleTabs" getter in chrome://browser/content/tabbrowser.xml
@@ -48,6 +51,9 @@ browser.addEventListener("load", function load(e) {
 		clearInterval(wait);
 		btn.image = image;
 		btn.tooltipText = tip;
+		setTimeout(function() {
+			delete btn._cb_disabled;
+		}, 500);
 		tab.closing = false;
 
 		if(!updEnabled)
