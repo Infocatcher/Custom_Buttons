@@ -128,6 +128,9 @@ function _localize(s, key) {
 		"Disable XUL cache": {
 			ru: "Отключить кэш XUL"
 		},
+		"Allow XUL and XBL for file://": {
+			ru: "Разрешить XUL и XBL для file://"
+		},
 		"Enable E4X for chrome": {
 			ru: "Включить E4X для chrome"
 		},
@@ -197,9 +200,11 @@ var cmds = this.commands = {
 	},
 	get platformVersion() {
 		delete this.platformVersion;
-		return this.platformVersion = Components.classes["@mozilla.org/xre/app-info;1"]
-			.getService(Components.interfaces.nsIXULAppInfo)
-			.platformVersion;
+		return this.platformVersion = parseFloat(
+			Components.classes["@mozilla.org/xre/app-info;1"]
+				.getService(Components.interfaces.nsIXULAppInfo)
+				.platformVersion
+		);
 	},
 	get defaultActionPref() {
 		delete this.defaultActionPref;
@@ -303,6 +308,7 @@ var cmds = this.commands = {
 				)
 					tab.linkedBrowser.reload();
 			});
+			//~ todo: add support for tab groups
 
 			if("treeStyleTab" in gBrowser) {
 				var selectedTabPos = "_tPos" in selectedTab //~ todo: don't use with "closing" tabs?
@@ -414,10 +420,7 @@ var cmds = this.commands = {
 		if(onlyGet)
 			return locale;
 		this.setPref(localePref, locale);
-		if(
-			!this.options.forceRestartOnLocaleChange
-			&& parseFloat(this.platformVersion) >= 18
-		)
+		if(!this.options.forceRestartOnLocaleChange && this.platformVersion >= 18)
 			this.reopenWindow();
 		else
 			this.restart();
@@ -467,7 +470,7 @@ var cmds = this.commands = {
 		return this.isDebugBuild = this.getPref(
 			"general.warnOnAboutConfig",
 			true,
-			this.prefSvc.getDefaultBranch("")
+			this.defaultBranch
 		) == false;
 	},
 	get canDisableE4X() {
@@ -633,11 +636,7 @@ this.appendChild(parseXULFromString('\
 					tooltiptext="dom.report_all_js_exceptions"\
 					type="checkbox"\
 					label="' + _localize("Show all exceptions") + '"\
-					hidden="' + (
-						Components.classes["@mozilla.org/xpcom/version-comparator;1"]
-							.getService(Components.interfaces.nsIVersionComparator)
-							.compare(cmds.platformVersion, "1.9a1pre") < 0
-					) + '"\
+					hidden="' + (cmds.platformVersion < 1.9) + '"\
 					closemenu="none" />\
 				<menuitem cb_pref="extensions.logging.enabled"\
 					tooltiptext="extensions.logging.enabled"\
@@ -654,6 +653,12 @@ this.appendChild(parseXULFromString('\
 					tooltiptext="nglayout.debug.disable_xul_cache"\
 					type="checkbox"\
 					label="' + _localize("Disable XUL cache") + '"\
+					closemenu="none" />\
+				<menuitem cb_pref="dom.allow_XUL_XBL_for_file"\
+					tooltiptext="dom.allow_XUL_XBL_for_file"\
+					type="checkbox"\
+					label="' + _localize("Allow XUL and XBL for file://") + '"\
+					hidden="' + (cmds.platformVersion < 2) + '"\
 					closemenu="none" />\
 				<menuseparator hidden="' + !this.commands.canDisableE4X + '" />\
 				<menuitem cb_pref="javascript.options.xml.chrome"\
