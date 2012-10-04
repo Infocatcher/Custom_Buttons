@@ -175,7 +175,7 @@ this.onmouseover = function(e) {
 	);
 };
 this.onclick = function(e) {
-	if(e.target != this || e.button != 1)
+	if(e.target != this || e.button != 1 || this.disabled)
 		return;
 	var defaultAction = this.commands.defaultAction;
 	if(!defaultAction)
@@ -244,11 +244,6 @@ var cmds = this.commands = {
 		return this.canReopenWindow = ss && "getWindowState" in ss && "setWindowState" in ss;
 	},
 	reopenWindow: function() {
-		const flag = "__customButtonsReopeningFlag";
-		if(flag in window)
-		  return;
-		window[flag] = true;
-
 		this.button.disabled = true;
 
 		var ss = this.ss;
@@ -283,6 +278,8 @@ var cmds = this.commands = {
 		return this.canMoveTabsToNewWindow = "swapBrowsersAndCloseOther" in gBrowser;
 	},
 	moveTabsToNewWindow: function() {
+		this.button.disabled = true;
+
 		var win = this.openBrowserWindow();
 		win.addEventListener("load", function reopenWindow() {
 		win.removeEventListener("load", reopenWindow, false);
