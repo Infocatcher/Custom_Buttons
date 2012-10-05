@@ -652,7 +652,7 @@ var cmds = this.commands = {
 		setTimeout(function(_this) {
 			_this.prefSvc.savePrefFile(null);
 			LOG("savePrefFile()");
-		}, 0, this);
+		}, 100, this);
 	}
 };
 
