@@ -303,9 +303,12 @@ var cmds = this.commands = {
 					var stateObj = JSON.parse(ss.getWindowState(window)).windows[0];
 					delete stateObj._shouldRestore;
 					var state = JSON.stringify(stateObj);
+					//LOG("state:\n" + state);
 					win.setTimeout(function() {
 						var closed = JSON.parse(ss.getClosedWindowData());
 						for(var i = 0, l = closed.length; i < l; ++i) {
+							delete closed[i]._shouldRestore;
+							//LOG("#" + i + "\n" + JSON.stringify(closed[i]));
 							if(JSON.stringify(closed[i]) == state) {
 								ss.forgetClosedWindow(i);
 								break;
