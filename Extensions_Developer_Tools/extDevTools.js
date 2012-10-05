@@ -20,7 +20,28 @@
 var options = {
 	locales: ["ru", "en-US"],
 	forceRestartOnLocaleChange: false,
-	closeOptionsMenu: false
+	closeOptionsMenu: false,
+	hotkeys: {
+		cleanAndRestart: {
+			key: "control alt shift R",
+			command: function() {
+				cmds.cleanAndRestart();
+			}
+		},
+		attrsInspector: {
+			key: "control alt I",
+			command: function() {
+				cmds.attrsInspector();
+			}
+		},
+		scratchpad: {
+			key: "shift VK_F4",
+			override: "key_scratchpad",
+			command: function() {
+				cmds.openScratchpad();
+			}
+		}
+	}
 };
 var images = {
 	// Fugue Icons by Yusuke Kamiyamane, http://www.iconfinder.com/icondetails/25550/16/applications_blue_icon
@@ -753,6 +774,42 @@ this.appendChild(parseXULFromString('\
 		</menu>\
 	</menupopup>'
 ));
+for(var kId in options.hotkeys) if(options.hotkeys.hasOwnProperty(kId)) {
+	var cmd = options.hotkeys[kId];
+	if(!cmd.key)
+		continue;
+	var keyElt;
+	if(
+		cmd.hasOwnProperty("override")
+		&& (keyElt = document.getElementById(cmd.override))
+	) {
+		// Break old key
+		keyElt.setAttribute("__disabledByEvtDevTools", "true");
+		keyElt.setAttribute("key", "\xa0"); // &nbsp;
+		keyElt.removeAttribute("keycode");
+		keyElt.removeAttribute("modifiers");
+		keyElt.removeAttribute("keytext");
+		//Array.slice(document.getElementsByAttribute("key", cmd.override)).forEach(function(node) {
+		//	node.removeAttribute("key");
+		//});
+	}
+	keyElt = document.getElementById("mainKeyset")
+		.appendChild(document.createElement("key"));
+	var keyId = keyElt.id = "custombuttons-extDevTools-key-" + kId;
+
+	var tokens = cmd.key.split(" ");
+	var key = tokens.pop() || " ";
+	var modifiers = tokens.join(",");
+	keyElt.setAttribute(
+		key.substr(0, 3) == "VK_" ? "keycode" : "key",
+		key
+	);
+	keyElt.setAttribute("modifiers", modifiers);
+	keyElt._cb_oncommand = cmd.command;
+	keyElt.setAttribute("oncommand", "this._cb_oncommand();");
+	var mi = this.getElementsByAttribute("cb_id", kId)[0];
+	mi && mi.setAttribute("key", keyId);
+}
 function parseXULFromString(xul) {
 	xul = xul.replace(/>\s+</g, "><");
 	return new DOMParser().parseFromString(xul, "application/xml").documentElement;
