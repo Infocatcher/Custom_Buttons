@@ -5,7 +5,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011-2012
-// version 0.1.0pre16 - 2012-10-04
+// version 0.1.0pre17 - 2012-10-05
 
 // Includes Attributes Inspector
 // http://forum.mozilla-russia.org/viewtopic.php?pid=470532#p470532
@@ -254,6 +254,8 @@ var cmds = this.commands = {
 			this.setPref(this.defaultActionPref, val);
 	},
 	initMenu: function(menu) {
+		if(!menu)
+			menu = this.button.lastChild;
 		var defaultAction = this.defaultAction;
 		Array.forEach(
 			menu.getElementsByAttribute("cb_id", "*"),
@@ -276,7 +278,8 @@ var cmds = this.commands = {
 		if(!action)
 			return;
 		this.defaultAction = this.defaultAction == action ? "" : action;
-		this.initMenu(mi.parentNode);
+		this.initMenu();
+		this.savePrefFile(true);
 	},
 
 	get canReopenWindow() {
@@ -464,6 +467,7 @@ var cmds = this.commands = {
 		if(!this.options.forceRestartOnLocaleChange && this.platformVersion >= 18) {
 			this.flushCaches();
 			this.reopenWindow();
+			this.savePrefFile(true);
 		}
 		else {
 			this.restart();
@@ -588,7 +592,8 @@ var cmds = this.commands = {
 		this.setPref(pref, node.getAttribute("checked") == "true");
 		this.hlPrefItem(node, pref);
 		if(pref == "devtools.chrome.enabled")
-			this.initMenu(this.button.lastChild);
+			this.initMenu();
+		this.prefsChanged = true;
 	},
 	hlPrefItem: function(node, pref) {
 		node.style.fontWeight = this.prefHasUserValue(pref) ? "bold" : "";
@@ -637,6 +642,17 @@ var cmds = this.commands = {
 		if(this.getPref(pName, null, this.defaultBranch) == null)
 			return !!this.getPref(pName);
 		return this.prefSvc.prefHasUserValue(pName);
+	},
+
+	prefsChanged: false,
+	savePrefFile: function(force) {
+		if(!force && !this.prefsChanged)
+			return;
+		this.prefsChanged = false;
+		setTimeout(function(_this) {
+			_this.prefSvc.savePrefFile(null);
+			LOG("savePrefFile()");
+		}, 0, this);
 	}
 };
 
@@ -716,6 +732,7 @@ this.appendChild(parseXULFromString('\
 			accesskey="' + _localize("O", "optionsKey") + '">\
 			<menupopup\
 				onpopupshowing="this.parentNode.parentNode.parentNode.commands.initPrefsMenu(this);"\
+				onpopuphidden="this.parentNode.parentNode.parentNode.commands.savePrefFile();"\
 				oncommand="this.parentNode.parentNode.parentNode.commands.doPrefsMenuCommand(event.target);"\
 				onclick="if(event.button == 1) closeMenus(this);">\
 				<menuitem cb_pref="javascript.options.showInConsole"\
