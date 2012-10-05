@@ -169,6 +169,9 @@ function _localize(s, key) {
 		},
 		"Enable E4X for content": {
 			ru: "Включить E4X для content"
+		},
+		"Middle-click: %S": {
+			ru: "Клик средней кнопкой мыши: %S"
 		}
 	};
 	var locale = (cmds.getPref("general.useragent.locale") || "en").match(/^[a-z]*/)[0];
@@ -209,12 +212,8 @@ this.onmouseover = function(e) {
 this.onclick = function(e) {
 	if(e.target != this || e.button != 1 || this.disabled)
 		return;
-	var defaultAction = this.commands.defaultAction;
-	if(!defaultAction)
-		return;
-	var mi = this.getElementsByAttribute("cb_id", defaultAction);
-	if(mi.length)
-		mi[0].doCommand();
+	var mi = this.commands.defaultActionItem;
+	mi && mi.doCommand();
 };
 
 var cmds = this.commands = {
@@ -253,6 +252,15 @@ var cmds = this.commands = {
 		else
 			this.setPref(this.defaultActionPref, val);
 	},
+	get defaultActionItem() {
+		var defaultAction = this.defaultAction;
+		if(!defaultAction)
+			return null;
+		var mis = this.button.getElementsByAttribute("cb_id", defaultAction);
+		if(!mis.length)
+			return null;
+		return mis[0];
+	},
 	initMenu: function(menu) {
 		if(!menu)
 			menu = this.button.lastChild;
@@ -260,8 +268,8 @@ var cmds = this.commands = {
 		Array.forEach(
 			menu.getElementsByAttribute("cb_id", "*"),
 			function(mi) {
-				mi.setAttribute("default", mi.getAttribute("cb_id") == defaultAction);
 				var cbId = mi.getAttribute("cb_id");
+				mi.setAttribute("default", cbId == defaultAction);
 				if(cbId == "attrsInspector") {
 					mi.style.color = "inspectDOMNode" in window ? "" : "grayText";
 					this.setAttrsInspectorActive(mi);
@@ -279,7 +287,19 @@ var cmds = this.commands = {
 			return;
 		this.defaultAction = this.defaultAction == action ? "" : action;
 		this.initMenu();
+		this.setDefaultActionTip();
 		this.savePrefFile(true);
+	},
+	setDefaultActionTip: function() {
+		var _this = this;
+		setTimeout(function() {
+			var mi = _this.defaultActionItem;
+			_this.button.tooltipText = _this.button.tooltipText.replace(/ \n.*$/, "") + (
+				mi
+					? " \n" + _localize("Middle-click: %S").replace("%S", mi.getAttribute("label"))
+					: ""
+			);
+		}, 100);
 	},
 
 	get canReopenWindow() {
@@ -830,6 +850,8 @@ for(var kId in options.hotkeys) if(options.hotkeys.hasOwnProperty(kId)) {
 	var mi = this.getElementsByAttribute("cb_id", kId)[0];
 	mi && mi.setAttribute("key", keyId);
 }
+cmds.setDefaultActionTip();
+
 function parseXULFromString(xul) {
 	xul = xul.replace(/>\s+</g, "><");
 	return new DOMParser().parseFromString(xul, "application/xml").documentElement;
