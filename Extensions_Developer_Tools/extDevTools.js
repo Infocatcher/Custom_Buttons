@@ -317,14 +317,20 @@ var cmds = this.commands = {
 		win.addEventListener("load", function restoreSession() {
 			win.removeEventListener("load", restoreSession, false);
 			ss.setWindowState(win, state, true);
-			if("forgetClosedWindow" in ss) {
-				window.addEventListener("unload", function clearUndo(e) {
-					window.removeEventListener("unload", clearUndo, false);
+
+			// Try remove closed window from undo history
+			window.addEventListener("unload", function clearUndo(e) {
+				window.removeEventListener("unload", clearUndo, false);
+
+				var canForget = "forgetClosedWindow" in ss;
+				if(canForget) {
 					var stateObj = JSON.parse(ss.getWindowState(window)).windows[0];
 					delete stateObj._shouldRestore;
 					var state = JSON.stringify(stateObj);
 					//LOG("state:\n" + state);
-					win.setTimeout(function() {
+				}
+				win.setTimeout(function() {
+					if(canForget) {
 						var closed = JSON.parse(ss.getClosedWindowData());
 						for(var i = 0, l = closed.length; i < l; ++i) {
 							delete closed[i]._shouldRestore;
@@ -334,9 +340,20 @@ var cmds = this.commands = {
 								break;
 							}
 						}
-					}, 0);
-				}, false);
-			}
+					}
+					else if(
+						"getClosedWindowCount" in ss
+							? ss.getClosedWindowCount() == 1
+							: "getClosedWindowData" in ss && JSON.parse(ss.getClosedWindowData()).length == 1
+					) {
+						ss.setWindowState(win, '{"windows":[{}],"_closedWindows":[]}', false);
+					}
+					else {
+						LOG("Can't remove closed window from undo history");
+					}
+				}, 0);
+			}, false);
+
 			window.close();
 		}, false);
 	},
