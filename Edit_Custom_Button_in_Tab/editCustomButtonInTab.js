@@ -35,6 +35,17 @@ editInTab.setAttribute("oncommand", "editCustomButtonInTab();");
 editInTab.removeAttribute("observes"); // For Firefox 3.6 and older
 editItem.parentNode.insertBefore(editInTab, editItem.nextSibling);
 
+Array.filter( // Process already cloned menu items
+	document.getElementsByAttribute("observes", editItem.getAttribute("observes")),
+	function(mi) {
+		return mi != editItem && (mi.id || "").substr(0, editId.length) == editId;
+	}
+).forEach(function(editItem, i) {
+	var clone = editInTab.cloneNode(true);
+	clone.id += "-cloned-" + i;
+	editItem.parentNode.insertBefore(clone, editItem.nextSibling);
+});
+
 window.editCustomButtonInTab = function(btn, newTab) { // Should be global to work in cloned menus
 	if(!btn)
 		btn = custombuttons.popupNode;

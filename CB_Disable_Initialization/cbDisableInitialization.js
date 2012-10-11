@@ -34,6 +34,18 @@ toggleEnabled.setAttribute("label", toggleEnabledLabel);
 toggleEnabled.setAttribute("oncommand", "toggleCustomButtonEnabled();");
 toggleEnabled.removeAttribute("observes"); // For Firefox 3.6 and older
 deleteItem.parentNode.insertBefore(toggleEnabled, deleteItem);
+
+Array.filter( // Process already cloned menu items
+	document.getElementsByAttribute("observes", deleteItem.getAttribute("observes")),
+	function(mi) {
+		return mi != deleteItem && (mi.id || "").substr(0, deleteId.length) == deleteId;
+	}
+).forEach(function(deleteItem, i) {
+	var clone = toggleEnabled.cloneNode(true);
+	clone.id += "-cloned-" + i;
+	deleteItem.parentNode.insertBefore(clone, deleteItem);
+});
+
 addEventListener("popupshowing", function(e) {
 	var popup = e.target;
 	if(popup.localName != "menupopup" || (popup.id || "").substr(0, 14) != "custombuttons-")
