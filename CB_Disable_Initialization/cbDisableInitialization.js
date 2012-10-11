@@ -16,8 +16,8 @@
 var toggleEnabledLabel = (function() {
 	var locale = (cbu.getPrefs("general.useragent.locale") || "en").match(/^\w*/)[0];
 	if(locale == "ru")
-		return "¬ключено";
-	return "Enabled";
+		return "¬ключить инициализацию";
+	return "Enable initialization";
 })();
 
 const deleteId = "custombuttons-contextpopup-remove";
