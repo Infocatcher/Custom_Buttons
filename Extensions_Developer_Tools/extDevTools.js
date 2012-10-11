@@ -5,7 +5,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011-2012
-// version 0.1.0pre17 - 2012-10-05
+// version 0.1.0pre17 - 2012-10-11
 
 // Includes Attributes Inspector
 // http://forum.mozilla-russia.org/viewtopic.php?pid=470532#p470532
@@ -572,6 +572,13 @@ var cmds = this.commands = {
 			&& "openScratchpad" in Scratchpad;
 	},
 	openScratchpad: function() {
+		if("ScratchpadManager" in Scratchpad) { // Firefox 10+
+			// Use JSON.stringify(win.Scratchpad.getState()) to get state object
+			var context = this.getPref("devtools.chrome.enabled") ? 2 : 1;
+			Scratchpad.ScratchpadManager.openScratchpad({ text: "", executionContext: context, saved: true });
+			return;
+		}
+
 		var win = Scratchpad.openScratchpad();
 		var _this = this;
 		win.addEventListener("load", function tweak(e) {
