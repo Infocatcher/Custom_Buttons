@@ -4,7 +4,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2012
-// version 0.1.5 - 2012-08-10
+// version 0.1.6pre - 2012-10-11
 
 // Note:
 // In Firefox 3.6 and older:
@@ -29,6 +29,7 @@ if(editInTab)
 var editItem = document.getElementById(editId);
 editInTab = editItem.cloneNode(true);
 editInTab.id = editInTabId;
+editInTab.setAttribute("cb_id", editInTabId);
 editInTab.setAttribute("label", editInTabLabel);
 editInTab.setAttribute("oncommand", "editCustomButtonInTab();");
 editInTab.removeAttribute("observes"); // For Firefox 3.6 and older
@@ -177,9 +178,9 @@ checkTab(gBrowser.selectedTab);
 
 this.onDestroy = function(reason) {
 	if(reason == "update" || reason == "delete") {
-		let editInTab = document.getElementById(editInTabId);
-		if(editInTab)
-			editInTab.parentNode.removeChild(editInTab);
+		Array.slice(document.getElementsByAttribute("cb_id", editInTabId)).forEach(function(btn) {
+			btn.parentNode.removeChild(btn);
+		});
 		delete window.editCustomButtonInTab;
 	}
 };
