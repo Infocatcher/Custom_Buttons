@@ -50,13 +50,11 @@ addEventListener("popupshowing", function(e) {
 	var popup = e.target;
 	if(popup.localName != "menupopup" || (popup.id || "").substr(0, 14) != "custombuttons-")
 		return;
-	var btn = custombuttons.popupNode;
-	if(!btn)
-		return;
 	var toggleEnabled = popup.getElementsByAttribute("cb_id", toggleEnabledId)[0];
 	if(!toggleEnabled)
 		return;
-	var initCode = btn.cbInitCode;
+	var btn = getBtn();
+	var initCode = btn && btn.cbInitCode || "";
 	if(/^\n*return(?:;|\s*\n)/.test(initCode))
 		toggleEnabled.removeAttribute("checked");
 	else
@@ -67,9 +65,8 @@ addEventListener("popupshowing", function(e) {
 		toggleEnabled.removeAttribute("disabled");
 }, true);
 
-window.toggleCustomButtonEnabled = function(btn) { // Should be global to work in cloned menus
-	if(!btn)
-		btn = custombuttons.popupNode;
+window.toggleCustomButtonEnabled = function() { // Should be global to work in cloned menus
+	var btn = getBtn();
 	if(!btn)
 		return;
 
@@ -95,6 +92,12 @@ window.toggleCustomButtonEnabled = function(btn) { // Should be global to work i
 
 	//btn.init();
 };
+function getBtn() {
+	var btn = custombuttons.popupNode;
+	if(!btn || (btn.id || "").substr(0, 20) != "custombuttons-button")
+		return null;
+	return btn;
+}
 
 var style = '\
 	@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");\n\
