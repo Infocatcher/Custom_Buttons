@@ -44,10 +44,10 @@ this.onDestroy = function() {
 	this._autoPin && this.toggleAutoPin();
 };
 this.onclick = function(e) {
-	if(e.button == 0)
-		this.toggleTabsPinned();
-	else if(e.button == 1)
+	if(e.button == 1 || e.button == 0 && (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey))
 		this.toggleAutoPin();
+	else if(e.button == 0)
+		this.toggleTabsPinned();
 };
 if(this.startupAutoPin) {
 	this.toggleTabsPinned(true);
