@@ -1,7 +1,14 @@
-// Pin Tabs for Custom Buttons
-// version 0.1.1 - 2010-08-08
+// http://infocatcher.ucoz.net/js/cb/pinTabs.js
+// https://github.com/Infocatcher/Custom_Buttons/tree/master/Pin_Tabs
+
+// Pin Tabs button for Custom Buttons
 // (code for "initialization" section)
-// (c) Infocatcher 2010
+
+// (c) Infocatcher 2010, 2012
+// version 0.1.2 - 2012-10-12
+
+// Left-click: pin/unpin current tab
+// Middle-click: toggle autopin
 
 //== Settings begin
 this.startupAutoPin = false;
