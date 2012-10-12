@@ -16,7 +16,7 @@ this.toggleTabPinned = function(tab) {
 	gBrowser[tab.pinned ? "unpinTab" : "pinTab"](tab);
 };
 this.toggleTabsPinned = function(pin) {
-	var tabs = Array.slice(gBrowser.tabs);
+	var tabs = Array.slice(gBrowser.visibleTabs || gBrowser.tabs);
 	pin = arguments.length
 		? pin
 		: tabs.some(function(tab) { return !tab.pinned; });
