@@ -4,7 +4,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2012
-// version 0.1.6pre - 2012-10-11
+// version 0.1.6 - 2012-10-12
 
 // Note:
 // In Firefox 3.6 and older:
@@ -20,9 +20,9 @@ var editInTabLabel = (function() {
 })();
 
 const editId = "custombuttons-contextpopup-edit";
-const editInTabId = editId + "-inTab";
-const cbIdAttr = "custombuttons-editInTab-id";
+const editInTabId = editId + "InTab";
 const editorBaseUri = "chrome://custombuttons/content/editor.xul";
+const cbIdTabAttr = "custombuttons-editInTab-id";
 var editInTab = document.getElementById(editInTabId);
 if(editInTab)
 	editInTab.parentNode.removeChild(editInTab);
@@ -33,6 +33,7 @@ editInTab.setAttribute("cb_id", editInTabId);
 editInTab.setAttribute("label", editInTabLabel);
 editInTab.setAttribute("oncommand", "editCustomButtonInTab();");
 editInTab.removeAttribute("observes"); // For Firefox 3.6 and older
+editInTab.setAttribute("image", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAitJREFUeNrEk0tIVVEUhr99zrnHc1+SkYQVFWo20G6SgkFRDorEILFJDoogkoLoXfOopEZCYIFlIITlRIUiC5UmFZVk1igwCAozfD9uat17z97tc5XK0pGDFiz289/rXz//FkopFhMGiwyr5GoHHgkpZUnCde9LqXwwHyuR3HVNIzZpGrubbLtjfHwYyzvywIYpHp0o386ajAAD3/R1MRfugZeFoGcgbm9pedo+7VVVCMvTwKt8tGwrfXGb5mfRJFj8VV0Ki7hpk9t5gW35lYx9GcSZGFOGSjJQvuXpYd4PTLPUYU6m+Q1SgzbBkEPey0tUHjlJfU8j0c8j+Aa/ahFn2x2cdknVgLBfpx5DyTQIBGx8+oHjras4vX8DtfWNFG0q4gmPyas9VqgZqEbNAEvPUnW1sCMI+QVBPXc02Ar5ONiURW55NsHus1TkjNDW2srHdYcormo/Z2kG+0p35BPTfaaHrVnBBAmt75QwKK3LYuPetdDbDxMTdHc2ELn4gfWj32l+MFQhdla1KVdKpCvxBPXAcWUSlQEaYgeIlK2GvmENHuHOmxVcW3mLoDuqn09gGjNiF8xnEPWw+DUFpTA0BS+uc/tdDodrnhf+445dV9p/LaQw+SH8nBfVRBMpKi0zm5LIEupq7lF541Vhy6lIV3XGTRw5qdWXM078bRSBK3zs6b3MWxEgplxSPnWS2e8kwXfPbO4SanIefy4cf7bWtdAl8d9/408BBgBVmNFVzOyEfgAAAABJRU5ErkJggg==");
 editItem.parentNode.insertBefore(editInTab, editItem.nextSibling);
 
 Array.filter( // Process already cloned menu items
@@ -94,7 +95,7 @@ window.editCustomButtonInTab = function(btn, newTab) { // Should be global to wo
 	if(!tab) {
 		tab = gBrowser.selectedTab = gBrowser.addTab(editorUri);
 		initSessionStore();
-		tab.setAttribute(cbIdAttr, btn.id);
+		tab.setAttribute(cbIdTabAttr, btn.id);
 	}
 
 	var browser = tab.linkedBrowser;
@@ -159,10 +160,10 @@ function initSessionStore() {
 		Components.classes["@mozilla.org/browser/sessionstore;1"]
 		|| Components.classes["@mozilla.org/suite/sessionstore;1"]
 	).getService(Components.interfaces.nsISessionStore);
-	ss.persistTabAttribute(cbIdAttr);
+	ss.persistTabAttribute(cbIdTabAttr);
 }
 function checkTab(tab) {
-	var cbId = tab.getAttribute(cbIdAttr);
+	var cbId = tab.getAttribute(cbIdTabAttr);
 	if(!cbId)
 		return;
 	initSessionStore();
