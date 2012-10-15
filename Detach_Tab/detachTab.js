@@ -68,8 +68,8 @@ function _attachTab() {
 		if(parentTab && parentTab.parentNode)
 			gBrowser.treeStyleTab.attachTabTo(newTab, parentTab);
 	}
-	varwarnOnClose = cbu.getPrefs("browser.tabs.warnOnClose");
-	if(varwarnOnClose) // Strange bug...
+	var warnOnClose = cbu.getPrefs("browser.tabs.warnOnClose");
+	if(warnOnClose) // Strange bug...
 		cbu.setPrefs("browser.tabs.warnOnClose", false);
 	try {
 		gBrowser.swapBrowsersAndCloseOther(newTab, tab);
@@ -77,7 +77,7 @@ function _attachTab() {
 	catch(e) {
 		Components.utils.reportError(e);
 	}
-	if(varwarnOnClose)
+	if(warnOnClose)
 		cbu.setPrefs("browser.tabs.warnOnClose", true);
 	window.focus();
 	delete btn[ns + "detachedWindow"];
