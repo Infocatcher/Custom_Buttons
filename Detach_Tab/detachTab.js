@@ -5,7 +5,7 @@
 // (code for "code" section)
 
 // (c) Infocatcher 2012
-// version 0.2.0 - 2012-09-08
+// version 0.2.1 - 2012-10-15
 
 var forceHideTabBar = false;
 
@@ -68,17 +68,28 @@ function _attachTab() {
 		if(parentTab && parentTab.parentNode)
 			gBrowser.treeStyleTab.attachTabTo(newTab, parentTab);
 	}
+
+	// Strange bug...
+	// Temporary override some preferences
 	var warnOnClose = cbu.getPrefs("browser.tabs.warnOnClose");
-	if(warnOnClose) // Strange bug...
+	if(warnOnClose)
 		cbu.setPrefs("browser.tabs.warnOnClose", false);
+	var warnOnQuit = cbu.getPrefs("browser.warnOnQuit");
+	if(warnOnQuit)
+		cbu.setPrefs("browser.warnOnQuit", false);
+
 	try {
 		gBrowser.swapBrowsersAndCloseOther(newTab, tab);
 	}
 	catch(e) {
 		Components.utils.reportError(e);
 	}
+
 	if(warnOnClose)
 		cbu.setPrefs("browser.tabs.warnOnClose", true);
+	if(warnOnQuit)
+		cbu.setPrefs("browser.warnOnQuit", true);
+
 	window.focus();
 	delete btn[ns + "detachedWindow"];
 	delete btn[ns + "tabPos"];
