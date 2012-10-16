@@ -1,0 +1,26 @@
+<!DOCTYPE HTML>
+<meta charset="utf-8"/>
+<title>Add New Buttons After This Button [0.1.0 - 2012-07-01]</title>
+<body>
+<a href="custombutton://%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%0D%0A%3Ccustombutton%20xmlns%3Acb%3D%22http%3A//xsms.nm.ru/custombuttons/%22%3E%0A%20%20%3Cname%3EAdd%20New%20Buttons%20After%20This%20Button%3C/name%3E%0A%20%20%3Cimage%3E%3C%21%5BCDATA%5Bdata%3Aimage/png%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAABX1BMVEUAAACIzt/P6/KIzt+Izt+Izt8RdxHH6PCd1+XL6vFJnlIujza+5O6w3uonjSc8ojyI7ohRt1Hm9fih2Obk9Pg6oDrp9vnE5+8cghzo9vnM6vFOp8mq3Oja8PVHrUe74+3F5++p2Ofi8/eDxNqw3+rn9fm84+3x+fuM0OCFxNuGxNql1eXr9/qh1eRrutRJpcjP6/ITibeJz9+S0uKj2eby+vur3Ohcsc+IxdsulC7u+Pqv3Ol+5H7l9Piy3+qv3umk2eaY1ePG5/BVu1XI6fA4ncMZjbnv+fttutRVrMtAocXD5e7L6fG13up+wdlNp8mz3ek1oGBEqkRmum+74uye0eLR6/JmtNE6ncNEosaSyt6i0+Oc0uK54uy34exhsWaQ0eFmtdF84nxYrmP2+/3s9/oymsGp2udz2XNPqspuuNN9wtm14Ovh8vcXjLhhx2GVzeB1vtY3nMKQy94RdxH7vk2yAAAADHRSTlMA8fHo8mO/8mPo+9jm5jjpAAAAxElEQVR4XoXP5U7DUBgA0G+03ZB76y5zd3cf7u7u7u8fSCBZ+cV5gwP/owiHDUEBqbSGxDAJUb4UmalfJeUQL/qfsnkoeCf7W9V4whcLHB4dB0+hZ5YrRuMmlc485DrdYg8EjKc/MMaz13f3jxgLYCL0/IoQens/m9pEyIS2rs/NLywuLa+srq1v6G3wWNb2zu7e/oFhuFm35QFF+ybLmnbCcOcccwGuy181tnnbZGswOjbyY5yWXiR6AmzUgQp/OD+dAF8C0SPhEjHy+wAAAABJRU5ErkJggg%3D%3D%5D%5D%3E%3C/image%3E%0A%20%20%3Cmode%3E0%3C/mode%3E%0A%20%20%3Cinitcode%3E%3C%21%5BCDATA%5B//%20https%3A//github.com/Infocatcher/Custom_Buttons/tree/master/Add_New_Buttons_After_This_Button%0A%0A//%20Add%20New%20Buttons%20After%20This%20Button%20button%20for%20Custom%20Buttons%0A//%20%28code%20for%20%22initialization%22%20section%29%0A//%20Note%3A%20button%20are%20disabled%20by%20default%2C%20click%20to%20enable%0A%0A//%20%28c%29%20Infocatcher%202012%0A//%20version%200.1.0%20-%202012-07-01%0A%0Avar%20cbs%20%3D%20Components.classes%5B%22@xsms.nm.ru/custombuttons/cbservice%3B1%22%5D%0A%09.getService%28Components.interfaces.cbICustomButtonsService%29%3B%0Avar%20windowId%20%3D%20cbs.getWindowId%28document.documentURI%29%3B%0Avar%20notificationPrefix%20%3D%20cbs.getNotificationPrefix%28windowId%29%3B%0A%0Athis.onclick%20%3D%20function%28e%29%20%7B%0A%09if%28e.button%20%3D%3D%200%29%20%7B%0A%09%09this.checked%20%3D%20%21this.checked%3B%0A%09%09document.persist%28this.id%2C%20%22checked%22%29%3B%0A%09%7D%0A%7D%3B%0A%0Avar%20observer%20%3D%20%7B%0A%09button%3A%20this%2C%0A%09observe%3A%20function%28button%2C%20topic%2C%20data%29%20%7B%0A%09%09if%28topic%20%21%3D%20notificationPrefix%20+%20%22installButton%22%29%0A%09%09%09return%3B%0A%09%09if%28%21this.button.checked%29%0A%09%09%09return%3B%0A%09%09var%20toolbar%20%3D%20this.button.parentNode%3B%0A%09%09toolbar.insertBefore%28button%2C%20this.button.nextSibling%29%3B%0A%09%09custombuttons.persistCurrentSets%28toolbar.id%2C%20this.button.id%2C%20button.id%20%7C%7C%20button.getAttribute%28%22id%22%29%29%3B%0A%09%7D%0A%7D%3B%0Avar%20os%20%3D%20Components.classes%5B%22@mozilla.org/observer-service%3B1%22%5D%0A%09.getService%20%28Components.interfaces.nsIObserverService%29%3B%0Aos.addObserver%28observer%2C%20notificationPrefix%20+%20%22installButton%22%2C%20false%29%3B%0A%0Athis.onDestroy%20%3D%20function%28%29%20%7B%0A%09os.removeObserver%28observer%2C%20notificationPrefix%20+%20%22installButton%22%29%3B%0A%7D%3B%5D%5D%3E%3C/initcode%3E%0A%20%20%3Ccode%3E%3C%21%5BCDATA%5B/*CODE*/%5D%5D%3E%3C/code%3E%0A%20%20%3Caccelkey%3E%3C%21%5BCDATA%5B%5D%5D%3E%3C/accelkey%3E%0A%20%20%3Chelp%3E%3C%21%5BCDATA%5B%5D%5D%3E%3C/help%3E%0A%20%20%3Cattributes/%3E%0A%3C/custombutton%3E"
+>Install</a>
+<script type="text/javascript">
+var a = document.getElementsByTagName("a")[0];
+a.title = document.title;
+if(/%3Cimage%3E%3C%21%5BCDATA%5B(data%3A\S+)%5D%5D%3E%3C\/image%3E/.test(a.href)) {
+	var icon = decodeURIComponent(RegExp.$1);
+
+	var img = document.createElement("img");
+	img.src = icon;
+	img.alt = "";
+	img.style.verticalAlign = "middle";
+	img.style.marginRight = "4px";
+	a.insertBefore(img, a.firstChild);
+
+	var link = document.createElement("link");
+	link.rel = "shortcut icon";
+	link.href = icon;
+	document.documentElement.insertBefore(link, document.documentElement.firstChild);
+}
+</script>
+</body>
