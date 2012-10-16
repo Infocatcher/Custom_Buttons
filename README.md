@@ -6,8 +6,7 @@ New custom buttons will automatically placed after this button (button are disab
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Attributes_Inspector/icon.png)&nbsp;[Attributes Inspector](Custom_Buttons/blob/master/Attributes_Inspector)
 Shows tooltip with with all attributes and allow open [DOM Inspector](https://addons.mozilla.org/firefox/addon/dom-inspector-6622/) for current node
-
-![Attributes Inspector](https://raw.github.com/Infocatcher/Custom_Buttons/master/Attributes_Inspector/attrsInspector-en.png)
+<br>![Attributes Inspector](https://raw.github.com/Infocatcher/Custom_Buttons/master/Attributes_Inspector/attrsInspector-en.png)
 
 ##### [Back to Close](Custom_Buttons/blob/master/Back_to_Close)
 Use “Back” command to close tab without “back history”
@@ -23,14 +22,14 @@ Add “On top” button to built-in custom button's editor (doesn't work on some pla
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Check_for_Addons_Updates/icon.png)&nbsp;[Check for Addons Updates](Custom_Buttons/blob/master/Check_for_Addons_Updates)
 Button just open hidden tab with about:addons and trigger built-in “Check for Updates” function.
-And show tab, if found updates.
+<br>And show tab, if found updates.
 
 ##### [Convert E4X](Custom_Buttons/blob/master/Convert_E4X)
 Tries convert [deprecated](http://custombuttons.sourceforge.net/forum/viewtopic.php?f=2&t=365) [E4X](https://developer.mozilla.org/en-US/docs/E4X) to string literals
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Cookies_Permissions/icons/icon.png)&nbsp;[Cookies Permissions](Custom_Buttons/blob/master/Cookies_Permissions)
 Menage cookies permissions: block, allow for session or allow.
-Also shows permissions for current site and has some cookies-related features.
+<br>Also shows permissions for current site and has some cookies-related features.
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Detach_Tab/icon.png)&nbsp;[Detach Tab](Custom_Buttons/blob/master/Detach_Tab)
 Detach current tab to new “light weight” window without toolbars and attach back, if button pressed second time or window was closed
@@ -47,19 +46,19 @@ Open/focus/toggle window demo
 
 ##### [Pin Tabs](Custom_Buttons/blob/master/Pin_Tabs)
 Left-click: pin/unpin current tab
-Middle-click: toggle autopin
+<br>Middle-click: toggle autopin
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Plugins_Permissions/icons/icon.png)&nbsp;[Plugins Permissions](Custom_Buttons/blob/master/Plugins_Permissions)
 Menage plugins permissions: block or allow.
-Note: *plugins.click_to_play* in about:config should be enabled.
+<br>Note: *plugins.click_to_play* in about:config should be enabled.
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Purge_Tabs_History/icon.png)&nbsp;[Purge Tab(s) History](Custom_Buttons/blob/master/Purge_Tabs_History)
 Purge back/forward history for current tab (left-click) or all tabs (middle-click)
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Session_Bookmarks/icon.png)&nbsp;[Session Bookmarks](Custom_Buttons/blob/master/Session_Bookmarks)
 Drop-down menu with “session” bookmarks: additionally saves session information (such as scroll position and controls state).
-Use middle-click or left+click with any modifier to add current tab.
-Drag and drop any tab to add new bookmark.
+<br>Use middle-click or left+click with any modifier to add current tab.
+<br>Drag and drop any tab to add new bookmark.
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Title_Bar/icon.png)&nbsp;[Title Bar](Custom_Buttons/blob/master/Title_Bar)
 Show window title (if original title was hidden by some reasons)
