@@ -6,7 +6,7 @@ New custom buttons will automatically placed after this button (button are disab
 
 ##### [Attributes_Inspector](Custom_Buttons/blob/master/Attributes_Inspector)
 Shows tooltip with with all attributes and allow open [DOM Inspector](https://addons.mozilla.org/firefox/addon/dom-inspector-6622/) for current node
-![Attributes Inspector](https://raw.github.com/Infocatcher/Custom_Buttons/blob/master/Attributes_Inspector/attrsInspector-en.png)
+![Attributes Inspector](https://raw.github.com/Infocatcher/Custom_Buttons/master/Attributes_Inspector/attrsInspector-en.png)
 
 ##### [Back_to_Close](Custom_Buttons/blob/master/Back_to_Close)
 Use “Back” command to close tab without “back history”
@@ -39,7 +39,7 @@ Add “Edit button in tab…” to custom button's context menu
 
 ##### [Extensions_Developer_Tools](Custom_Buttons/blob/master/Extensions_Developer_Tools)
 Some tools for extensions or custom buttons developers
-![Extensions Developer Tools](https://raw.github.com/Infocatcher/Custom_Buttons/blob/master/Extensions_Developer_Tools/extDevTools-en.png)
+![Extensions Developer Tools](https://raw.github.com/Infocatcher/Custom_Buttons/master/Extensions_Developer_Tools/extDevTools-en.png)
 
 ##### [Open_Window](Custom_Buttons/blob/master/Open_Window)
 Open/focus/toggle window demo
