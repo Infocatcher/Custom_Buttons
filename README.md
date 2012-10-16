@@ -6,6 +6,7 @@ New custom buttons will automatically placed after this button (button are disab
 
 ##### [Attributes_Inspector](Custom_Buttons/blob/master/Attributes_Inspector)
 Shows tooltip with with all attributes and allow open [DOM Inspector](https://addons.mozilla.org/firefox/addon/dom-inspector-6622/) for current node
+
 ![Attributes Inspector](https://raw.github.com/Infocatcher/Custom_Buttons/master/Attributes_Inspector/attrsInspector-en.png)
 
 ##### [Back_to_Close](Custom_Buttons/blob/master/Back_to_Close)
