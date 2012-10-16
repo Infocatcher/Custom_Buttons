@@ -51,7 +51,7 @@ Middle-click: toggle autopin
 
 ##### [Plugins Permissions](Custom_Buttons/blob/master/Plugins_Permissions)
 Menage plugins permissions: block or allow.
-Note: plugins.click_to_play in about:config should be enabled.
+Note: *plugins.click_to_play* in about:config should be enabled.
 
 ##### [Purge Tab(s) History](Custom_Buttons/blob/master/Purge_Tabs_History)
 Purge back/forward history for current tab (left-click) or all tabs (middle-click)
