@@ -1,5 +1,7 @@
-Install [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/) extension to use these scripts!
-
+##### Usage
+* Install **[Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)** extension
+* Open *.html (if exist) and click on custombutton:// link
+* or read instructions in *.js and copy code to the “code” or “initialization” section in custom button editor
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Add_New_Buttons_After_This_Button/icon.png)&nbsp;[Add New Buttons After This Button](Custom_Buttons/blob/master/Add_New_Buttons_After_This_Button)
 New custom buttons will automatically placed after this button (button are disabled by default, click to enable)
