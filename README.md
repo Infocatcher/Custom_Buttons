@@ -60,6 +60,9 @@ Drop-down menu with “session” bookmarks: additionally saves session information 
 <br>Use middle-click or left+click with any modifier to add current tab.
 <br>Drag and drop any tab to add new bookmark.
 
+##### [Tabbar Doubleclick](Custom_Buttons/blob/master/Tabbar_Doubleclick)
+Tab bar double click action example
+
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Title_Bar/icon.png)&nbsp;[Title Bar](Custom_Buttons/blob/master/Title_Bar)
 Show window title (if original title was hidden by some reasons)
 
