@@ -1,2 +1,2 @@
-**Convert E4X** for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
-Tries convert [deprecated](http://custombuttons.sf.net/forum/viewtopic.php?f=2&t=365) [E4X](https://developer.mozilla.org/en-US/docs/E4X) to string literals
+**Convert E4X** button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+<br>Tries convert [deprecated](http://custombuttons.sf.net/forum/viewtopic.php?f=2&t=365) [E4X](https://developer.mozilla.org/en-US/docs/E4X) to string literals

@@ -1,2 +1,2 @@
-![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/CB_Disable_Initialization/icon.png)&nbsp;**Custom Buttons: Disable Initialization** for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
-Add “Enabled” checkbox to custom button's context menu (for test purposes)
+![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/CB_Disable_Initialization/icon.png)&nbsp;**Custom Buttons: Disable Initialization** button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+<br>Add “Enabled” checkbox to custom button's context menu (for test purposes)
