@@ -354,7 +354,8 @@ var cmds = this.commands = {
 				}, 0);
 			}, false);
 
-			window.close();
+			if(!window.closed)
+				window.close();
 		}, false);
 	},
 	get canMoveTabsToNewWindow() {
@@ -505,6 +506,7 @@ var cmds = this.commands = {
 			return locale;
 		this.setPref(localePref, locale);
 		if(!this.options.forceRestartOnLocaleChange && this.platformVersion >= 18) {
+			window.close();
 			this.flushCaches();
 			this.reopenWindow();
 			this.savePrefFile(true);
