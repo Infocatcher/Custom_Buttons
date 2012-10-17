@@ -1,0 +1,3 @@
+![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Attributes_Inspector/icon.png)&nbsp;**Attributes Inspector** for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+Shows tooltip with with all attributes and allow open [DOM Inspector](https://addons.mozilla.org/addon/dom-inspector-6622/) for current node
+<br>![Attributes Inspector](https://raw.github.com/Infocatcher/Custom_Buttons/master/Attributes_Inspector/attrsInspector-en.png)

@@ -1,0 +1,2 @@
+![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/CB_Editor_Toggle_on_Top/icons/icon.png)&nbsp;**Custom Buttons Editor: Toggle on Top** for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+Add “On top” button to built-in custom button's editor (doesn't work on some platforms!)

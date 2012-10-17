@@ -1,0 +1,2 @@
+![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Add_New_Buttons_After_This_Button/icon.png)&nbsp;**Add New Buttons After This Button** for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+New custom buttons will automatically placed after this button (button are disabled by default, click to enable)

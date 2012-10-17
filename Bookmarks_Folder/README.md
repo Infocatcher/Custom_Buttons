@@ -1,0 +1,2 @@
+![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Bookmarks_Folder/icon.png)&nbsp;**Bookmarks Folder** for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+Show contents of any bookmarks folder in drop-down menu

@@ -1,0 +1,2 @@
+![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Title_Bar/icon.png)&nbsp;**Title Bar** for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+Show window title (if original title was hidden by some reasons)

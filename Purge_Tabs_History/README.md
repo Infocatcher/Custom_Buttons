@@ -1,0 +1,2 @@
+![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Purge_Tabs_History/icon.png)&nbsp;**Purge Tab(s) History** for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+Purge back/forward history for current tab (left-click) or all tabs (middle-click)

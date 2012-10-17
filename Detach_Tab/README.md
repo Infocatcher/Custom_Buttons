@@ -1,0 +1,2 @@
+![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Detach_Tab/icon.png)&nbsp;**Detach Tab** for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+Detach current tab to new “light weight” window without toolbars and attach back, if button pressed second time or window was closed
