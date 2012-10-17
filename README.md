@@ -1,11 +1,11 @@
-Install [Custom Buttons](https://addons.mozilla.org/firefox/addon/custom-buttons/) extension to use these scripts!
+Install [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/) extension to use these scripts!
 
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Add_New_Buttons_After_This_Button/icon.png)&nbsp;[Add New Buttons After This Button](Custom_Buttons/blob/master/Add_New_Buttons_After_This_Button)
 New custom buttons will automatically placed after this button (button are disabled by default, click to enable)
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Attributes_Inspector/icon.png)&nbsp;[Attributes Inspector](Custom_Buttons/blob/master/Attributes_Inspector)
-Shows tooltip with with all attributes and allow open [DOM Inspector](https://addons.mozilla.org/firefox/addon/dom-inspector-6622/) for current node
+Shows tooltip with with all attributes and allow open [DOM Inspector](https://addons.mozilla.org/addon/dom-inspector-6622/) for current node
 <br>![Attributes Inspector](https://raw.github.com/Infocatcher/Custom_Buttons/master/Attributes_Inspector/attrsInspector-en.png)
 
 ##### [Back to Close](Custom_Buttons/blob/master/Back_to_Close)
@@ -25,7 +25,7 @@ Button just open hidden tab with about:addons and trigger built-in “Check for Up
 <br>And show tab, if found updates.
 
 ##### [Convert E4X](Custom_Buttons/blob/master/Convert_E4X)
-Tries convert [deprecated](http://custombuttons.sourceforge.net/forum/viewtopic.php?f=2&t=365) [E4X](https://developer.mozilla.org/en-US/docs/E4X) to string literals
+Tries convert [deprecated](http://custombuttons.sf.net/forum/viewtopic.php?f=2&t=365) [E4X](https://developer.mozilla.org/en-US/docs/E4X) to string literals
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Cookies_Permissions/icons/icon.png)&nbsp;[Cookies Permissions](Custom_Buttons/blob/master/Cookies_Permissions)
 Menage cookies permissions: block, allow for session or allow.
