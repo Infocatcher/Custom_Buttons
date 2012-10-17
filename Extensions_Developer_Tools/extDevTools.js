@@ -225,6 +225,8 @@ var cmds = this.commands = {
 	},
 	get ss() {
 		delete this.ss;
+		if(!("nsISessionStore" in Components.interfaces)) // Thunderbird
+			return this.ss = null;
 		return this.ss = (
 			Components.classes["@mozilla.org/browser/sessionstore;1"]
 			|| Components.classes["@mozilla.org/suite/sessionstore;1"]
@@ -360,7 +362,8 @@ var cmds = this.commands = {
 	},
 	get canMoveTabsToNewWindow() {
 		delete this.canMoveTabsToNewWindow;
-		return this.canMoveTabsToNewWindow = "swapBrowsersAndCloseOther" in gBrowser;
+		return this.canMoveTabsToNewWindow = "gBrowser" in window
+			&& "swapBrowsersAndCloseOther" in gBrowser;
 	},
 	moveTabsToNewWindow: function() {
 		this.button.disabled = true;
@@ -859,8 +862,12 @@ for(var kId in options.hotkeys) if(options.hotkeys.hasOwnProperty(kId)) {
 		//	node.removeAttribute("key");
 		//});
 	}
-	keyElt = document.getElementById("mainKeyset")
-		.appendChild(document.createElement("key"));
+	if(!keyset) {
+		var keyset = document.getElementById("mainKeyset")
+			|| document.getElementById("mailKeys")
+			|| document.getElementsByTagName("keyset")[0];
+	}
+	keyElt = keyset.appendChild(document.createElement("key"));
 	var keyId = keyElt.id = "custombuttons-extDevTools-key-" + kId;
 
 	var tokens = cmd.key.split(" ");
