@@ -13,21 +13,57 @@
 var btn = this;
 if("_cb_disabled" in btn)
 	return;
+btn._cb_disabled = true;
+
+Components.utils.import("resource://gre/modules/Services.jsm");
+
 var image = btn.image;
 var tip = btn.tooltipText;
 btn.image = "chrome://browser/skin/tabbrowser/connecting.png";
 btn.tooltipText = "Open about:addons…";
-btn._cb_disabled = true;
-var tab = gBrowser.addTab("about:addons");
-tab.collapsed = true;
-tab.closing = true; // See "visibleTabs" getter in chrome://browser/content/tabbrowser.xml
+
+var tab;
+var ws = Services.wm.getEnumerator("navigator:browser");
+windowsLoop:
+while(ws.hasMoreElements()) {
+	let w = ws.getNext();
+	let tabs = w.gBrowser.tabs;
+	for(let i = 0, l = tabs.length; i < l; ++i) {
+		let t = tabs[i];
+		if(
+			!t.closing
+			&& t.linkedBrowser
+			&& t.linkedBrowser.currentURI.spec == "about:addons"
+		) {
+			tab = t;
+			break windowsLoop;
+		}
+	}
+}
+
+if(!tab) {
+	tab = gBrowser.addTab("about:addons");
+	tab.collapsed = true;
+	tab.closing = true; // See "visibleTabs" getter in chrome://browser/content/tabbrowser.xml
+}
 
 var browser = tab.linkedBrowser;
-browser.addEventListener("load", function load(e) {
-	var doc = e.target;
-	if(doc.location != "about:addons")
-		return;
-	browser.removeEventListener(e.type, load, true);
+if(browser.webProgress.isLoadingDocument)
+	browser.addEventListener("load", processAddonsTab, true);
+else
+	processAddonsTab();
+
+function processAddonsTab(e) {
+	var doc;
+	if(e) {
+		doc = e.target;
+		if(doc.location != "about:addons")
+			return;
+		browser.removeEventListener(e.type, processAddonsTab, true);
+	}
+	else {
+		doc = browser.contentDocument;
+	}
 
 	btn.image = "chrome://browser/skin/tabbrowser/loading.png";
 	btn.tooltipText = doc.getElementById("updates-progress").getAttribute("value");
@@ -40,6 +76,11 @@ browser.addEventListener("load", function load(e) {
 	doc.getElementById("cmd_findAllUpdates").doCommand();
 
 	var wait = setInterval(function() {
+		if(!doc.defaultView || doc.defaultView.closed) {
+			stopWait();
+			notify("Tab with add-ons manager was closed!");
+			return;
+		}
 		var inProgress = doc.getElementById("updates-progress");
 		if(!inProgress.hidden)
 			return;
@@ -48,36 +89,43 @@ browser.addEventListener("load", function load(e) {
 		if(found.hidden && notFound.hidden) // Too early?
 			return;
 
-		clearInterval(wait);
-		btn.image = image;
-		btn.tooltipText = tip;
-		setTimeout(function() {
-			delete btn._cb_disabled;
-		}, 500);
+		stopWait();
 		tab.closing = false;
 
 		if(!updEnabled)
 			cbu.setPrefs(updEnabledPref, false);
 
 		if(!notFound.hidden) {
-			//tab.collapsed = false;
-			gBrowser.removeTab(tab);
-			Components.classes["@mozilla.org/alerts-service;1"]
-				.getService(Components.interfaces.nsIAlertsService)
-				.showAlertNotification(
-					"chrome://mozapps/skin/extensions/extensionGeneric.png",
-					"Custom Buttons",
-					notFound.getAttribute("value"),
-					false, "", null
-				);
+			if(tab.collapsed)
+				gBrowser.removeTab(tab);
+			notify(notFound.getAttribute("value"));
 			return;
 		}
 		tab.collapsed = false;
 		doc.getElementById("categories").selectedItem = doc.getElementById("category-availableUpdates");
-		gBrowser.selectedTab = tab;
+		var tabWin = tab.ownerDocument.defaultView;
+		tabWin.gBrowser.selectedTab = tab;
 		setTimeout(function() {
+			tabWin.focus();
 			doc.defaultView.focus();
 			doc.getElementById("addon-list").focus();
 		}, 0);
 	}, 50);
-}, true);
+	function stopWait() {
+		clearInterval(wait);
+		btn.image = image;
+		btn.tooltipText = tip;
+		setTimeout(function() {
+			delete btn._cb_disabled;
+		}, 500);
+	}
+	function notify(msg) {
+		Components.classes["@mozilla.org/alerts-service;1"]
+			.getService(Components.interfaces.nsIAlertsService)
+			.showAlertNotification(
+				"chrome://mozapps/skin/extensions/extensionGeneric.png",
+				"Custom Buttons",
+				msg, false, "", null
+			);
+	}
+}
