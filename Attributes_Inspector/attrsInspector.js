@@ -68,12 +68,12 @@ var context = _ns in window && window[_ns] || (
 		}
 	}
 );
-var ael = function(type, func, useCapture, target) {
+function ael(type, func, useCapture, target) {
 	return (target || window).addEventListener(type, func, useCapture);
-};
-var rel = function(type, func, useCapture, target) {
+}
+function rel(type, func, useCapture, target) {
 	return (target || window).removeEventListener(type, func, useCapture);
-};
+}
 
 context.toggle();
 
@@ -85,13 +85,24 @@ function toggle() {
 		if(!checked) {
 			var doc = btn.ownerDocument;
 			(function uncheck() { // D'oh...
-				for(var node = btn.parentNode; ; node = node.parentNode) {
+				for(var node = btn.parentNode; node != doc; node = node.parentNode) {
 					if(!node) { // Node was removed from document
 						_log("Button was removed from document");
+						var toolboxes = doc.getElementsByTagName("toolbox");
+						for(var i = 0, l = toolboxes.length; i < l; ++i) {
+							var toolbox = toolboxes[i];
+							if("palette" in toolbox) {
+								var paletteBtns = toolbox.palette.getElementsByAttribute("id", btn.id);
+								var paletteBtn = paletteBtns.length && paletteBtns[0];
+								if(paletteBtn && paletteBtn.getAttribute("checked") == "true") {
+									_log("Uncheck pallete button");
+									paletteBtn.removeAttribute("checked");
+									break;
+								}
+							}
+						}
 						return;
 					}
-					if(node.nodeType == node.DOCUMENT_NODE)
-						break;
 				}
 				//if(!doc.getElementById("wrapper-" + btn.id)) {
 				if(btn.parentNode.localName != "toolbarpaletteitem") {
