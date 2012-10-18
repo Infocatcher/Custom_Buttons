@@ -37,6 +37,7 @@ var _forbidTooltips = true;
 var _popupLocker = 1; // 0 - disable, 1 - only if Shift pressed, 2 - always enable
 var _showNamespaceURI = 2; // 0 - don't show, 1 - show as is, 2 - show pretty name instead of URI
 var _showFullTree = 2; // 0 - current frame, 1 - top frame, 2 - topmost frame
+var _nodePosition = 0.55; // Position of selected node in DOM Inspector's tree, 0..1 (-1 - don't change)
 var _debug = false; // Show debug messages in error console
 
 function _log() {
@@ -1254,7 +1255,7 @@ function init() {
 			var w = ws.getNext();
 			if(!("inspectDOMNode" in w))
 				continue;
-			if(_showFullTree && this.evtHandlerGlobal.fxVersion >= 2) {
+			if((_showFullTree || _nodePosition >= 0) && this.evtHandlerGlobal.fxVersion >= 2) {
 				return function(node, top) {
 					// Too many hacks...
 					//if((node.ownerDocument || node).defaultView == top) {
@@ -1265,9 +1266,11 @@ function init() {
 						"chrome://inspector/content/",
 						"_blank",
 						"chrome,all,dialog=no",
-						_showFullTree == 1
-							? (node.ownerDocument || node).defaultView.top.document
-							: (top || window.top).document
+						_showFullTree == 0
+							? node.ownerDocument || node
+							: _showFullTree == 1
+								? (node.ownerDocument || node).defaultView.top.document
+								: (top || window.top).document
 					);
 					var tryDelay = 5;
 					function inspect() {
@@ -1295,6 +1298,15 @@ function init() {
 										viewer.showNodeInTree(node);
 									else
 										viewer.selectElementInTree(node);
+									if(_nodePosition >= 0) {
+										var tbo = viewer.mDOMTree.treeBoxObject;
+										var cur = tbo.view.selection.currentIndex;
+										var first = tbo.getFirstVisibleRow();
+										var visibleRows = tbo.height/tbo.rowHeight;
+										var newFirst = cur - _nodePosition*visibleRows + 1;
+										tbo.scrollByLines(Math.round(newFirst - first));
+										tbo.ensureRowIsVisible(cur); // Should be visible, but...
+									}
 									return;
 								}
 								catch(e2) {
