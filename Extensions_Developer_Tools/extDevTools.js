@@ -844,6 +844,7 @@ this.appendChild(parseXULFromString('\
 		</menu>\
 	</menupopup>'
 ));
+const keyCbId = "custombuttons-extDevTools-key";
 for(var kId in options.hotkeys) if(options.hotkeys.hasOwnProperty(kId)) {
 	var cmd = options.hotkeys[kId];
 	if(!cmd.key)
@@ -870,6 +871,7 @@ for(var kId in options.hotkeys) if(options.hotkeys.hasOwnProperty(kId)) {
 	}
 	keyElt = keyset.appendChild(document.createElement("key"));
 	var keyId = keyElt.id = "custombuttons-extDevTools-key-" + kId;
+	keyElt.setAttribute("cb_id", keyCbId);
 
 	var tokens = cmd.key.split(" ");
 	var key = tokens.pop() || " ";
@@ -884,6 +886,14 @@ for(var kId in options.hotkeys) if(options.hotkeys.hasOwnProperty(kId)) {
 	var mi = this.getElementsByAttribute("cb_id", kId)[0];
 	mi && mi.setAttribute("key", keyId);
 }
+this.onDestroy = function(reason) {
+	if(reason == "update" || reason == "delete") {
+		Array.slice(document.getElementsByAttribute("cb_id", keyCbId)).forEach(function(key) {
+			key.parentNode.removeChild(key);
+		});
+	}
+};
+
 cmds.setDefaultActionTip();
 
 function parseXULFromString(xul) {
@@ -2245,12 +2255,14 @@ function init() {
 	this.ww.registerNotification(this.evtHandlerGlobal);
 	var btn = this.button;
 	if(btn) {
-		btn._context = context;
+		if("onDestroy" in btn)
+			var origOnDestroy = btn._attrsInspectorOrigOnDestroy = btn.onDestroy;
 		btn.onDestroy = function(reason) {
-			if(reason != "delete")
-				return;
-			_log('"Delete button" pressed -> stop()');
-			this._context.stop();
+			if(reason == "delete") {
+				_log('"Delete button" pressed -> stop()');
+				context.stop();
+			}
+			origOnDestroy && origOnDestroy.apply(this, arguments);
 		};
 	}
 	_log(
@@ -2292,8 +2304,10 @@ function destroy() {
 	this.ww.unregisterNotification(ehg);
 	var btn = this.button;
 	if(btn) {
-		delete btn._context;
-		delete btn.onDestroy;
+		if("_attrsInspectorOrigOnDestroy" in btn)
+			btn.onDestroy = btn._attrsInspectorOrigOnDestroy;
+		else
+			delete btn.onDestroy;
 	}
 	delete window[_ns];
 	_log("Shutdown finished!");
