@@ -8,8 +8,9 @@
 // version 0.1.0pre17 - 2012-10-11
 
 // Includes Attributes Inspector
-// http://forum.mozilla-russia.org/viewtopic.php?pid=470532#p470532
 // http://infocatcher.ucoz.net/js/cb/attrsInspector.js
+// http://forum.mozilla-russia.org/viewtopic.php?pid=577661
+// https://github.com/Infocatcher/Custom_Buttons/tree/master/Attributes_Inspector
 
 // Icon: http://www.iconfinder.com/icondetails/22560/16/gear_preferences_settings_tool_tools_icon
 
@@ -555,8 +556,8 @@ var cmds = this.commands = {
 			"chrome,all,centerscreen,resizable,dialog=0"
 		);
 	},
-	attrsInspector: function() {
-		this.button.attrsInspector();
+	attrsInspector: function(e) {
+		this.button.attrsInspector(e);
 		this.setAttrsInspectorActive();
 	},
 	setAttrsInspectorActive: function(mi) {
@@ -766,7 +767,7 @@ this.appendChild(parseXULFromString('\
 			class="menuitem-iconic"\
 			image="' + images.errorConsole + '" />\
 		<menuitem cb_id="attrsInspector"\
-			oncommand="this.parentNode.parentNode.commands.attrsInspector();"\
+			oncommand="this.parentNode.parentNode.commands.attrsInspector(event);"\
 			label="' + _localize("Attributes Inspector") + '"\
 			accesskey="' + _localize("A", "attrsInspectorKey") + '"\
 			class="menuitem-iconic"\
@@ -890,13 +891,14 @@ function parseXULFromString(xul) {
 	return new DOMParser().parseFromString(xul, "application/xml").documentElement;
 }
 
-this.attrsInspector = function() {
+this.attrsInspector = function(event) {
 //=== Attributes Inspector begin
-// http://forum.mozilla-russia.org/viewtopic.php?pid=470532#p470532
 // http://infocatcher.ucoz.net/js/cb/attrsInspector.js
+// http://forum.mozilla-russia.org/viewtopic.php?pid=577661
+// https://github.com/Infocatcher/Custom_Buttons/tree/master/Attributes_Inspector
 
 // (c) Infocatcher 2010-2012
-// version 0.6.0pre10 - 2012-08-17
+// version 0.6.0pre11 - 2012-10-18
 
 //===================
 // Attributes Inspector button for Custom Buttons
@@ -919,18 +921,29 @@ var _highlight = true; // Hightlight current node
 var _highlightUsingFlasher = false; // Don't modify DOM, but has some side effects (and slower)
 // Note: inIFlasher works in Firefox 4 and higher only with disabled hardware acceleration!
 // See https://bugzilla.mozilla.org/show_bug.cgi?id=368608 and https://bugzilla.mozilla.org/show_bug.cgi?id=594299
-var _borderColor = "red";
-var _borderWidth = 1;
-var _borderStyle = "solid"; // Doesn't work with _highlightUsingFlasher = true
+var _borderColor = "red"; // Any valid CSS color
+var _borderWidth = 1; // Border width in pixels
+var _borderStyle = "solid"; // border-style property in CSS
+// Note: doesn't work with _highlightUsingFlasher = true
+
+// Highlight added/removed/changed attributes, any valid CSS color:
 var _addedColor = "-moz-hyperlinktext";
 var _removedColor = "grayText";
 var _changedColor = "-moz-visitedhyperlinktext";
-var _forbidTooltips = true;
+
+var _forbidTooltips = true; // Prevent all other tooltips
+var _popupLocker = 1;
 // Lock all popups in window while DOM Inspector is opened (or until Escape was not pressed)
-var _popupLocker = 1; // 0 - disable, 1 - only if Shift pressed, 2 - always enable
+// Values: 0 - disable, 1 - only if Shift pressed, 2 - always enable
 var _showNamespaceURI = 2; // 0 - don't show, 1 - show as is, 2 - show pretty name instead of URI
 var _showFullTree = 2; // 0 - current frame, 1 - top frame, 2 - topmost frame
-var _debug = false; // Show debug messages in error console
+var _nodePosition = 0.55; // Position of selected node in DOM Inspector's tree, 0..1 (-1 - don't change)
+
+// Show debug messages in error console:
+//var _debug = false;
+var _debug = typeof event == "object" && event instanceof Event
+	? event.shiftKey || event.ctrlKey || event.altKey || event.metaKey
+	: false;
 
 function _log() {
 	if(!_debug)
@@ -961,12 +974,12 @@ var context = _ns in window && window[_ns] || (
 		}
 	}
 );
-var ael = function(type, func, useCapture, target) {
+function ael(type, func, useCapture, target) {
 	return (target || window).addEventListener(type, func, useCapture);
-};
-var rel = function(type, func, useCapture, target) {
+}
+function rel(type, func, useCapture, target) {
 	return (target || window).removeEventListener(type, func, useCapture);
-};
+}
 
 context.toggle();
 
@@ -978,13 +991,24 @@ function toggle() {
 		if(!checked) {
 			var doc = btn.ownerDocument;
 			(function uncheck() { // D'oh...
-				for(var node = btn.parentNode; ; node = node.parentNode) {
+				for(var node = btn.parentNode; node != doc; node = node.parentNode) {
 					if(!node) { // Node was removed from document
 						_log("Button was removed from document");
+						var toolboxes = doc.getElementsByTagName("toolbox");
+						for(var i = 0, l = toolboxes.length; i < l; ++i) {
+							var toolbox = toolboxes[i];
+							if("palette" in toolbox) {
+								var paletteBtns = toolbox.palette.getElementsByAttribute("id", btn.id);
+								var paletteBtn = paletteBtns.length && paletteBtns[0];
+								if(paletteBtn && paletteBtn.getAttribute("checked") == "true") {
+									_log("Uncheck pallete button");
+									paletteBtn.removeAttribute("checked");
+									break;
+								}
+							}
+						}
 						return;
 					}
-					if(node.nodeType == node.DOCUMENT_NODE)
-						break;
 				}
 				//if(!doc.getElementById("wrapper-" + btn.id)) {
 				if(btn.parentNode.localName != "toolbarpaletteitem") {
@@ -2131,77 +2155,89 @@ function init() {
 		}
 	};
 	this.__defineGetter__("inspector", function() {
+		if(!("@mozilla.org/commandlinehandler/general-startup;1?type=inspector" in Components.classes)) {
+			_log("DOM Inspector not installed!");
+			return null;
+		}
+		if((_showFullTree || _nodePosition >= 0) && this.evtHandlerGlobal.fxVersion >= 2) {
+			return function(node, top) {
+				var inspWin = window.openDialog(
+					"chrome://inspector/content/",
+					"_blank",
+					"chrome,all,dialog=no",
+					_showFullTree == 0
+						? node.ownerDocument || node
+						: _showFullTree == 1
+							? (node.ownerDocument || node).defaultView.top.document
+							: (top || window.top).document
+				);
+				var tryDelay = 5;
+				function inspect() {
+					if(!inspWin.inspector) {
+						inspWin.setTimeout(inspect, tryDelay);
+						return;
+					}
+					try {
+						try {
+							// Avoid warnings in error console after getViewer("dom")
+							var hash = inspWin.inspector.mPanelSet.registry.mViewerHash;
+						}
+						catch(e1) {
+							Components.utils.reportError(e1);
+						}
+						if(!hash || ("dom" in hash)) {
+							var viewer = inspWin.inspector.getViewer("dom");
+							var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+								.getService(Components.interfaces.nsIPrefBranch);
+							const blinkPref = "inspector.blink.on";
+							var blink = prefs.getBoolPref(blinkPref);
+							blink && prefs.setBoolPref(blinkPref, false);
+							try {
+								if("showNodeInTree" in viewer) // New DOM Inspector
+									viewer.showNodeInTree(node);
+								else
+									viewer.selectElementInTree(node);
+								if(_nodePosition >= 0) {
+									var tbo = viewer.mDOMTree.treeBoxObject;
+									var cur = tbo.view.selection.currentIndex;
+									var first = tbo.getFirstVisibleRow();
+									var visibleRows = tbo.height/tbo.rowHeight;
+									var newFirst = cur - _nodePosition*visibleRows + 1;
+									tbo.scrollByLines(Math.round(newFirst - first));
+									tbo.ensureRowIsVisible(cur); // Should be visible, but...
+								}
+								return;
+							}
+							catch(e2) {
+								Components.utils.reportError(e2);
+							}
+							finally {
+								blink && prefs.setBoolPref(blinkPref, true);
+							}
+						}
+					}
+					catch(e) {
+						Components.utils.reportError(e);
+					}
+					inspWin.setTimeout(inspect, tryDelay);
+				}
+				inspWin.addEventListener("load", function showNode(e) {
+					inspWin.removeEventListener("load", showNode, false);
+					inspect();
+				}, false);
+			};
+		}
+
 		var ws = this.wm.getEnumerator(null);
 		while(ws.hasMoreElements()) {
 			var w = ws.getNext();
-			if(!("inspectDOMNode" in w))
-				continue;
-			if(_showFullTree && this.evtHandlerGlobal.fxVersion >= 2) {
+			if("inspectDOMNode" in w) {
 				return function(node, top) {
-					// Too many hacks...
-					//if((node.ownerDocument || node).defaultView == top) {
-					//	w.inspectDOMNode(node);
-					//	return;
-					//}
-					var inspWin = window.openDialog(
-						"chrome://inspector/content/",
-						"_blank",
-						"chrome,all,dialog=no",
-						_showFullTree == 1
-							? (node.ownerDocument || node).defaultView.top.document
-							: (top || window.top).document
-					);
-					var tryDelay = 5;
-					function inspect() {
-						if(!inspWin.inspector) {
-							inspWin.setTimeout(inspect, tryDelay);
-							return;
-						}
-						try {
-							try {
-								// Avoid warnings in error console after getViewer("dom")
-								var hash = inspWin.inspector.mPanelSet.registry.mViewerHash;
-							}
-							catch(e1) {
-								Components.utils.reportError(e1);
-							}
-							if(!hash || ("dom" in hash)) {
-								var viewer = inspWin.inspector.getViewer("dom");
-								var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-									.getService(Components.interfaces.nsIPrefBranch);
-								const blinkPref = "inspector.blink.on";
-								var blink = prefs.getBoolPref(blinkPref);
-								prefs.setBoolPref(blinkPref, false);
-								try {
-									if("showNodeInTree" in viewer) // New DOM Inspector
-										viewer.showNodeInTree(node);
-									else
-										viewer.selectElementInTree(node);
-									return;
-								}
-								catch(e2) {
-									Components.utils.reportError(e2);
-								}
-								finally {
-									prefs.setBoolPref(blinkPref, blink);
-								}
-							}
-						}
-						catch(e) {
-							Components.utils.reportError(e);
-						}
-						inspWin.setTimeout(inspect, tryDelay);
-					}
-					inspWin.addEventListener("load", function showNode(e) {
-						inspWin.removeEventListener("load", showNode, false);
-						inspect();
-					}, false);
+					w.inspectDOMNode(node);
 				};
 			}
-			return function(node, top) {
-				w.inspectDOMNode(node);
-			};
 		}
+		_log("Can't find window with DOM Inspector's inspectDOMNode()");
 		return null;
 	});
 
