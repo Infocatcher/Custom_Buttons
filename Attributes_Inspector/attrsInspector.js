@@ -1250,88 +1250,89 @@ function init() {
 		}
 	};
 	this.__defineGetter__("inspector", function() {
+		if(!("@mozilla.org/commandlinehandler/general-startup;1?type=inspector" in Components.classes)) {
+			_log("DOM Inspector not installed!");
+			return null;
+		}
+		if((_showFullTree || _nodePosition >= 0) && this.evtHandlerGlobal.fxVersion >= 2) {
+			return function(node, top) {
+				var inspWin = window.openDialog(
+					"chrome://inspector/content/",
+					"_blank",
+					"chrome,all,dialog=no",
+					_showFullTree == 0
+						? node.ownerDocument || node
+						: _showFullTree == 1
+							? (node.ownerDocument || node).defaultView.top.document
+							: (top || window.top).document
+				);
+				var tryDelay = 5;
+				function inspect() {
+					if(!inspWin.inspector) {
+						inspWin.setTimeout(inspect, tryDelay);
+						return;
+					}
+					try {
+						try {
+							// Avoid warnings in error console after getViewer("dom")
+							var hash = inspWin.inspector.mPanelSet.registry.mViewerHash;
+						}
+						catch(e1) {
+							Components.utils.reportError(e1);
+						}
+						if(!hash || ("dom" in hash)) {
+							var viewer = inspWin.inspector.getViewer("dom");
+							var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+								.getService(Components.interfaces.nsIPrefBranch);
+							const blinkPref = "inspector.blink.on";
+							var blink = prefs.getBoolPref(blinkPref);
+							blink && prefs.setBoolPref(blinkPref, false);
+							try {
+								if("showNodeInTree" in viewer) // New DOM Inspector
+									viewer.showNodeInTree(node);
+								else
+									viewer.selectElementInTree(node);
+								if(_nodePosition >= 0) {
+									var tbo = viewer.mDOMTree.treeBoxObject;
+									var cur = tbo.view.selection.currentIndex;
+									var first = tbo.getFirstVisibleRow();
+									var visibleRows = tbo.height/tbo.rowHeight;
+									var newFirst = cur - _nodePosition*visibleRows + 1;
+									tbo.scrollByLines(Math.round(newFirst - first));
+									tbo.ensureRowIsVisible(cur); // Should be visible, but...
+								}
+								return;
+							}
+							catch(e2) {
+								Components.utils.reportError(e2);
+							}
+							finally {
+								blink && prefs.setBoolPref(blinkPref, true);
+							}
+						}
+					}
+					catch(e) {
+						Components.utils.reportError(e);
+					}
+					inspWin.setTimeout(inspect, tryDelay);
+				}
+				inspWin.addEventListener("load", function showNode(e) {
+					inspWin.removeEventListener("load", showNode, false);
+					inspect();
+				}, false);
+			};
+		}
+
 		var ws = this.wm.getEnumerator(null);
 		while(ws.hasMoreElements()) {
 			var w = ws.getNext();
-			if(!("inspectDOMNode" in w))
-				continue;
-			if((_showFullTree || _nodePosition >= 0) && this.evtHandlerGlobal.fxVersion >= 2) {
+			if("inspectDOMNode" in w) {
 				return function(node, top) {
-					// Too many hacks...
-					//if((node.ownerDocument || node).defaultView == top) {
-					//	w.inspectDOMNode(node);
-					//	return;
-					//}
-					var inspWin = window.openDialog(
-						"chrome://inspector/content/",
-						"_blank",
-						"chrome,all,dialog=no",
-						_showFullTree == 0
-							? node.ownerDocument || node
-							: _showFullTree == 1
-								? (node.ownerDocument || node).defaultView.top.document
-								: (top || window.top).document
-					);
-					var tryDelay = 5;
-					function inspect() {
-						if(!inspWin.inspector) {
-							inspWin.setTimeout(inspect, tryDelay);
-							return;
-						}
-						try {
-							try {
-								// Avoid warnings in error console after getViewer("dom")
-								var hash = inspWin.inspector.mPanelSet.registry.mViewerHash;
-							}
-							catch(e1) {
-								Components.utils.reportError(e1);
-							}
-							if(!hash || ("dom" in hash)) {
-								var viewer = inspWin.inspector.getViewer("dom");
-								var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-									.getService(Components.interfaces.nsIPrefBranch);
-								const blinkPref = "inspector.blink.on";
-								var blink = prefs.getBoolPref(blinkPref);
-								prefs.setBoolPref(blinkPref, false);
-								try {
-									if("showNodeInTree" in viewer) // New DOM Inspector
-										viewer.showNodeInTree(node);
-									else
-										viewer.selectElementInTree(node);
-									if(_nodePosition >= 0) {
-										var tbo = viewer.mDOMTree.treeBoxObject;
-										var cur = tbo.view.selection.currentIndex;
-										var first = tbo.getFirstVisibleRow();
-										var visibleRows = tbo.height/tbo.rowHeight;
-										var newFirst = cur - _nodePosition*visibleRows + 1;
-										tbo.scrollByLines(Math.round(newFirst - first));
-										tbo.ensureRowIsVisible(cur); // Should be visible, but...
-									}
-									return;
-								}
-								catch(e2) {
-									Components.utils.reportError(e2);
-								}
-								finally {
-									prefs.setBoolPref(blinkPref, blink);
-								}
-							}
-						}
-						catch(e) {
-							Components.utils.reportError(e);
-						}
-						inspWin.setTimeout(inspect, tryDelay);
-					}
-					inspWin.addEventListener("load", function showNode(e) {
-						inspWin.removeEventListener("load", showNode, false);
-						inspect();
-					}, false);
+					w.inspectDOMNode(node);
 				};
 			}
-			return function(node, top) {
-				w.inspectDOMNode(node);
-			};
 		}
+		_log("Can't find window with DOM Inspector's inspectDOMNode()");
 		return null;
 	});
 
