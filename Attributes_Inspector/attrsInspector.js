@@ -1350,12 +1350,14 @@ function init() {
 	this.ww.registerNotification(this.evtHandlerGlobal);
 	var btn = this.button;
 	if(btn) {
-		btn._context = context;
+		if("onDestroy" in btn)
+			var origOnDestroy = btn._attrsInspectorOrigOnDestroy = btn.onDestroy;
 		btn.onDestroy = function(reason) {
-			if(reason != "delete")
-				return;
-			_log('"Delete button" pressed -> stop()');
-			this._context.stop();
+			if(reason == "delete") {
+				_log('"Delete button" pressed -> stop()');
+				context.stop();
+			}
+			origOnDestroy && origOnDestroy.apply(this, arguments);
 		};
 	}
 	_log(
@@ -1397,8 +1399,10 @@ function destroy() {
 	this.ww.unregisterNotification(ehg);
 	var btn = this.button;
 	if(btn) {
-		delete btn._context;
-		delete btn.onDestroy;
+		if("_attrsInspectorOrigOnDestroy" in btn)
+			btn.onDestroy = btn._attrsInspectorOrigOnDestroy;
+		else
+			delete btn.onDestroy;
 	}
 	delete window[_ns];
 	_log("Shutdown finished!");
