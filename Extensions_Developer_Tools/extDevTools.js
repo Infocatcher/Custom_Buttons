@@ -22,6 +22,7 @@ var options = {
 	locales: ["ru", "en-US"],
 	forceRestartOnLocaleChange: false,
 	closeOptionsMenu: false,
+	restoreErrorConsole: true,
 	hotkeys: {
 		cleanAndRestart: {
 			key: "control alt shift R",
@@ -556,6 +557,42 @@ var cmds = this.commands = {
 			"chrome,all,centerscreen,resizable,dialog=0"
 		);
 	},
+	_restoreErrorConsoleObserver: null,
+	get restoreErrorConsolePref() {
+		delete this.restoreErrorConsolePref;
+		return this.restoreErrorConsolePref = "extensions.custombuttons.button" + this.btnNum + ".restoreErrorConsole";
+	},
+	initErrorConsoleRestoring: function() {
+		if(this._restoreErrorConsoleObserver || this.platformVersion < 2)
+			return;
+		this.restoreErrorConsole();
+		var obs = this.obs = Components.classes["@mozilla.org/observer-service;1"]
+			.getService(Components.interfaces.nsIObserverService);
+		var _this = this;
+		var observer = this._restoreErrorConsoleObserver = function() {
+			obs.removeObserver(observer, "quit-application-granted");
+			if(
+				Components.classes["@mozilla.org/appshell/window-mediator;1"]
+					.getService(Components.interfaces.nsIWindowMediator)
+					.getMostRecentWindow("global:console")
+			)
+				_this.setPref(_this.restoreErrorConsolePref, true);
+		};
+		obs.addObserver(observer, "quit-application-granted", false);
+	},
+	destroyErrorConsoleRestoring: function() {
+		var o = this._restoreErrorConsoleObserver;
+		if(o) {
+			this._restoreErrorConsoleObserver = null;
+			this.obs.removeObserver(o, "quit-application-granted");
+		}
+	},
+	restoreErrorConsole: function() {
+		if(this.getPref(this.restoreErrorConsolePref)) {
+			this.prefSvc.clearUserPref(this.restoreErrorConsolePref);
+			this.openErrorConsole();
+		}
+	},
 	attrsInspector: function(e) {
 		this.button.attrsInspector(e);
 		this.setAttrsInspectorActive();
@@ -844,6 +881,7 @@ this.appendChild(parseXULFromString('\
 		</menu>\
 	</menupopup>'
 ));
+
 const keyCbId = "custombuttons-extDevTools-key";
 for(var kId in options.hotkeys) if(options.hotkeys.hasOwnProperty(kId)) {
 	var cmd = options.hotkeys[kId];
@@ -886,15 +924,19 @@ for(var kId in options.hotkeys) if(options.hotkeys.hasOwnProperty(kId)) {
 	var mi = this.getElementsByAttribute("cb_id", kId)[0];
 	mi && mi.setAttribute("key", keyId);
 }
+
+cmds.setDefaultActionTip();
+if(options.restoreErrorConsole)
+	cmds.initErrorConsoleRestoring();
+
 this.onDestroy = function(reason) {
 	if(reason == "update" || reason == "delete") {
 		Array.slice(document.getElementsByAttribute("cb_id", keyCbId)).forEach(function(key) {
 			key.parentNode.removeChild(key);
 		});
+		cmds.destroyErrorConsoleRestoring();
 	}
 };
-
-cmds.setDefaultActionTip();
 
 function parseXULFromString(xul) {
 	xul = xul.replace(/>\s+</g, "><");
