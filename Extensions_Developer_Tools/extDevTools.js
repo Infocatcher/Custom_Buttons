@@ -22,7 +22,7 @@ var options = {
 	locales: ["ru", "en-US"],
 	forceRestartOnLocaleChange: false,
 	closeOptionsMenu: false,
-	restoreErrorConsole: true,
+	restoreErrorConsole: true, // Only for Gecko 2.0+
 	hotkeys: {
 		cleanAndRestart: {
 			key: "control alt shift R",
