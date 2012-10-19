@@ -43,7 +43,12 @@ var _popupLocker = 1;
 var _showNamespaceURI = 2; // 0 - don't show, 1 - show as is, 2 - show pretty name instead of URI
 var _showFullTree = 2; // 0 - current frame, 1 - top frame, 2 - topmost frame
 var _nodePosition = 0.55; // Position of selected node in DOM Inspector's tree, 0..1 (-1 - don't change)
-var _debug = false; // Show debug messages in error console
+
+// Show debug messages in error console:
+//var _debug = false;
+var _debug = typeof event == "object" && event instanceof Event
+	? event.shiftKey || event.ctrlKey || event.altKey || event.metaKey
+	: false;
 
 function _log() {
 	if(!_debug)
