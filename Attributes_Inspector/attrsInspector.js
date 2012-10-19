@@ -26,15 +26,20 @@ var _highlight = true; // Hightlight current node
 var _highlightUsingFlasher = false; // Don't modify DOM, but has some side effects (and slower)
 // Note: inIFlasher works in Firefox 4 and higher only with disabled hardware acceleration!
 // See https://bugzilla.mozilla.org/show_bug.cgi?id=368608 and https://bugzilla.mozilla.org/show_bug.cgi?id=594299
-var _borderColor = "red";
-var _borderWidth = 1;
-var _borderStyle = "solid"; // Doesn't work with _highlightUsingFlasher = true
+var _borderColor = "red"; // Any valid CSS color
+var _borderWidth = 1; // Border width in pixels
+var _borderStyle = "solid"; // border-style property in CSS
+// Note: doesn't work with _highlightUsingFlasher = true
+
+// Highlight added/removed/changed attributes, any valid CSS color:
 var _addedColor = "-moz-hyperlinktext";
 var _removedColor = "grayText";
 var _changedColor = "-moz-visitedhyperlinktext";
-var _forbidTooltips = true;
+
+var _forbidTooltips = true; // Prevent all other tooltips
+var _popupLocker = 1;
 // Lock all popups in window while DOM Inspector is opened (or until Escape was not pressed)
-var _popupLocker = 1; // 0 - disable, 1 - only if Shift pressed, 2 - always enable
+// Values: 0 - disable, 1 - only if Shift pressed, 2 - always enable
 var _showNamespaceURI = 2; // 0 - don't show, 1 - show as is, 2 - show pretty name instead of URI
 var _showFullTree = 2; // 0 - current frame, 1 - top frame, 2 - topmost frame
 var _nodePosition = 0.55; // Position of selected node in DOM Inspector's tree, 0..1 (-1 - don't change)
