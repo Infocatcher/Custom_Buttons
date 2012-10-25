@@ -189,6 +189,8 @@ function _localize(s, key) {
 	return _localize.apply(this, arguments);
 }
 
+var XULNS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
+
 this.onmouseover = function(e) {
 	if(e.target != this)
 		return;
@@ -197,7 +199,7 @@ this.onmouseover = function(e) {
 		function(node) {
 			if(
 				node != this
-				&& node.namespaceURI == xulns
+				&& node.namespaceURI == XULNS
 				&& node.boxObject
 				&& node.boxObject instanceof Components.interfaces.nsIMenuBoxObject
 				&& node.open
@@ -747,7 +749,7 @@ var cmds = this.commands = {
 };
 
 this.appendChild(parseXULFromString('\
-	<menupopup xmlns="' + xulns + '"\
+	<menupopup xmlns="' + XULNS + '"\
 		onpopupshowing="if(event.target == this) this.parentNode.commands.initMenu(this);"\
 		onclick="if(event.button == 1) this.parentNode.commands.setDefaultAction(event.target);">\
 		<menuitem cb_id="reopenWindow"\
@@ -928,15 +930,6 @@ for(var kId in options.hotkeys) if(options.hotkeys.hasOwnProperty(kId)) {
 cmds.setDefaultActionTip();
 if(options.restoreErrorConsole)
 	cmds.initErrorConsoleRestoring();
-
-this.onDestroy = function(reason) {
-	if(reason == "update" || reason == "delete") {
-		Array.slice(document.getElementsByAttribute("cb_id", keyCbId)).forEach(function(key) {
-			key.parentNode.removeChild(key);
-		});
-		cmds.destroyErrorConsoleRestoring();
-	}
-};
 
 function parseXULFromString(xul) {
 	xul = xul.replace(/>\s+</g, "><");
@@ -2397,9 +2390,23 @@ var focusManager = {
 		return false;
 	}
 };
-addEventListener("mouseover", focusManager, true, this);
-addEventListener("mouseout", focusManager, true, this);
-addEventListener("command", focusManager, true, this);
+this.addEventListener("mouseover", focusManager, true);
+this.addEventListener("mouseout", focusManager, true);
+this.addEventListener("command", focusManager, true);
 
 this.type = "menu";
 this.orient = "horizontal";
+
+this.onDestroy = function(reason) {
+	if(reason == "update" || reason == "delete") {
+		Array.slice(document.getElementsByAttribute("cb_id", keyCbId)).forEach(function(key) {
+			key.parentNode.removeChild(key);
+		});
+		cmds.destroyErrorConsoleRestoring();
+	}
+	if(reason != "constructor" && typeof focusManager != "undefined") {
+		this.removeEventListener("mouseover", focusManager, true);
+		this.removeEventListener("mouseout", focusManager, true);
+		this.removeEventListener("command", focusManager, true);
+	}
+};
