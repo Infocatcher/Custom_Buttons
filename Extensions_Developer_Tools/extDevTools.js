@@ -541,14 +541,28 @@ var cmds = this.commands = {
 	get canSaveSessionAndExit() {
 		delete this.canSaveSessionAndExit;
 		return this.canSaveSessionAndExit = this.ss
-			&& this.getPref("browser.sessionstore.resume_session_once") != undefined;
+			&& this.getPref("browser.sessionstore.resume_session_once") != undefined
+			&& (
+				"goQuitApplication" in window
+				|| "Application" in window && "quit" in Application
+			);
 	},
 	saveSessionAndExit: function() {
 		//~ todo: browser.showQuitWarning, browser.tabs.warnOnClose, browser.warnOnQuit - ?
 		var woq = this.getPref("browser.warnOnQuit");
 		if(woq != undefined)
 			this.setPref("browser.warnOnQuit", false);
-		/*Application.quit()*/goQuitApplication() && this.setPref("browser.sessionstore.resume_session_once", true);
+		try {
+			if(
+				"goQuitApplication" in window
+					? goQuitApplication()
+					: "Application" in window && "quit" in Application && Application.quit()
+			)
+				this.setPref("browser.sessionstore.resume_session_once", true);
+		}
+		catch(e) {
+			Components.utils.reportError(e);
+		}
 		if(woq != undefined)
 			this.setPref("browser.warnOnQuit", woq);
 	},
@@ -915,9 +929,6 @@ if(!cmds.onlyPopup) for(var kId in options.hotkeys) if(options.hotkeys.hasOwnPro
 		keyElt.removeAttribute("keycode");
 		keyElt.removeAttribute("modifiers");
 		keyElt.removeAttribute("keytext");
-		//Array.slice(document.getElementsByAttribute("key", cmd.override)).forEach(function(node) {
-		//	node.removeAttribute("key");
-		//});
 	}
 	if(!keyset) {
 		var keyset = document.getElementById("mainKeyset")
@@ -925,7 +936,7 @@ if(!cmds.onlyPopup) for(var kId in options.hotkeys) if(options.hotkeys.hasOwnPro
 			|| document.getElementsByTagName("keyset")[0];
 	}
 	keyElt = keyset.appendChild(document.createElement("key"));
-	var keyId = keyElt.id = "custombuttons-extDevTools-key-" + kId;
+	var keyId = keyElt.id = keyCbId + "-" + kId;
 	keyElt.setAttribute("cb_id", keyCbId);
 
 	var tokens = cmd.key.split(" ");
