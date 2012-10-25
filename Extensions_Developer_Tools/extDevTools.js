@@ -295,6 +295,8 @@ var cmds = this.commands = {
 		mi.style.color = available ? "" : "grayText";
 	},
 	setDefaultAction: function(mi) {
+		if(this.button.localName == "popupset")
+			return;
 		var action = mi.getAttribute("cb_id");
 		if(!action)
 			return;
