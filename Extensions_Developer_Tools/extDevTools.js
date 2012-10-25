@@ -522,7 +522,11 @@ var cmds = this.commands = {
 		if(onlyGet)
 			return locale;
 		this.setPref(localePref, locale);
-		if(!this.options.forceRestartOnLocaleChange && this.platformVersion >= 18) {
+		if(
+			!this.options.forceRestartOnLocaleChange
+			&& this.canReopenWindow
+			&& this.platformVersion >= 18
+		) {
 			window.close();
 			this.flushCaches();
 			this.reopenWindow();
