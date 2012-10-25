@@ -277,15 +277,22 @@ var cmds = this.commands = {
 				var cbId = mi.getAttribute("cb_id");
 				mi.setAttribute("default", cbId == defaultAction);
 				if(cbId == "attrsInspector") {
-					mi.style.color = "inspectDOMNode" in window ? "" : "grayText";
+					//~ Note: should be "inspectDOMNode" in window for Firefox 1.5
+					this.setPartiallyAvailable(
+						mi,
+						"@mozilla.org/commandlinehandler/general-startup;1?type=inspector" in Components.classes
+					);
 					this.setAttrsInspectorActive(mi);
 				}
 				else if(cbId == "scratchpad") {
-					mi.style.color = this.getPref("devtools.chrome.enabled") ? "" : "grayText";
+					this.setPartiallyAvailable(mi, this.getPref("devtools.chrome.enabled"));
 				}
 			},
 			this
 		);
+	},
+	setPartiallyAvailable: function(mi, available) {
+		mi.style.color = available ? "" : "grayText";
 	},
 	setDefaultAction: function(mi) {
 		var action = mi.getAttribute("cb_id");
