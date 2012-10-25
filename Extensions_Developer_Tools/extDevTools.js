@@ -223,6 +223,7 @@ this.onclick = function(e) {
 var cmds = this.commands = {
 	options: options,
 	button: this,
+	onlyPopup: this.localName == "popupset",
 	get btnNum() {
 		delete this.btnNum;
 		return this.btnNum = this.button.id.match(/\d*$/)[0];
@@ -295,7 +296,7 @@ var cmds = this.commands = {
 		mi.style.color = available ? "" : "grayText";
 	},
 	setDefaultAction: function(mi) {
-		if(this.button.localName == "popupset")
+		if(this.onlyPopup)
 			return;
 		var action = mi.getAttribute("cb_id");
 		if(!action)
@@ -899,7 +900,7 @@ this.appendChild(parseXULFromString('\
 ));
 
 const keyCbId = "custombuttons-extDevTools-key";
-for(var kId in options.hotkeys) if(options.hotkeys.hasOwnProperty(kId)) {
+if(!cmds.onlyPopup) for(var kId in options.hotkeys) if(options.hotkeys.hasOwnProperty(kId)) {
 	var cmd = options.hotkeys[kId];
 	if(!cmd.key)
 		continue;
@@ -941,8 +942,9 @@ for(var kId in options.hotkeys) if(options.hotkeys.hasOwnProperty(kId)) {
 	mi && mi.setAttribute("key", keyId);
 }
 
-cmds.setDefaultActionTip();
-if(options.restoreErrorConsole)
+if(!cmds.onlyPopup)
+	cmds.setDefaultActionTip();
+if(options.restoreErrorConsole && !cmds.onlyPopup)
 	cmds.initErrorConsoleRestoring();
 
 function parseXULFromString(xul) {
