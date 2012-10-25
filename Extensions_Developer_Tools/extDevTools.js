@@ -311,7 +311,8 @@ var cmds = this.commands = {
 	get canReopenWindow() {
 		var ss = this.ss;
 		delete this.canReopenWindow;
-		return this.canReopenWindow = ss && "getWindowState" in ss && "setWindowState" in ss;
+		return this.canReopenWindow = ss && "getWindowState" in ss && "setWindowState" in ss
+			&& "gBrowser" in window && gBrowser.localName == "tabbrowser";
 	},
 	reopenWindow: function() {
 		this.button.disabled = true;
