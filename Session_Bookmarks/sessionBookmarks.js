@@ -677,13 +677,18 @@ this.bookmarks = {
 
 			if(
 				!disableForceLoad
+				&& tab != gBrowser.selectedTab // Should be loaded automatically in this case
 				&& (
 					tab.getAttribute("pending") == "true" // Gecko >= 9.0
 					|| tab.linkedBrowser.contentDocument.readyState == "uninitialized"
 					// || tab.linkedBrowser.__SS_restoreState == 1
 				)
-			)
+			) {
 				tab.linkedBrowser.reload();
+				// Show "Connecting…" instead of "New Tab"
+				// (disable browser.sessionstore.restore_on_demand to see this bug)
+				gBrowser.setTabTitleLoading && gBrowser.setTabTitleLoading(tab);
+			}
 		}
 		catch(e) {
 			if(e != "empty ssData") {
