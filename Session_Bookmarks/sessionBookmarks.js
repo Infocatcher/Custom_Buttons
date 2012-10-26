@@ -20,7 +20,11 @@ var options = {
 	addToEnd: true, // Add to end of list by default
 	loadInBackground: false, // Load tabs in background
 	leftClickCloseMenu: true, // Close menu after left-click
-	middleClickCloseMenu: true, // Close menu after middle-click
+	middleClickCloseMenu: 1,
+	// After middle-click:
+	// 0 - always stay menu open
+	// 1 - close only after click without modifiers
+	// 2 - always close
 	invertLoadBehavior: false, // true => left-click open bookmark in new tab
 	checkDuplicates: true, // Forbid duplicates
 	// Note: session data are checked too
@@ -625,7 +629,13 @@ this.bookmarks = {
 			var mergeHistory = true;
 		}
 
-		if(e.type == "click" && this.options.middleClickCloseMenu)
+		if(
+			e.type == "click"
+			&& (
+				this.options.middleClickCloseMenu == 1 && !this.hasModifier(e)
+				|| this.options.middleClickCloseMenu == 2
+			)
+		)
 			closeMenus(mi);
 
 		if(tab && this.options.useSessions)
