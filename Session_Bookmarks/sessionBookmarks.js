@@ -523,9 +523,23 @@ this.bookmarks = {
 		if("extData" in data) {
 			let extData = data.extData;
 			if(extData && typeof extData == "object") {
+				// Tree Style Tab https://addons.mozilla.org/firefox/addon/tree-style-tab/
 				delete extData["treestyletab-parent"];
 				delete extData["treestyletab-collapsed"];
 				delete extData["treestyletab-id"];
+			}
+		}
+		if("attributes" in data) {
+			let attrs = data.attributes;
+			if(attrs && typeof attrs == "object") {
+				// TabKit 2nd Edition https://addons.mozilla.org/firefox/addon/tabkit-2nd-edition/
+				delete attrs.tabid;
+				delete attrs.possibleparent;
+				delete attrs.outoforder;
+				delete attrs.uriKey;
+				delete attrs.groupid;
+				delete attrs.openerGroup;
+				delete attrs.uriGroup;
 			}
 		}
 	},
