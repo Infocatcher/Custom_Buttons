@@ -496,14 +496,17 @@ this.bookmarks = {
 			tab = gBrowser.selectedTab;
 		if(this.options.useSessions) {
 			var ssData = this.ss.getTabState(tab);
-			if(!this.options.saveTabHistory && "JSON" in window) try {
+			if("JSON" in window) try {
 				let data = JSON.parse(ssData);
-				data.entries = [data.entries[data.index - 1]];
-				data.index = 1;
+				if(!this.options.saveTabHistory) {
+					data.entries = [data.entries[data.index - 1]];
+					data.index = 1;
+				}
+				this.cleanupSessionData(data);
 				ssData = JSON.stringify(data);
 			}
 			catch(e) {
-				Components.utils.reportError(this.errPrefix + "getTabData: clear history failed");
+				Components.utils.reportError(this.errPrefix + "getTabData: session data tweaks failed");
 				Components.utils.reportError(e);
 			}
 		}
@@ -513,6 +516,18 @@ this.bookmarks = {
 			icon:   this.cachedIcon(tab.image),
 			ssData: ssData
 		});
+	},
+	cleanupSessionData: function(data) {
+		if(!data)
+			return;
+		if("extData" in data) {
+			let extData = data.extData;
+			if(extData && typeof extData == "object") {
+				delete extData["treestyletab-parent"];
+				delete extData["treestyletab-collapsed"];
+				delete extData["treestyletab-id"];
+			}
+		}
 	},
 	addBookmark: function(insPoint, tab) {
 		var td = this.getTabData(tab);
@@ -654,28 +669,29 @@ this.bookmarks = {
 		);
 	},
 	setTabSession: function(tab, ssData, uri, mergeHistory, disableForceLoad) {
-		if(mergeHistory && ssData && "JSON" in window) try {
-			var curData = JSON.parse(this.ss.getTabState(gBrowser.selectedTab));
-			var newData = JSON.parse(ssData);
-
-			var tabHistory = curData.entries.slice(0, curData.index);
-			if(tabHistory[tabHistory.length - 1].url == "about:blank")
-				tabHistory.pop();
-			if(!newData.entries.length) // We can get object here
-				newData.entries = [newData.entries];
-			if(tabHistory.length) {
-				let docshellID = tabHistory[0].docshellID;
-				newData.entries.forEach(function(entry) {
-					entry.docshellID = docshellID;
-				});
+		if(ssData && "JSON" in window) try {
+			var data = JSON.parse(ssData);
+			if(mergeHistory) {
+				var oldData = JSON.parse(this.ss.getTabState(gBrowser.selectedTab));
+				var tabHistory = oldData.entries.slice(0, oldData.index);
+				if(tabHistory[tabHistory.length - 1].url == "about:blank")
+					tabHistory.pop();
+				if(!data.entries.length) // We can get object here
+					data.entries = [data.entries];
+				if(tabHistory.length) {
+					let docshellID = tabHistory[0].docshellID;
+					data.entries.forEach(function(entry) {
+						entry.docshellID = docshellID;
+					});
+				}
+				data.entries = tabHistory.concat(data.entries);
+				data.index += tabHistory.length;
 			}
-			newData.entries = tabHistory.concat(newData.entries);
-			newData.index += tabHistory.length;
-
-			ssData = JSON.stringify(newData);
+			this.cleanupSessionData(data); // Only for already saved unwanted data...
+			ssData = JSON.stringify(data);
 		}
 		catch(e) {
-			Components.utils.reportError(this.errPrefix + "setTabSession: merge history failed");
+			Components.utils.reportError(this.errPrefix + "setTabSession: can't parse session data");
 			Components.utils.reportError(e);
 		}
 		try {
