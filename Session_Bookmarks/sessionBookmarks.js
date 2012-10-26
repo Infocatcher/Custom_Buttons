@@ -527,6 +527,11 @@ this.bookmarks = {
 				delete extData["treestyletab-parent"];
 				delete extData["treestyletab-collapsed"];
 				delete extData["treestyletab-id"];
+				// Tab Utilities https://addons.mozilla.org/firefox/addon/tab-utilities/
+				delete extData.group;
+				delete extData["group-color"];
+				delete extData["group-collapsed"];
+				delete extData["group-counter"];
 			}
 		}
 		if("attributes" in data) {
