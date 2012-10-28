@@ -1,7 +1,7 @@
-#### Usage
+Ôªø#### Usage
 * Install **[Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)** extension
 * Open *.html (if exist) and click on custombutton:// link
-* or read instructions in *.js and copy code to the ìcodeî or ìinitializationî section in custom button editor
+* or read instructions in *.js and copy code to the ‚Äúcode‚Äù or ‚Äúinitialization‚Äù section in custom button editor
 
 #### Buttons in alphabetical order
 
@@ -10,22 +10,21 @@ New custom buttons will automatically placed after this button (button are disab
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Attributes_Inspector/icon.png)&nbsp;[Attributes Inspector](Custom_Buttons/blob/master/Attributes_Inspector)
 Shows tooltip with with all attributes and allow open [DOM Inspector](https://addons.mozilla.org/addon/dom-inspector-6622/) for current node
-<br>![Attributes Inspector](https://raw.github.com/Infocatcher/Custom_Buttons/master/Attributes_Inspector/attrsInspector-en.png)
 
 ##### [Back to Close](Custom_Buttons/blob/master/Back_to_Close)
-Use ìBackî command to close tab without ìback historyî
+Use ‚ÄúBack‚Äù command to close tab without ‚Äúback history‚Äù
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Bookmarks_Folder/icon.png)&nbsp;[Bookmarks Folder](Custom_Buttons/blob/master/Bookmarks_Folder)
 Show contents of any bookmarks folder in drop-down menu
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/CB_Disable_Initialization/icon.png)&nbsp;[Custom Buttons: Disable Initialization](Custom_Buttons/blob/master/CB_Disable_Initialization)
-Add ìEnabledî checkbox to custom button's context menu (for test purposes)
+Add ‚ÄúEnabled‚Äù checkbox to custom button's context menu (for test purposes)
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/CB_Editor_Toggle_on_Top/icons/icon.png)&nbsp;[Custom Buttons Editor: Toggle on Top](Custom_Buttons/blob/master/CB_Editor_Toggle_on_Top)
-Add ìOn topî button to built-in custom button's editor (doesn't work on some platforms!)
+Add ‚ÄúOn top‚Äù button to built-in custom button's editor (doesn't work on some platforms!)
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Check_for_Addons_Updates/icon.png)&nbsp;[Check for Addons Updates](Custom_Buttons/blob/master/Check_for_Addons_Updates)
-Button just open hidden tab with about:addons and trigger built-in ìCheck for Updatesî function.
+Button just open hidden tab with about:addons and trigger built-in ‚ÄúCheck for Updates‚Äù function.
 <br>And show tab, if found updates.
 
 ##### [Convert E4X](Custom_Buttons/blob/master/Convert_E4X)
@@ -36,14 +35,13 @@ Menage cookies permissions: block, allow for session or allow.
 <br>Also shows permissions for current site and has some cookies-related features.
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Detach_Tab/icon.png)&nbsp;[Detach Tab](Custom_Buttons/blob/master/Detach_Tab)
-Detach current tab to new ìlight weightî window without toolbars and attach back, if button pressed second time or window was closed
+Detach current tab to new ‚Äúlight weight‚Äù window without toolbars and attach back, if button pressed second time or window was closed
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Edit_Custom_Button_in_Tab/icon.png)&nbsp;[Edit Custom Button in Tab](Custom_Buttons/blob/master/Edit_Custom_Button_in_Tab)
-Add ìEdit button in tabÖî to custom button's context menu
+Add ‚ÄúEdit button in tab‚Ä¶‚Äù to custom button's context menu
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Extensions_Developer_Tools/icon.png)&nbsp;[Extensions Developer Tools](Custom_Buttons/blob/master/Extensions_Developer_Tools)
 Some tools for extensions or custom buttons developers
-![Extensions Developer Tools](https://raw.github.com/Infocatcher/Custom_Buttons/master/Extensions_Developer_Tools/extDevTools-en.png)
 
 ##### [Open Window](Custom_Buttons/blob/master/Open_Window)
 Open/focus/toggle window demo
@@ -60,7 +58,7 @@ Menage plugins permissions: block or allow.
 Purge back/forward history for current tab (left-click) or all tabs (middle-click)
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Session_Bookmarks/icon.png)&nbsp;[Session Bookmarks](Custom_Buttons/blob/master/Session_Bookmarks)
-Drop-down menu with ìsessionî bookmarks: additionally saves session information (such as scroll position and controls state).
+Drop-down menu with ‚Äúsession‚Äù bookmarks: additionally saves session information (such as scroll position and controls state).
 <br>Use middle-click or left+click with any modifier to add current tab.
 <br>Drag and drop any tab to add new bookmark.
 
