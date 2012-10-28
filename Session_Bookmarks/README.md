@@ -5,7 +5,7 @@
 <br>
 
 ##### Screenshots:
-[Button context menu](https://raw.github.com/Infocatcher/Custom_Buttons/master/Session_Bookmarks/screenshots/button_context_menu-en.png)
-[Bookmarks](https://raw.github.com/Infocatcher/Custom_Buttons/master/Session_Bookmarks/screenshots/bookmarks-en.png)
-[Bookmark context menu](https://raw.github.com/Infocatcher/Custom_Buttons/master/Session_Bookmarks/screenshots/bookmark_context_menu-en.png)
-[Bookmark properties](https://raw.github.com/Infocatcher/Custom_Buttons/master/Session_Bookmarks/screenshots/bookmark_properties-en.png)
+![Button context menu](https://raw.github.com/Infocatcher/Custom_Buttons/master/Session_Bookmarks/screenshots/button_context_menu-en.png)
+![Bookmarks](https://raw.github.com/Infocatcher/Custom_Buttons/master/Session_Bookmarks/screenshots/bookmarks-en.png)
+![Bookmark context menu](https://raw.github.com/Infocatcher/Custom_Buttons/master/Session_Bookmarks/screenshots/bookmark_context_menu-en.png)
+![Bookmark properties](https://raw.github.com/Infocatcher/Custom_Buttons/master/Session_Bookmarks/screenshots/bookmark_properties-en.png)
