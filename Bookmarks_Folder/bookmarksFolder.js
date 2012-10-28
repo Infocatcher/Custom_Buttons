@@ -330,11 +330,19 @@ this.type = "menu";
 this.orient = "horizontal";
 if(hideDropMarker) {
 	let btn = this;
+	let doc = btn.ownerDocument;
 	let stopTime = Date.now() + 500;
 	setTimeout(function hideDropMarker() { // Wait for menu XBL binding
-		var dm = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-menu-dropmarker");
-		if(dm)
+		var dm = doc.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-menu-dropmarker");
+		if(dm) {
 			dm.hidden = true;
+			let icon = doc.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon");
+			if(icon) {
+				let s = doc.defaultView.getComputedStyle(icon, null);
+				if(s.paddingRight != s.paddingLeft) // Hack for Firefox 19 and large icons
+					icon.style.paddingLeft = icon.style.paddingRight = s.paddingLeft;
+			}
+		}
 		else if(Date.now() < stopTime)
 			setTimeout(hideDropMarker, 10);
 	}, 0);
