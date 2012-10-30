@@ -2,4 +2,4 @@
 <br>Add “On top” button to built-in custom button's editor (doesn't work on some platforms!)
 
 ##### Screenshot:
-<img src="https://raw.github.com/Infocatcher/Custom_Buttons/master/CB_Editor_Toggle_on_Top/screenshots/cbEditorToggleOnTop-en.png" alt="Select bookmarks folder" align="top">
+<img src="https://raw.github.com/Infocatcher/Custom_Buttons/master/CB_Editor_Toggle_on_Top/cbEditorToggleOnTop-en.png" alt="Select bookmarks folder" align="top">
