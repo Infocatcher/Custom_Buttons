@@ -516,12 +516,13 @@ function init() {
 			"stopImmediatePropagation" in e && e.stopImmediatePropagation();
 			//_log("stopEvent: " + e.type);
 		},
-		_timers: [],
+		_timers: { __proto__: null },
+		_timersCounter: 0,
 		timer: function(callback, context, delay, args) {
-			var timer = Components.classes["@mozilla.org/timer;1"]
-				.createInstance(Components.interfaces.nsITimer);
+			var id = ++this._timersCounter;
 			var _timers = this._timers;
-			var id = _timers.push(timer) - 1;
+			var timer = _timers[id] = Components.classes["@mozilla.org/timer;1"]
+				.createInstance(Components.interfaces.nsITimer);
 			timer.init({
 				observe: function(subject, topic, data) {
 					delete _timers[id];
@@ -539,10 +540,10 @@ function init() {
 		},
 		destroyTimers: function() {
 			var _timers = this._timers;
-			for(var id in _timers) if(_timers.hasOwnProperty(id))
+			for(var id in _timers)
 				_timers[id].cancel();
-			//_timers.length = 0;
-			_timers.splice(0);
+			this._timers = { __proto__: null };
+			this._timersCounter = 0;
 		},
 		get flasher() {
 			var flasher = Components.classes["@mozilla.org/inspector/flasher;1"]
