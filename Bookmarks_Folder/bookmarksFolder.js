@@ -5,11 +5,15 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011-2012
-// version 0.1.0pre11 - 2012-09-16
+// version 0.1.0pre12 - 2012-11-01
 
 // Compatibility: Firefox 4.0+, SeaMonkey 2.1+
 
 // Icon by FatCow Web Hosting: http://www.iconfinder.com/icondetails/36059/16/
+
+// Hidden feature: you can manually set extensions.custombuttons.button<N>.bookmarkFolder
+// preference to any place: URI https://developer.mozilla.org/en-US/docs/Places_query_URIs
+// (and press OK in button editor or reopen window or restart browser)
 
 var hideDropMarker = true;
 
@@ -100,7 +104,9 @@ this.bookmarks = {
 		mp = document.createElement("menupopup");
 		mp.setAttribute("context", "placesContext");
 		mp.setAttribute("placespopup", "true");
-		var placeURI = "place:folder=" + folder + "&amp;excludeItems=0&amp;expandQueries=0";
+		var placeURI = folder.substr(0, 6) == "place:"
+			? folder
+			: "place:folder=" + folder + "&amp;excludeItems=0&amp;expandQueries=0";
 		mp.setAttribute(
 			"onpopupshowing",
 			'if(!this.parentNode._placesView)\
@@ -176,7 +182,7 @@ this.bookmarks = {
 						oncommand="document.documentElement.acceptDialog();" />\n\
 				</keyset>\n\
 				<tree id="tree" type="places"\n\
-					place="' + "place:excludeItems=1&amp;excludeQueries=1&amp;folder=" + rootFolder + '"\n\
+					place="place:excludeItems=1&amp;excludeQueries=1&amp;folder=' + rootFolder + '"\n\
 					hidecolumnpicker="true" seltype="single" flex="1"\n\
 					onselect="onSelect();">\n\
 					<treecols>\n\
