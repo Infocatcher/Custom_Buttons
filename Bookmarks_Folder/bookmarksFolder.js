@@ -1,4 +1,5 @@
-﻿// http://infocatcher.ucoz.net/js/cb/bookmarks.js
+﻿// http://infocatcher.ucoz.net/js/cb/bookmarksFolder.js
+// https://github.com/Infocatcher/Custom_Buttons/tree/master/Bookmarks_Folder
 
 // Bookmarks Folder button for Custom Buttons
 // (code for "initialization" section)
