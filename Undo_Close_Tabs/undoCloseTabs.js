@@ -216,6 +216,33 @@ this.undoCloseTabsList = {
 		cm.undoCloseTabsList = this;
 		return this.cm = document.getElementById("mainPopupSet").appendChild(cm);
 	},
+	get cbMenu() {
+		var cbPopup = document.getElementById(this.button.defaultContextId);
+		if(!cbPopup) {
+			Components.utils.reportError(this.errPrefix + "cb menu not found");
+			return this.cbMenu = null;
+		}
+		cbPopup = cbPopup.cloneNode(true);
+		var id = "-" + this.button.id.match(/\d*$/)[0] + "-cloned";
+		cbPopup.id += id;
+		Array.slice(cbPopup.getElementsByAttribute("id", "*")).forEach(function(node) {
+			node.id += id;
+		});
+		var menu = this.createElement("menu", {
+			label: _localize("buttonMenu"),
+			accesskey: _localize("buttonMenuAccesskey"),
+			tooltiptext: ""
+		});
+		menu.appendChild(cbPopup);
+		cbPopup.setAttribute(
+			"onpopupshowing",
+			'\
+			var btn = document.popupNode = this.parentNode.parentNode.parentNode;\n\
+			custombutton.setContextMenuVisibility(btn);'
+		);
+		delete this.cbMenu;
+		return this.cbMenu = menu;
+	},
 	ss: (
 		Components.classes["@mozilla.org/browser/sessionstore;1"]
 		|| Components.classes["@mozilla.org/suite/sessionstore;1"]
@@ -443,35 +470,9 @@ this.undoCloseTabsList = {
 					}));
 				break;
 				case "buttonMenu":
-					let cbPopup = document.getElementById(this.button.defaultContextId);
-					if(!cbPopup) {
-						Components.utils.reportError(this.errPrefix + "cb menu not found");
-						break;
-					}
-					cbPopup = cbPopup.cloneNode(true);
-					let id = "-" + this.button.id.match(/\d*$/)[0] + "-cloned";
-					cbPopup.id += id;
-					Array.slice(cbPopup.getElementsByAttribute("id", "*")).forEach(function(node) {
-						node.id += id;
-					});
-					let menu = this.createElement("menu", {
-						label: _localize("buttonMenu"),
-						accesskey: _localize("buttonMenuAccesskey"),
-						tooltiptext: ""
-					});
-					menu.appendChild(cbPopup);
-					mp.appendChild(menu);
-
-					let pn = document.popupNode;
-					document.popupNode = this.button;
-					try {
-						custombutton.setContextMenuVisibility(this.button);
-					}
-					catch(e) {
-						Components.utils.reportError(this.errPrefix + "setContextMenuVisibility() failed");
-						Components.utils.reportError(e);
-					}
-					document.popupNode = pn;
+					let cbMenu = this.cbMenu;
+					if(cbMenu)
+						mp.appendChild(cbMenu);
 				break;
 				case "separator":
 					if(mp.hasChildNodes() && mp.lastChild.localName != "menuseparator")
