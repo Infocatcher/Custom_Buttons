@@ -4,7 +4,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2012
-// version 0.1.0pre - 2012-10-11
+// version 0.1.0pre2 - 2012-11-06
 
 // Add "Enabled" checkbox to custom button's context menu.
 // Only for test purposes!
@@ -63,7 +63,7 @@ addEventListener("popupshowing", function(e) {
 		toggleEnabled.setAttribute("disabled", "true");
 	else
 		toggleEnabled.removeAttribute("disabled");
-}, true);
+}, false);
 
 window.toggleCustomButtonEnabled = function() { // Should be global to work in cloned menus
 	var btn = getBtn();
