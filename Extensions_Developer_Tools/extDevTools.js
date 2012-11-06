@@ -24,24 +24,11 @@ var options = {
 	closeOptionsMenu: false,
 	restoreErrorConsole: true, // Only for Gecko 2.0+
 	hotkeys: {
-		cleanAndRestart: {
-			key: "control alt shift R",
-			command: function() {
-				cmds.cleanAndRestart();
-			}
-		},
-		attrsInspector: {
-			key: "control alt I",
-			command: function() {
-				cmds.attrsInspector();
-			}
-		},
-		scratchpad: {
+		cleanAndRestart: "control alt shift R",
+		attrsInspector: "control alt I",
+		openScratchpad: {
 			key: "shift VK_F4",
-			override: "key_scratchpad",
-			command: function() {
-				cmds.openScratchpad();
-			}
+			override: "key_scratchpad"
 		}
 	}
 };
@@ -840,7 +827,7 @@ this.appendChild(parseXULFromString('\
 			accesskey="' + _localize("A", "attrsInspectorKey") + '"\
 			class="menuitem-iconic"\
 			image="' + images.attrsInspector + '" />\
-		<menuitem cb_id="scratchpad"\
+		<menuitem cb_id="openScratchpad"\
 			oncommand="this.parentNode.parentNode.commands.openScratchpad();"\
 			label="' + _localize("Scratchpad") + '"\
 			accesskey="' + _localize("p", "scratchpadKey") + '"\
@@ -916,7 +903,8 @@ this.appendChild(parseXULFromString('\
 const keyCbId = "custombuttons-extDevTools-key";
 if(!cmds.onlyPopup) for(var kId in options.hotkeys) if(options.hotkeys.hasOwnProperty(kId)) {
 	var cmd = options.hotkeys[kId];
-	if(!cmd.key)
+	var key = typeof cmd == "string" ? cmd : cmd.key;
+	if(!key)
 		continue;
 	var keyElt;
 	if(
@@ -939,16 +927,16 @@ if(!cmds.onlyPopup) for(var kId in options.hotkeys) if(options.hotkeys.hasOwnPro
 	var keyId = keyElt.id = keyCbId + "-" + kId;
 	keyElt.setAttribute("cb_id", keyCbId);
 
-	var tokens = cmd.key.split(" ");
-	var key = tokens.pop() || " ";
+	var tokens = key.split(" ");
+	key = tokens.pop() || " ";
 	var modifiers = tokens.join(",");
 	keyElt.setAttribute(
 		key.substr(0, 3) == "VK_" ? "keycode" : "key",
 		key
 	);
 	keyElt.setAttribute("modifiers", modifiers);
-	keyElt._cb_oncommand = cmd.command;
-	keyElt.setAttribute("oncommand", "this._cb_oncommand();");
+	keyElt._cbCommands = cmds;
+	keyElt.setAttribute("oncommand", "this._cbCommands." + kId + "();");
 	var mi = this.getElementsByAttribute("cb_id", kId)[0];
 	mi && mi.setAttribute("key", keyId);
 }
