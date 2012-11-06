@@ -54,6 +54,7 @@ if(!tab) {
 	tab = gBrowser.addTab("about:addons");
 	tab.collapsed = true;
 	tab.closing = true; // See "visibleTabs" getter in chrome://browser/content/tabbrowser.xml
+	window.addEventListener("TabSelect", dontSelectHiddenTab, false);
 }
 
 var browser = tab.linkedBrowser;
@@ -124,6 +125,7 @@ function processAddonsTab(e) {
 		clearInterval(wait);
 		btn.image = image;
 		btn.tooltipText = tip;
+		window.removeEventListener("TabSelect", dontSelectHiddenTab, false);
 		setTimeout(function() {
 			delete btn._cb_disabled;
 		}, 500);
@@ -137,4 +139,24 @@ function processAddonsTab(e) {
 				msg, false, "", null
 			);
 	}
+}
+function dontSelectHiddenTab(e) {
+	// <tab /><tab collapsed="true" />
+	// Close first tab: collapsed tab becomes selected
+	if(e.target != tab)
+		return;
+	function done(t) {
+		if(!t.hidden && !t.closing) {
+			e.preventDefault();
+			e.stopPropagation();
+			return gBrowser.selectedTab = t;
+		}
+		return false;
+	}
+	for(var t = tab.nextSibling; t; t = t.nextSibling)
+		if(done(t))
+			return;
+	for(var t = tab.previousSibling; t; t = t.previousSibling)
+		if(done(t))
+			return;
 }
