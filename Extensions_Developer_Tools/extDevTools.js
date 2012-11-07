@@ -907,16 +907,18 @@ if(!cmds.onlyPopup) for(var kId in options.hotkeys) if(options.hotkeys.hasOwnPro
 	if(!key)
 		continue;
 	var keyElt;
-	if(
-		cmd.hasOwnProperty("override")
-		&& (keyElt = document.getElementById(cmd.override))
-	) {
-		// Break old key
-		keyElt.setAttribute("__disabledByEvtDevTools", "true");
-		keyElt.setAttribute("key", "\xa0"); // &nbsp;
-		keyElt.removeAttribute("keycode");
-		keyElt.removeAttribute("modifiers");
-		keyElt.removeAttribute("keytext");
+	if(cmd.hasOwnProperty("override")) {
+		cmd.override.split(/,\s*/).forEach(function(id) {
+			var keyElt = document.getElementById(id);
+			if(!keyElt)
+				return;
+			// Break old key
+			keyElt.setAttribute("__disabledByEvtDevTools", "true");
+			keyElt.setAttribute("key", "\xa0"); // &nbsp;
+			keyElt.removeAttribute("keycode");
+			keyElt.removeAttribute("modifiers");
+			keyElt.removeAttribute("keytext");
+		});
 	}
 	if(!keyset) {
 		var keyset = document.getElementById("mainKeyset")
