@@ -697,9 +697,16 @@ function init() {
 			}
 		},
 
-		setClipboardData: function(dataObj, clipId) {
+		setClipboardData: function(dataObj, sourceWindow, clipId) {
 			var ta = Components.classes["@mozilla.org/widget/transferable;1"]
 				.createInstance(Components.interfaces.nsITransferable);
+			if(sourceWindow && "init" in ta) {
+				// The clipboard will be cleared when private browsing mode ends
+				var privacyContext = sourceWindow.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+					.getInterface(Components.interfaces.nsIWebNavigation)
+					.QueryInterface(Components.interfaces.nsILoadContext);
+				ta.init(privacyContext);
+			}
 			for(var flavor in dataObj) if(dataObj.hasOwnProperty(flavor)) {
 				var value = dataObj[flavor];
 				var str = Components.classes["@mozilla.org/supports-string;1"]
@@ -927,6 +934,8 @@ function init() {
 			}
 		},
 		copyTootipContent: function() {
+			var node = this._node;
+			var sourceWindow = node && (node.ownerDocument || node).defaultView;
 			var tt = this.context.tt;
 			var text = Array.map(tt.childNodes, function(node) {
 				return node.textContent;
@@ -943,7 +952,7 @@ function init() {
 			this.setClipboardData({
 				"text/unicode": text,
 				"text/html":    html
-			});
+			}, sourceWindow);
 
 			if(!/(?:^|\s)attrsInspector-copied(?:\s|$)/.test(tt.className))
 				tt.className += " attrsInspector-copied";
