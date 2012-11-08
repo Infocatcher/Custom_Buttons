@@ -78,7 +78,11 @@ function convertCode(s) {
 				return s;
 			LOG("<tag> ... </tag>\n" + s);
 			return convertE4X(s);
-		});
+		})
+		// All .toXMLString() calls are useless
+		// Example:
+		// window.openDialog("data:application/vnd.mozilla.xul+xml," + encodeURIComponent(dialog.toXMLString()), ...
+		.replace(/\s*\.\s*toXMLString\s*\(\)/g, "");
 
 	if(s != orig) {
 		if(/\WXML\s*\.\s*\w/.test(orig))
