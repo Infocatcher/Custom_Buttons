@@ -554,20 +554,22 @@ this.undoCloseTabsList = {
 			undoPopup.appendChild(mi);
 		}, this);
 	},
-	convertURI: function(uri, crop) {
+	crop: function(s, crop) {
 		if(crop == undefined)
 			crop = 500;
+		if(s.length <= crop)
+			return s;
+		var start = Math.round(crop*0.6);
+		return s.substr(0, start) + "…" + s.substr(start - crop);
+	},
+	convertURI: function(uri, crop) {
 		try {
 			uri = losslessDecodeURI({ spec: uri });
 		}
 		catch(e) {
 			Components.utils.reportError(e);
 		}
-		if(uri.length > crop) {
-			var start = Math.round(crop*0.6);
-			uri = uri.substr(0, start) + "…" + uri.substr(start - crop);
-		}
-		return uri;
+		return this.crop(uri, crop);
 	},
 	cachedIcon: function(src) {
 		if(
@@ -597,7 +599,7 @@ this.undoCloseTabsList = {
 			// Or update tooltipText only on mouseover
 			let undoTabItems = JSON.parse(this.ss.getClosedTabData(window));
 			let lastItem = undoTabItems[0];
-			lastTabTip = " \n" + lastItem.title
+			lastTabTip = " \n" + this.crop(lastItem.title)
 				+ " \n" + this.convertURI(lastItem.state.entries[lastItem.state.index - 1].url);
 		}
 		this.button.tooltipText = _localize("restoreTab") + lastTabTip;
