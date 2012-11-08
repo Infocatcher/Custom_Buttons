@@ -517,9 +517,11 @@ this.undoCloseTabsList = {
 			//	mi.setAttribute("tooltiptext", selectedTab.entries[selectedTab.index - 1].url);
 			var uris = [];
 			tabs.forEach(function(tab) {
-				if(tab.entries && tab.entries.length) // Can be [] for about:blank
-					uris.push((tab == selectedTab && tabs.length > 1 ? "*" : "") + tab.entries[tab.index - 1].url);
-			});
+				if(!tab.entries || !tab.entries.length) // Can be [] for about:blank
+					return;
+				var url = this.convertURI(tab.entries[tab.index - 1].url, 120);
+				uris.push((tab == selectedTab && tabs.length > 1 ? "*" : "") + url);
+			}, this);
 			if(uris.length)
 				mi.setAttribute("tooltiptext", uris.join(" \n"));
 			if(i == 0)
@@ -537,7 +539,7 @@ this.undoCloseTabsList = {
 				class: "menuitem-iconic bookmark-item menuitem-with-favicon",
 				oncommand: "this.parentNode.parentNode.undoCloseTabsList.undoCloseTab(" + i + ");",
 				onclick: "if(event.button == 1) { this.parentNode.parentNode.undoCloseTabsList.undoCloseTab(" + i + "); this.parentNode.parentNode.undoCloseTabsList.drawUndoList(); }",
-				tooltiptext: undoItem.state.entries[undoItem.state.index - 1].url,
+				tooltiptext: this.convertURI(undoItem.state.entries[undoItem.state.index - 1].url),
 				cb_index: i,
 				cb_type: "tab"
 			});
@@ -551,6 +553,21 @@ this.undoCloseTabsList = {
 				mi.setAttribute("key", "key_undoCloseTab");
 			undoPopup.appendChild(mi);
 		}, this);
+	},
+	convertURI: function(uri, crop) {
+		if(crop == undefined)
+			crop = 500;
+		try {
+			uri = losslessDecodeURI({ spec: uri });
+		}
+		catch(e) {
+			Components.utils.reportError(e);
+		}
+		if(uri.length > crop) {
+			var start = Math.round(crop*0.6);
+			uri = uri.substr(0, start) + "…" + uri.substr(start - crop);
+		}
+		return uri;
 	},
 	cachedIcon: function(src) {
 		if(
@@ -581,7 +598,7 @@ this.undoCloseTabsList = {
 			let undoTabItems = JSON.parse(this.ss.getClosedTabData(window));
 			let lastItem = undoTabItems[0];
 			lastTabTip = " \n" + lastItem.title
-				+ " \n" + lastItem.state.entries[lastItem.state.index - 1].url;
+				+ " \n" + this.convertURI(lastItem.state.entries[lastItem.state.index - 1].url);
 		}
 		this.button.tooltipText = _localize("restoreTab") + lastTabTip;
 	},
