@@ -85,8 +85,12 @@ function convertCode(s) {
 		.replace(/\s*\.\s*toXMLString\s*\(\)/g, "");
 
 	if(s != orig) {
-		if(/\WXML\s*\.\s*\w/.test(orig))
-			s = 'var XML = window.XML || {};\n\n' + s;
+		if(/\WXML\s*\.\s*\w/.test(orig)) {
+			s = s.replace(
+				/^(?:\/\*(?:CODE|Initialization Code)\*\/\n?)?/,
+				"$&var XML = window.XML || {};\n\n"
+			);
+		}
 		var addFuncs = "";
 		if(s.indexOf("e4xConv_parseXULFromString") != -1)
 			addFuncs += "\n" + e4xConv_parseXULFromString;
