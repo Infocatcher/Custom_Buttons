@@ -28,6 +28,7 @@ var options = {
 	invertLoadBehavior: false, // true => left-click open bookmark in new tab
 	checkDuplicates: true, // Forbid duplicates
 	// Note: session data are checked too
+	deleteAfterOpen: false, // Delete opened bookmarks
 	useSessions: true, // Save and restore session data
 	saveTabHistory: true, // Only for "useSessions: true"
 	// Save back/forward history of tab
@@ -674,6 +675,9 @@ this.bookmarks = {
 
 		if(tab && this.options.useSessions)
 			this.setTabSession(tab, mi.getAttribute("cb_ssData"), uri, mergeHistory);
+
+		if(this.options.deleteAfterOpen)
+			this.deleteBookmark(mi);
 	},
 	openAllBookmarks: function() {
 		Array.forEach(
@@ -686,6 +690,8 @@ this.bookmarks = {
 			},
 			this
 		);
+		if(this.options.deleteAfterOpen)
+			this.deleteAllBookmarks();
 	},
 	setTabSession: function(tab, ssData, uri, mergeHistory, disableForceLoad) {
 		if(ssData && "JSON" in window) try {
