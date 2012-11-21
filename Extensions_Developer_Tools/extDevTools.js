@@ -535,10 +535,13 @@ var cmds = this.commands = {
 			);
 	},
 	saveSessionAndExit: function() {
-		//~ todo: browser.showQuitWarning, browser.tabs.warnOnClose, browser.warnOnQuit - ?
+		//~ todo: browser.showQuitWarning, browser.warnOnQuit - ?
 		var woq = this.getPref("browser.warnOnQuit");
 		if(woq != undefined)
 			this.setPref("browser.warnOnQuit", false);
+		var woc = this.getPref("browser.tabs.warnOnClose");
+		if(woc != undefined)
+			this.setPref("browser.tabs.warnOnClose", false);
 		try {
 			if(
 				"goQuitApplication" in window
@@ -552,6 +555,8 @@ var cmds = this.commands = {
 		}
 		if(woq != undefined)
 			this.setPref("browser.warnOnQuit", woq);
+		if(woc != undefined)
+			this.setPref("browser.tabs.warnOnClose", woc);
 	},
 	openErrorConsole: function() {
 		if("toErrorConsole" in window) {
