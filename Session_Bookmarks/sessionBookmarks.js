@@ -5,7 +5,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011-2012
-// version 0.2.0pre36 - 2012-10-29
+// version 0.2.0pre37 - 2012-11-26
 
 // Usage:
 //   Use middle-click or left+click with any modifier to add current tab
