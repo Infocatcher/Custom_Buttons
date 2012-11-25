@@ -1,4 +1,5 @@
 ﻿// http://infocatcher.ucoz.net/js/cb/sessionBookmarks.js
+// https://github.com/Infocatcher/Custom_Buttons/tree/master/Session_Bookmarks
 
 // Session Bookmarks button for Custom Buttons
 // (code for "initialization" section)
