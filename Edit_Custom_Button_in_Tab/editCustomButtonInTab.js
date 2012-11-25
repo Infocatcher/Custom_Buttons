@@ -4,7 +4,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2012
-// version 0.1.6 - 2012-10-12
+// version 0.1.7 - 2012-11-25
 
 // Note:
 // In Firefox 3.6 and older:
@@ -19,10 +19,11 @@ var editInTabLabel = (function() {
 	return "Edit button in tab…";
 })();
 
-const editId = "custombuttons-contextpopup-edit";
-const editInTabId = editId + "InTab";
 const editorBaseUri = "chrome://custombuttons/content/editor.xul";
 const cbIdTabAttr = "custombuttons-editInTab-id";
+
+const editId = "custombuttons-contextpopup-edit";
+const editInTabId = editId + "InTab";
 var editInTab = document.getElementById(editInTabId);
 if(editInTab)
 	editInTab.parentNode.removeChild(editInTab);
@@ -32,20 +33,36 @@ editInTab.id = editInTabId;
 editInTab.setAttribute("cb_id", editInTabId);
 editInTab.setAttribute("label", editInTabLabel);
 editInTab.setAttribute("oncommand", "editCustomButtonInTab();");
-editInTab.removeAttribute("observes"); // For Firefox 3.6 and older
+//editInTab.removeAttribute("observes"); // For Firefox 3.6 and older
 editInTab.setAttribute("image", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAitJREFUeNrEk0tIVVEUhr99zrnHc1+SkYQVFWo20G6SgkFRDorEILFJDoogkoLoXfOopEZCYIFlIITlRIUiC5UmFZVk1igwCAozfD9uat17z97tc5XK0pGDFiz289/rXz//FkopFhMGiwyr5GoHHgkpZUnCde9LqXwwHyuR3HVNIzZpGrubbLtjfHwYyzvywIYpHp0o386ajAAD3/R1MRfugZeFoGcgbm9pedo+7VVVCMvTwKt8tGwrfXGb5mfRJFj8VV0Ki7hpk9t5gW35lYx9GcSZGFOGSjJQvuXpYd4PTLPUYU6m+Q1SgzbBkEPey0tUHjlJfU8j0c8j+Aa/ahFn2x2cdknVgLBfpx5DyTQIBGx8+oHjras4vX8DtfWNFG0q4gmPyas9VqgZqEbNAEvPUnW1sCMI+QVBPXc02Ar5ONiURW55NsHus1TkjNDW2srHdYcormo/Z2kG+0p35BPTfaaHrVnBBAmt75QwKK3LYuPetdDbDxMTdHc2ELn4gfWj32l+MFQhdla1KVdKpCvxBPXAcWUSlQEaYgeIlK2GvmENHuHOmxVcW3mLoDuqn09gGjNiF8xnEPWw+DUFpTA0BS+uc/tdDodrnhf+445dV9p/LaQw+SH8nBfVRBMpKi0zm5LIEupq7lF541Vhy6lIV3XGTRw5qdWXM078bRSBK3zs6b3MWxEgplxSPnWS2e8kwXfPbO4SanIefy4cf7bWtdAl8d9/408BBgBVmNFVzOyEfgAAAABJRU5ErkJggg==");
 editItem.parentNode.insertBefore(editInTab, editItem.nextSibling);
 
 Array.filter( // Process already cloned menu items
 	document.getElementsByAttribute("observes", editItem.getAttribute("observes")),
 	function(mi) {
-		return mi != editItem && (mi.id || "").substr(0, editId.length) == editId;
+		var id = mi.id || "";
+		return mi != editItem
+			&& id.substr(0, editId.length) == editId
+			&& id.substr(0, editInTabId.length) != editInTabId;
 	}
 ).forEach(function(editItem, i) {
 	var clone = editInTab.cloneNode(true);
 	clone.id += "-cloned-" + i;
 	editItem.parentNode.insertBefore(clone, editItem.nextSibling);
 });
+
+// Process #custombuttons-contextpopup-sub
+const editIdSub = editId + "-sub";
+var editItemSub = document.getElementById(editIdSub);
+if(editItemSub) {
+	var clone = editInTab.cloneNode(true);
+	if(editItemSub.hasAttribute("observes"))
+		clone.setAttribute("observes", editItemSub.getAttribute("observes"));
+	else
+		clone.removeAttribute("observes");
+	clone.id += "-sub";
+	editItemSub.parentNode.insertBefore(clone, editItemSub.nextSibling);
+}
 
 window.editCustomButtonInTab = function(btn, newTab) { // Should be global to work in cloned menus
 	if(!btn)
