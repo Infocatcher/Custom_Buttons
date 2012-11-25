@@ -5,19 +5,18 @@
 // Note: button are disabled by default, click to enable
 
 // (c) Infocatcher 2012
-// version 0.1.0 - 2012-07-01
+// version 0.1.1 - 2012-11-25
 
 var cbs = Components.classes["@xsms.nm.ru/custombuttons/cbservice;1"]
 	.getService(Components.interfaces.cbICustomButtonsService);
 var windowId = cbs.getWindowId(document.documentURI);
 var notificationPrefix = cbs.getNotificationPrefix(windowId);
 
-this.onclick = function(e) {
-	if(e.button == 0) {
-		this.checked = !this.checked;
-		document.persist(this.id, "checked");
-	}
+this.toggleEnabled = function() {
+	this.checked = !this.checked;
+	document.persist(this.id, "checked");
 };
+this.setAttribute("oncommand", "this.toggleEnabled();");
 
 var observer = {
 	button: this,
