@@ -39,12 +39,6 @@ var options = {
 
 function _localize(s, key) {
 	var strings = {
-		"Delete All Bookmarks": {
-			ru: "Удалить все закладки"
-		},
-		deleteAllKey: {
-			ru: "в"
-		},
 		"Update": {
 			ru: "Обновить"
 		},
@@ -57,6 +51,56 @@ function _localize(s, key) {
 		updateLocationKey: {
 			ru: "а"
 		},
+		"Delete All Bookmarks": {
+			ru: "Удалить все закладки"
+		},
+		deleteAllKey: {
+			ru: "в"
+		},
+
+		"Sort": {
+			ru: "Сортировать"
+		},
+		sortKey: {
+			ru: "С"
+		},
+		"Sort By Name, A>Z": {
+			ru: "Сортировать по имени, А>Я"
+		},
+		sortByNameAZKey: {
+			ru: "и"
+		},
+		"Sort By Name, Z>A": {
+			ru: "Сортировать по имени, Я>А"
+		},
+		sortByNameZAKey: {
+			ru: "и"
+		},
+		"Sort By Base Domain, Host and Name, A>Z": {
+			ru: "Сортировать по базовому домену, хосту и имени, А>Я"
+		},
+		sortByBaseDomainHostNameAZKey: {
+			ru: "б"
+		},
+		"Sort By Base Domain, Host and Name, Z>A": {
+			ru: "Сортировать по базовому домену, хосту и имени, Я>А"
+		},
+		sortByBaseDomainHostNameZAKey: {
+			ru: "б"
+		},
+		"Sort By Host and Name, A>Z": {
+			ru: "Сортировать по хосту и имени, А>Я"
+		},
+		sortByHostNameAZKey: {
+			ru: "х"
+		},
+		"Sort By Host and Name, Z>A": {
+			ru: "Сортировать по хосту и имени, Я>А"
+		},
+		sortByHostNameZAKey: {
+			ru: "х"
+		},
+
 		"Session Bookmark Properties": {
 			ru: "Свойства закладки-сессии"
 		},
@@ -175,6 +219,11 @@ this.bookmarks = {
 		return this.ios = Components.classes["@mozilla.org/network/io-service;1"]
 			.getService(Components.interfaces.nsIIOService);
 	},
+	get tld() {
+		delete this.tld;
+		return this.tld = Components.classes["@mozilla.org/network/effective-tld-service;1"]
+			.getService(Components.interfaces.nsIEffectiveTLDService);
+	},
 	get wm() {
 		delete this.wm;
 		return this.wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
@@ -268,7 +317,7 @@ this.bookmarks = {
 		this.button.appendChild(mp);
 		mp.addEventListener("DOMMenuItemActive",   this.showLink, false);
 		mp.addEventListener("DOMMenuItemInactive", this.showLink, false);
-		this.showOpenAll();
+		this.onBookmarksChanged();
 	},
 	initIds: function() {
 		this.initIds = function() {};
@@ -291,6 +340,9 @@ this.bookmarks = {
 		this.deleteSepId   = btnId + "-separator-delete";
 		this.deleteId      = btnId + "-delete";
 		this.deleteAllId   = btnId + "-deleteAll";
+
+		this.sortSepId     = btnId + "-separator-sort";
+		this.sortId        = btnId + "-sort";
 
 		this.undoId        = btnId + "-undo";
 		this.redoId        = btnId + "-redo";
@@ -318,7 +370,7 @@ this.bookmarks = {
 
 		var cm = this.$(this.cmId);
 		cm && cm.parentNode.removeChild(cm);
-		cm = this.parseXULFromString('\
+		cm = this.cm = this.parseXULFromString('\
 			<menupopup xmlns="' + xulns + '"\
 				id="' + this.cmId + '"\
 				onpopupshowing="\
@@ -360,6 +412,46 @@ this.bookmarks = {
 					oncommand="this.parentNode.bookmarks.deleteAllBookmarks();"\
 					label="' + _localize("Delete All Bookmarks") + '"\
 					accesskey="' + _localize("A", "deleteAllKey") + '" />\
+				\
+				<menuseparator id="' + this.sortSepId + '" />\
+				<menu id="' + this.sortId + '"\
+					label="' + _localize("Sort") + '"\
+					accesskey="' + _localize("S", "sortKey") + '">\
+					<menupopup>\
+						<menuitem\
+							closemenu="single"\
+							oncommand="this.parentNode.parentNode.parentNode.bookmarks.sortBookmarks([\'name\']);"\
+							label="' + _localize("Sort By Name, A>Z") + '"\
+							accesskey="' + _localize("N", "sortByNameAZKey") + '" />\
+						<menuitem\
+							closemenu="single"\
+							oncommand="this.parentNode.parentNode.parentNode.bookmarks.sortBookmarks([\'name\'], true);"\
+							label="' + _localize("Sort By Name, Z>A") + '"\
+							accesskey="' + _localize("N", "sortByNameZAKey") + '" />\
+						<menuseparator />\
+						<menuitem\
+							closemenu="single"\
+							oncommand="this.parentNode.parentNode.parentNode.bookmarks.sortBookmarks([\'baseDomain\', \'host\', \'name\']);"\
+							label="' + _localize("Sort By Base Domain, Host and Name, A>Z") + '"\
+							accesskey="' + _localize("B", "sortByBaseDomainHostNameAZKey") + '" />\
+						<menuitem\
+							closemenu="single"\
+							oncommand="this.parentNode.parentNode.parentNode.bookmarks.sortBookmarks([\'baseDomain\', \'host\', \'name\'], true);"\
+							label="' + _localize("Sort By Base Domain, Host and Name, Z>A") + '"\
+							accesskey="' + _localize("B", "sortByBaseDomainHostNameZAKey") + '" />\
+						<menuseparator />\
+						<menuitem\
+							closemenu="single"\
+							oncommand="this.parentNode.parentNode.parentNode.bookmarks.sortBookmarks([\'host\', \'name\']);"\
+							label="' + _localize("Sort By Host and Name, A>Z") + '"\
+							accesskey="' + _localize("H", "sortByHostNameAZKey") + '" />\
+						<menuitem\
+							closemenu="single"\
+							oncommand="this.parentNode.parentNode.parentNode.bookmarks.sortBookmarks([\'host\', \'name\'], true);"\
+							label="' + _localize("Sort By Host and Name, Z>A") + '"\
+							accesskey="' + _localize("H", "sortByHostNameZAKey") + '" />\
+					</menupopup>\
+				</menu>\
 				\
 				<menuseparator />\
 				<menuitem id="' + this.undoId + '"\
@@ -568,7 +660,7 @@ this.bookmarks = {
 		var mi = this.getMenuitem(td.label, td.uri, td.icon, td.ssData);
 		this.mp.insertBefore(mi, this.correctInsPoint(insPoint));
 		this.addUndo({ action: "remove", mi: mi, pn: mi.parentNode, ns: mi.nextSibling });
-		this.showOpenAll(true);
+		this.onBookmarksChanged(true);
 		this.blink();
 		this.scheduleSave();
 		return mi;
@@ -783,7 +875,7 @@ this.bookmarks = {
 		this.addUndo({ action: "add", mi: mi, pn: mi.parentNode, ns: mi.nextSibling });
 		mi.parentNode.removeChild(mi);
 		this.closePropertiesWindow(mi);
-		this.showOpenAll();
+		this.onBookmarksChanged();
 		this.scheduleSave();
 	},
 	deleteAllBookmarks: function() {
@@ -795,7 +887,7 @@ this.bookmarks = {
 		this.closeAllPropertiesWindows();
 		this.addUndo({ action: "adds", actions: undo.reverse() });
 		this.save();
-		this.showOpenAll(false);
+		this.onBookmarksChanged(false);
 	},
 	_undoStorage: [],
 	_undoPos: undefined,
@@ -838,7 +930,7 @@ this.bookmarks = {
 			return true;
 		this.undoRedoAction(us[pos], redo);
 		this._undoPos = redo ? pos : pos - 1;
-		this.showOpenAll();
+		this.onBookmarksChanged();
 		this.scheduleSave();
 		return true;
 	},
@@ -868,7 +960,7 @@ this.bookmarks = {
 			}
 			else if(action == "move")
 				o.mi.parentNode.insertBefore(o.mi, invert ? o.newPos : o.oldPos);
-			else if(action == "adds") {
+			else if(action == "adds" || action == "moves") {
 				var actions = o.actions;
 				if(invert)
 					actions = o.actions.slice().reverse();
@@ -1038,14 +1130,16 @@ this.bookmarks = {
 		while(ws.hasMoreElements())
 			ws.getNext().close();
 	},
-	showOpenAll: function(show) {
-		if(show === undefined)
-			show = this.mp.getElementsByAttribute("cb_uri", "*").length > 0;
-		this.$(this.sepId).hidden = this.$(this.openAllId).hidden = !show;
-		if(!show)
+	onBookmarksChanged: function(hasBookmarks) {
+		if(hasBookmarks === undefined)
+			hasBookmarks = this.mp.getElementsByAttribute("cb_uri", "*").length > 0;
+		this.button.disabled =
+			this.$(this.sepId).hidden =
+			this.$(this.openAllId).hidden =
+			this.$(this.deleteAllId).disabled =
+			this.$(this.sortId).disabled = !hasBookmarks;
+		if(!hasBookmarks)
 			this.mp.hidePopup();
-		this.$(this.deleteAllId).disabled = !show;
-		this.button.disabled = !show;
 	},
 	initContextMenu: function(mi) {
 		var isBtn = mi == this.button;
@@ -1250,6 +1344,88 @@ this.bookmarks = {
 			sss.loadAndRegisterSheet(cssURI, sss.USER_SHEET);
 		else if(!add && has)
 			sss.unregisterSheet(cssURI, sss.USER_SHEET);
+	},
+	sortBookmarks: function(sortOrder, reverse) {
+		// sortOrder: array of strings, possible values:
+		// "name", "uri", "host", "baseDomain" (see sortBookmarksNodes())
+		// Example: sortBookmarks(["baseDomain", "host", "name"])
+		// We sort separately each "section" between menuseparator's
+		// (just like built-in Sort By Name for bookmarks)
+		var sections = [[]];
+		var section = sections[0];
+		var chs = this.mp.childNodes;
+		for(var i = 0, l = chs.length; i < l; ++i) {
+			let ch = chs[i];
+			if(ch.hasAttribute("cb_uri"))
+				section.push(ch);
+			else if(ch.localName == "menuseparator") {
+				if(ch.id == this.sepId)
+					break;
+				sections.push(section = []);
+			}
+		}
+		var undo = [];
+		sections.forEach(function(section) {
+			this.sortBookmarksNodes(section, sortOrder, reverse, undo);
+		}, this);
+		this.addUndo({ action: "moves", actions: undo.reverse() });
+		this.cm.hidePopup();
+		this.scheduleSave();
+	},
+	sortBookmarksNodes: function(bookmarksNodes, sortOrder, reverse, undo) {
+		if(!bookmarksNodes.length)
+			return;
+
+		var insPoint = bookmarksNodes[bookmarksNodes.length - 1].nextSibling;
+		var sort = {
+			name: false,
+			uri: false,
+			host: false,
+			baseDomain: false,
+			__proto__: null
+		};
+		sortOrder.forEach(function(s) {
+			sort[s] = true;
+		});
+
+		var df = document.createDocumentFragment();
+		var greaterThan = reverse ? -1 : 1;
+		var bookmarks = bookmarksNodes
+			.map(function(mi) {
+				var bm = {};
+				if(sort.uri || sort.host || sort.baseDomain)
+					bm.uri = mi.getAttribute("cb_uri");
+				if(sort.name)
+					bm.name = mi.getAttribute("label");
+				if(sort.host || sort.baseDomain) try {
+					let u = this.ios.newURI(bm.uri, null, null);
+					if(sort.host)
+						bm.host = u.host;
+					if(sort.baseDomain)
+						bm.baseDomain = this.tld.getBaseDomain(u);
+				}
+				catch(e) {
+					//Components.utils.reportError(e);
+				}
+				return {
+					mi: mi,
+					key: sortOrder.map(function(s) {
+						return bm[s];
+					}).join("\n")
+				};
+			}, this)
+			.sort(function(bm1, bm2) {
+				var s1 = bm1.key;
+				var s2 = bm2.key;
+				return s1 == s2 ? 0 : s1 > s2 ? greaterThan : -greaterThan;
+			})
+			.forEach(function(bm) {
+				var mi = bm.mi;
+				undo && undo.push({ action: "move", mi: mi, oldPos: mi.nextSibling, newPos: insPoint });
+				//this.mp.insertBefore(mi, insPoint);
+				df.appendChild(mi);
+			}, this);
+		this.mp.insertBefore(df, insPoint);
 	},
 	showLink: function(e) {
 		if(!("XULBrowserWindow" in window))
