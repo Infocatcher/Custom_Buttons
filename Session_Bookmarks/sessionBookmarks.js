@@ -30,6 +30,7 @@ var options = {
 	checkDuplicates: true, // Forbid duplicates
 	// Note: session data are checked too
 	deleteAfterOpen: false, // Delete opened bookmarks
+	itemInPageContextMenu: false, // Show "Session Bookmark This Page" item in page context menu
 	useSessions: true, // Save and restore session data
 	saveTabHistory: true, // Only for "useSessions: true"
 	// Save back/forward history of tab
@@ -102,6 +103,23 @@ function _localize(s, key) {
 			ru: "х"
 		},
 
+		"Button Menu": {
+			ru: "Меню кнопки"
+		},
+		buttonMenuKey: {
+			ru: "М"
+		},
+
+		"Session Bookmark This Page": {
+			ru: "Добавить страницу в закладки-сессии"
+		},
+		"Button: %S": {
+			ru: "Кнопка: %S"
+		},
+		pageContextItemKey: {
+			ru: "с"
+		},
+
 		"Session Bookmark Properties": {
 			ru: "Свойства закладки-сессии"
 		},
@@ -116,12 +134,6 @@ function _localize(s, key) {
 		},
 		iconKey: {
 			ru: "И"
-		},
-		"Button Menu": {
-			ru: "Меню кнопки"
-		},
-		buttonMenuKey: {
-			ru: "М"
 		}
 	};
 	var locale = (cbu.getPrefs("general.useragent.locale") || "en").match(/^[a-z]*/)[0];
@@ -263,6 +275,8 @@ this.bookmarks = {
 			this.readFromFileAsync(file, this.load, this);
 		else
 			this.load("");
+		if(this.options.itemInPageContextMenu)
+			this.initPageContextMenu();
 	},
 
 	_label:   "label:   ",
@@ -365,6 +379,8 @@ this.bookmarks = {
 			this.closeAllPropertiesWindows();
 			this.markInsertionPoint(false);
 		}
+		if(this.options.itemInPageContextMenu)
+			this.destroyPageContextMenu(force);
 	},
 	addContextMenu: function() {
 		this.addContextMenu = function() {};
@@ -496,6 +512,55 @@ this.bookmarks = {
 		cm.bookmarks = this;
 		this.$("mainPopupSet").appendChild(cm);
 	},
+
+	_hasPageContextItem: false,
+	get pageContextItem() {
+		this._hasPageContextItem = true;
+		var cbId = "sessionBookmarksPageContextItem";
+		var mi = this.createElement("menuitem", {
+			label: _localize("Session Bookmark This Page"),
+			accesskey: _localize("S", "pageContextItemKey"),
+			tooltiptext: _localize("Button: %S")
+				.replace("%S", this.button.tooltipText || this.button.label),
+			oncommand: "this._bookmarks.addBookmark();",
+			cb_id: cbId
+		});
+		mi._bookmarks = this;
+		var insPoint = this.bmItem.nextSibling;
+		while(insPoint && insPoint.getAttribute("cb_id") == cbId)
+			insPoint = insPoint.nextSibling;
+		this.bmPopup.insertBefore(mi, insPoint);
+		delete this.pageContextItem;
+		return this.pageContextItem = mi;
+	},
+	initPageContextMenu: function() {
+		var bmItem = this.bmItem = this.$("context-bookmarkpage");
+		if(!bmItem)
+			return;
+		var bmPopup = this.bmPopup = bmItem.parentNode;
+		bmPopup.addEventListener("popupshowing", this, true);
+	},
+	destroyPageContextMenu: function(force) {
+		this.bmPopup.removeEventListener("popupshowing", this, true);
+		if(force && this._hasPageContextItem && this.pageContextItem.parentNode)
+			this.bmPopup.removeChild(this.pageContextItem);
+	},
+	updatePageContextItemVisibility: function() {
+		var hidden = this.bmItem.hidden;
+		if(
+			!hidden
+			&& gContextMenu
+			&& gContextMenu.target
+			&& gContextMenu.target.ownerDocument.defaultView.top != content
+		)
+			hidden = true;
+		this.pageContextItem.hidden = hidden;
+	},
+	handleEvent: function(e) {
+		if(e.type == "popupshowing" && e.target == e.currentTarget)
+			this.updatePageContextItemVisibility();
+	},
+
 	reload: function(data) {
 		this.destroy();
 
@@ -1632,7 +1697,11 @@ this.bookmarks = {
 	}
 };
 this.bookmarks.init();
-this.onDestroy = function() {
+//LOG("init");
+this.onDestroy = function(reason) {
+	if(reason == "constructor")
+		return; // Changed XBL binding, ignore
+	//LOG("destroy: " + reason);
 	this.bookmarks.destroy(true);
 };
 this.type = "menu";
