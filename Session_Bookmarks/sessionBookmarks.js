@@ -65,38 +65,38 @@ function _localize(s, key) {
 		sortKey: {
 			ru: "С"
 		},
-		"Sort By Name, A>Z": {
-			ru: "Сортировать по имени, А>Я"
+		"By Name, A>Z": {
+			ru: "По имени, А>Я"
 		},
 		sortByNameAZKey: {
 			ru: "и"
 		},
-		"Sort By Name, Z>A": {
-			ru: "Сортировать по имени, Я>А"
+		"By Name, Z>A": {
+			ru: "По имени, Я>А"
 		},
 		sortByNameZAKey: {
 			ru: "и"
 		},
-		"Sort By Base Domain, Host and Name, A>Z": {
-			ru: "Сортировать по базовому домену, хосту и имени, А>Я"
+		"By Base Domain, Host and Name, A>Z": {
+			ru: "По базовому домену, хосту и имени, А>Я"
 		},
 		sortByBaseDomainHostNameAZKey: {
 			ru: "б"
 		},
-		"Sort By Base Domain, Host and Name, Z>A": {
-			ru: "Сортировать по базовому домену, хосту и имени, Я>А"
+		"By Base Domain, Host and Name, Z>A": {
+			ru: "По базовому домену, хосту и имени, Я>А"
 		},
 		sortByBaseDomainHostNameZAKey: {
 			ru: "б"
 		},
-		"Sort By Host and Name, A>Z": {
-			ru: "Сортировать по хосту и имени, А>Я"
+		"By Host and Name, A>Z": {
+			ru: "По хосту и имени, А>Я"
 		},
 		sortByHostNameAZKey: {
 			ru: "х"
 		},
-		"Sort By Host and Name, Z>A": {
-			ru: "Сортировать по хосту и имени, Я>А"
+		"By Host and Name, Z>A": {
+			ru: "По хосту и имени, Я>А"
 		},
 		sortByHostNameZAKey: {
 			ru: "х"
@@ -422,34 +422,34 @@ this.bookmarks = {
 						<menuitem\
 							closemenu="single"\
 							oncommand="this.parentNode.parentNode.parentNode.bookmarks.sortBookmarks([\'name\']);"\
-							label="' + _localize("Sort By Name, A>Z") + '"\
+							label="' + _localize("By Name, A>Z") + '"\
 							accesskey="' + _localize("N", "sortByNameAZKey") + '" />\
 						<menuitem\
 							closemenu="single"\
 							oncommand="this.parentNode.parentNode.parentNode.bookmarks.sortBookmarks([\'name\'], true);"\
-							label="' + _localize("Sort By Name, Z>A") + '"\
+							label="' + _localize("By Name, Z>A") + '"\
 							accesskey="' + _localize("N", "sortByNameZAKey") + '" />\
 						<menuseparator />\
 						<menuitem\
 							closemenu="single"\
 							oncommand="this.parentNode.parentNode.parentNode.bookmarks.sortBookmarks([\'baseDomain\', \'host\', \'name\']);"\
-							label="' + _localize("Sort By Base Domain, Host and Name, A>Z") + '"\
+							label="' + _localize("By Base Domain, Host and Name, A>Z") + '"\
 							accesskey="' + _localize("B", "sortByBaseDomainHostNameAZKey") + '" />\
 						<menuitem\
 							closemenu="single"\
 							oncommand="this.parentNode.parentNode.parentNode.bookmarks.sortBookmarks([\'baseDomain\', \'host\', \'name\'], true);"\
-							label="' + _localize("Sort By Base Domain, Host and Name, Z>A") + '"\
+							label="' + _localize("By Base Domain, Host and Name, Z>A") + '"\
 							accesskey="' + _localize("B", "sortByBaseDomainHostNameZAKey") + '" />\
 						<menuseparator />\
 						<menuitem\
 							closemenu="single"\
 							oncommand="this.parentNode.parentNode.parentNode.bookmarks.sortBookmarks([\'host\', \'name\']);"\
-							label="' + _localize("Sort By Host and Name, A>Z") + '"\
+							label="' + _localize("By Host and Name, A>Z") + '"\
 							accesskey="' + _localize("H", "sortByHostNameAZKey") + '" />\
 						<menuitem\
 							closemenu="single"\
 							oncommand="this.parentNode.parentNode.parentNode.bookmarks.sortBookmarks([\'host\', \'name\'], true);"\
-							label="' + _localize("Sort By Host and Name, Z>A") + '"\
+							label="' + _localize("By Host and Name, Z>A") + '"\
 							accesskey="' + _localize("H", "sortByHostNameZAKey") + '" />\
 					</menupopup>\
 				</menu>\
