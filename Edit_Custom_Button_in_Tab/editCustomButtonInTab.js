@@ -1,4 +1,5 @@
 ﻿// http://infocatcher.ucoz.net/js/cb/editCustomButtonInTab.js
+// https://github.com/Infocatcher/Custom_Buttons/tree/master/Edit_Custom_Button_in_Tab
 
 // Edit Custom Button in Tab button for Custom Buttons
 // (code for "initialization" section)
