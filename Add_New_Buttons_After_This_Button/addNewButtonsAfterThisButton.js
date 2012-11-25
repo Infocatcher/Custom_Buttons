@@ -34,7 +34,11 @@ var observer = {
 var os = Components.classes["@mozilla.org/observer-service;1"]
 	.getService (Components.interfaces.nsIObserverService);
 os.addObserver(observer, notificationPrefix + "installButton", false);
+var hasObserver = true;
 
 this.onDestroy = function() {
-	os.removeObserver(observer, notificationPrefix + "installButton");
+	if(hasObserver) {
+		hasObserver = false;
+		os.removeObserver(observer, notificationPrefix + "installButton");
+	}
 };
