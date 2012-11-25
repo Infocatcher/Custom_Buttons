@@ -4,7 +4,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2012
-// version 0.1.0pre2 - 2012-11-06
+// version 0.1.0pre3 - 2012-11-25
 
 // Add "Enabled" checkbox to custom button's context menu.
 // Only for test purposes!
@@ -32,7 +32,7 @@ toggleEnabled.setAttribute("cb_id", toggleEnabledId);
 toggleEnabled.setAttribute("type", "checkbox");
 toggleEnabled.setAttribute("label", toggleEnabledLabel);
 toggleEnabled.setAttribute("oncommand", "toggleCustomButtonEnabled();");
-toggleEnabled.removeAttribute("observes"); // For Firefox 3.6 and older
+//toggleEnabled.removeAttribute("observes"); // For Firefox 3.6 and older
 deleteItem.parentNode.insertBefore(toggleEnabled, deleteItem);
 
 Array.filter( // Process already cloned menu items
@@ -45,6 +45,19 @@ Array.filter( // Process already cloned menu items
 	clone.id += "-cloned-" + i;
 	deleteItem.parentNode.insertBefore(clone, deleteItem);
 });
+
+// Process #custombuttons-contextpopup-sub
+const deleteIdSub = deleteId + "-sub";
+var deleteItemSub = document.getElementById(deleteIdSub);
+if(deleteItemSub) {
+	var clone = toggleEnabled.cloneNode(true);
+	if(deleteItemSub.hasAttribute("observes"))
+		clone.setAttribute("observes", deleteItemSub.getAttribute("observes"));
+	else
+		clone.removeAttribute("observes");
+	clone.id += "-sub";
+	deleteItemSub.parentNode.insertBefore(clone, deleteItemSub);
+}
 
 addEventListener("popupshowing", function(e) {
 	var popup = e.target;
