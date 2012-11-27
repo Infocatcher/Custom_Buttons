@@ -1473,19 +1473,18 @@ this.bookmarks = {
 		var ssData = dt.mozGetDataAt(dragNS + "ssData", 0);
 		var uri    = dt.mozGetDataAt(dragNS + "uri",    0);
 
-		var tabOpened = false;
 		var _this = this;
 		function tabOpen(e) {
-			tabOpened = true;
 			e.currentTarget.removeEventListener(e.type, tabOpen, true);
+			clearTimeout(timer);
 			var tab = e.target;
 			_this.setTabSession(tab, ssData, uri);
 			LOG(e.type + " => setTabSession()");
 		}
 		tabs.addEventListener("TabOpen", tabOpen, true);
-		setTimeout(function() {
+		var timer = setTimeout(function() {
 			tabs.removeEventListener("TabOpen", tabOpen, true);
-			if(!tabOpened && tab) {
+			if(tab) {
 				_this.setTabSession(tab, ssData, uri, true);
 				LOG("setTimeout => to TabOpen => setTabSession() for current tab");
 			}
