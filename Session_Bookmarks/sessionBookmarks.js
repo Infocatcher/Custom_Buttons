@@ -1257,8 +1257,8 @@ this.bookmarks = {
 		var dt = e.dataTransfer;
 		dt.mozSetDataAt(dragNS + "buttonId", this._btnId, 0);
 		if(mi.localName == "menuseparator") {
-			dt.mozSetDataAt("text/unicode",     "--------------------", 0);
-			dt.mozSetDataAt("text/html",        "<hr>",                 0);
+			//dt.mozSetDataAt("text/unicode",     "--------------------", 0);
+			//dt.mozSetDataAt("text/html",        "<hr>",                 0);
 			dt.mozSetDataAt(dragNS + "tagname", "menuseparator",        0);
 		}
 		else {
@@ -1439,7 +1439,7 @@ this.bookmarks = {
 		var dt = e.dataTransfer;
 		var dragNS = this.dragDataNS;
 		if(
-			!dt.types.contains(dragNS + "tagname")
+			!dt.types.contains(dragNS + "uri")
 			|| dt.mozGetDataAt(dragNS + "buttonId", 0) != this._btnId
 		)
 			return;
