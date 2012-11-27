@@ -684,9 +684,21 @@ this.bookmarks = {
 			let extData = data.extData;
 			if(extData && typeof extData == "object") {
 				// Tree Style Tab https://addons.mozilla.org/firefox/addon/tree-style-tab/
-				delete extData["treestyletab-parent"];
-				delete extData["treestyletab-collapsed"];
 				delete extData["treestyletab-id"];
+				delete extData["treestyletab-children"];
+				delete extData["treestyletab-parent"];
+				delete extData["treestyletab-ancestors"];
+				delete extData["treestyletab-nest"];
+				delete extData["treestyletab-insert-before"];
+				delete extData["treestyletab-insert-after"];
+				delete extData["treestyletab-closed-set-id"];
+
+				delete extData["treestyletab-id-new"];
+				delete extData["treestyletab-id-restoring"];
+				delete extData["treestyletab-children-restoring"];
+
+				delete extData["treestyletab-collapsed"];
+
 				// Tab Utilities https://addons.mozilla.org/firefox/addon/tab-utilities/
 				delete extData.group;
 				delete extData["group-color"];
