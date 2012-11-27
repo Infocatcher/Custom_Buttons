@@ -369,6 +369,7 @@ this.bookmarks = {
 		this.btnMenuId     = btnId + "-buttonMenu";
 	},
 	destroy: function(force) {
+		//LOG("destroy, " + (force ? "force" : "not force"));
 		if(this.mp) {
 			this.mp.removeEventListener("DOMMenuItemActive",   this.showLink, false);
 			this.mp.removeEventListener("DOMMenuItemInactive", this.showLink, false);
@@ -1702,7 +1703,7 @@ this.onDestroy = function(reason) {
 	if(reason == "constructor")
 		return; // Changed XBL binding, ignore
 	//LOG("destroy: " + reason);
-	this.bookmarks.destroy(true);
+	this.bookmarks.destroy(reason == "update" || reason == "delete");
 };
 this.type = "menu";
 this.orient = "horizontal";
