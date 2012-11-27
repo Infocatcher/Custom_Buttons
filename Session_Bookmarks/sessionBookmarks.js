@@ -277,6 +277,7 @@ this.bookmarks = {
 			this.load("");
 		if(this.options.itemInPageContextMenu)
 			this.initPageContextMenu();
+		window.addEventListener("drop", this, true);
 	},
 
 	_label:   "label:   ",
@@ -334,6 +335,29 @@ this.bookmarks = {
 		mp.addEventListener("DOMMenuItemInactive", this.showLink, false);
 		this.onBookmarksChanged();
 	},
+	destroy: function(force) {
+		//LOG("destroy, " + (force ? "force" : "not force"));
+		if(this.mp) {
+			this.mp.removeEventListener("DOMMenuItemActive",   this.showLink, false);
+			this.mp.removeEventListener("DOMMenuItemInactive", this.showLink, false);
+			if(!force)
+				this.closePropertiesWindows();
+		}
+		if(force) {
+			this.closeAllPropertiesWindows();
+			this.markInsertionPoint(false);
+		}
+		if(this.options.itemInPageContextMenu)
+			this.destroyPageContextMenu(force);
+		window.removeEventListener("drop", this, true);
+	},
+	handleEvent: function(e) {
+		if(e.type == "popupshowing" && e.target == e.currentTarget)
+			this.updatePageContextItemVisibility();
+		else if(e.type == "drop")
+			this.handleBookmarkDrop(e);
+	},
+
 	initIds: function() {
 		this.initIds = function() {};
 
@@ -367,21 +391,6 @@ this.bookmarks = {
 
 		this.btnMenuSepId  = btnId + "-separator-buttonMenu";
 		this.btnMenuId     = btnId + "-buttonMenu";
-	},
-	destroy: function(force) {
-		//LOG("destroy, " + (force ? "force" : "not force"));
-		if(this.mp) {
-			this.mp.removeEventListener("DOMMenuItemActive",   this.showLink, false);
-			this.mp.removeEventListener("DOMMenuItemInactive", this.showLink, false);
-			if(!force)
-				this.closePropertiesWindows();
-		}
-		if(force) {
-			this.closeAllPropertiesWindows();
-			this.markInsertionPoint(false);
-		}
-		if(this.options.itemInPageContextMenu)
-			this.destroyPageContextMenu(force);
 	},
 	addContextMenu: function() {
 		this.addContextMenu = function() {};
@@ -557,10 +566,6 @@ this.bookmarks = {
 			hidden = true;
 		this.pageContextItem.hidden = hidden;
 	},
-	handleEvent: function(e) {
-		if(e.type == "popupshowing" && e.target == e.currentTarget)
-			this.updatePageContextItemVisibility();
-	},
 
 	reload: function(data) {
 		this.destroy();
@@ -680,6 +685,7 @@ this.bookmarks = {
 	cleanupSessionData: function(data) {
 		if(!data)
 			return;
+		//LOG("cleanupSessionData:\n" + JSON.stringify(data, null, "  "));
 		if("extData" in data) {
 			let extData = data.extData;
 			if(extData && typeof extData == "object") {
@@ -1239,12 +1245,17 @@ this.bookmarks = {
 	_openMenuDelay: 350,
 	_closeMenuDelay: 350,
 	_sourceNode: null,
+	get _btnId() {
+		delete this._btnId;
+		return this._btnId = Math.random().toFixed(14).substr(2) + "-" + this.btnNum;
+	},
 	handleDragStart: function(e) {
 		var mi = e.target;
 		if(!mi.hasAttribute("cb_bookmarkItem"))
 			return;
 		var dragNS = this.dragDataNS;
 		var dt = e.dataTransfer;
+		dt.mozSetDataAt(dragNS + "buttonId", this._btnId, 0);
 		if(mi.localName == "menuseparator") {
 			dt.mozSetDataAt("text/unicode",     "--------------------", 0);
 			dt.mozSetDataAt("text/html",        "<hr>",                 0);
@@ -1423,6 +1434,62 @@ this.bookmarks = {
 			sss.loadAndRegisterSheet(cssURI, sss.USER_SHEET);
 		else if(!add && has)
 			sss.unregisterSheet(cssURI, sss.USER_SHEET);
+	},
+	handleBookmarkDrop: function(e) {
+		var dt = e.dataTransfer;
+		var dragNS = this.dragDataNS;
+		if(
+			!dt.types.contains(dragNS + "tagname")
+			|| dt.mozGetDataAt(dragNS + "buttonId", 0) != this._btnId
+		)
+			return;
+
+		var trg = e.target;
+		var tab, tabs;
+		if(
+			e.view.top == window
+			&& /(?:^|\s)tabbrowser-tabs?(?:\s|$)/.test(trg.className)
+		) {
+			if(trg.localName == "tabs")
+				tabs = trg;
+			else {
+				tab = trg;
+				tabs = trg.parentNode;
+			}
+		}
+		else if(e.view.top == content) {
+			if(trg instanceof HTMLInputElement || trg instanceof HTMLTextAreaElement) try {
+				if(typeof trg.selectionStart == "number")
+					return;
+			}
+			catch(e) {
+			}
+			tab = gBrowser.selectedTab;
+			tabs = gBrowser.tabContainer;
+		}
+		else
+			return;
+
+		var ssData = dt.mozGetDataAt(dragNS + "ssData", 0);
+		var uri    = dt.mozGetDataAt(dragNS + "uri",    0);
+
+		var tabOpened = false;
+		var _this = this;
+		function tabOpen(e) {
+			tabOpened = true;
+			e.currentTarget.removeEventListener(e.type, tabOpen, true);
+			var tab = e.target;
+			_this.setTabSession(tab, ssData, uri);
+			LOG(e.type + " => setTabSession()");
+		}
+		tabs.addEventListener("TabOpen", tabOpen, true);
+		setTimeout(function() {
+			tabs.removeEventListener("TabOpen", tabOpen, true);
+			if(!tabOpened && tab) {
+				_this.setTabSession(tab, ssData, uri, true);
+				LOG("setTimeout => to TabOpen => setTabSession() for current tab");
+			}
+		}, 0);
 	},
 	sortBookmarks: function(sortOrder, reverse) {
 		// sortOrder: array of strings, possible values:
