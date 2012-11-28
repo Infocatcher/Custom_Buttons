@@ -389,8 +389,9 @@ this.undoCloseTabsList = {
 	},
 	drawUndoList: function() {
 		var mp = this.mp;
-		while(mp.hasChildNodes())
-			mp.removeChild(mp.lastChild);
+		//while(mp.hasChildNodes())
+		//	mp.removeChild(mp.lastChild);
+		mp.textContent = "";
 
 		var wc = this.closedWindowCount;
 		var tc = this.closedTabCount;
@@ -403,15 +404,16 @@ this.undoCloseTabsList = {
 
 		this._undoWindowItems = wc && JSON.parse(ss.getClosedWindowData());
 		this._undoTabItems    = tc && JSON.parse(ss.getClosedTabData(window));
+		var df = document.createDocumentFragment();
 
 		this.options.menuTemplate.forEach(function(sid, indx, arr) {
 			switch(sid) {
 				case "closedWindows":
-					wc && this.addUndoWindowsList(mp);
+					wc && this.addUndoWindowsList(df);
 				break;
 				case "restoreClosedWindows":
 					wc > this.options.hideRestoreAllForSingleEntry
-					&& mp.appendChild(this.createElement("menuitem", {
+					&& df.appendChild(this.createElement("menuitem", {
 						label: _localize("restoreAllWindows"),
 						accesskey: _localize("restoreAllWindowsAccesskey"),
 						tooltiptext: "",
@@ -419,7 +421,7 @@ this.undoCloseTabsList = {
 					}));
 				break;
 				case "clearClosedWindows":
-					wc && mp.appendChild(this.createElement("menuitem", {
+					wc && df.appendChild(this.createElement("menuitem", {
 						label: _localize("clearWindowsHistory"),
 						accesskey: _localize("clearWindowsHistoryAccesskey"),
 						tooltiptext: "",
@@ -428,11 +430,11 @@ this.undoCloseTabsList = {
 					}));
 				break;
 				case "closedTabs":
-					tc && this.addUndoTabsList(mp);
+					tc && this.addUndoTabsList(df);
 				break;
 				case "restoreClosedTabs":
 					tc > this.options.hideRestoreAllForSingleEntry
-					&& mp.appendChild(this.createElement("menuitem", {
+					&& df.appendChild(this.createElement("menuitem", {
 						label: _localize("restoreAllTabs"),
 						accesskey: _localize("restoreAllTabsAccesskey"),
 						tooltiptext: "",
@@ -440,7 +442,7 @@ this.undoCloseTabsList = {
 					}));
 				break;
 				case "clearClosedTabs":
-					tc && mp.appendChild(this.createElement("menuitem", {
+					tc && df.appendChild(this.createElement("menuitem", {
 						label: _localize("clearTabsHistory"),
 						accesskey: _localize("clearTabsHistoryAccesskey"),
 						tooltiptext: "",
@@ -454,7 +456,7 @@ this.undoCloseTabsList = {
 						|| wc && arr.indexOf("clearClosedWindows") == -1
 						|| tc && arr.indexOf("clearClosedTabs") == -1
 					)
-					&& mp.appendChild(this.createElement("menuitem", {
+					&& df.appendChild(this.createElement("menuitem", {
 						label: _localize("clearAllHistory"),
 						accesskey: _localize("clearAllHistoryAccesskey"),
 						tooltiptext: "",
@@ -462,7 +464,7 @@ this.undoCloseTabsList = {
 					}));
 				break;
 				case "restoreLastSession": // Gecko 2.0+
-					canRestoreLastSession && mp.appendChild(this.createElement("menuitem", {
+					canRestoreLastSession && df.appendChild(this.createElement("menuitem", {
 						label: _localize("restoreLastSession"),
 						accesskey: _localize("restoreLastSessionAccesskey"),
 						tooltiptext: "",
@@ -472,24 +474,27 @@ this.undoCloseTabsList = {
 				case "buttonMenu":
 					let cbMenu = this.cbMenu;
 					if(cbMenu)
-						mp.appendChild(cbMenu);
+						df.appendChild(cbMenu);
 				break;
 				case "separator":
-					if(mp.hasChildNodes() && mp.lastChild.localName != "menuseparator")
-						mp.appendChild(document.createElement("menuseparator"));
+					if(df.hasChildNodes() && df.lastChild.localName != "menuseparator")
+						df.appendChild(document.createElement("menuseparator"));
 				break;
 				default:
 					Components.utils.reportError(this.errPrefix + 'Invalid template entry: "' + sid + '"');
 			}
 		}, this);
 
-		while(mp.hasChildNodes() && mp.lastChild.localName == "menuseparator")
-			mp.removeChild(mp.lastChild);
+		while(df.hasChildNodes() && df.lastChild.localName == "menuseparator")
+			df.removeChild(df.lastChild);
 
 		this._undoWindowItems = this._undoTabItems = null;
 
-		var show = mp.hasChildNodes();
-		!show && mp.hidePopup();
+		var show = df.hasChildNodes();
+		if(show)
+			mp.appendChild(df);
+		else
+			mp.hidePopup();
 		return show;
 	},
 	addUndoWindowsList: function(undoPopup) {
