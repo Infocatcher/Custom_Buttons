@@ -31,11 +31,14 @@ var options = {
 	// Note: session data are checked too
 	deleteAfterOpen: false, // Delete opened bookmarks
 	itemInPageContextMenu: false, // Show "Session Bookmark This Page" item in page context menu
+
 	useSessions: true, // Save and restore session data
 	saveTabHistory: true, // Only for "useSessions: true"
 	// Save back/forward history of tab
+	saveTabPinnedState: false,
 	reloadSessions: true, // Only for "useSessions: true"
 	// Ignore cache during session restore (otherwise may be opened obsolete cached version of page)
+
 	undoLimit: 10 // Max length of undo/redo history
 };
 
@@ -686,6 +689,8 @@ this.bookmarks = {
 		if(!data)
 			return;
 		//LOG("cleanupSessionData:\n" + JSON.stringify(data, null, "  "));
+		if(!this.options.saveTabPinnedState)
+			delete data.pinned;
 		if("extData" in data) {
 			let extData = data.extData;
 			if(extData && typeof extData == "object") {
