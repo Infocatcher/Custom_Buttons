@@ -23,6 +23,7 @@ var options = {
 	forceRestartOnLocaleChange: false,
 	closeOptionsMenu: false,
 	restoreErrorConsole: true, // Only for Gecko 2.0+
+	reopenWindowFlushCaches: true,
 	hotkeys: {
 		cleanAndRestart: "control alt shift R",
 		attrsInspector: "control alt I",
@@ -311,11 +312,18 @@ var cmds = this.commands = {
 		return this.canReopenWindow = ss && "getWindowState" in ss && "setWindowState" in ss
 			&& "gBrowser" in window && gBrowser.localName == "tabbrowser";
 	},
-	reopenWindow: function() {
+	reopenWindow: function(flushCaches) {
 		this.button.disabled = true;
 
 		var ss = this.ss;
 		var state = ss.getWindowState(window);
+
+		if(flushCaches === undefined)
+			flushCaches = this.options.reopenWindowFlushCaches;
+		if(flushCaches) {
+			window.close();
+			this.flushCaches();
+		}
 
 		var win = this.openBrowserWindow();
 		win.addEventListener("load", function restoreSession() {
@@ -515,9 +523,7 @@ var cmds = this.commands = {
 			&& this.canReopenWindow
 			&& this.platformVersion >= 18
 		) {
-			window.close();
-			this.flushCaches();
-			this.reopenWindow();
+			this.reopenWindow(true);
 			this.savePrefFile(true);
 		}
 		else {
