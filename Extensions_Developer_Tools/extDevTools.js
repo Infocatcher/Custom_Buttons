@@ -1484,12 +1484,13 @@ function init() {
 			"stopImmediatePropagation" in e && e.stopImmediatePropagation();
 			//_log("stopEvent: " + e.type);
 		},
-		_timers: [],
+		_timers: { __proto__: null },
+		_timersCounter: 0,
 		timer: function(callback, context, delay, args) {
-			var timer = Components.classes["@mozilla.org/timer;1"]
-				.createInstance(Components.interfaces.nsITimer);
+			var id = ++this._timersCounter;
 			var _timers = this._timers;
-			var id = _timers.push(timer) - 1;
+			var timer = _timers[id] = Components.classes["@mozilla.org/timer;1"]
+				.createInstance(Components.interfaces.nsITimer);
 			timer.init({
 				observe: function(subject, topic, data) {
 					delete _timers[id];
@@ -1507,10 +1508,10 @@ function init() {
 		},
 		destroyTimers: function() {
 			var _timers = this._timers;
-			for(var id in _timers) if(_timers.hasOwnProperty(id))
+			for(var id in _timers)
 				_timers[id].cancel();
-			//_timers.length = 0;
-			_timers.splice(0);
+			this._timers = { __proto__: null };
+			this._timersCounter = 0;
 		},
 		get flasher() {
 			var flasher = Components.classes["@mozilla.org/inspector/flasher;1"]
@@ -1664,9 +1665,16 @@ function init() {
 			}
 		},
 
-		setClipboardData: function(dataObj, clipId) {
+		setClipboardData: function(dataObj, sourceWindow, clipId) {
 			var ta = Components.classes["@mozilla.org/widget/transferable;1"]
 				.createInstance(Components.interfaces.nsITransferable);
+			if(sourceWindow && "init" in ta) {
+				// The clipboard will be cleared when private browsing mode ends
+				var privacyContext = sourceWindow.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+					.getInterface(Components.interfaces.nsIWebNavigation)
+					.QueryInterface(Components.interfaces.nsILoadContext);
+				ta.init(privacyContext);
+			}
 			for(var flavor in dataObj) if(dataObj.hasOwnProperty(flavor)) {
 				var value = dataObj[flavor];
 				var str = Components.classes["@mozilla.org/supports-string;1"]
@@ -1894,6 +1902,8 @@ function init() {
 			}
 		},
 		copyTootipContent: function() {
+			var node = this._node;
+			var sourceWindow = node && (node.ownerDocument || node).defaultView;
 			var tt = this.context.tt;
 			var text = Array.map(tt.childNodes, function(node) {
 				return node.textContent;
@@ -1910,7 +1920,7 @@ function init() {
 			this.setClipboardData({
 				"text/unicode": text,
 				"text/html":    html
-			});
+			}, sourceWindow);
 
 			if(!/(?:^|\s)attrsInspector-copied(?:\s|$)/.test(tt.className))
 				tt.className += " attrsInspector-copied";
