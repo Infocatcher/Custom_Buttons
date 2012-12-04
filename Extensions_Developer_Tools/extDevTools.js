@@ -371,8 +371,8 @@ var cmds = this.commands = {
 		this.button.disabled = true;
 
 		var win = this.openBrowserWindow();
-		win.addEventListener("load", function reopenWindow() {
-		win.removeEventListener("load", reopenWindow, false);
+		win.addEventListener("load", function moveTabs() {
+		win.removeEventListener("load", moveTabs, false);
 
 			if(window.windowState == window.STATE_NORMAL)
 				win.moveTo(window.screenX, window.screenY);
