@@ -21,9 +21,24 @@ function LOG(s) {
 
 extDevTools.call(ps);
 var popup = ps.firstChild;
-var e = typeof event == "object" && event instanceof Event // FireGestures
-	? event
-	: window.mgGestureState && mgGestureState.endEvent; // Mouse Gestures Redox
+
+var e;
+if(typeof event == "object" && event instanceof Event && "screenX" in event) // FireGestures
+	e = event;
+else if("mgGestureState" in window && "endEvent" in mgGestureState) // Mouse Gestures Redox
+	e = mgGestureState.endEvent;
+else {
+	var anchor = window.gBrowser && gBrowser.selectedBrowser
+		|| document.documentElement;
+	if("boxObject" in anchor) {
+		var bo = anchor.boxObject;
+		e = {
+			screenX: bo.screenX,
+			screenY: bo.screenY
+		};
+	}
+}
+
 if(!popup || !e) {
 	alert("Mouse Gestures Launcher for Extensions Developer Tools:\nNo popup or can't get event object");
 	destroy();
