@@ -1,16 +1,20 @@
-// http://infocatcher.ucoz.net/js/cb/extDevToolsMouseGesturesLauncher.js
+﻿// http://infocatcher.ucoz.net/js/cb/extDevToolsMouseGesturesLauncher.js
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Extensions_Developer_Tools
 
 // Mouse Gestures Launcher for Extensions Developer Tools
+// Also the code can be used from hotkeys (using keyconfig or similar extension)
 // Copy all code from
 // https://github.com/Infocatcher/Custom_Buttons/blob/master/Extensions_Developer_Tools/extDevTools.js
 // after "//=== Extensions Developer Tools begin"
 
 // (c) Infocatcher 2012
-// version 0.1.0pre - 2012-10-25
+// version 0.1.0pre2 - 2012-12-05
 
-var ps = document.createElement("popupset");
-ps.id = "mgLauncherForExtDevTools-popupset";
+const popupsetId = "mgLauncherForExtDevTools-popupset";
+var ps = document.getElementById(popupsetId);
+ps && ps.parentNode.removeChild(ps);
+ps = document.createElement("popupset");
+ps.id = popupsetId;
 document.documentElement.appendChild(ps);
 
 function LOG(s) {
