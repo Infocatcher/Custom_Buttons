@@ -1,4 +1,5 @@
 ﻿// http://infocatcher.ucoz.net/js/cb/extDevTools.js
+// http://forum.mozilla-russia.org/viewtopic.php?pid=591696
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Extensions_Developer_Tools
 
 // Extensions Developer Tools button for Custom Buttons
