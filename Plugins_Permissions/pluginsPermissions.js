@@ -494,17 +494,17 @@ this.permissions = {
 		if("__cbPermissionsTweaked" in win)
 			return;
 		win.__cbPermissionsTweaked = true;
-		var keypressHandler = function(e) {
+		function keypressHandler(e) {
 			if(e.keyCode == e.DOM_VK_ESCAPE)
 				win.close();
-		};
+		}
 		win.addEventListener("keypress", keypressHandler, false);
 		win.addEventListener("unload", function destroy(e) {
 			var win = e.target.defaultView;
-			if(win !== win.top || e.target.location.protocol != "chrome:")
+			if(win != e.currentTarget)
 				return;
 			win.removeEventListener(e.type, destroy, false);
-			win.removeEventListener("keydown", keypressHandler, false);
+			win.removeEventListener("keypress", keypressHandler, false);
 		}, false);
 	},
 	setTextboxValue: function(tb, val, onlySelect) {
