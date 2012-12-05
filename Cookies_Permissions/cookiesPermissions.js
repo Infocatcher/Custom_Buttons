@@ -6,7 +6,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2010-2012
-// version 0.2.0pre11 - 2012-09-08
+// version 0.2.0pre12 - 2012-12-05
 
 var {Application, Components} = window; // Prevent garbage collection in Firefox 3.6 and older
 
