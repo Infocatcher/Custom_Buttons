@@ -39,9 +39,11 @@ else {
 function destroy(e) {
 	if(e && e.target != popup)
 		return;
-	popup.removeEventListener("popuphidden", destroy, false);
-	popup && popup.onDestroy && popup.onDestroy("delete");
-	LOG("onDestroy()");
+	if(popup) {
+		popup.removeEventListener("popuphidden", destroy, false);
+		popup.onDestroy && popup.onDestroy("delete");
+		LOG("onDestroy()");
+	}
 	ps.parentNode.removeChild(ps);
 	LOG("Remove popup");
 }
