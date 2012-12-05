@@ -5,7 +5,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011-2012
-// version 0.1.0pre18 - 2012-10-25
+// version 0.1.0pre19 - 2012-12-05
 
 // Includes Attributes Inspector
 // http://infocatcher.ucoz.net/js/cb/attrsInspector.js
@@ -971,7 +971,7 @@ this.attrsInspector = function(event) {
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Attributes_Inspector
 
 // (c) Infocatcher 2010-2012
-// version 0.6.0pre11 - 2012-10-18
+// version 0.6.0pre12 - 2012-12-05
 
 //===================
 // Attributes Inspector button for Custom Buttons
@@ -1052,6 +1052,20 @@ function ael(type, func, useCapture, target) {
 }
 function rel(type, func, useCapture, target) {
 	return (target || window).removeEventListener(type, func, useCapture);
+}
+function defineGetter(o, p, g) {
+	defineGetter = "defineProperty" in Object // Firefox >= 4.0
+		? function(o, p, g) {
+			Object.defineProperty(o, p, {
+				get: g,
+				configurable: true,
+				enumerable: true
+			});
+		}
+		: function(o, p, g) {
+			Object.__defineGetter__.call(o, p, g);
+		};
+	return defineGetter.apply(this, arguments);
 }
 
 context.toggle();
@@ -1230,7 +1244,7 @@ function init() {
 		get separator() {
 			var sep = this._separator = this.s(" = ");
 			sep.className = "attrsInspector-separator";
-			this.__defineGetter__("separator", function() {
+			defineGetter(this, "separator", function() {
 				return this._separator.cloneNode(true);
 			});
 			return this.separator;
@@ -1238,7 +1252,7 @@ function init() {
 		get space() {
 			var sp = this._space = this.s(" ");
 			sp.className = "attrsInspector-space";
-			this.__defineGetter__("space", function() {
+			defineGetter(this, "space", function() {
 				return this._space.cloneNode(true);
 			});
 			return this.space;
@@ -1277,7 +1291,7 @@ function init() {
 
 			overflowBox.appendChild(item);
 
-			this.__defineGetter__("overflowBox", function() {
+			defineGetter(this, "overflowBox", function() {
 				return this._overflowBox.cloneNode(true);
 			});
 			return this.overflowBox;
@@ -2237,7 +2251,7 @@ function init() {
 			this.globalHandler[e.type + "Handler"](e, this.currentWindow);
 		}
 	};
-	this.__defineGetter__("inspector", function() {
+	defineGetter(this, "inspector", function() {
 		if(!("@mozilla.org/commandlinehandler/general-startup;1?type=inspector" in Components.classes)) {
 			_log("DOM Inspector not installed!");
 			return null;
