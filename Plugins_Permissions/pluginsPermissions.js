@@ -5,7 +5,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2012
-// version 0.1.0pre3 - 2012-09-14
+// version 0.1.0pre4 - 2012-12-05
 
 // Based on Cookies Permissions button
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Cookies_Permissions
