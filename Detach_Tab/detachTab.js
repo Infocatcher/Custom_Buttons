@@ -113,15 +113,15 @@ function compactWindow(win) {
 		.chromeclass-toolbar-additional {\n\
 			visibility: collapse !important;\n\
 		}';
+	var root = document.documentElement;
 	document.insertBefore(
 		document.createProcessingInstruction(
 			"xml-stylesheet",
 			'href="' + "data:text/css,"
 				+ encodeURIComponent(style) + '" type="text/css"'
 		),
-		document.firstChild
+		root
 	);
-	var root = document.documentElement;
 	// See #main-window[disablechrome] ... in chrome://browser/content/browser.css
 	// User may want override this styles
 	var origSetAttribute = root.setAttribute;
