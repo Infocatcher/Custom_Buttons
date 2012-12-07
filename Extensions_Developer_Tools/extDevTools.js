@@ -581,11 +581,11 @@ var cmds = this.commands = {
 			w.focus();
 			return;
 		}
-		window.openDialog(
-			"chrome://global/content/console.xul",
-			"_blank",
-			"chrome,all,centerscreen,resizable,dialog=0"
-		);
+		var consoleURI = "@zeniko/console2-clh;1" in Components.classes
+			|| "@mozilla.org/commandlinehandler/general-startup;1?type=console2" in Components.classes // Firefox <= 3.6
+			? "chrome://console2/content/console2.xul"
+			: "chrome://global/content/console.xul";
+		window.openDialog(consoleURI, "_blank", "chrome,all,centerscreen,resizable,dialog=0");
 	},
 	_restoreErrorConsoleObserver: null,
 	get restoreErrorConsolePref() {
