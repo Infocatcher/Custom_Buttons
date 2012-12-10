@@ -1,4 +1,5 @@
 ﻿// http://infocatcher.ucoz.net/js/cb/pluginsPermissions.js
+// http://forum.mozilla-russia.org/viewtopic.php?id=57303
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Plugins_Permissions
 
 // Plugins Permissions button for Custom Buttons
@@ -10,7 +11,7 @@
 // Based on Cookies Permissions button
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Cookies_Permissions
 
-// Note: plugins.click_to_play in about:config should be enabled
+// Note: plugins.click_to_play in about:config ("Block plugins" checkbox) should be enabled
 
 var options = {
 	useBaseDomain: { // If set to true, will use short domain like google.com instead of www.google.com
@@ -53,6 +54,9 @@ function _localize(sid) {
 			allowLabel: "Allow",
 			allowAccesskey: "A",
 
+			blockPluginsLabel: "Block plugins",
+			blockPluginsAccesskey: "c",
+
 			showPermissionsLabel: "Show Exceptions…",
 			showPermissionsAccesskey: "x",
 
@@ -81,6 +85,9 @@ function _localize(sid) {
 			denyAccesskey: "Б",
 			allowLabel: "Разрешить",
 			allowAccesskey: "Р",
+
+			blockPluginsLabel: "Блокировать плагины",
+			blockPluginsAccesskey: "к",
 
 			showPermissionsLabel: "Показать исключения…",
 			showPermissionsAccesskey: "и",
@@ -204,6 +211,13 @@ this.permissions = {
 					accesskey="' + _localize("allowAccesskey") + '" />\
 				<menuseparator />\
 				<menuitem\
+					cb_id="toggleBlock"\
+					type="checkbox"\
+					oncommand="this.parentNode.parentNode.permissions.toggleBlock(this.getAttribute(\'checked\') == \'true\');"\
+					label="' + _localize("blockPluginsLabel") + '"\
+					accesskey="' + _localize("blockPluginsAccesskey") + '" />\
+				<menuseparator />\
+				<menuitem\
 					cb_id="openPermissions"\
 					oncommand="this.parentNode.parentNode.permissions.openPermissions();"\
 					label="' + _localize("showPermissionsLabel") + '"\
@@ -279,36 +293,44 @@ this.permissions = {
 		};
 		this.oSvc.addObserver(this.permissionsObserver, "perm-changed", false);
 
-		if(this.options.showDefaultPolicy) {
-			let po = this.prefsObserver = {
-				context: this,
-				get prefs() {
-					delete this.prefs;
-					return this.prefs = Components.classes["@mozilla.org/preferences-service;1"]
-						.getService(Components.interfaces.nsIPrefService)
-						.getBranch("plugins.click_to_play")
-						.QueryInterface(Components.interfaces.nsIPrefBranch2 || Components.interfaces.nsIPrefBranch);
-				},
-				getBoolPref: function(name) {
-					try {
-						return this.prefs.getBoolPref(name);
-					}
-					catch(e) {
-						Components.utils.reportError(e);
-					}
-					return false;
-				},
-				observe: function(subject, topic, data) {
-					if(topic != "nsPref:changed")
-						return;
-					if(data != "")
-						return;
-					this.context.defaultDeny = this.getBoolPref(data);
-					this.context.updButtonState();
+		var ps = this.prefs = {
+			context: this,
+			get branch() {
+				delete this.branch;
+				return this.branch = Components.classes["@mozilla.org/preferences-service;1"]
+					.getService(Components.interfaces.nsIPrefService)
+					.getBranch("plugins.click_to_play")
+					.QueryInterface(Components.interfaces.nsIPrefBranch2 || Components.interfaces.nsIPrefBranch);
+			},
+			get: function(name) {
+				try {
+					return this.branch.getBoolPref(name || "");
 				}
-			};
-			this.defaultDeny = po.getBoolPref("");
-			po.prefs.addObserver("", po, false);
+				catch(e) {
+					Components.utils.reportError(e);
+				}
+				return false;
+			},
+			set: function(val, name) {
+				try {
+					this.branch.setBoolPref(name || "", val);
+				}
+				catch(e) {
+					Components.utils.reportError(e);
+				}
+			},
+			observe: function(subject, topic, data) {
+				if(topic != "nsPref:changed" || data != "")
+					return;
+				var ctx = this.context;
+				ctx.defaultDeny = this.get();
+				ctx.updButtonState();
+				ctx.updToggleBlockItem();
+			}
+		};
+		if(this.options.showDefaultPolicy) {
+			this.defaultDeny = ps.get();
+			ps.branch.addObserver("", ps, false);
 		}
 
 		this.updButtonState();
@@ -321,8 +343,8 @@ this.permissions = {
 		gBrowser.removeProgressListener(this.progressListener);
 		this.oSvc.removeObserver(this.permissionsObserver, "perm-changed");
 		if(this.options.showDefaultPolicy)
-			this.prefsObserver.prefs.removeObserver("", this.prefsObserver);
-		this.progressListener = this.permissionsObserver = this.prefsObserver = null;
+			this.prefs.branch.removeObserver("", this.prefs);
+		this.progressListener = this.permissionsObserver = this.prefs = null;
 	},
 	moveToStatusBar: function() {
 		var insPoint;
@@ -414,7 +436,21 @@ this.permissions = {
 		var mi = this.mp.getElementsByAttribute("cb_permission", permission);
 		mi.length && mi[0].setAttribute("checked", "true");
 
+		this.updToggleBlockItem();
+
 		return true;
+	},
+	updToggleBlockItem: function() {
+		this.mp.getElementsByAttribute("cb_id", "toggleBlock")[0]
+			.setAttribute(
+				"checked",
+				this.options.showDefaultPolicy
+					? this.defaultDeny
+					: this.prefs.get()
+			);
+	},
+	toggleBlock: function(block) {
+		this.prefs.set(block);
 	},
 
 	openPermissions: function() {
