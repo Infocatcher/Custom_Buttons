@@ -1085,7 +1085,7 @@ function toggle() {
 						var toolboxes = doc.getElementsByTagName("toolbox");
 						for(var i = 0, l = toolboxes.length; i < l; ++i) {
 							var toolbox = toolboxes[i];
-							if("palette" in toolbox) {
+							if("palette" in toolbox && toolbox.palette) {
 								var paletteBtns = toolbox.palette.getElementsByAttribute("id", btn.id);
 								var paletteBtn = paletteBtns.length && paletteBtns[0];
 								if(paletteBtn && paletteBtn.getAttribute("checked") == "true") {
