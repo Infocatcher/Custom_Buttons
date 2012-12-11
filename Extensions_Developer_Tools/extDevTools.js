@@ -319,6 +319,42 @@ var cmds = this.commands = {
 		var ss = this.ss;
 		var state = ss.getWindowState(window);
 
+		// Try remove closed window from undo history
+		window.addEventListener("unload", function clearUndo(e) {
+			window.removeEventListener(e.type, clearUndo, false);
+
+			var canForget = "forgetClosedWindow" in ss;
+			if(canForget) {
+				var stateObj = JSON.parse(ss.getWindowState(window)).windows[0];
+				delete stateObj._shouldRestore;
+				var state = JSON.stringify(stateObj);
+				//LOG("state:\n" + state);
+			}
+			win.setTimeout(function() {
+				if(canForget) {
+					var closed = JSON.parse(ss.getClosedWindowData());
+					for(var i = 0, l = closed.length; i < l; ++i) {
+						delete closed[i]._shouldRestore;
+						//LOG("#" + i + "\n" + JSON.stringify(closed[i]));
+						if(JSON.stringify(closed[i]) == state) {
+							ss.forgetClosedWindow(i);
+							break;
+						}
+					}
+				}
+				else if(
+					"getClosedWindowCount" in ss
+						? ss.getClosedWindowCount() == 1
+						: "getClosedWindowData" in ss && JSON.parse(ss.getClosedWindowData()).length == 1
+				) {
+					ss.setWindowState(win, '{"windows":[{}],"_closedWindows":[]}', false);
+				}
+				else {
+					LOG("Can't remove closed window from undo history");
+				}
+			}, 0);
+		}, false);
+
 		if(flushCaches === undefined)
 			flushCaches = this.options.reopenWindowFlushCaches;
 		if(flushCaches) {
@@ -327,46 +363,9 @@ var cmds = this.commands = {
 		}
 
 		var win = this.openBrowserWindow();
-		win.addEventListener("load", function restoreSession() {
-			win.removeEventListener("load", restoreSession, false);
+		win.addEventListener("load", function restoreSession(e) {
+			win.removeEventListener(e.type, restoreSession, false);
 			ss.setWindowState(win, state, true);
-
-			// Try remove closed window from undo history
-			window.addEventListener("unload", function clearUndo(e) {
-				window.removeEventListener("unload", clearUndo, false);
-
-				var canForget = "forgetClosedWindow" in ss;
-				if(canForget) {
-					var stateObj = JSON.parse(ss.getWindowState(window)).windows[0];
-					delete stateObj._shouldRestore;
-					var state = JSON.stringify(stateObj);
-					//LOG("state:\n" + state);
-				}
-				win.setTimeout(function() {
-					if(canForget) {
-						var closed = JSON.parse(ss.getClosedWindowData());
-						for(var i = 0, l = closed.length; i < l; ++i) {
-							delete closed[i]._shouldRestore;
-							//LOG("#" + i + "\n" + JSON.stringify(closed[i]));
-							if(JSON.stringify(closed[i]) == state) {
-								ss.forgetClosedWindow(i);
-								break;
-							}
-						}
-					}
-					else if(
-						"getClosedWindowCount" in ss
-							? ss.getClosedWindowCount() == 1
-							: "getClosedWindowData" in ss && JSON.parse(ss.getClosedWindowData()).length == 1
-					) {
-						ss.setWindowState(win, '{"windows":[{}],"_closedWindows":[]}', false);
-					}
-					else {
-						LOG("Can't remove closed window from undo history");
-					}
-				}, 0);
-			}, false);
-
 			if(!window.closed)
 				window.close();
 		}, false);
@@ -501,6 +500,7 @@ var cmds = this.commands = {
 		this.restart();
 	},
 	flushCaches: function() {
+		// See resource://gre/modules/XPIProvider.jsm
 		var obs = Components.classes["@mozilla.org/observer-service;1"]
 			.getService(Components.interfaces.nsIObserverService);
 		obs.notifyObservers(null, "startupcache-invalidate", null);
