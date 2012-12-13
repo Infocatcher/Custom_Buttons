@@ -528,7 +528,10 @@ var cmds = this.commands = {
 			this.savePrefFile(true);
 		}
 		else {
-			this.restart();
+			if(this.platformVersion >= 2)
+				this.cleanAndRestart();
+			else
+				this.restart();
 		}
 		return locale;
 	},
