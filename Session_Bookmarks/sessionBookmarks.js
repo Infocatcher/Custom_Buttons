@@ -256,7 +256,7 @@ this.bookmarks = {
 		file.append("custombuttons");
 		file.append("bookmarks-" + this.btnNum + ".txt");
 		file.QueryInterface(Components.interfaces.nsILocalFile || Components.interfaces.nsIFile);
-		this.ensureFilePermissions(file, 0600);
+		this.ensureFilePermissions(file, this.PERMS_FILE_OWNER_WRITE);
 		delete this.file;
 		return this.file = file;
 	},
@@ -264,7 +264,7 @@ this.bookmarks = {
 		var file = this.file.clone();
 		file.leafName += ".bak";
 		file.QueryInterface(Components.interfaces.nsILocalFile || Components.interfaces.nsIFile);
-		this.ensureFilePermissions(file, 0600);
+		this.ensureFilePermissions(file, this.PERMS_FILE_OWNER_WRITE);
 		delete this.backupFile;
 		return this.backupFile = file;
 	},
@@ -1609,6 +1609,9 @@ this.bookmarks = {
 		return s.replace(/\n/g, "\r");
 	},
 
+	PERMS_FILE_READ:        parseInt("0444", 8),
+	PERMS_FILE_WRITE:       parseInt("0644", 8),
+	PERMS_FILE_OWNER_WRITE: parseInt("0600", 8),
 	writeToFileAsync: function(str, file, callback, context) {
 		try {
 			Components.utils.import("resource://gre/modules/NetUtil.jsm");
@@ -1641,7 +1644,7 @@ this.bookmarks = {
 	writeToFile: function(str, file) {
 		var fos = Components.classes["@mozilla.org/network/file-output-stream;1"]
 			.createInstance(Components.interfaces.nsIFileOutputStream);
-		fos.init(file, 0x02 | 0x08 | 0x20, 0644, 0);
+		fos.init(file, 0x02 | 0x08 | 0x20, this.PERMS_FILE_WRITE, 0);
 		var cos = Components.classes["@mozilla.org/intl/converter-output-stream;1"]
 			.createInstance(Components.interfaces.nsIConverterOutputStream);
 		cos.init(fos, "UTF-8", 0, 0);
@@ -1690,7 +1693,7 @@ this.bookmarks = {
 	readFromFile: function(file) {
 		var fis = Components.classes["@mozilla.org/network/file-input-stream;1"]
 			.createInstance(Components.interfaces.nsIFileInputStream);
-		fis.init(file, 0x01, 0444, 0);
+		fis.init(file, 0x01, this.PERMS_FILE_READ, 0);
 		var sis = Components.classes["@mozilla.org/scriptableinputstream;1"]
 			.createInstance(Components.interfaces.nsIScriptableInputStream);
 		sis.init(fis);
@@ -1735,10 +1738,10 @@ this.bookmarks = {
 		try {
 			var fis = Components.classes["@mozilla.org/network/file-input-stream;1"]
 				.createInstance(Components.interfaces.nsIFileInputStream);
-			fis.init(file, 0x01, 0444, 0);
+			fis.init(file, 0x01, this.PERMS_FILE_READ, 0);
 			var fos = Components.classes["@mozilla.org/network/file-output-stream;1"]
 				.createInstance(Components.interfaces.nsIFileOutputStream);
-			fos.init(newFile, 0x02 | 0x08 | 0x20, 0644, 0);
+			fos.init(newFile, 0x02 | 0x08 | 0x20, this.PERMS_FILE_WRITE, 0);
 
 			NetUtil.asyncCopy(fis, fos, this.bind(function(status) {
 				callback.call(context || this, status);
