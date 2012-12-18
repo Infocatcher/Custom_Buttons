@@ -574,8 +574,9 @@ this.bookmarks = {
 		this.destroy();
 
 		var btn = this.button;
-		while(btn.hasChildNodes())
-			btn.removeChild(btn.lastChild);
+		//while(btn.hasChildNodes())
+		//	btn.removeChild(btn.lastChild);
+		btn.textContent = "";
 
 		this._undoStorage.length = 0;
 		this._undoPos = undefined;
