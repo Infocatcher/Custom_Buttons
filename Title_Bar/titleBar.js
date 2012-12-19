@@ -55,7 +55,9 @@ var titleUpdater = {
 	}
 };
 if("MutationObserver" in window) {
-	var mo = new MutationObserver(titleUpdater);
+	var mo = new MutationObserver(function() {
+		titleUpdater.handleMutations.apply(titleUpdater, arguments);
+	});
 	// http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#mutation-observers
 	mo.observe(root, {
 		attributes: true,
