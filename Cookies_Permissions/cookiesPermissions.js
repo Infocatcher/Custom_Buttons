@@ -743,9 +743,9 @@ this.permissions = {
 	},
 	addPermission: function(capability, temporary) {
 		// capability:
-		//  this.cp.ACCESS_DENY
+		//  this.cp.ACCESS_ALLOW (this.pm.ALLOW_ACTION)
 		//  this.cp.ACCESS_SESSION
-		//  this.cp.ACCESS_ALLOW
+		//  this.cp.ACCESS_DENY (this.pm.DENY_ACTION)
 
 		var host = this.options.useBaseDomain.addPermission
 			? this.currentBaseDomain
@@ -832,7 +832,7 @@ this.permissions = {
 			return this.PERMISSIONS_NOT_SUPPORTED;
 		var pm = this.pm;
 		var matchedPermission = pm.UNKNOWN_ACTION;
-		var hostLen = -1;
+		var maxHostLen = -1;
 		var enumerator = pm.enumerator;
 		while(enumerator.hasMoreElements()) {
 			let permission = enumerator.getNext()
@@ -842,12 +842,13 @@ this.permissions = {
 			var permissionHost = permission.host;
 			if(permissionHost == host)
 				return permission;
+			var hostLen = permissionHost.length;
 			if(
-				this.checkCookieHost(host, permissionHost)
-				&& permissionHost.length > hostLen
+				hostLen > maxHostLen
+				&& host.substr(-hostLen - 1) == "." + permissionHost // ~= checkCookieHost()
 			) {
 				matchedPermission = permission;
-				hostLen = permissionHost.length;
+				maxHostLen = hostLen;
 			}
 		}
 		return matchedPermission;
