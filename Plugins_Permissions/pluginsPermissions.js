@@ -14,6 +14,9 @@
 // Note: plugins.click_to_play in about:config ("Block plugins" checkbox) should be enabled
 
 var options = {
+	showTempPermissions: true, // Show items about temporary permissions (only Gecko 2.0+)
+	tempExpire: -1, // Type of temporary permissions
+	// -1 - session, otherwise - expire after given time (in milliseconds)
 	useBaseDomain: { // If set to true, will use short domain like google.com instead of www.google.com
 		addPermission: false, // Add (and toggle) permission action
 		openPermissions: false,  // Filter in "Show Exceptions" window
@@ -51,11 +54,17 @@ function _localize(sid) {
 			defaultAccesskey: "D",
 			denyLabel: "Block",
 			denyAccesskey: "B",
+			denyTempLabel: "Temporarily Block",
+			denyTempAccesskey: "k",
 			allowLabel: "Allow",
 			allowAccesskey: "A",
+			allowTempLabel: "Temporarily Allow",
+			allowTempAccesskey: "w",
 
 			blockPluginsLabel: "Block plugins",
 			blockPluginsAccesskey: "c",
+			removeTempPermissionsLabel: "Remove Temporary Permissions",
+			removeTempPermissionsAccesskey: "T",
 
 			showPermissionsLabel: "Show Exceptions…",
 			showPermissionsAccesskey: "x",
@@ -83,11 +92,17 @@ function _localize(sid) {
 			defaultAccesskey: "у",
 			denyLabel: "Блокировать",
 			denyAccesskey: "Б",
+			denyTempLabel: "Временно блокировать",
+			denyTempAccesskey: "л",
 			allowLabel: "Разрешить",
 			allowAccesskey: "Р",
+			allowTempLabel: "Временно разрешить",
+			allowTempAccesskey: "ш",
 
 			blockPluginsLabel: "Блокировать плагины",
 			blockPluginsAccesskey: "к",
+			removeTempPermissionsLabel: "Удалить временные исключения",
+			removeTempPermissionsAccesskey: "ы",
 
 			showPermissionsLabel: "Показать исключения…",
 			showPermissionsAccesskey: "и",
@@ -183,9 +198,7 @@ this.permissions = {
 
 		this.mpId = this.button.id + "-context";
 		var pm = this.pm;
-
-		//~ todo: try add temporary permissions, see
-		// https://developer.mozilla.org/en-US/docs/XPCOM_Interface_Reference/nsIPermissionManager#Permission_expiration_constants
+		var noTempPermissions = !this.options.showTempPermissions || !this.hasTempPermissions;
 		var mp = this.mp = this.button.appendChild(this.parseXULFromString('\
 			<menupopup xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"\
 				id="' + this.mpId + '"\
@@ -205,10 +218,22 @@ this.permissions = {
 					oncommand="this.parentNode.parentNode.permissions.addPermission(Components.interfaces.nsIPermissionManager.DENY_ACTION);"\
 					label="' + _localize("denyLabel") + '"\
 					accesskey="' + _localize("denyAccesskey") + '" />\
+				<menuitem type="radio" cb_permission="' + pm.DENY_ACTION + '-temp"\
+					collapsed="' + noTempPermissions + '"\
+					class="cbTempPermission"\
+					oncommand="this.parentNode.parentNode.permissions.addPermission(Components.interfaces.nsIPermissionManager.DENY_ACTION, true);"\
+					label="' + _localize("denyTempLabel") + '"\
+					accesskey="' + _localize("denyTempAccesskey") + '" />\
 				<menuitem type="radio" cb_permission="' + pm.ALLOW_ACTION + '"\
 					oncommand="this.parentNode.parentNode.permissions.addPermission(Components.interfaces.nsIPermissionManager.ALLOW_ACTION);"\
 					label="' + _localize("allowLabel") + '"\
 					accesskey="' + _localize("allowAccesskey") + '" />\
+				<menuitem type="radio" cb_permission="' + pm.ALLOW_ACTION + '-temp"\
+					collapsed="' + noTempPermissions + '"\
+					class="cbTempPermission"\
+					oncommand="this.parentNode.parentNode.permissions.addPermission(Components.interfaces.nsIPermissionManager.ALLOW_ACTION, true);"\
+					label="' + _localize("allowTempLabel") + '"\
+					accesskey="' + _localize("allowTempAccesskey") + '" />\
 				<menuseparator />\
 				<menuitem\
 					cb_id="toggleBlock"\
@@ -216,6 +241,12 @@ this.permissions = {
 					oncommand="this.parentNode.parentNode.permissions.toggleBlock(this.getAttribute(\'checked\') == \'true\');"\
 					label="' + _localize("blockPluginsLabel") + '"\
 					accesskey="' + _localize("blockPluginsAccesskey") + '" />\
+				<menuitem\
+					cb_id="removeTempPermissions"\
+					hidden="' + noTempPermissions + '"\
+					oncommand="this.parentNode.parentNode.permissions.removeTempPermissions();"\
+					label="' + _localize("removeTempPermissionsLabel") + '"\
+					accesskey="' + _localize("removeTempPermissionsAccesskey") + '" />\
 				<menuseparator />\
 				<menuitem\
 					cb_id="openPermissions"\
@@ -420,6 +451,9 @@ this.permissions = {
 			mp.showPopup(this, e.screenX, e.screenY, isContext ? "context" : "popup", null, null);
 	},
 	updMenu: function() {
+		var permission = this.options.showTempPermissions
+			? this.getPermissionEx()
+			: this.getPermission();
 		var permission = this.getPermission();
 
 		var noPermissions = permission == this.PERMISSIONS_NOT_SUPPORTED;
@@ -433,8 +467,18 @@ this.permissions = {
 			}
 		);
 
-		var mi = this.mp.getElementsByAttribute("cb_permission", permission);
-		mi.length && mi[0].setAttribute("checked", "true");
+		if(!noPermissions) {
+			let cbPermission = permission.capability || permission;
+			if(
+				this.options.showTempPermissions
+				&& permission instanceof Components.interfaces.nsIPermission
+				&& "expireType" in permission
+				&& permission.expireType != this.pm.EXPIRE_NEVER
+			)
+				cbPermission += "-temp";
+			let mi = this.mp.getElementsByAttribute("cb_permission", cbPermission);
+			mi.length && mi[0].setAttribute("checked", "true");
+		}
 
 		this.updToggleBlockItem();
 
@@ -567,16 +611,14 @@ this.permissions = {
 		tb.dispatchEvent(evt);
 	},
 
-	addPermission: function(capability, expireType, expireTime) {
+	get hasTempPermissions() {
+		delete this.hasTempPermissions;
+		return this.hasTempPermissions = "EXPIRE_SESSION" in this.pm && this.pm.add.length > 3;
+	},
+	addPermission: function(capability, temporary) {
 		// capability:
 		//  this.pm.ALLOW_ACTION
 		//  this.pm.DENY_ACTION
-		// expireType:
-		//  this.pm.EXPIRE_NEVER
-		//  this.pm.EXPIRE_SESSION
-		//  this.pm.EXPIRE_TIME
-		// expireTime:
-		//  time in milliseconds since Jan 1 1970 0:00:00
 
 		var host = this.options.useBaseDomain.addPermission
 			? this.currentBaseDomain
@@ -584,28 +626,25 @@ this.permissions = {
 		if(!host)
 			return;
 
+		if(temporary && !this.hasTempPermissions)
+			temporary = false;
 		this.updButtonState(capability); // Faster than ProgressListener (70-80 ms for me)
 
 		var pm = this.pm;
-		var enumerator = pm.enumerator;
-		while(enumerator.hasMoreElements()) {
-			let permission = enumerator.getNext()
-				.QueryInterface(Components.interfaces.nsIPermission);
-			if(
-				permission.type == this.permissionType
-				&& permission.host == host
-				&& permission.capability == capability
-				&& (!expireType || !("expireType" in permission) || permission.expireType == expireType)
-				&& (!expireTime || !("expireTime" in permission) || permission.expireTime == expireTime)
-			)
-				return; // Already added
+		if(this.hasTempPermissions) try { // Can't change expireType...
+			pm.remove(host, this.permissionType);
+		}
+		catch(e) {
+			Components.utils.reportError(e);
 		}
 
 		var args = [this.getURI(host), this.permissionType, capability];
-		if(expireType) {
-			args.push(expireType);
-			if(expireTime)
-				args.push(expireTime);
+		if(temporary) {
+			let expire = this.options.tempExpire;
+			if(expire < 0)
+				args.push(pm.EXPIRE_SESSION);
+			else
+				args.push(pm.EXPIRE_TIME, expire + Date.now());
 		}
 		pm.add.apply(pm, args);
 	},
@@ -636,11 +675,55 @@ this.permissions = {
 		else
 			this.addPermission(capability);
 	},
+	removeTempPermissions: function() {
+		if(!this.hasTempPermissions)
+			return;
+		var pm = this.pm;
+		var enumerator = pm.enumerator;
+		while(enumerator.hasMoreElements()) {
+			let permission = enumerator.getNext()
+				.QueryInterface(Components.interfaces.nsIPermission);
+			if(
+				permission.type == this.permissionType
+				&& permission.expireType != pm.EXPIRE_NEVER
+			)
+				pm.remove(permission.host, this.permissionType);
+		}
+	},
 	getPermission: function() {
 		var host = this.currentHost;
 		return host
 			? this.pm.testPermission(this.getURI(host), this.permissionType)
 			: this.PERMISSIONS_NOT_SUPPORTED;
+	},
+	getPermissionEx: function() {
+		// Unfortunately no API like nsIPermissionManager.testPermission()
+		// for temporary permissions
+		var host = this.currentHost;
+		if(!host)
+			return this.PERMISSIONS_NOT_SUPPORTED;
+		var pm = this.pm;
+		var matchedPermission = pm.UNKNOWN_ACTION;
+		var maxHostLen = -1;
+		var enumerator = pm.enumerator;
+		while(enumerator.hasMoreElements()) {
+			let permission = enumerator.getNext()
+				.QueryInterface(Components.interfaces.nsIPermission);
+			if(permission.type != this.permissionType)
+				continue;
+			var permissionHost = permission.host;
+			if(permissionHost == host)
+				return permission;
+			var hostLen = permissionHost.length;
+			if(
+				hostLen > maxHostLen
+				&& host.substr(-hostLen - 1) == "." + permissionHost
+			) {
+				matchedPermission = permission;
+				maxHostLen = hostLen;
+			}
+		}
+		return matchedPermission;
 	},
 	get defaultPermission() {
 		return this.defaultDeny
@@ -729,6 +812,10 @@ var cssStr = ('\
 		}\n\
 		%button%.custombuttons-insideStatusbarpanel > .toolbarbutton-text {\n\
 			display: none !important;\n\
+		}\n\
+		%button% .cbTempPermission {\n\
+			font-style: italic !important;\n\
+			/*-moz-padding-start: 0.7em !important;*/\n\
 		}\n\
 	}')
 	.replace(/%button%/g, "#" + this.id)
