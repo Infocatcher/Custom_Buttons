@@ -454,7 +454,6 @@ this.permissions = {
 		var permission = this.options.showTempPermissions
 			? this.getPermissionEx()
 			: this.getPermission();
-		var permission = this.getPermission();
 
 		var noPermissions = permission == this.PERMISSIONS_NOT_SUPPORTED;
 		Array.forEach(
