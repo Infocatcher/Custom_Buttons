@@ -479,6 +479,26 @@ this.permissions = {
 			mi.length && mi[0].setAttribute("checked", "true");
 		}
 
+		if(this.hasTempPermissions) {
+			let maxItems = 10;
+			let removeItem = this.mp.getElementsByAttribute("cb_id", "removeTempPermissions")[0];
+			let tempPermissions = this.removeTempPermissions(true);
+			removeItem.disabled = !tempPermissions.length;
+			if(tempPermissions.length > maxItems)
+				tempPermissions.splice(maxItems - 2, tempPermissions.length - maxItems + 1, "…");
+			let pm = this.pm;
+			removeItem.tooltipText = tempPermissions.map(function(permission) {
+				if(typeof permission == "string")
+					return permission;
+				var action = "???";
+				switch(permission.capability) {
+					case pm.ALLOW_ACTION: action = "allowLabel"; break;
+					case pm.DENY_ACTION:  action = "denyLabel";
+				}
+				return permission.host + ": " + _localize(action).toLowerCase();
+			}).join(", \n");
+		}
+
 		this.updToggleBlockItem();
 
 		return true;
@@ -674,9 +694,10 @@ this.permissions = {
 		else
 			this.addPermission(capability);
 	},
-	removeTempPermissions: function() {
+	removeTempPermissions: function(onlyGet) {
+		var out = onlyGet ? [] : false;
 		if(!this.hasTempPermissions)
-			return;
+			return out;
 		var pm = this.pm;
 		var enumerator = pm.enumerator;
 		while(enumerator.hasMoreElements()) {
@@ -685,9 +706,16 @@ this.permissions = {
 			if(
 				permission.type == this.permissionType
 				&& permission.expireType != pm.EXPIRE_NEVER
-			)
-				pm.remove(permission.host, this.permissionType);
+			) {
+				if(onlyGet)
+					out.push(permission);
+				else {
+					out = true;
+					pm.remove(permission.host, this.permissionType);
+				}
+			}
 		}
+		return out;
 	},
 	getPermission: function() {
 		var host = this.currentHost;
