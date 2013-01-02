@@ -203,7 +203,7 @@ this.bookmarks = {
 	errPrefix: "[Custom Buttons :: Session Bookmarks]: ",
 
 	get openAllLabel() {
-		var sb = this.$("bundle_browser");
+		var sb = this.$("bundle_browser") || this.$("bundle_navigator");
 		if(sb) try {
 			var label = sb.getString("menuOpenAllInTabs.label");
 		}
