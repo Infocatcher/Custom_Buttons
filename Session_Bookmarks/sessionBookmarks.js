@@ -1450,20 +1450,23 @@ this.bookmarks = {
 		)
 			return;
 
-		var trg = e.target;
 		var tab, tabs;
-		if(
-			e.view.top == window
-			&& /(?:^|\s)tabbrowser-tabs?(?:\s|$)/.test(trg.className)
-		) {
-			if(trg.localName == "tabs")
-				tabs = trg;
-			else {
-				tab = trg;
-				tabs = trg.parentNode;
+		if(e.view.top == window) {
+			var trg = e.originalTarget;
+			for(; trg; trg = trg.parentNode) {
+				if(/(?:^|\s)tabbrowser-tabs?(?:\s|$)/.test(trg.className)) {
+					if(trg.localName == "tabs")
+						tabs = trg;
+					else {
+						tab = trg;
+						tabs = trg.parentNode;
+					}
+					break;
+				}
 			}
 		}
 		else if(e.view.top == content) {
+			var trg = e.target;
 			if(trg instanceof HTMLInputElement || trg instanceof HTMLTextAreaElement) try {
 				if(typeof trg.selectionStart == "number")
 					return;
@@ -1473,7 +1476,8 @@ this.bookmarks = {
 			tab = gBrowser.selectedTab;
 			tabs = gBrowser.tabContainer;
 		}
-		else
+
+		if(!tabs)
 			return;
 
 		var ssData = dt.mozGetDataAt(dragNS + "ssData", 0);
