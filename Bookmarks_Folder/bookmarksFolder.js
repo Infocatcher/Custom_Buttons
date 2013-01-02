@@ -106,7 +106,12 @@ this.bookmarks = {
 		mp.setAttribute("placespopup", "true");
 		var placeURI = folder.substr(0, 6) == "place:"
 			? folder
-			: "place:folder=" + folder + "&amp;excludeItems=0&amp;expandQueries=0";
+			: "place:folder=" + folder + "&excludeItems=0&expandQueries=0";
+		placeURI = placeURI
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
+			.replace(/"/g, "&quot;");
 		mp.setAttribute(
 			"onpopupshowing",
 			'if(!this.parentNode._placesView)\
