@@ -4,8 +4,8 @@
 // Bookmarks Folder button for Custom Buttons
 // (code for "initialization" section)
 
-// (c) Infocatcher 2011-2012
-// version 0.1.0pre12 - 2012-11-01
+// (c) Infocatcher 2011-2013
+// version 0.1.0pre13 - 2013-01-02
 
 // Compatibility: Firefox 4.0+, SeaMonkey 2.1+
 
@@ -114,8 +114,7 @@ this.bookmarks = {
 			.replace(/"/g, "&quot;");
 		mp.setAttribute(
 			"onpopupshowing",
-			'if(!this.parentNode._placesView)\
-				this.parentNode._placesMenu = new PlacesMenu(event, "' + placeURI + '");'
+			'this.parentNode.bookmarks.initMenu(event, "' + placeURI + '");'
 		);
 		mp.setAttribute("oncommand", "BookmarksEventHandler.onCommand(event, this.parentNode._placesView);");
 		mp.setAttribute("onclick", "BookmarksEventHandler.onClick(event, this.parentNode._placesView);");
@@ -124,6 +123,14 @@ this.bookmarks = {
 		btn.appendChild(mp);
 
 		this.initialized = true;
+	},
+	initMenu: function(event, placeURI) {
+		var btn = this.button;
+		if("_placesView" in btn)
+			return;
+		btn._placesMenu = new PlacesMenu(event, placeURI);
+		// Add "Open All in Tabs" menuitem
+		PlacesViewBase.prototype._mayAddCommandsItems(btn.firstChild);
 	},
 	destroy: function() {
 		var btn = this.button;
