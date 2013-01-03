@@ -377,8 +377,19 @@ this.permissions = {
 					// See chrome://browser/content/preferences/permissions.js
 					// observe: function (aSubject, aTopic, aData)
 					let win = this.context.wm.getMostRecentWindow("Browser:Permissions");
-					if(win && "gPermissionManager" in win && win.gPermissionManager._type == type)
-						win.gPermissionManager._loadPermissions();
+					if(win && "gPermissionManager" in win && win.gPermissionManager._type == type) {
+						let pm = win.gPermissionManager;
+						let perms = pm._permissions;
+						for(let i = 0, l = perms.length; i < l; ++i) {
+							if(perms[i].host == permission.host) {
+								perms.splice(i, 1);
+								--pm._view._rowCount;
+								pm._tree.treeBoxObject.rowCountChanged(i, -1);
+								pm._tree.treeBoxObject.invalidate();
+								break;
+							}
+						}
+					}
 				}
 			}
 		};
