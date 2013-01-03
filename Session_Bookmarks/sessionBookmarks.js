@@ -905,8 +905,16 @@ this.bookmarks = {
 		try {
 			if(!ssData)
 				throw "empty ssData";
-			if(this.options.reloadSessions && !this.ios.offline)
+			if(this.options.reloadSessions && !this.ios.offline) try {
 				tab.linkedBrowser.addProgressListener(this.progressListener);
+			}
+			catch(e2) {
+				Components.utils.reportError(this.errPrefix + "setTabSession: can't reload session");
+				Components.utils.reportError(e2);
+				setTimeout(function(_this) {
+					tab.linkedBrowser.addProgressListener(_this.progressListener);
+				}, 0, this);
+			}
 			this.ss.setTabState(tab, ssData);
 
 			if(
