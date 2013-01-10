@@ -43,6 +43,9 @@ Add “Edit button in tab…” to custom button's context menu
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Extensions_Developer_Tools/icon.png)&nbsp;[Extensions Developer Tools](Custom_Buttons/blob/master/Extensions_Developer_Tools)
 Some tools for extensions or custom buttons developers
 
+##### [Extensions Installer](Custom_Buttons/blob/master/Extensions_Installer)
+For extensions developers: installs extension from given link
+
 ##### [Open Window](Custom_Buttons/blob/master/Open_Window)
 Open/focus/toggle window demo
 

@@ -1,0 +1,2 @@
+<strong>Extensions Installer</strong> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+<br>For extensions developers: installs extension from given link, useful to test restartless extensions
