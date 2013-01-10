@@ -18,13 +18,10 @@ btn._cb_disabled = true;
 Components.utils.import("resource://gre/modules/Services.jsm");
 var appName = Services.appinfo.name;
 
-var imgConnecting, imgLoading;
+var imgConnecting = "chrome://browser/skin/tabbrowser/connecting.png";
+var imgLoading = "chrome://browser/skin/tabbrowser/loading.png";
 if(appName == "SeaMonkey")
 	imgConnecting = imgLoading = "chrome://communicator/skin/icons/loading.gif";
-else {
-	imgConnecting = "chrome://browser/skin/tabbrowser/connecting.png";
-	imgLoading = "chrome://browser/skin/tabbrowser/loading.png";
-}
 
 var image = btn.image;
 var tip = btn.tooltipText;
