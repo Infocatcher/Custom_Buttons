@@ -5,7 +5,7 @@
 // For developers, useful to test restartless extensions
 
 // (c) Infocatcher 2013
-// version 0.2.0 - 2013-01-11
+// version 0.2.1 - 2013-01-11
 
 var dir = "d:\\my_extension";
 var xpi = dir + "\\my_extension-latest.xpi";
@@ -36,22 +36,23 @@ else {
 	notify("Started…", "Started installation…");
 }
 
+if(make) try {
+	var process = Components.classes["@mozilla.org/process/util;1"]
+		.createInstance(Components.interfaces.nsIProcess);
+	process.init(file(expandVariables(makeExe)));
+	process.runw(true, makeArgs.map(expandVariables), makeArgs.length);
+}
+catch(e) {
+	btn.image = origImg;
+	notify("Error", "Can't make *.xpi!\n" + e);
+	Components.utils.reportError(e);
+	return;
+}
+
 Components.utils.import("resource://gre/modules/AddonManager.jsm");
 AddonManager.getInstallForURL(
 	xpi,
 	function(install) {
-		if(make) try {
-			var process = Components.classes["@mozilla.org/process/util;1"]
-				.createInstance(Components.interfaces.nsIProcess);
-			process.init(file(expandVariables(makeExe)));
-			process.runw(true, makeArgs.map(expandVariables), makeArgs.length);
-		}
-		catch(e) {
-			btn.image = origImg;
-			notify("Error", "Can't make *.xpi!\n" + e);
-			Components.utils.reportError(e);
-			return;
-		}
 		if(isCb)
 			btn.image = imgLoading;
 		install.addListener({
