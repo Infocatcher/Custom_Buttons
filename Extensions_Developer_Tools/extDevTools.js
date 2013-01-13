@@ -1,5 +1,5 @@
 ﻿// http://infocatcher.ucoz.net/js/cb/extDevTools.js
-// http://forum.mozilla-russia.org/viewtopic.php?pid=591696
+// https://forum.mozilla-russia.org/viewtopic.php?id=57296
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Extensions_Developer_Tools
 
 // Extensions Developer Tools button for Custom Buttons
@@ -9,9 +9,9 @@
 // version 0.1.0pre20 - 2012-12-11
 
 // Includes Attributes Inspector
-// http://infocatcher.ucoz.net/js/cb/attrsInspector.js
-// http://forum.mozilla-russia.org/viewtopic.php?pid=577661
-// https://github.com/Infocatcher/Custom_Buttons/tree/master/Attributes_Inspector
+//   http://infocatcher.ucoz.net/js/cb/attrsInspector.js
+//   https://forum.mozilla-russia.org/viewtopic.php?id=56041
+//   https://github.com/Infocatcher/Custom_Buttons/tree/master/Attributes_Inspector
 
 // Icon: http://www.iconfinder.com/icondetails/22560/16/gear_preferences_settings_tool_tools_icon
 

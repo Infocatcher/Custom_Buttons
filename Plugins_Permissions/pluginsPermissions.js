@@ -1,5 +1,5 @@
 ﻿// http://infocatcher.ucoz.net/js/cb/pluginsPermissions.js
-// http://forum.mozilla-russia.org/viewtopic.php?id=57303
+// https://forum.mozilla-russia.org/viewtopic.php?id=57303
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Plugins_Permissions
 
 // Plugins Permissions button for Custom Buttons

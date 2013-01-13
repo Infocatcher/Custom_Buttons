@@ -1,5 +1,5 @@
 ﻿// http://infocatcher.ucoz.net/js/cb/cookiesPermissions.js
-// http://forum.mozilla-russia.org/viewtopic.php?pid=580201
+// https://forum.mozilla-russia.org/viewtopic.php?id=56039
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Cookies_Permissions
 
 // Cookies Permissions button for Custom Buttons

@@ -1,5 +1,5 @@
 ﻿// http://infocatcher.ucoz.net/js/cb/undoCloseTabs.js
-// http://forum.mozilla-russia.org/viewtopic.php?pid=580309
+// https://forum.mozilla-russia.org/viewtopic.php?id=56267
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Undo_Close_Tabs
 
 // Undo Close Tabs button for Custom Buttons

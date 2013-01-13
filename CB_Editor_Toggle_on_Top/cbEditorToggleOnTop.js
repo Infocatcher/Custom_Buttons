@@ -1,4 +1,4 @@
-﻿// http://forum.mozilla-russia.org/viewtopic.php?id=56040
+﻿// https://forum.mozilla-russia.org/viewtopic.php?id=56040
 // http://infocatcher.ucoz.net/js/cb/cbEditorToggleOnTop.js
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/CB_Editor_Toggle_on_Top
 
