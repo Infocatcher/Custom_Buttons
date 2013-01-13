@@ -6,7 +6,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011-2012
-// version 0.1.0pre20 - 2012-12-11
+// version 0.1.0 - 2012-12-20
 
 // Includes Attributes Inspector
 //   http://infocatcher.ucoz.net/js/cb/attrsInspector.js
@@ -971,11 +971,11 @@ function parseXULFromString(xul) {
 this.attrsInspector = function(event) {
 //=== Attributes Inspector begin
 // http://infocatcher.ucoz.net/js/cb/attrsInspector.js
-// http://forum.mozilla-russia.org/viewtopic.php?pid=577661
+// https://forum.mozilla-russia.org/viewtopic.php?id=56041
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Attributes_Inspector
 
 // (c) Infocatcher 2010-2012
-// version 0.6.0pre12 - 2012-12-05
+// version 0.6.0 - 2012-12-20
 
 //===================
 // Attributes Inspector button for Custom Buttons
@@ -990,6 +990,11 @@ this.attrsInspector = function(event) {
 //   Escape             - cancel or disable popup locker
 //   Ctrl+Up, Ctrl+Down - go to parent/child node
 //   Ctrl+Shift+C       - copy tooltip contents
+
+// For more developer tools see Extensions Developer Tools button:
+//   http://infocatcher.ucoz.net/js/cb/extDevTools.js
+//   https://forum.mozilla-russia.org/viewtopic.php?id=57296
+//   https://github.com/Infocatcher/Custom_Buttons/tree/master/Extensions_Developer_Tools
 
 // Icon: http://www.iconsearch.ru/detailed/278/2/
 //===================
