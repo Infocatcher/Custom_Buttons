@@ -19,6 +19,11 @@
 //   Ctrl+Up, Ctrl+Down - go to parent/child node
 //   Ctrl+Shift+C       - copy tooltip contents
 
+// For more developer tools see Extensions Developer Tools button:
+//   http://infocatcher.ucoz.net/js/cb/extDevTools.js
+//   https://forum.mozilla-russia.org/viewtopic.php?id=57296
+//   https://github.com/Infocatcher/Custom_Buttons/tree/master/Extensions_Developer_Tools
+
 // Icon: http://www.iconsearch.ru/detailed/278/2/
 //===================
 
