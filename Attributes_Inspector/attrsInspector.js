@@ -965,7 +965,7 @@ function init() {
 			var tt = this.context.tt;
 			var text = Array.map(tt.childNodes, function(node) {
 				return node.textContent;
-			}).join(this.lineBreak);
+			}).join("\n");
 			var _tt = tt.cloneNode(true);
 			Array.forEach(_tt.getElementsByAttribute("class", "attrsInspector-value"), function(elt) {
 				elt.style.whiteSpace = "pre";
@@ -974,10 +974,10 @@ function init() {
 				_tt.firstChild.style.whiteSpace = "pre";
 			var html = Array.map(_tt.childNodes, function(node) {
 				return new XMLSerializer().serializeToString(node);
-			}).join(this.lineBreak);
+			}).join("\n");
 			this.setClipboardData({
-				"text/unicode": text,
-				"text/html":    html
+				"text/unicode": text.replace(/\r\n?|\n/g, this.lineBreak),
+				"text/html":    html.replace(/\r\n?|\n/g, this.lineBreak)
 			}, sourceWindow);
 
 			if(!/(?:^|\s)attrsInspector-copied(?:\s|$)/.test(tt.className))
