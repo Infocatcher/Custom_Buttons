@@ -499,10 +499,13 @@ function init() {
 			return e.button == 1 && noMdf && !e.ctrlKey // Middle-click
 			    || e.button == 0 && noMdf &&  e.ctrlKey; // Ctrl + left-click
 		},
-		get fxVersion() {
-			var appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
+		get appInfo() {
+			delete this.appInfo;
+			return this.appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
 				.getService(Components.interfaces.nsIXULAppInfo);
-			var pv = appInfo.platformVersion;
+		},
+		get fxVersion() {
+			var pv = this.appInfo.platformVersion;
 			var vc = Components.classes["@mozilla.org/xpcom/version-comparator;1"]
 				.getService(Components.interfaces.nsIVersionComparator);
 			var v;
@@ -962,7 +965,7 @@ function init() {
 			var tt = this.context.tt;
 			var text = Array.map(tt.childNodes, function(node) {
 				return node.textContent;
-			}).join("\n");
+			}).join(this.lineBreak);
 			var _tt = tt.cloneNode(true);
 			Array.forEach(_tt.getElementsByAttribute("class", "attrsInspector-value"), function(elt) {
 				elt.style.whiteSpace = "pre";
@@ -971,7 +974,7 @@ function init() {
 				_tt.firstChild.style.whiteSpace = "pre";
 			var html = Array.map(_tt.childNodes, function(node) {
 				return new XMLSerializer().serializeToString(node);
-			}).join("\n");
+			}).join(this.lineBreak);
 			this.setClipboardData({
 				"text/unicode": text,
 				"text/html":    html
@@ -988,6 +991,10 @@ function init() {
 				//tt.style.opacity = "";
 				tt.style.color = "";
 			}, this, 150);
+		},
+		get lineBreak() {
+			delete this.lineBreak;
+			return this.lineBreak = this.appInfo.OS == "WINNT" ? "\r\n" : "\n";
 		},
 		stopSingleEvent: function(target, type) {
 			target.addEventListener(type, {
