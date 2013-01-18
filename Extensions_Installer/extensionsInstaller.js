@@ -5,7 +5,7 @@
 // For developers, useful to test restartless extensions
 
 // (c) Infocatcher 2013
-// version 0.2.1 - 2013-01-11
+// version 0.2.2 - 2013-01-18
 
 var dir = "d:\\my_extension";
 var xpi = dir + "\\my_extension-latest.xpi";
