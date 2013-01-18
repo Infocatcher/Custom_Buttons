@@ -19,10 +19,8 @@ var make = typeof event == "object" && event instanceof Event
 	? !event.ctrlKey && !event.shiftKey && !event.altKey && !event.metaKey
 	: true;
 
-Components.utils.import("resource://gre/modules/Services.jsm");
-xpi = Services.io.newFileURI(file(xpi)).spec;
-
 var isCb = this instanceof XULElement;
+Components.utils.import("resource://gre/modules/Services.jsm");
 if(isCb) {
 	var btn = this;
 	var imgConnecting = "chrome://browser/skin/tabbrowser/connecting.png";
@@ -40,6 +38,14 @@ if(isCb) {
 else {
 	notify("Started…", "Started installation…");
 }
+
+var xpiFile = file(xpi);
+if(!xpiFile.exists()) {
+	isCb && restoreBtn();
+	notify("Error", "File not found:\n" + xpi);
+	return;
+}
+xpi = Services.io.newFileURI(xpiFile).spec;
 
 if(make) try {
 	var process = Components.classes["@mozilla.org/process/util;1"]
