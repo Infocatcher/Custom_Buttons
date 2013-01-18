@@ -43,7 +43,8 @@ if(make) try {
 	process.runw(true, makeArgs.map(expandVariables), makeArgs.length);
 }
 catch(e) {
-	btn.image = origImg;
+	if(isCb)
+		btn.image = origImg;
 	notify("Error", "Can't make *.xpi!\n" + e);
 	Components.utils.reportError(e);
 	return;
