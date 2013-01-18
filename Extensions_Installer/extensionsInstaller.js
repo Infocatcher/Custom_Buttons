@@ -31,6 +31,11 @@ if(isCb) {
 		imgConnecting = imgLoading = "chrome://communicator/skin/icons/loading.gif";
 	var origImg = btn.image;
 	btn.image = imgConnecting;
+	btn.disabled = true;
+	var restoreBtn = function() {
+		btn.image = origImg;
+		btn.disabled = false;
+	};
 }
 else {
 	notify("Started…", "Started installation…");
@@ -43,8 +48,7 @@ if(make) try {
 	process.runw(true, makeArgs.map(expandVariables), makeArgs.length);
 }
 catch(e) {
-	if(isCb)
-		btn.image = origImg;
+	isCb && restoreBtn();
 	notify("Error", "Can't make *.xpi!\n" + e);
 	Components.utils.reportError(e);
 	return;
@@ -59,8 +63,7 @@ AddonManager.getInstallForURL(
 		install.addListener({
 			onInstallEnded: function(install, addon) {
 				install.removeListener(this);
-				if(isCb)
-					btn.image = origImg;
+				isCb && restoreBtn();
 				notify("Ok!", "Successfully installed:\n" + xpi.match(/[^\\\/]*$/)[0]);
 				if(addon.pendingOperations)
 					Application.restart();
@@ -69,8 +72,7 @@ AddonManager.getInstallForURL(
 				install.removeListener(this);
 				var err = "Installation failed\n" + xpi;
 				Components.utils.reportError(err);
-				if(isCb)
-					btn.image = origImg;
+				isCb && restoreBtn();
 				notify("Error", err);
 			}
 		});
