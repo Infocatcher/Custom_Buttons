@@ -280,7 +280,9 @@ this.undoCloseTabsList = {
 		switch(e.type) {
 			case "TabClose":
 			case "SSTabRestoring":
-				this.updUI();
+				setTimeout(function(_this) {
+					_this.updUI();
+				}, 0, this);
 			break;
 			case "DOMMenuItemActive":
 			case "DOMMenuItemInactive":
