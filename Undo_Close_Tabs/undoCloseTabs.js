@@ -5,8 +5,8 @@
 // Undo Close Tabs button for Custom Buttons
 // (code for "initialization" section)
 
-// (c) Infocatcher 2009-2012
-// version 0.3.0pre13 - 2012-09-04
+// (c) Infocatcher 2009-2013
+// version 0.3.0 - 2013-01-23
 
 var options = {
 	menuTemplate: [
