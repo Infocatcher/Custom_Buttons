@@ -1,2 +1,2 @@
-![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Edit_Custom_Button_in_Tab/icon.png)&nbsp;<strong>Edit Custom Button in Tab</strong> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Edit_Custom_Button_in_Tab/icon.png)&nbsp;<a href="http://infocatcher.github.com/Custom_Buttons/install/editCustomButtonInTab.html"><strong>Edit Custom Button in Tab</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
 <br>Add “Edit button in tab…” to custom button's context menu

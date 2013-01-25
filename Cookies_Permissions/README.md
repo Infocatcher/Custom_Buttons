@@ -1,4 +1,4 @@
-![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Cookies_Permissions/icons/icon.png)&nbsp;<strong>Cookies Permissions</strong> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Cookies_Permissions/icons/icon.png)&nbsp;<a href="http://infocatcher.github.com/Custom_Buttons/install/cookiesPermissions.html"><strong>Cookies Permissions</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
 <br>Menage cookies permissions: block, allow for session or allow.
 <br>Also shows permissions for current site and has some cookies-related features.
 

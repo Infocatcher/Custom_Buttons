@@ -1,2 +1,2 @@
-![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Title_Bar/icon.png)&nbsp;<strong>Title Bar</strong> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Title_Bar/icon.png)&nbsp;<a href="http://infocatcher.github.com/Custom_Buttons/install/titleBar.html"><strong>Title Bar</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
 <br>Show window title (if original title was hidden by some reasons)

@@ -1,2 +1,2 @@
-![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Undo_Close_Tabs/icons/icon.png)&nbsp;<strong>Undo Close Tabs</strong> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Undo_Close_Tabs/icons/icon.png)&nbsp;<a href="http://infocatcher.github.com/Custom_Buttons/install/undoCloseTabs.html"><strong>Undo Close Tabs</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
 <br>Allows restore recently closed tabs and windows

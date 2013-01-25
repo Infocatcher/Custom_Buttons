@@ -1,3 +1,3 @@
-![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Check_for_Addons_Updates/icon.png)&nbsp;<strong>Check for Addons Updates</strong> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Check_for_Addons_Updates/icon.png)&nbsp;<a href="http://infocatcher.github.com/Custom_Buttons/install/checkForAddonsUpdates.html"><strong>Check for Addons Updates</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
 <br>Button just open hidden tab with about:addons and trigger built-in “Check for Updates” function.
 <br>And show tab, if found updates.
