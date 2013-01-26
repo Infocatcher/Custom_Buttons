@@ -1,4 +1,5 @@
 ﻿// http://infocatcher.ucoz.net/js/cb/bookmarksFolder.js
+// https://forum.mozilla-russia.org/viewtopic.php?id=57872
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Bookmarks_Folder
 
 // Bookmarks Folder button for Custom Buttons

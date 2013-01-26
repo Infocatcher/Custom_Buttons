@@ -1,4 +1,5 @@
 ﻿// http://infocatcher.ucoz.net/js/cb/sessionBookmarks.js
+// https://forum.mozilla-russia.org/viewtopic.php?id=57871
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Session_Bookmarks
 
 // Session Bookmarks button for Custom Buttons
