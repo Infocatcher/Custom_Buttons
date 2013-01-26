@@ -3,6 +3,7 @@
 
 // Toggle Restartless Add-ons button for Custom Buttons
 // (code for "initialization" section)
+// Also the code can be used from main window context (as Mouse Gestures code, for example)
 
 // (c) Infocatcher 2013
 // version 0.1.0b1 - 2013-01-27
@@ -13,9 +14,6 @@ var mp = document.createElement("menupopup");
 mp.setAttribute("onpopupshowing", "this.updateMenu();");
 mp.setAttribute("oncommand", "this.toggleAddon(event.target);");
 mp.setAttribute("onpopuphidden", "this.destroyMenu();");
-
-this.type = "menu";
-this.appendChild(mp);
 
 var cleanupTimer = 0;
 mp.updateMenu = function() {
@@ -69,6 +67,42 @@ mp.destroyMenu = function() {
 };
 function setDisabled(mi, disabled) {
 	mi.style.opacity = disabled ? "0.5" : "";
+}
+
+if(
+	this instanceof XULElement // Custom Buttons
+	&& typeof event == "object"
+	&& !("type" in event) // Initialization
+) {
+	this.type = "menu";
+	this.appendChild(mp);
+}
+else { // Mouse gestures or something other...
+	let e;
+	if(typeof event == "object" && event instanceof Event && "screenX" in event) // FireGestures
+		e = event;
+	else if("mgGestureState" in window && "endEvent" in mgGestureState) // Mouse Gestures Redox
+		e = mgGestureState.endEvent;
+	else {
+		let anchor = window.gBrowser && gBrowser.selectedBrowser
+			|| document.documentElement;
+		if("boxObject" in anchor) {
+			let bo = anchor.boxObject;
+			e = {
+				screenX: bo.screenX,
+				screenY: bo.screenY
+			};
+		}
+	}
+	if(!e || !("screenX" in e))
+		throw new Error("[Toggle Restartless Add-ons]: Can't get event object");
+	document.documentElement.appendChild(mp);
+	mp.addEventListener("popuphidden", function destroy(e) {
+		mp.removeEventListener(e.type, destroy, false);
+		mp.destroyMenu();
+		mp.parentNode.removeChild(mp);
+	}, false);
+	mp.openPopupAtScreen(e.screenX, e.screenY);
 }
 
 function getRestartlessAddons(addonTypes, callback, context) {
