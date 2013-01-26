@@ -9,6 +9,10 @@
 // version 0.1.0b1 - 2013-01-27
 
 const addonTypes = ["extension", "plugin"];
+var showVersions = 0;
+// 0 - don't show versions
+// 1 - show after name: "Addon Name 1.2"
+// 2 - show as "acceltext" (in place for hotkey text)
 
 var mp = document.createElement("menupopup");
 mp.setAttribute("onpopupshowing", "this.updateMenu();");
@@ -39,7 +43,12 @@ mp.updateMenu = function() {
 				|| "";
 			var mi = document.createElement("menuitem");
 			mi.className = "menuitem-iconic";
-			mi.setAttribute("label", addon.name);
+			var label = addon.name;
+			if(showVersions == 1)
+				label += " " + addon.version;
+			else if(showVersions == 2)
+				mi.setAttribute("acceltext", addon.version);
+			mi.setAttribute("label", label);
 			mi.setAttribute("image", icon);
 			var desc = addon.description;
 			desc && mi.setAttribute("tooltiptext", desc);
