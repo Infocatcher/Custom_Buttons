@@ -695,6 +695,9 @@ this.bookmarks = {
 		if("extData" in data) {
 			let extData = data.extData;
 			if(extData && typeof extData == "object") {
+				// Built-in Panorama
+				delete extData["tabview-tab"];
+
 				// Tree Style Tab https://addons.mozilla.org/firefox/addon/tree-style-tab/
 				delete extData["treestyletab-id"];
 				delete extData["treestyletab-children"];
