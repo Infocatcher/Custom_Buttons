@@ -45,6 +45,10 @@ this.onclick = function(e) {
 	else if(e.button == 1 || e.button == 0 && (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey))
 		this.bookmarks.changeFolder();
 };
+this.onmousedown = function(e) {
+	if(e.target == this && e.button == 0 && (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey))
+		e.preventDefault();
+};
 this.onmouseover = function(e) {
 	if(e.target != this)
 		return;
