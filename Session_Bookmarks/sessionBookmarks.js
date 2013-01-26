@@ -1500,14 +1500,14 @@ this.bookmarks = {
 			clearTimeout(timer);
 			var tab = e.target;
 			_this.setTabSession(tab, ssData, uri);
-			LOG(e.type + " => setTabSession()");
+			//LOG(e.type + " => setTabSession()");
 		}
 		tabs.addEventListener("TabOpen", tabOpen, true);
 		var timer = setTimeout(function() {
 			tabs.removeEventListener("TabOpen", tabOpen, true);
 			if(tab) {
 				_this.setTabSession(tab, ssData, uri, true);
-				LOG("setTimeout => to TabOpen => setTabSession() for current tab");
+				//LOG("setTimeout => to TabOpen => setTabSession() for current tab");
 			}
 		}, 0);
 	},
