@@ -74,5 +74,8 @@ Show window title (if original title was hidden by some reasons)
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Toggle_Flash/icon.png)&nbsp;[Toggle Flash](Custom_Buttons/tree/master/Toggle_Flash)
 Toggle Shockwave Flash plugin
 
+##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Toggle_Restartless_Add-ons/icon.png)&nbsp;[Toggle Restartless Add-ons](Custom_Buttons/tree/master/Toggle_Restartless_Add-ons)
+Drop-down menu to toggle restartless add-ons
+
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Undo_Close_Tabs/icons/icon.png)&nbsp;[Undo Close Tabs](Custom_Buttons/tree/master/Undo_Close_Tabs)
 Allows restore recently closed tabs and windows
