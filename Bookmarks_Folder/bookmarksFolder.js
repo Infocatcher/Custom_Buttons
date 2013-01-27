@@ -6,7 +6,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011-2013
-// version 0.1.0 - 2013-01-26
+// version 0.1.1pre - 2013-01-27
 
 // Compatibility: Firefox 4.0+, SeaMonkey 2.1+
 
