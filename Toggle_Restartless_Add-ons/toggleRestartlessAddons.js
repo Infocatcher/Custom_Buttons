@@ -17,6 +17,8 @@ var showVersions = 0;
 var mp = document.createElement("menupopup");
 mp.setAttribute("onpopupshowing", "this.updateMenu();");
 mp.setAttribute("oncommand", "this.toggleAddon(event.target);");
+mp.setAttribute("oncontextmenu", "return false;");
+mp.setAttribute("onclick", "if(event.button == 2) this.openOptions(event.target);");
 mp.setAttribute("onpopuphidden", "this.destroyMenu();");
 
 var cleanupTimer = 0;
@@ -67,6 +69,10 @@ mp.toggleAddon = function(mi) {
 	var dis = !addon.userDisabled;
 	addon.userDisabled = dis;
 	setDisabled(mi, dis);
+};
+mp.openOptions = function(mi) {
+	if("_cbAddon" in mi && openAddonOptions(mi._cbAddon))
+		closeMenus(mi);
 };
 mp.destroyMenu = function() {
 	clearTimeout(cleanupTimer);
@@ -148,4 +154,37 @@ function getRestartlessAddons(addonTypes, callback, context) {
 		});
 		callback.call(context, restartless);
 	});
+}
+function openAddonOptions(addon) {
+	// Based on code from chrome://mozapps/content/extensions/extensions.js
+	// Firefox 21.0a1 (2013-01-27)
+	Components.utils.import("resource://gre/modules/Services.jsm");
+	var optionsURL = addon.optionsURL;
+	if(!addon.isActive || !optionsURL)
+		return false;
+	if(addon.type == "plugin") // No options for now!
+		return false;
+	if(addon.optionsType == AddonManager.OPTIONS_TYPE_INLINE) {
+		var openAddonsMgr = window.BrowserOpenAddonsMgr // Firefox
+			|| window.openAddonsMgr // Thunderbird
+			|| window.toEM; // SeaMonkey
+		var scrollToPreferences = parseFloat(Services.appinfo.platformVersion) >= 12 ? "/preferences" : "";
+		openAddonsMgr("addons://detail/" + encodeURIComponent(addon.id) + scrollToPreferences);
+	}
+	else if(addon.optionsType == AddonManager.OPTIONS_TYPE_TAB && "switchToTabHavingURI" in window) {
+		switchToTabHavingURI(optionsURL, true);
+	}
+	else {
+		var windows = Services.wm.getEnumerator(null);
+		while(windows.hasMoreElements()) {
+			var win = windows.getNext();
+			if(win.document.documentURI == optionsURL) {
+				win.focus();
+				return true;
+			}
+		}
+		// Note: original code checks browser.preferences.instantApply and may open modal windows
+		window.openDialog(optionsURL, "", "chrome,titlebar,toolbar,centerscreen,dialog=no");
+	}
+	return true;
 }
