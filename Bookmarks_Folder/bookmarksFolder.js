@@ -319,6 +319,12 @@ this.bookmarks = {
 			"chrome,all,resizable,centerscreen,modal",
 			folderId, rootFolder, callback, this
 		);
+		if(folder && options.useFolderTitle) setTimeout(function(_this) {
+			var mp = _this.button.getElementsByTagName("menupopup")[0];
+			var evt = document.createEvent("Event");
+			evt.initEvent("popupshowing", true, true);
+			mp.dispatchEvent(evt);
+		}, 100, this);
 		return folder;
 	},
 	changeFolder: function() {
