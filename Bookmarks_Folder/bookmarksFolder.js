@@ -16,7 +16,10 @@
 // preference to any place: URI https://developer.mozilla.org/en-US/docs/Places_query_URIs
 // (and press OK in button editor or reopen window or restart browser)
 
-var hideDropMarker = true;
+var options = {
+	hideDropMarker: true,
+	useFolderTitle: true
+};
 
 function _localize(s, key) {
 	var strings = {
@@ -84,6 +87,16 @@ this.bookmarks = {
 	set folder(val) {
 		cbu.setPrefs(this.pref, String(val));
 	},
+	get titlePref() {
+		delete this.titlePref;
+		return this.titlePref = "extensions.custombuttons.button" + this.button.id.match(/\d*$/)[0] + ".bookmarkFolderTitle";
+	},
+	get folderTitle() {
+		return cbu.getPrefs(this.titlePref) || "";
+	},
+	set folderTitle(val) {
+		cbu.setPrefs(this.titlePref, val);
+	},
 	get wm() {
 		delete this.wm;
 		return this.wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
@@ -126,6 +139,9 @@ this.bookmarks = {
 		mp.setAttribute("tooltip", "bhTooltip");
 		mp.setAttribute("popupsinherittooltip", "true");
 		btn.appendChild(mp);
+		options.useFolderTitle && setTimeout(function(_this) {
+			_this.setButtonTitle();
+		}, 0, this);
 
 		this.initialized = true;
 	},
@@ -134,6 +150,8 @@ this.bookmarks = {
 		if("_placesView" in btn)
 			return;
 		btn._placesMenu = new PlacesMenu(event, placeURI);
+		if(options.useFolderTitle)
+			this.setButtonTitle(btn._placesView._resultNode && btn._placesView._resultNode.title);
 		// Add "Open All in Tabs" menuitem
 		PlacesViewBase.prototype._mayAddCommandsItems(btn.firstChild);
 	},
@@ -149,6 +167,15 @@ this.bookmarks = {
 		}
 		delete btn._placesView;
 		delete btn._placesMenu;
+	},
+	setButtonTitle: function(title) {
+		var btn = this.button;
+		if(title)
+			this.folderTitle = title;
+		else
+			title = this.folderTitle;
+		if(title)
+			btn.tooltipText = btn.label = title;
 	},
 	initWithFolder: function(folder) {
 		this.destroy();
@@ -352,7 +379,7 @@ this.bookmarks = {
 
 this.type = "menu";
 this.orient = "horizontal";
-if(hideDropMarker) {
+if(options.hideDropMarker) {
 	let btn = this;
 	let doc = btn.ownerDocument;
 	let stopTime = Date.now() + 500;
