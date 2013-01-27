@@ -30,7 +30,7 @@ function _localize(s, key) {
 			ru: "Корневая папка"
 		}
 	};
-	var locale = (cbu.getPrefs("general.useragent.locale") || "en").match(/^[a-z]*/)[0];
+	var locale = Application.prefs.getValue("general.useragent.locale", "en").match(/^[a-z]*/)[0];
 	_localize = !locale || locale == "en"
 		? function(s) {
 			return s;
@@ -82,20 +82,20 @@ this.bookmarks = {
 		return this.pref = "extensions.custombuttons.button" + this.button.id.match(/\d*$/)[0] + ".bookmarkFolder";
 	},
 	get folder() {
-		return cbu.getPrefs(this.pref) || "";
+		return Application.prefs.getValue(this.pref, "");
 	},
 	set folder(val) {
-		cbu.setPrefs(this.pref, String(val));
+		Application.prefs.setValue(this.pref, String(val));
 	},
 	get titlePref() {
 		delete this.titlePref;
 		return this.titlePref = "extensions.custombuttons.button" + this.button.id.match(/\d*$/)[0] + ".bookmarkFolderTitle";
 	},
 	get folderTitle() {
-		return cbu.getPrefs(this.titlePref) || "";
+		return Application.prefs.getValue(this.titlePref, "");
 	},
 	set folderTitle(val) {
-		cbu.setPrefs(this.titlePref, val);
+		Application.prefs.setValue(this.titlePref, val);
 	},
 	get wm() {
 		delete this.wm;
