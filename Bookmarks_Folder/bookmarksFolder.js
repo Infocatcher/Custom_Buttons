@@ -319,12 +319,13 @@ this.bookmarks = {
 			"chrome,all,resizable,centerscreen,modal",
 			folderId, rootFolder, callback, this
 		);
-		if(folder && options.useFolderTitle) setTimeout(function(_this) {
-			var mp = _this.button.getElementsByTagName("menupopup")[0];
-			var evt = document.createEvent("Event");
-			evt.initEvent("popupshowing", true, true);
-			mp.dispatchEvent(evt);
-		}, 100, this);
+		if(folder && options.useFolderTitle) setTimeout(function(btn) {
+			var mp = btn.firstChild;
+			mp.collapsed = true;
+			btn.open = true;
+			btn.open = false;
+			mp.collapsed = false;
+		}, 100, this.button);
 		return folder;
 	},
 	changeFolder: function() {
