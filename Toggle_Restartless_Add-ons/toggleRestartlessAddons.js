@@ -86,6 +86,29 @@ if(
 	this.type = "menu";
 	this.orient = "horizontal";
 	this.appendChild(mp);
+
+	this.onmouseover = function(e) {
+		if(e.target != this)
+			return;
+		Array.some(
+			this.parentNode.getElementsByTagName("*"),
+			function(node) {
+				if(
+					node != this
+					&& node.namespaceURI == xulns
+					&& node.boxObject
+					&& node.boxObject instanceof Components.interfaces.nsIMenuBoxObject
+					&& node.open
+				) {
+					node.open = false;
+					this.open = true;
+					return true;
+				}
+				return false;
+			},
+			this
+		);
+	};
 }
 else { // Mouse gestures or something other...
 	let e;
