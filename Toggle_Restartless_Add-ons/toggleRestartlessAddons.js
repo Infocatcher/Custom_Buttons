@@ -84,6 +84,7 @@ if(
 	&& !("type" in event) // Initialization
 ) {
 	this.type = "menu";
+	this.orient = "horizontal";
 	this.appendChild(mp);
 }
 else { // Mouse gestures or something other...
