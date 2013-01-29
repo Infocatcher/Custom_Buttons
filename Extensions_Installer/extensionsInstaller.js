@@ -19,6 +19,16 @@ var make = typeof event == "object" && event instanceof Event
 	? !event.ctrlKey && !event.shiftKey && !event.altKey && !event.metaKey
 	: true;
 
+var lockKey = "__extensionsInstaller_" + xpi;
+if(lockKey in window)
+	return;
+window[lockKey] = true;
+function unlock() {
+	setTimeout(function() {
+		delete window[lockKey];
+	}, 300);
+}
+
 var isCb = this instanceof XULElement;
 Components.utils.import("resource://gre/modules/Services.jsm");
 if(isCb) {
@@ -29,19 +39,19 @@ if(isCb) {
 		imgConnecting = imgLoading = "chrome://communicator/skin/icons/loading.gif";
 	var origImg = btn.image;
 	btn.image = imgConnecting;
-	btn.disabled = true;
-	var restoreBtn = function() {
+	var restore = function() {
 		btn.image = origImg;
-		btn.disabled = false;
+		unlock();
 	};
 }
 else {
+	var restore = unlock;
 	notify("Started…", "Started installation…");
 }
 
 var xpiFile = file(xpi);
 if(!xpiFile.exists()) {
-	isCb && restoreBtn();
+	restore();
 	notify("Error", "File not found:\n" + xpi);
 	return;
 }
@@ -54,7 +64,7 @@ if(make) try {
 	process.runw(true, makeArgs.map(expandVariables), makeArgs.length);
 }
 catch(e) {
-	isCb && restoreBtn();
+	restore();
 	notify("Error", "Can't make *.xpi!\n" + e);
 	Components.utils.reportError(e);
 	return;
@@ -69,7 +79,7 @@ AddonManager.getInstallForURL(
 		install.addListener({
 			onInstallEnded: function(install, addon) {
 				install.removeListener(this);
-				isCb && restoreBtn();
+				restore();
 				notify("Ok!", "Successfully installed:\n" + xpi.match(/[^\\\/]*$/)[0]);
 				if(addon.pendingOperations)
 					Application.restart();
@@ -78,7 +88,7 @@ AddonManager.getInstallForURL(
 				install.removeListener(this);
 				var err = "Installation failed\n" + xpi;
 				Components.utils.reportError(err);
-				isCb && restoreBtn();
+				restore();
 				notify("Error", err);
 			}
 		});
