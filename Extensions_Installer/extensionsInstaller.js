@@ -5,7 +5,7 @@
 // For developers, useful to test restartless extensions
 
 // (c) Infocatcher 2013
-// version 0.2.3 - 2013-01-29
+// version 0.2.3.1 - 2013-01-29
 
 var dir = "d:\\my_extension";
 var xpi = dir + "\\my_extension-latest.xpi";
@@ -67,6 +67,10 @@ if(make) try {
 catch(e) {
 	restore();
 	notify("Error", "Can't make *.xpi!\n" + e);
+	Components.utils.reportError(
+		"[Extensions Installer] Can't make *.xpi!\nCommand line:\n"
+		+ expandVariables(makeExe) + "\n" + makeArgs.map(expandVariables).join("\n")
+	);
 	Components.utils.reportError(e);
 	return;
 }
