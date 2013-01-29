@@ -24,6 +24,7 @@ mp.setAttribute("onpopuphidden", "this.destroyMenu();");
 var cleanupTimer = 0;
 mp.updateMenu = function() {
 	clearTimeout(cleanupTimer);
+	addStyle();
 	getRestartlessAddons(addonTypes, function(addons) {
 		var df = document.createDocumentFragment();
 		var prevType;
@@ -83,13 +84,17 @@ mp.handleEvent = function(e) {
 	}
 };
 mp.destroyMenu = function() {
+	removeStyle();
 	clearTimeout(cleanupTimer);
 	cleanupTimer = setTimeout(function() {
 		mp.textContent = "";
 	}, 5000);
 };
 function setDisabled(mi, disabled) {
-	mi.style.opacity = disabled ? "0.5" : "";
+	if(disabled)
+		mi.classList.add("toggleRestartlessAddons-disabled");
+	else
+		mi.classList.remove("toggleRestartlessAddons-disabled");
 }
 
 if(
@@ -198,4 +203,32 @@ function openAddonPage(addon, scrollToPreferences) {
 			? "/preferences"
 			: "";
 	openAddonsMgr("addons://detail/" + encodeURIComponent(addon.id) + scrollToPreferences);
+}
+
+function addStyle() {
+	if(addStyle.hasOwnProperty("_style"))
+		return;
+	var style = '\
+		.toggleRestartlessAddons-disabled > .menu-iconic-left {\n\
+			opacity: 0.4;\n\
+		}\n\
+		.toggleRestartlessAddons-disabled > .menu-iconic-text,\n\
+		.toggleRestartlessAddons-disabled > .menu-accel-container {\n\
+			opacity: 0.5;\n\
+		}';
+	addStyle._style = document.insertBefore(
+		document.createProcessingInstruction(
+			"xml-stylesheet",
+			'href="' + "data:text/css,"
+				+ encodeURIComponent(style) + '" type="text/css"'
+		),
+		document.documentElement
+	);
+}
+function removeStyle() {
+	if(!addStyle.hasOwnProperty("_style"))
+		return;
+	var s = addStyle._style;
+	s.parentNode.removeChild(s);
+	delete addStyle._style;
 }
