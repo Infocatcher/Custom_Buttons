@@ -6,7 +6,7 @@
 // Also the code can be used from main window context (as Mouse Gestures code, for example)
 
 // (c) Infocatcher 2013
-// version 0.1.0b3 - 2013-01-28
+// version 0.1.0b4 - 2013-01-29
 
 const addonTypes = ["extension", "plugin"];
 var showVersions = 0;
