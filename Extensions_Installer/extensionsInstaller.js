@@ -5,7 +5,7 @@
 // For developers, useful to test restartless extensions
 
 // (c) Infocatcher 2013
-// version 0.2.2 - 2013-01-18
+// version 0.2.3 - 2013-01-29
 
 var dir = "d:\\my_extension";
 var xpi = dir + "\\my_extension-latest.xpi";
@@ -62,6 +62,7 @@ if(make) try {
 		.createInstance(Components.interfaces.nsIProcess);
 	process.init(file(expandVariables(makeExe)));
 	process.runw(true, makeArgs.map(expandVariables), makeArgs.length);
+	setTimeout(window.focus, 0); // Strange things happens...
 }
 catch(e) {
 	restore();
