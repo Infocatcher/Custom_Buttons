@@ -28,7 +28,7 @@ mp.updateMenu = function() {
 		var df = document.createDocumentFragment();
 		var prevType;
 		function key(addon) {
-			return addonTypes.indexOf(addon.type) + "\n" + addon.name;
+			return addonTypes.indexOf(addon.type) + "\n" + addon.name.toLowerCase();
 		}
 		addons.sort(function(a, b) {
 			var ka = key(a);
