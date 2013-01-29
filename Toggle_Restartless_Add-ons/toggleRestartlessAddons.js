@@ -75,8 +75,8 @@ mp.handleEvent = function(e) {
 		setDisabled(mi, dis);
 	}
 	else if(e.type == "command" && hasModifier || e.type == "click" && e.button == 1) {
-		closeMenus(mi);
 		openAddonPage(addon);
+		closeMenus(mi);
 	}
 	else if(e.type == "click" && e.button == 2) {
 		if(openAddonOptions(addon))
