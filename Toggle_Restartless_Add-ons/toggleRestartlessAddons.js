@@ -151,8 +151,10 @@ else { // Mouse gestures or something other...
 	document.documentElement.appendChild(mp);
 	mp.addEventListener("popuphidden", function destroy(e) {
 		mp.removeEventListener(e.type, destroy, false);
-		mp.destroyMenu();
-		mp.parentNode.removeChild(mp);
+		setTimeout(function() {
+			mp.destroyMenu();
+			mp.parentNode.removeChild(mp);
+		}, 0);
 	}, false);
 	mp.openPopupAtScreen(e.screenX, e.screenY);
 }
