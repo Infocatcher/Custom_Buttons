@@ -40,7 +40,7 @@ mp.updateMenu = function() {
 			if(prevType && type != prevType)
 				df.appendChild(document.createElement("menuseparator"));
 			prevType = type;
-			var icon = addon.iconURL
+			var icon = addon.iconURL || addon.icon64URL
 				|| type == "plugin"    && "chrome://mozapps/skin/plugins/pluginGeneric-16.png"
 				|| type == "extension" && "chrome://mozapps/skin/extensions/extensionGeneric-16.png"
 				|| "";
