@@ -17,6 +17,7 @@ var showVersions = 0;
 var mp = document.createElement("menupopup");
 mp.setAttribute("onpopupshowing", "this.updateMenu();");
 mp.setAttribute("oncommand", "this.handleEvent(event);");
+mp.setAttribute("onmousedown", "if(event.button == 0) this.handleEvent(event);");
 mp.setAttribute("onclick", "if(event.button > 0) this.handleEvent(event);");
 mp.setAttribute("oncontextmenu", "return false;");
 mp.setAttribute("onpopuphidden", "this.destroyMenu();");
@@ -67,9 +68,13 @@ mp.handleEvent = function(e) {
 	var mi = e.target;
 	if(!("_cbAddon" in mi))
 		return;
+	if(e.type == "mousedown") {
+		mi.setAttribute("closemenu", e.shiftKey ? "none" : "auto");
+		return;
+	}
 	var addon = mi._cbAddon;
 	var hasModifier = e.ctrlKey || e.shiftKey || e.altKey || e.metaKey;
-	if(e.type == "command" && !hasModifier) {
+	if(e.type == "command" && (!hasModifier || e.shiftKey)) {
 		var dis = !addon.userDisabled;
 		addon.userDisabled = dis;
 		setDisabled(mi, dis);
