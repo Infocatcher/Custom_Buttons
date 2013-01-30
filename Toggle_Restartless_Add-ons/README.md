@@ -4,7 +4,8 @@
 <br>Left-click – open drop-down menu
 <br><em>In menu:</em>
 <br>Left-click – toggle enabled/disabled
-<br>Middle-click or left-click with any modifier – open add-on page
+<br>Shift+left-click – toggle enabled/disabled and don't close menu
+<br>Middle-click or left-click with any modifier (except Shift) – open add-on page
 <br>Right-click – open add-on options (if any)
 
 ##### Screenshot:
