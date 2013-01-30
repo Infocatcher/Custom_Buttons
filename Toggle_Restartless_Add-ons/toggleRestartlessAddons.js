@@ -105,7 +105,7 @@ function setDisabled(mi, disabled) {
 if(
 	this instanceof XULElement // Custom Buttons
 	&& typeof event == "object"
-	&& !("type" in event) // Initialization
+	&& !("type" in event) && typeof _phase == "string" && _phase == "init" // Initialization
 ) {
 	this.type = "menu";
 	this.orient = "horizontal";
@@ -138,10 +138,11 @@ else { // Mouse gestures or something other...
 	let e;
 	if(typeof event == "object" && event instanceof Event && "screenX" in event) // FireGestures
 		e = event;
-	else if("mgGestureState" in window && "endEvent" in mgGestureState) // Mouse Gestures Redox
+	else if(this == window && "mgGestureState" in window && "endEvent" in mgGestureState) // Mouse Gestures Redox
 		e = mgGestureState.endEvent;
 	else {
-		let anchor = window.gBrowser && gBrowser.selectedBrowser
+		let anchor = this instanceof XULElement && this
+			|| window.gBrowser && gBrowser.selectedBrowser
 			|| document.documentElement;
 		if("boxObject" in anchor) {
 			let bo = anchor.boxObject;
@@ -149,6 +150,8 @@ else { // Mouse gestures or something other...
 				screenX: bo.screenX,
 				screenY: bo.screenY
 			};
+			if(this instanceof XULElement)
+				e.screenY += bo.height;
 		}
 	}
 	if(!e || !("screenX" in e))
