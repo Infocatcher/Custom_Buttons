@@ -6,7 +6,7 @@
 // Also the code can be used from main window context (as Mouse Gestures code, for example)
 
 // (c) Infocatcher 2013
-// version 0.1.0pre - 2013-01-30
+// version 0.1.0pre2 - 2013-01-31
 
 const addonTypes = ["extension", "plugin"];
 var showVersions = 0;
@@ -241,4 +241,14 @@ function removeStyle() {
 	var s = addStyle._style;
 	s.parentNode.removeChild(s);
 	delete addStyle._style;
+}
+function closeMenus(node) {
+	// Based on function closeMenus from chrome://browser/content/utilityOverlay.js
+	for(; node && "tagName" in node; node = node.parentNode) {
+		if(
+			node.namespaceURI == "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+			&& (node.localName == "menupopup" || node.localName == "popup")
+		)
+			node.hidePopup();
+	}
 }
