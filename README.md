@@ -79,3 +79,6 @@ Drop-down menu to toggle restartless add-ons
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Undo_Close_Tabs/icons/icon.png)&nbsp;[Undo Close Tabs](Custom_Buttons/tree/master/Undo_Close_Tabs)
 Allows restore recently closed tabs and windows
+
+#### [Code snippets](Custom_Buttons/tree/master/code_snippets)
+Some code snippets related to Custom Buttons.
