@@ -1,4 +1,5 @@
 // http://infocatcher.ucoz.net/js/cb/toggleRestartlessAddons.js
+// https://forum.mozilla-russia.org/viewtopic.php?id=57948
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Toggle_Restartless_Add-ons
 
 // Toggle Restartless Add-ons button for Custom Buttons
