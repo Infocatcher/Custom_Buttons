@@ -29,10 +29,11 @@ var popup = ps.firstChild;
 var e;
 if(typeof event == "object" && event instanceof Event && "screenX" in event) // FireGestures
 	e = event;
-else if("mgGestureState" in window && "endEvent" in mgGestureState) // Mouse Gestures Redox
+else if(this == window && "mgGestureState" in window && "endEvent" in mgGestureState) // Mouse Gestures Redox
 	e = mgGestureState.endEvent;
 else {
-	var anchor = window.gBrowser && gBrowser.selectedBrowser
+	var anchor = this instanceof XULElement && this
+		|| window.gBrowser && gBrowser.selectedBrowser
 		|| document.documentElement;
 	if("boxObject" in anchor) {
 		var bo = anchor.boxObject;
@@ -40,10 +41,12 @@ else {
 			screenX: bo.screenX,
 			screenY: bo.screenY
 		};
+		if(this instanceof XULElement)
+			e.screenY += bo.height;
 	}
 }
 
-if(!popup || !e) {
+if(!popup || !e || !("screenX" in e)) {
 	alert("Mouse Gestures Launcher for Extensions Developer Tools:\nNo popup or can't get event object");
 	destroy();
 }
