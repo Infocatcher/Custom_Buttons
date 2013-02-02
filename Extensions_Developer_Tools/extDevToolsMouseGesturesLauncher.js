@@ -60,9 +60,12 @@ function destroy(e) {
 		return;
 	popup && popup.removeEventListener("popuphidden", destroy, false);
 	setTimeout(function() {
-		if(popup) {
-			popup.onDestroy && popup.onDestroy("delete");
+		if(popup && popup.onDestroy) try {
+			popup.onDestroy("delete");
 			LOG("onDestroy()");
+		}
+		catch(e) {
+			Components.utils.reportError(e);
 		}
 		ps.parentNode.removeChild(ps);
 		LOG("Remove popup");
