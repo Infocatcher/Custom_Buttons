@@ -74,7 +74,7 @@ function _log() {
 const _ns = "__attributesInspector";
 var context = _ns in window && window[_ns] || (
 	window[_ns] = {
-		button: "getAttribute" in this && this,
+		button: this instanceof XULElement && this.localName != "popupset" && this,
 		checked: false,
 		toggle: function() {
 			toggle.call(context);
