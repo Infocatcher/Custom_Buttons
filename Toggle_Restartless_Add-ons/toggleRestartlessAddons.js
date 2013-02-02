@@ -6,7 +6,7 @@
 // Also the code can be used from main window context (as Mouse Gestures code, for example)
 
 // (c) Infocatcher 2013
-// version 0.1.0pre2 - 2013-01-31
+// version 0.1.0 - 2013-02-02
 
 const addonTypes = ["extension", "plugin"];
 var showVersions = 0;
@@ -75,7 +75,7 @@ mp.handleEvent = function(e) {
 	var addon = mi._cbAddon;
 	var hasModifier = e.ctrlKey || e.shiftKey || e.altKey || e.metaKey;
 	if(e.type == "command" && (!hasModifier || e.shiftKey)) {
-		var dis = !addon.userDisabled;
+		let dis = !addon.userDisabled;
 		addon.userDisabled = dis;
 		setDisabled(mi, dis);
 	}
@@ -192,9 +192,9 @@ function openAddonOptions(addon) {
 	else if(addon.optionsType == AddonManager.OPTIONS_TYPE_TAB && "switchToTabHavingURI" in window)
 		switchToTabHavingURI(optionsURL, true);
 	else {
-		var windows = Services.wm.getEnumerator(null);
+		let windows = Services.wm.getEnumerator(null);
 		while(windows.hasMoreElements()) {
-			var win = windows.getNext();
+			let win = windows.getNext();
 			if(win.document.documentURI == optionsURL) {
 				win.focus();
 				return true;
