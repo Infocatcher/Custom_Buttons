@@ -7,8 +7,8 @@
 // https://github.com/Infocatcher/Custom_Buttons/blob/master/Extensions_Developer_Tools/extDevTools.js
 // after "//=== Extensions Developer Tools begin"
 
-// (c) Infocatcher 2012
-// version 0.1.0pre2 - 2012-12-05
+// (c) Infocatcher 2012-2013
+// version 0.1.0 - 2013-02-02
 
 const popupsetId = "mgLauncherForExtDevTools-popupset";
 var ps = document.getElementById(popupsetId);
