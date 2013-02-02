@@ -694,7 +694,11 @@ var cmds = this.commands = {
 	},
 	get canDisableE4X() {
 		delete this.canDisableE4X;
-		return this.canDisableE4X = this.getPref("javascript.options.xml.chrome") != undefined;
+		return this.canDisableE4X = this.getPref(
+			"javascript.options.xml.chrome",
+			undefined,
+			this.defaultBranch
+		) != undefined;
 	},
 
 	initPrefsMenu: function(popup) {
