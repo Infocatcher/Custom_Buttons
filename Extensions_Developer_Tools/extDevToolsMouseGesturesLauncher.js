@@ -58,13 +58,15 @@ else {
 function destroy(e) {
 	if(e && e.target != popup)
 		return;
-	if(popup) {
-		popup.removeEventListener("popuphidden", destroy, false);
-		popup.onDestroy && popup.onDestroy("delete");
-		LOG("onDestroy()");
-	}
-	ps.parentNode.removeChild(ps);
-	LOG("Remove popup");
+	popup && popup.removeEventListener("popuphidden", destroy, false);
+	setTimeout(function() {
+		if(popup) {
+			popup.onDestroy && popup.onDestroy("delete");
+			LOG("onDestroy()");
+		}
+		ps.parentNode.removeChild(ps);
+		LOG("Remove popup");
+	}, 0);
 }
 
 
