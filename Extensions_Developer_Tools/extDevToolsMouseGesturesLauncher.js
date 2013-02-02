@@ -63,8 +63,8 @@ function destroy(e) {
 		return;
 	popup && popup.removeEventListener("popuphidden", destroy, false);
 	setTimeout(function() {
-		if(popup && popup.onDestroy) try {
-			popup.onDestroy("delete");
+		if("onDestroy" in ps) try {
+			ps.onDestroy("delete");
 			LOG("onDestroy()");
 		}
 		catch(e) {
