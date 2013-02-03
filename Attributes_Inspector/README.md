@@ -1,15 +1,15 @@
 ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Attributes_Inspector/icon.png)&nbsp;<a href="http://infocatcher.github.com/Custom_Buttons/install/attrsInspector.html"><strong>Attributes Inspector</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
-<br>Shows tooltip with with all attributes and allow open [DOM Inspector](https://addons.mozilla.org/addon/dom-inspector-6622/) for current node
+<br>Shows a tooltip with all the attributes for any node and allows to inspect the selected node in [DOM Inspector](https://addons.mozilla.org/addon/dom-inspector-6622/)
 
 ##### Usage:
-* Use middle-click or Ctrl + left-click to inspect node in DOM Inspector
-<br>(hold additional Shift key to enable pupup locker)
-* Hold Shift key to show and don't hide tooltips and popups
+* Use middle-click or Ctrl + left-click to inspect the node in DOM Inspector
+<br>(additionally hold Shift key to enable popup locker)
+* Hold Shift key to make tooltips and popups persistent
 
 ##### Hotkeys:
-* Escape – cancel or disable popup locker
-* Ctrl+Up, Ctrl+Down – go to parent/child node
-* Ctrl+Shift+C – copy tooltip contents
+* Escape ï¿½ cancel or disable popup locker
+* Ctrl+Up, Ctrl+Down ï¿½ navigate to parent/child node
+* Ctrl+Shift+C ï¿½ copy tooltip's contents
 
 ##### Screenshot:
 <img src="https://raw.github.com/Infocatcher/Custom_Buttons/master/Attributes_Inspector/attrsInspector-en.png" alt="Tooltip with all attributes" align="top">
