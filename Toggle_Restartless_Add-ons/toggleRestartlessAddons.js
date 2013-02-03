@@ -74,13 +74,13 @@ mp.handleEvent = function(e) {
 		return;
 	}
 	var addon = mi._cbAddon;
-	var hasModifier = e.ctrlKey || e.shiftKey || e.altKey || e.metaKey;
-	if(e.type == "command" && (!hasModifier || e.shiftKey)) {
+	var hasMdf = hasModifier(e);
+	if(e.type == "command" && (!hasMdf || e.shiftKey)) {
 		let dis = !addon.userDisabled;
 		addon.userDisabled = dis;
 		setDisabled(mi, dis);
 	}
-	else if(e.type == "command" && hasModifier || e.type == "click" && e.button == 1) {
+	else if(e.type == "command" && hasMdf || e.type == "click" && e.button == 1) {
 		openAddonPage(addon);
 		closeMenus(mi);
 	}
@@ -133,6 +133,16 @@ if(
 			},
 			this
 		);
+	};
+	this.onmousedown = function(e) {
+		if(e.target == this && e.button == 0 && hasModifier(e))
+			e.preventDefault();
+	};
+	this.onclick = function(e) {
+		if(e.target != this)
+			return;
+		if(e.button == 0 && hasModifier(e) || e.button == 1)
+			openAddonsManager();
 	};
 }
 else { // Mouse gestures or something other...
@@ -206,14 +216,21 @@ function openAddonOptions(addon) {
 	}
 	return true;
 }
-function openAddonPage(addon, scrollToPreferences) {
+function openAddonsManager(view) {
 	var openAddonsMgr = window.BrowserOpenAddonsMgr // Firefox
 		|| window.openAddonsMgr // Thunderbird
 		|| window.toEM; // SeaMonkey
+	openAddonsMgr(view);
+}
+function openAddonPage(addon, scrollToPreferences) {
 	scrollToPreferences = scrollToPreferences && parseFloat(Services.appinfo.platformVersion) >= 12
-			? "/preferences"
-			: "";
-	openAddonsMgr("addons://detail/" + encodeURIComponent(addon.id) + scrollToPreferences);
+		? "/preferences"
+		: "";
+	openAddonsManager("addons://detail/" + encodeURIComponent(addon.id) + scrollToPreferences);
+}
+
+function hasModifier(e) {
+	return e.ctrlKey || e.shiftKey || e.altKey || e.metaKey;
 }
 
 function addStyle() {
