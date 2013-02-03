@@ -19,6 +19,9 @@ var showVersions = 0;
 // 0 - don't show versions
 // 1 - show after name: "Addon Name 1.2"
 // 2 - show as "acceltext" (in place for hotkey text)
+var separateDisabledAddons = false;
+// false - sort add-ons of each type alphabetically
+// true  - show enabled add-ons (of each type) first
 
 var mp = document.createElement("menupopup");
 mp.setAttribute("onpopupshowing", "this.updateMenu();");
@@ -36,7 +39,9 @@ mp.updateMenu = function() {
 		var df = document.createDocumentFragment();
 		var prevType;
 		function key(addon) {
-			return addonTypes.indexOf(addon.type) + "\n" + addon.name.toLowerCase();
+			return addonTypes.indexOf(addon.type)
+				+ (separateDisabledAddons ? "\n" + +!addon.isActive : "")
+				+ "\n" + addon.name.toLowerCase();
 		}
 		addons.sort(function(a, b) {
 			var ka = key(a);
