@@ -12,7 +12,7 @@
 // after "//== Check for Addons Updates begin"
 
 // (c) Infocatcher 2013
-// version 0.1.0 - 2013-02-02
+// version 0.1.1pre - 2013-02-04
 
 const addonTypes = ["extension", "plugin"];
 var showVersions = 0;
