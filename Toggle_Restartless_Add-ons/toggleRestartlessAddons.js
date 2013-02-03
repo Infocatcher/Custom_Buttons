@@ -6,6 +6,11 @@
 // (code for "initialization" section)
 // Also the code can be used from main window context (as Mouse Gestures code, for example)
 
+// Also you can check for add-ons updates using right-click:
+// copy all code from
+// https://github.com/Infocatcher/Custom_Buttons/blob/master/Check_for_Addons_Updates/checkForAddonsUpdates.js
+// after "//== Check for Addons Updates begin"
+
 // (c) Infocatcher 2013
 // version 0.1.0 - 2013-02-02
 
@@ -138,11 +143,17 @@ if(
 		if(e.target == this && e.button == 0 && hasModifier(e))
 			e.preventDefault();
 	};
+	this.oncontextmenu = function(e) {
+		if(e.target == this && !hasModifier(e) && hasUpdater())
+			e.preventDefault();
+	};
 	this.onclick = function(e) {
 		if(e.target != this)
 			return;
 		if(e.button == 0 && hasModifier(e) || e.button == 1)
 			openAddonsManager();
+		else if(e.button == 2 && !hasModifier(e) && hasUpdater())
+			checkForAddonsUpdates.call(this);
 	};
 }
 else { // Mouse gestures or something other...
@@ -269,4 +280,17 @@ function closeMenus(node) {
 		)
 			node.hidePopup();
 	}
+}
+
+function hasUpdater() {
+	var has = checkForAddonsUpdates.toString().indexOf("Services.jsm") != -1;
+	hasUpdater = function() {
+		return has;
+	};
+	return has;
+}
+function checkForAddonsUpdates() {
+//== Check for Addons Updates begin
+
+//== Check for Addons Updates end
 }
