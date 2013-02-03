@@ -1,11 +1,12 @@
 ﻿// http://infocatcher.ucoz.net/js/cb/checkForAddonsUpdates.js
+// https://forum.mozilla-russia.org/viewtopic.php?id=57958
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Check_for_Addons_Updates
 
 // Check for Addons Updates button for Custom Buttons
 // (code for "code" section)
 
-// (c) Infocatcher 2012
-// version 0.1.2 - 2012-10-04
+// (c) Infocatcher 2012-2013
+// version 0.1.2.1 - 2013-01-10
 
 // Button just open hidden tab with about:addons and trigger built-in "Check for Updates" function.
 // And show tab, if found updates.
