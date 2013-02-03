@@ -7,9 +7,9 @@
 * Hold Shift key to show and don't hide tooltips and popups
 
 ##### Hotkeys:
-* Escape – cancel or disable popup locker
-* Ctrl+Up, Ctrl+Down – go to parent/child node
-* Ctrl+Shift+C – copy tooltip contents
+* Escape â€“ cancel or disable popup locker
+* Ctrl+Up, Ctrl+Down â€“ go to parent/child node
+* Ctrl+Shift+C â€“ copy tooltip contents
 
 ##### Screenshot:
 <img src="https://raw.github.com/Infocatcher/Custom_Buttons/master/Attributes_Inspector/attrsInspector-en.png" alt="Tooltip with all attributes" align="top">
