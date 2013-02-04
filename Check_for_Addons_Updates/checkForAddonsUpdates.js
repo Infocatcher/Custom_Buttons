@@ -76,6 +76,9 @@ function processAddonsTab(e) {
 	btn.image = imgLoading;
 	btn.tooltipText = doc.getElementById("updates-progress").getAttribute("value");
 
+	var origIcon = tab.image;
+	tab.image = image;
+
 	var updEnabledPref = "extensions.update.enabled";
 	var updEnabled = cbu.getPrefs(updEnabledPref);
 	if(!updEnabled)
@@ -123,6 +126,8 @@ function processAddonsTab(e) {
 		clearInterval(wait);
 		btn.image = image;
 		btn.tooltipText = tip;
+		if(tab.image == image)
+			tab.image = origIcon;
 		window.removeEventListener("TabSelect", dontSelectHiddenTab, false);
 		setTimeout(function() {
 			delete btn._cb_disabled;
