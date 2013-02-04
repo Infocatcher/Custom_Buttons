@@ -146,9 +146,9 @@ function dontSelectHiddenTab(e) {
 
 	if(/\n(?:BrowserOpenAddonsMgr|toEM)@chrome:\/\//.test(new Error().stack)) {
 		// User open Add-ons Manager, show tab
-		tab.collapsed = tab.closing = false;
 		window.removeEventListener("TabSelect", dontSelectHiddenTab, false);
 		setTimeout(function() { // Hidden tab can't be selected, so select it manually...
+			tab.collapsed = tab.closing = false;
 			gBrowser.selectedTab = tab;
 		}, 0);
 	}
