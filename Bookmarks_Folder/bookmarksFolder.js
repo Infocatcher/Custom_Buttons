@@ -125,11 +125,7 @@ this.bookmarks = {
 		var placeURI = folder.substr(0, 6) == "place:"
 			? folder
 			: "place:folder=" + folder + "&excludeItems=0&expandQueries=0";
-		placeURI = placeURI
-			.replace(/&/g, "&amp;")
-			.replace(/</g, "&lt;")
-			.replace(/>/g, "&gt;")
-			.replace(/"/g, "&quot;");
+		placeURI = placeURI.replace(/"/g, '\\"');
 		mp.setAttribute(
 			"onpopupshowing",
 			'this.parentNode.bookmarks.initMenu(event, "' + placeURI + '");'
