@@ -1,4 +1,5 @@
 ﻿// http://infocatcher.ucoz.net/js/cb/toggleGifAnimation.js
+// https://forum.mozilla-russia.org/viewtopic.php?id=57977
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Toggle_GIF_Animation
 
 // Toggle GIF Animation button for Custom Buttons

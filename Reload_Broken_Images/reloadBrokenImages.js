@@ -1,4 +1,5 @@
 // http://infocatcher.ucoz.net/js/cb/reloadBrokenImages.js
+// https://forum.mozilla-russia.org/viewtopic.php?id=57978
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Reload_Broken_Images
 
 // Reload Broken Images button for Custom Buttons
