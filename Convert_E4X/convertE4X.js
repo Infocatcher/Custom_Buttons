@@ -123,7 +123,8 @@ function convertE4X(s) {
 	// { expressions }
 	s = s.replace(/(=\s*)?\{([^\}]*)\}/g, function(s, eq, code) {
 		//~ todo: don't add ( ... ) for foo, this.foo, this[foo] and foo("something") ?
-		code = "e4xConv_encodeHTML(" + code + ")";
+		var isAttr = !!RegExp.$1;
+		code = "e4xConv_encodeHTML(" + code + (isAttr ? ", true" : "") + ")";
 		var q = eq ? '"' : "";
 		code = q + "' + " + code + " + '" + q;
 		codes.push(code);
@@ -166,10 +167,17 @@ function e4xConv_parseXULFromString(xul) {
 	xul = xul.replace(/>\s+</g, "><");
 	return new DOMParser().parseFromString(xul, "application/xml").documentElement;
 }
-function e4xConv_encodeHTML(s) {
-	return String(s)
+function e4xConv_encodeHTML(s, isAttr) {
+	s = String(s)
 		.replace(/&/g, "&amp;")
 		.replace(/</g, "&lt;")
 		.replace(/>/g, "&gt;")
 		.replace(/"/g, "&quot;");
+	if(isAttr) {
+		s = s
+			.replace(/\t/g, "&#x9;")
+			.replace(/\n/g, "&#xA;")
+			.replace(/\r/g, "&#xD;");
+	}
+	return s;
 }
