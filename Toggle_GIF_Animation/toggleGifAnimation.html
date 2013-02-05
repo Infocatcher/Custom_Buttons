@@ -1,0 +1,27 @@
+<!DOCTYPE HTML>
+<meta charset="utf-8"/>
+<title>Toggle GIF Animation [0.1.0 - 2013-02-05]</title>
+<body>
+<a href="custombutton://%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%0D%0A%3Ccustombutton%20xmlns%3Acb%3D%22http%3A//xsms.nm.ru/custombuttons/%22%3E%0A%20%20%3Cname%3EToggle%20GIF%20Animation%3C/name%3E%0A%20%20%3Cimage%3E%3C%21%5BCDATA%5Bdata%3Aimage/png%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAABblBMVEUAAADq6urr6+vm5ubnuaPgTC2enp7l5eWbm5vo6Ojp6emampr0Zkf2WjjupJPwUjCYmJjp6emZmZnpSSeXl5fp6enoVzjiPx2VlZXn5+fkTi7bNhSUlJTnVjfdORfVLgxtbW2tra3W1tbjUDHaNhTLLQ16enqjo6OkpKSpqamqqqqqqqqqqqqqqqq3dWjBSjLJKwzJKwvARCu1aVqkpKSkpKTORBH////j4+Pe3t7g4ODa2tr7cVLo6OjNNBXc3Nzp6eni4uLf39/n5+fhTi/8clPdSSvZ2dnoWDnh4eHdZi3Y2Nj4bU/ONRbvqJj8bk3ouK3sXT7X19fk5OT7gWLgTS/uYULdTiHtWTHYpJnVPiDoZEbAWEH8gWLq6urONBb1lH7qhW/gYiXnuaPUhnfQOBnrXD3d3d3bYSa7Lgq8Lwrm5ub4d1ntvbLgdV7fc13b29vbcVzoVznZRSfFOQ2dnZ36Yj/LYkv7cVO8MAsi43WXAAAANnRSTlMA19fn/v0e5zfnrTf9UPKjN9I35jfn/eY35/ajN/bmUAE4/vnpfQMTZpKkrLa80ef4996yciec+O5uAAAA5ElEQVR4Xj3M1XLDMBBA0VVTJ2nKzMzMIrPDjGVmZv77rt2Z3oeV9oxGAOBvJoRUuRESAqhO/Xd2aLUD0GvGWIqd4qSWVYPAKMa8Q9c98NZ394Ue7kag7pXdspsfGr7z4af0r63tz/zxQwCwIOflcm4zls3GMg0u1CZtXii+PXEeva+rR2iRMnkSebTt6MGR0ojQJBzndUPK74rhKK0IbeaViCQE7kJ0dCJ0qc/mS0KrGObHV08vQl86Ht/Z3TNUdb9/YBBgaHikVEqfX1xq2ujY+ATA5NT0zOzc/MLi0vLK6tr6L68zNH+FfEIKAAAAAElFTkSuQmCC%5D%5D%3E%3C/image%3E%0A%20%20%3Cmode%3E0%3C/mode%3E%0A%20%20%3Cinitcode%3E%3C%21%5BCDATA%5B/*Initialization%20Code*/%5D%5D%3E%3C/initcode%3E%0A%20%20%3Ccode%3E%3C%21%5BCDATA%5B//%20http%3A//infocatcher.ucoz.net/js/cb/toggleGifAnimation.js%0A//%20https%3A//github.com/Infocatcher/Custom_Buttons/tree/master/Toggle_GIF_Animation%0A%0A//%20Toggle%20GIF%20Animation%20button%20for%20Custom%20Buttons%0A//%20%28code%20for%20%22code%22%20section%29%0A%0A//%20%28c%29%20Infocatcher%202013%0A//%20version%200.1.0%20-%202013-02-05%0A%0Afunction%20_localize%28s%2C%20key%29%20%7B%0A%09var%20strings%20%3D%20%7B%0A%09%09%22GIF%20Animation%3A%22%3A%20%7B%0A%09%09%09ru%3A%20%22GIF-%u0430%u043D%u0438%u043C%u0430%u0446%u0438%u044F%3A%22%0A%09%09%7D%2C%0A%09%09%22Enabled%22%3A%20%7B%0A%09%09%09ru%3A%20%22%u0412%u043A%u043B%u044E%u0447%u0435%u043D%u0430%22%0A%09%09%7D%2C%0A%09%09%22Disabled%22%3A%20%7B%0A%09%09%09ru%3A%20%22%u0412%u044B%u043A%u043B%u044E%u0447%u0435%u043D%u0430%22%0A%09%09%7D%0A%09%7D%3B%0A%09var%20locale%20%3D%20Application.prefs.getValue%28%22general.useragent.locale%22%2C%20%22en%22%29.match%28/%5E%5Ba-z%5D*/%29%5B0%5D%3B%0A%09_localize%20%3D%20%21locale%20%7C%7C%20locale%20%3D%3D%20%22en%22%0A%09%09%3F%20function%28s%29%20%7B%0A%09%09%09return%20s%3B%0A%09%09%7D%0A%09%09%3A%20function%28s%29%20%7B%0A%09%09%09return%20strings%5Bs%5D%20%26%26%20strings%5Bs%5D%5Blocale%5D%20%7C%7C%20s%3B%0A%09%09%7D%3B%0A%09return%20_localize.apply%28this%2C%20arguments%29%3B%0A%7D%0A%0Avar%20win%20%3D%20content%3B%0A%0Avar%20utils%20%3D%20getUtils%28win%29%3B%0Avar%20ic%20%3D%20Components.interfaces.imgIContainer%3B%0Avar%20am%20%3D%20utils.imageAnimationMode%20%3D%20utils.imageAnimationMode%20%3D%3D%20ic.kNormalAnimMode%0A%09%3F%20ic.kDontAnimMode%0A%09%3A%20ic.kNormalAnimMode%3B%0AArray.forEach%28win.frames%2C%20parseWin%29%3B%0A%0AComponents.classes%5B%22@mozilla.org/alerts-service%3B1%22%5D%0A%09.getService%28Components.interfaces.nsIAlertsService%29%0A%09.showAlertNotification%28%0A%09%09this.image%20%7C%7C%20%22chrome%3A//mozapps/skin/extensions/extensionGeneric.png%22%2C%0A%09%09_localize%28%22GIF%20Animation%3A%22%29%2C%0A%09%09am%20%3D%3D%20ic.kNormalAnimMode%0A%09%09%09%3F%20_localize%28%22Enabled%22%29%0A%09%09%09%3A%20_localize%28%22Disabled%22%29%0A%09%29%3B%0A%0Afunction%20getUtils%28win%29%20%7B%0A%09return%20win.QueryInterface%28Components.interfaces.nsIInterfaceRequestor%29%0A%09%09.getInterface%28Components.interfaces.nsIDOMWindowUtils%29%3B%0A%7D%0Afunction%20parseWin%28win%29%20%7B%0A%09Array.forEach%28win.frames%2C%20parseWin%29%3B%0A%09var%20utils%20%3D%20getUtils%28win%29%3B%0A%09try%20%7B%0A%09%09utils.imageAnimationMode%20%3D%20am%3B%0A%09%7D%0A%09catch%28e%29%20%7B%20//%20NS_ERROR_NOT_AVAILABLE%0A%09%7D%0A%7D%5D%5D%3E%3C/code%3E%0A%20%20%3Caccelkey%3E%3C%21%5BCDATA%5B%5D%5D%3E%3C/accelkey%3E%0A%20%20%3Chelp%3E%3C%21%5BCDATA%5B%5D%5D%3E%3C/help%3E%0A%20%20%3Cattributes/%3E%0A%3C/custombutton%3E"
+>Install</a>
+| <a href="https://github.com/Infocatcher/Custom_Buttons/tree/master/Bookmarks_Folder">Source</a>
+<script type="text/javascript">
+var a = document.getElementsByTagName("a")[0];
+a.title = document.title;
+if(/%3Cimage%3E%3C%21%5BCDATA%5B(data%3A\S+)%5D%5D%3E%3C\/image%3E/.test(a.href)) {
+	var icon = decodeURIComponent(RegExp.$1);
+
+	var img = document.createElement("img");
+	img.src = icon;
+	img.alt = "";
+	img.style.verticalAlign = "middle";
+	img.style.marginRight = "4px";
+	a.insertBefore(img, a.firstChild);
+
+	var link = document.createElement("link");
+	link.rel = "shortcut icon";
+	link.href = icon;
+	document.documentElement.insertBefore(link, document.documentElement.firstChild);
+}
+</script>
+</body>
