@@ -73,10 +73,8 @@ function convertCode(s) {
 			return convertE4X(s);
 		})
 		// <tag> ... </tag>
-		.replace(/<(\w+)[\s>]([\s\S]+?)<\/\1>(?:\s*\.\s*toXMLString\s*\(\))?/g, function(s) {
+		.replace(/<(\w+)(?:[^>]*[^>\/])?>([\s\S]*?)<\/\1>(?:\s*\.\s*toXMLString\s*\(\))?/g, function(s) {
 			if(inE4X(RegExp.leftContext))
-				return s;
-			if(/^<\w+\s[^>]+\/>/.test(s))
 				return s;
 			LOG("<tag> ... </tag>\n" + s);
 			return convertE4X(s);
