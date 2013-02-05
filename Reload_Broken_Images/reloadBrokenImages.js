@@ -1,6 +1,6 @@
-// Based on code from chrome://browser/content/nsContextMenu.js (Firefox 3.6)
+// Based on code from chrome://browser/content/nsContextMenu.js (Firefox 15.0a1)
 function reloadImage(img) {
-	if(!(img instanceof Components.interfaces.nsIImageLoadingContent))
+	if(!(img instanceof Components.interfaces.nsIImageLoadingContent) || !img.currentURI)
 		return;
 	urlSecurityCheck(img.currentURI.spec,
 	                 gBrowser.contentPrincipal,
