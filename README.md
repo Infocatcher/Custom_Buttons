@@ -27,7 +27,7 @@ Add “On top” button to built-in custom button's editor (doesn't work on some
 Button just open hidden tab with about:addons and trigger built-in “Check for Updates” function.
 <br>And show tab, if found updates.
 
-##### [Convert E4X](Convert_E4X)
+##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Convert_E4X/icon.png)&nbsp;[Convert E4X](Convert_E4X)
 Tries convert [deprecated](http://custombuttons.sf.net/forum/viewtopic.php?f=2&t=365) [E4X](https://developer.mozilla.org/en-US/docs/E4X) to string literals
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Cookies_Permissions/icons/icon.png)&nbsp;[Cookies Permissions](Cookies_Permissions)
