@@ -1,4 +1,6 @@
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Convert_E4X
+// https://forum.mozilla-russia.org/viewtopic.php?id=56442
+// http://custombuttons.sf.net/forum/viewtopic.php?f=2&t=365
 
 // Convert E4X button for Custom Buttons
 // Code for "code" section
