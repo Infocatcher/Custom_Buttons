@@ -1,0 +1,2 @@
+![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Toggle_GIF_Animation/icon.png)&nbsp;<a href="http://infocatcher.github.com/Custom_Buttons/install/toggleGifAnimation.html"><strong>Toggle GIF Animation</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+<br>Disable or enable GIF animation on current page

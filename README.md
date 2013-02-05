@@ -74,6 +74,9 @@ Show window title (if original title was hidden by some reasons)
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Toggle_Flash/icon.png)&nbsp;[Toggle Flash](Toggle_Flash)
 Toggle Shockwave Flash plugin
 
+##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Toggle_GIF_Animation/icon.png)&nbsp;[Toggle GIF Animation](Toggle_GIF_Animation)
+Disable or enable GIF animation on current page
+
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Toggle_Restartless_Add-ons/icon.png)&nbsp;[Toggle Restartless Add-ons](Toggle_Restartless_Add-ons)
 Drop-down menu to toggle restartless add-ons
 
