@@ -3,6 +3,7 @@
 * Open *.html (if exist) and click on custombutton:// link
 * or read instructions in *.js and copy code to the “code” or “initialization” section in custom button editor
 
+<hr>
 #### Buttons in alphabetical order
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Add_New_Buttons_After_This_Button/icon.png)&nbsp;[Add New Buttons After This Button](Add_New_Buttons_After_This_Button)
@@ -86,5 +87,6 @@ Drop-down menu to toggle restartless add-ons
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Undo_Close_Tabs/icons/icon.png)&nbsp;[Undo Close Tabs](Undo_Close_Tabs)
 Allows restore recently closed tabs and windows
 
+<hr>
 #### [Code snippets](code_snippets)
 Some code snippets related to Custom Buttons.
