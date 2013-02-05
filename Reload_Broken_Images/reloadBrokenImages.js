@@ -1,6 +1,19 @@
-// Based on code from chrome://browser/content/nsContextMenu.js (Firefox 15.0a1)
-Components.utils.import("resource://gre/modules/Services.jsm");
+// http://infocatcher.ucoz.net/js/cb/reloadBrokenImages.js
+// https://github.com/Infocatcher/Custom_Buttons/tree/master/Reload_Broken_Images
+
+// Reload Broken Images button for Custom Buttons
+// (code for "code" section)
+
+// (c) Infocatcher 2012-2013
+// version 0.2.0 - 2013-02-05
+
+var debug = false;
+var maxAttempts = 4;
+
+var logPrefix = "reloadImage(): ";
+debug && Components.utils.import("resource://gre/modules/Services.jsm");
 function reloadImage(img) {
+	// Based on code from chrome://browser/content/nsContextMenu.js (Firefox 21.0a1)
 	if(!(img instanceof Components.interfaces.nsIImageLoadingContent) || !img.currentURI)
 		return;
 	var request = img.getRequest(Components.interfaces.nsIImageLoadingContent.CURRENT_REQUEST);
@@ -13,13 +26,13 @@ function reloadImage(img) {
 		img.ownerDocument.nodePrincipal,
 		Components.interfaces.nsIScriptSecurityManager.DISALLOW_SCRIPT
 	);
-	Services.console.logStringMessage("reloadImage(): " + src);
+	debug && Services.console.logStringMessage(logPrefix + src);
 	var errors = 0;
 	function check(e) {
 		if(e.type == "error")
 			++errors;
-		Services.console.logStringMessage("reloadImage(): " + src + " => " + e.type + (errors ? "#" + errors : ""));
-		if(errors && errors < 4) {
+		debug && Services.console.logStringMessage(logPrefix + src + " => " + e.type + (errors ? "#" + errors : ""));
+		if(errors && errors < maxAttempts) {
 			try {
 				var tools = Components.classes["@mozilla.org/image/tools;1"]
 					.getService(Components.interfaces.imgITools);
@@ -29,11 +42,11 @@ function reloadImage(img) {
 						.getService(Components.interfaces.imgICache);
 				if(cache.findEntryProperties(uri)) {
 					cache.removeEntry(uri);
-					Services.console.logStringMessage("reloadImage(): " + src + " => remove this URI from cache");
+					debug && Services.console.logStringMessage(logPrefix + src + " => remove this URI from cache");
 				}
 			}
 			catch(e) {
-				Services.console.logStringMessage("reloadImage(): " + src + " => cache.removeEntry() failed");
+				debug && Services.console.logStringMessage(logPrefix + src + " => cache.removeEntry() failed");
 				Components.utils.reportError(e);
 			}
 			img.src = "about:blank";
@@ -42,12 +55,17 @@ function reloadImage(img) {
 			}, 0);
 		}
 		else {
-			img.removeEventListener("load", check, true);
-			img.removeEventListener("error", check, true);
+			clearTimeout(stopWaitTimer);
+			destroy();
 		}
+	}
+	function destroy() {
+		img.removeEventListener("load", check, true);
+		img.removeEventListener("error", check, true);
 	}
 	img.addEventListener("load", check, true);
 	img.addEventListener("error", check, true);
+	var stopWaitTimer = setTimeout(destroy, 8*60e3);
 	img.forceReload();
 }
 function parseWin(win) {
