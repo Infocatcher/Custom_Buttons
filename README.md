@@ -47,6 +47,9 @@ Some tools for extensions or custom buttons developers
 ##### [Extensions Installer](Extensions_Installer)
 For extensions developers: installs extension from given link
 
+##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Merge_Custom_Buttons/icon.png)&nbsp;[Merge Custom Buttons](Merge_Custom_Buttons)
+Merge many custom buttons into one
+
 ##### [Open Window](Open_Window)
 Open/focus/toggle window demo
 
