@@ -14,7 +14,12 @@ this.onclick = function(e) {
 var dummy = function() {};
 this.historyManager = {
 	button: this,
+	initialized: false,
 	init: function() {
+		if(this.initialized)
+			return;
+		this.initialized = true;
+
 		window.addEventListener(this.ssTabRestoredEvent, this, false);
 		window.addEventListener("TabClose", this, false);
 		window.addEventListener("unload", this, false);
@@ -24,6 +29,10 @@ this.historyManager = {
 		//this.updButtonStateDelayed(1000);
 	},
 	destroy: function() {
+		if(!this.initialized)
+			return;
+		this.initialized = false;
+
 		window.removeEventListener(this.ssTabRestoredEvent, this, false);
 		window.removeEventListener("TabClose", this, false);
 		window.removeEventListener("unload", this, false);
