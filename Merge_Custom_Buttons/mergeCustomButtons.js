@@ -10,7 +10,7 @@
 // Middle-click or left-click with any modifier - temporary split/merge.
 
 // (c) Infocatcher 2011, 2013
-// version 0.1.0a5 - 2013-02-06
+// version 0.1.0a6pre - 2013-02-06
 
 this.onmouseover = function(e) {
 	if(e.target != this)
@@ -107,9 +107,12 @@ this.mergeButtons = {
 
 		var mp = this.mp;
 		mp.textContent = "";
-		mp.appendChild(df);
 
 		setTimeout(function(_this) {
+			if(!mp.parentNode) // Hack for SeaMonkey
+				mp = _this.mp = _this.button.getElementsByTagName("menupopup")[0];
+			mp.appendChild(df);
+
 			if(_this.button.open) {
 				_this.reinitButtons(nodes);
 				return;
@@ -158,7 +161,7 @@ this.mergeButtons = {
 		if(!initCode || initCode == "/*Initialization Code*/")
 			return;
 		setTimeout(function(_this) {
-			LOG("Reinit " + btn.getAttribute("label"));
+			//LOG("Reinit " + btn.getAttribute("label"));
 			//var link = custombuttons.makeButtonLink("edit", btn.id);
 			//var cbService = custombuttons.cbService;
 			//var param = cbService.getButtonParameters(link);
@@ -331,11 +334,12 @@ function closeMenus(node) {
 	}
 }
 
+//LOG("init() " + this.type);
 this.type = "menu";
 this.orient = "horizontal";
 this.mergeButtons.init();
-//LOG("init();");
 this.onDestroy = function(reason) {
 	//LOG("onDestroy(" + reason + ");");
-	this.mergeButtons.destroy(reason);
+	if(reason != "constructor") // For SeaMonkey
+		this.mergeButtons.destroy(reason);
 };
