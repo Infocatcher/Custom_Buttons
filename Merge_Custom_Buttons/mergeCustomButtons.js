@@ -3,11 +3,8 @@
 // Merge Buttons button for Custom Buttons
 // (code for "initialization" section)
 
-// (c) Infocatcher 2011
-// version 0.1.0a3 - 2011-07-20
-
-//var buttons = [12, 16, "-", 18];
-var buttons = [1, 5, "-", 6, 9];
+// (c) Infocatcher 2011, 2013
+// version 0.1.0a4 - 2013-02-06
 
 this.onmouseover = function(e) {
 	if(e.target != this)
@@ -34,129 +31,203 @@ this.onmouseover = function(e) {
 
 this.mergeButtons = {
 	button: this,
-	buttons: buttons,
 	merged: false,
 	get mp() {
 		var mp = this.button.appendChild(document.createElement("menupopup"));
-		mp.setAttribute("onpopupshowing", "if(event.target == this) this.parentNode.mergeButtons.merge();");
-		addEventListener("click", this, true, mp);
+		mp.className = "cbMergeButtonsPopup";
+		mp.setAttribute("onclick", "if(event.target == this) this.parentNode.mergeButtons.close(event);");
+		mp.setAttribute("onmouseover", "this.parentNode.mergeButtons.over(event);");
 		delete this.mp;
 		return this.mp = mp;
 	},
 	init: function() {
-		this.mp;
-		this.buttons.forEach(function(id, i) {
-			var item;
-			if(id == "-") {
-				item = document.createElement("menuseparator");
-				this.buttons[i] = null;
-			}
-			else {
-				item = document.getElementById("custombuttons-button" + id);
-				if(!item) {
-					delete this.buttons[i];
-					Components.utils.reportError(<>[Custom Buttons :: Merge Buttons] Button "{id}" not found!</>);
-					return;
-				}
-				item.setAttribute("collapsed", "true");
-				item.__mergeButtonsPosition = item.nextSibling;
-				item.__mergeButtonsParent = item.parentNode;
-				this.buttons[i] = item;
-			}
-		}, this);
+		setTimeout(function(_this) {
+			_this.merge();
+			setTimeout(function() {
+				_this.addStyles();
+			}, 50);
+		}, 10, this);
+		function hasModifier(e) {
+			return e.ctrlKey || e.shiftKey || e.altKey || e.metaKey;
+		}
+		this.button.onmousedown = function(e) {
+			if(e.target == this && e.button == 0 && hasModifier(e))
+				e.preventDefault();
+		};
+		this.button.onclick = function(e) {
+			if(e.target != this)
+				return;
+			if(e.button == 0 && hasModifier(e) || e.button == 1)
+				this.mergeButtons.toggle();
+		};
+		addEventListener("beforecustomization", this, false);
+		//addEventListener("aftercustomization", this, false);
+	},
+	destroy: function(reason) {
+		if(reason == "update" || reason == "delete") {
+			this.split();
+			this.removeStyles();
+		}
 	},
 	merge: function() {
 		if(this.merged)
 			return;
 		this.merged = true;
+
+		var nodes = [];
+		var hasSep = false; // Will stop on <toolbarseparator/><toolbarseparator/>
+		for(var node = this.button.nextSibling; node; node = node.nextSibling) {
+			var isCb = (node.id || "").substr(0, 20) == "custombuttons-button";
+			var isSep = !isCb && node.localName == "toolbarseparator";
+			if(!isCb && !isSep)
+				break;
+			if(isSep && hasSep) {
+				nodes.pop().collapsed = node.collapsed = true;
+				break;
+			}
+			nodes.push(node);
+			hasSep = isSep;
+		}
+
+		var df = document.createDocumentFragment();
+		nodes.forEach(function(node) {
+			df.appendChild(node);
+		});
+
 		var mp = this.mp;
-		while(mp.hasChildNodes())
-			mp.removeChild(mp.lastChild);
-		this.buttons.forEach(function(btn) {
-			if(!btn)
-				btn = document.createElement("menuseparator");
-			else
-				btn.removeAttribute("collapsed");
-			mp.appendChild(btn);
-		}, this);
+		mp.textContent = "";
+		mp.appendChild(df);
 	},
 	split: function() {
 		if(!this.merged)
 			return;
 		this.merged = false;
-		this.buttons.slice().reverse().forEach(function(btn) {
-			if(!btn)
-				return;
-			btn.removeAttribute("collapsed");
-			var insPos = btn.__mergeButtonsPosition;
-			var insParent = btn.__mergeButtonsParent;
-			if(insPos && insPos.parentNode != insParent)
-				insPos = null;
-			insParent.insertBefore(btn, insPos);
-		});
+
+		var btn = this.button;
+		var next1 = btn.nextSibling;
+		var next2 = next1 && next1.nextSibling;
+		if(
+			next1 && next1.localName == "toolbarseparator"
+			&& next2 && next2.localName == "toolbarseparator"
+		)
+			next1.collapsed = next2.collapsed = false;
+
+		var df = document.createDocumentFragment();
+		var mp = this.mp;
+		while(mp.hasChildNodes())
+			df.appendChild(mp.firstChild);
+
+		btn.parentNode.insertBefore(df, btn.nextSibling);
+	},
+	toggle: function() {
+		if(this.merged)
+			this.split();
+		else
+			this.merge();
+	},
+
+	handleEvent: function(e) {
+		if(e.type == "beforecustomization")
+			this.split();
+		//else if(e.type == "aftercustomization")
+		//	this.merge();
 	},
 	close: function(e) {
 		if(e.button == 2)
 			return;
 		var trg = e.target;
 		if(trg.localName == "toolbarbutton" && trg.type != "menu")
-			closeMenus(trg);
+			closeMenus(trg); //~ todo: doesn't work in Thunderbird
 	},
-	handleEvent: function(e) {
-		if(e.type == "beforecustomization")
-			this.split();
-		//else if(e.type == "aftercustomization")
-		//	this.merge();
-		else if(e.type == "click")
-			this.close(e);
+	_overTimer: 0,
+	over: function(e) {
+		var trg = e.target;
+		if(trg.parentNode != e.currentTarget)
+			return;
+		if((trg.type || "").substr(0, 4) == "menu") {
+			clearTimeout(this._overTimer);
+			return;
+		}
+		this._overTimer = setTimeout(function(_this) {
+			var btns = _this.mp.getElementsByTagName("toolbarbutton");
+			for(var i = 0, l = btns.length; i < l; ++i) {
+				var btn = btns[i];
+				if(
+					//btn.boxObject
+					//&& btn.boxObject instanceof Components.interfaces.nsIMenuBoxObject
+					(btn.type || "").substr(0, 4) == "menu"
+					&& "open" in btn
+					&& btn.open
+				) {
+					//btn.open = false;
+					var mp = btn.getElementsByTagName("menupopup")[0];
+					mp && mp.hidePopup();
+					break;
+				}
+			}
+		}, 350, this);
+	},
+
+	_style: null,
+	addStyles: function() {
+		if(this._style)
+			return;
+		var style = '\
+			@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");\n\
+			%button% > .cbMergeButtonsPopup > toolbarbutton {\n\
+				-moz-box-orient: horizontal !important;\n\
+				/*-moz-appearance: menuitem !important;*/\n\
+				margin: 0 !important;\n\
+				padding: 0 2px !important;\n\
+			}\n\
+			%button% > .cbMergeButtonsPopup > toolbarbutton > .toolbarbutton-icon {\n\
+				display: -moz-box !important;\n\
+				margin-left: 3px !important;\n\
+				margin-right: 3px !important;\n\
+				max-width: 16px;\n\
+				max-height: 16px;\n\
+			}\n\
+			%button% > .cbMergeButtonsPopup > toolbarbutton > .toolbarbutton-text {\n\
+				display: -moz-box !important;\n\
+				text-align: left !important;\n\
+				margin-left: 6px !important;\n\
+				margin-right: 6px !important;\n\
+			}\n\
+			%button% > .cbMergeButtonsPopup > toolbarbutton > .toolbarbutton-menu-dropmarker {\n\
+				/* See styles for .menu-right in chrome://global/skin/menu.css */\n\
+				-moz-appearance: menuarrow !important;\n\
+				-moz-margin-end: -2px !important;\n\
+				list-style-image: none !important;\n\
+				min-width: 1.28em !important;\n\
+				padding-top: 1px !important;\n\
+			}\n\
+			%button% > .cbMergeButtonsPopup > toolbarseparator {\n\
+				-moz-appearance: menuseparator !important;\n\
+			}'
+			.replace(/%button%/g, "#" + this.button.id);
+		this._style = document.insertBefore(
+			document.createProcessingInstruction(
+				"xml-stylesheet",
+				'href="' + "data:text/css,"
+					+ encodeURIComponent(style) + '" type="text/css"'
+			),
+			document.documentElement
+		);
+	},
+	removeStyles: function() {
+		var s = this._style;
+		if(s) {
+			this._style = null;
+			s.parentNode.removeChild(s);
+		}
 	}
 };
-
-addEventListener("beforecustomization", this.mergeButtons, false);
-//addEventListener("aftercustomization",  this.mergeButtons, false);
-this.onDestroy = function() {
-	this.mergeButtons.split();
-};
-//this.mergeButtons.merge();
-this.mergeButtons.init();
-setTimeout(function(_this) {
-	_this.mergeButtons.merge();
-}, 5000, this);
 
 this.type = "menu";
 this.orient = "horizontal";
-
-var sId = "__custombuttonsStyle__" + this.id; // Unique style "id"
-var cssStr = <><![CDATA[
-	%button% > menupopup toolbarbutton {
-		-moz-box-orient: horizontal !important;
-		/*-moz-appearance: menuitem !important;*/
-	}
-	%button% > menupopup .toolbarbutton-text {
-		display: -moz-box !important;
-		text-align: left !important;
-		-moz-margin-start: 4px !important;
-	}
-	]]></>
-	.toString()
-	.replace(/%button%/g, "#" + this.id);
-function sheet(cssStr, removeFlag) {
-	var sss = Components.classes["@mozilla.org/content/style-sheet-service;1"]
-		.getService(Components.interfaces.nsIStyleSheetService);
-	var ios = Components.classes["@mozilla.org/network/io-service;1"]
-		.getService(Components.interfaces.nsIIOService);
-	var data = "data:text/css," + encodeURIComponent(cssStr);
-	var uri = ios.newURI(data, null, null);
-	if(sss.sheetRegistered(uri, sss.USER_SHEET))
-		sss.unregisterSheet(uri, sss.USER_SHEET);
-	if(removeFlag)
-		return;
-	sss.loadAndRegisterSheet(uri, sss.USER_SHEET);
-	window[sId] = cssStr;
-}
-if(!(sId in window))
-	sheet(cssStr);
-else if(window[sId] != cssStr) {
-	sheet(window[sId], true);
-	sheet(cssStr);
-}
+this.mergeButtons.init();
+//LOG("init();");
+this.onDestroy = function(reason) {
+	//LOG("onDestroy(" + reason + ");");
+	this.mergeButtons.destroy(reason);
+};
