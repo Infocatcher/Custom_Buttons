@@ -4,9 +4,10 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011
-// version 0.1.0a2 - 2011-07-20
+// version 0.1.0a3 - 2011-07-20
 
-var buttons = [12, 16, "-", 18];
+//var buttons = [12, 16, "-", 18];
+var buttons = [1, 5, "-", 6, 9];
 
 this.onmouseover = function(e) {
 	if(e.target != this)
@@ -38,7 +39,7 @@ this.mergeButtons = {
 	get mp() {
 		var mp = this.button.appendChild(document.createElement("menupopup"));
 		mp.setAttribute("onpopupshowing", "if(event.target == this) this.parentNode.mergeButtons.merge();");
-		mp.setAttribute("onclick", "if(event.button != 2) closeMenus(this);");
+		addEventListener("click", this, true, mp);
 		delete this.mp;
 		return this.mp = mp;
 	},
@@ -94,11 +95,20 @@ this.mergeButtons = {
 			insParent.insertBefore(btn, insPos);
 		});
 	},
+	close: function(e) {
+		if(e.button == 2)
+			return;
+		var trg = e.target;
+		if(trg.localName == "toolbarbutton" && trg.type != "menu")
+			closeMenus(trg);
+	},
 	handleEvent: function(e) {
 		if(e.type == "beforecustomization")
 			this.split();
 		//else if(e.type == "aftercustomization")
 		//	this.merge();
+		else if(e.type == "click")
+			this.close(e);
 	}
 };
 
@@ -108,10 +118,10 @@ this.onDestroy = function() {
 	this.mergeButtons.split();
 };
 //this.mergeButtons.merge();
-//setTimeout(function(_this) {
-//	_this.mergeButtons.merge();
-//}, 50, this);
 this.mergeButtons.init();
+setTimeout(function(_this) {
+	_this.mergeButtons.merge();
+}, 5000, this);
 
 this.type = "menu";
 this.orient = "horizontal";
@@ -120,7 +130,7 @@ var sId = "__custombuttonsStyle__" + this.id; // Unique style "id"
 var cssStr = <><![CDATA[
 	%button% > menupopup toolbarbutton {
 		-moz-box-orient: horizontal !important;
-		-moz-appearance: menuitem !important;
+		/*-moz-appearance: menuitem !important;*/
 	}
 	%button% > menupopup .toolbarbutton-text {
 		display: -moz-box !important;
