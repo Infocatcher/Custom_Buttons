@@ -4,7 +4,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011
-// version 0.1.0a1 - 2011-07-20
+// version 0.1.0a2 - 2011-07-20
 
 var buttons = [12, 16, "-", 18];
 
@@ -34,46 +34,65 @@ this.onmouseover = function(e) {
 this.mergeButtons = {
 	button: this,
 	buttons: buttons,
+	merged: false,
 	get mp() {
 		var mp = this.button.appendChild(document.createElement("menupopup"));
+		mp.setAttribute("onpopupshowing", "if(event.target == this) this.parentNode.mergeButtons.merge();");
 		mp.setAttribute("onclick", "if(event.button != 2) closeMenus(this);");
 		delete this.mp;
 		return this.mp = mp;
 	},
-	_buttons: [],
-	merge: function() {
-		if(this._buttons.length)
-			return;
-		while(this.mp.hasChildNodes())
-			this.mp.removeChild(this.mp.lastChild);
-		this.buttons.forEach(function(id) {
+	init: function() {
+		this.mp;
+		this.buttons.forEach(function(id, i) {
 			var item;
-			if(id == "-")
+			if(id == "-") {
 				item = document.createElement("menuseparator");
+				this.buttons[i] = null;
+			}
 			else {
 				item = document.getElementById("custombuttons-button" + id);
 				if(!item) {
+					delete this.buttons[i];
 					Components.utils.reportError(<>[Custom Buttons :: Merge Buttons] Button "{id}" not found!</>);
 					return;
 				}
+				item.setAttribute("collapsed", "true");
 				item.__mergeButtonsPosition = item.nextSibling;
 				item.__mergeButtonsParent = item.parentNode;
-				this._buttons.push(item);
+				this.buttons[i] = item;
 			}
-			this.mp.appendChild(item);
+		}, this);
+	},
+	merge: function() {
+		if(this.merged)
+			return;
+		this.merged = true;
+		var mp = this.mp;
+		while(mp.hasChildNodes())
+			mp.removeChild(mp.lastChild);
+		this.buttons.forEach(function(btn) {
+			if(!btn)
+				btn = document.createElement("menuseparator");
+			else
+				btn.removeAttribute("collapsed");
+			mp.appendChild(btn);
 		}, this);
 	},
 	split: function() {
-		if(!this._buttons.length)
+		if(!this.merged)
 			return;
-		this._buttons.reverse().forEach(function(btn) {
+		this.merged = false;
+		this.buttons.slice().reverse().forEach(function(btn) {
+			if(!btn)
+				return;
+			btn.removeAttribute("collapsed");
 			var insPos = btn.__mergeButtonsPosition;
 			var insParent = btn.__mergeButtonsParent;
 			if(insPos && insPos.parentNode != insParent)
 				insPos = null;
 			insParent.insertBefore(btn, insPos);
 		});
-		this._buttons.length = 0;
 	},
 	handleEvent: function(e) {
 		if(e.type == "beforecustomization")
@@ -89,9 +108,10 @@ this.onDestroy = function() {
 	this.mergeButtons.split();
 };
 //this.mergeButtons.merge();
-setTimeout(function(_this) {
-	_this.mergeButtons.merge();
-}, 50, this);
+//setTimeout(function(_this) {
+//	_this.mergeButtons.merge();
+//}, 50, this);
+this.mergeButtons.init();
 
 this.type = "menu";
 this.orient = "horizontal";
