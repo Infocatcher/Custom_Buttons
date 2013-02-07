@@ -472,6 +472,14 @@ function init() {
 			tt.appendChild(df);
 		},
 		getRect: function(node) {
+			if(!(node instanceof Element)) try {
+				var rng = node.ownerDocument.createRange();
+				rng.selectNodeContents(node);
+				node = rng;
+			}
+			catch(e) {
+				Components.utils.reportError(e);
+			}
 			try {
 				var rect = "getBoundingClientRect" in node
 					? node.getBoundingClientRect()
