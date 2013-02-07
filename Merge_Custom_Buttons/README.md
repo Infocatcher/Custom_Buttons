@@ -3,3 +3,6 @@
 <br>Use two separators as “stop” flag.
 <br>May not work for buttons with initialization code.
 <br>Middle-click or left-click with any modifier – temporary split/merge.
+
+##### Screenshots:
+<img src="https://raw.github.com/Infocatcher/Custom_Buttons/master/Merge_Custom_Buttons/screenshots/menu_with_merged_custom_buttons.png" alt="Menu with merged custom buttons" align="top">&nbsp;<img src="https://raw.github.com/Infocatcher/Custom_Buttons/master/Merge_Custom_Buttons/screenshots/temporarily_split.png" alt="Middle-click to temporarily split" align="top">
