@@ -15,9 +15,10 @@
 //   (hold additional Shift key to enable pupup locker)
 //   Hold Shift key to show and don't hide tooltips and popups
 // Hotkeys:
-//   Escape             - cancel or disable popup locker
-//   Ctrl+Up, Ctrl+Down - go to parent/child node
-//   Ctrl+Shift+C       - copy tooltip contents
+//   Escape                - cancel or disable popup locker
+//   Ctrl+Up, Ctrl+Down    - navigate to parent/child node
+//   Ctrl+Left, Ctrl+Right - navigate to previous/next sibling node
+//   Ctrl+Shift+C          - copy tooltip contents
 
 // For more developer tools see Extensions Developer Tools button:
 //   http://infocatcher.ucoz.net/js/cb/extDevTools.js
@@ -388,17 +389,9 @@ function init() {
 				return;
 			}
 
-			var rect = "getBoundingClientRect" in node
-				? node.getBoundingClientRect()
-				: node instanceof XULElement
-					? node.boxObject
-					: node.ownerDocument && node.ownerDocument.getBoxObjectFor(node);
-			if(!("width" in rect)) {
-				rect.width = rect.right - rect.left;
-				rect.height = rect.bottom - rect.top;
-			}
-			var w = rect.width;
-			var h = rect.height;
+			var rect = this.getRect(node);
+			var w = rect && rect.width;
+			var h = rect && rect.height;
 			if(!w && !h)
 				df.appendChild(this.getItem(node.nodeName));
 			else {
@@ -471,6 +464,70 @@ function init() {
 			}, this);
 			tt.appendChild(df);
 		},
+		getRect: function(node) {
+			try {
+				var rect = "getBoundingClientRect" in node
+					? node.getBoundingClientRect()
+					: node instanceof XULElement
+						? node.boxObject
+						: node.ownerDocument && "getBoxObjectFor" in node.ownerDocument
+							&& node.ownerDocument.getBoxObjectFor(node);
+			}
+			catch(e) {
+			}
+			if(rect && !("width" in rect)) {
+				rect.width = rect.right - rect.left;
+				rect.height = rect.bottom - rect.top;
+			}
+			return rect;
+		},
+		getScreenRect: function(node) {
+			var win = node.ownerDocument.defaultView;
+			var scale = 1;
+			try {
+				var utils = win.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+					.getInterface(Components.interfaces.nsIDOMWindowUtils);
+				scale = utils.screenPixelsPerCSSPixel || 1;
+			}
+			catch(e) {
+				Components.utils.reportError(e);
+			}
+
+			if("getBoundingClientRect" in node) {
+				var rect = node.getBoundingClientRect();
+				return {
+					x: rect.left*scale,
+					y: rect.top*scale,
+					screenX: (rect.left + win.mozInnerScreenX)*scale,
+					screenY: (rect.top + win.mozInnerScreenY)*scale,
+					width: (rect.right - rect.left)*scale,
+					height: (rect.bottom - rect.top)*scale
+				};
+			}
+
+			try {
+				var bo = node instanceof XULElement && node.boxObject
+					|| node.ownerDocument && "getBoxObjectFor" in node.ownerDocument
+						&& node.ownerDocument.getBoxObjectFor(node);
+			}
+			catch(e) {
+			}
+			if(bo) {
+				if(!("width" in bo)) {
+					bo.width = bo.right - bo.left;
+					bo.height = bo.bottom - bo.top;
+				}
+				return {
+					x: bo.x*scale,
+					y: bo.y*scale,
+					screenX: bo.screenX*scale,
+					screenY: bo.screenY*scale,
+					width: bo.width*scale,
+					height: bo.height*scale
+				};
+			}
+			return null;
+		},
 		getNS: function(ns) {
 			if(_showNamespaceURI == 1)
 				return ns;
@@ -487,7 +544,7 @@ function init() {
 				case "http://www.w3.org/1999/02/22-rdf-syntax-ns":                    return "RDF";
 				case "http://www.w3.org/2001/xml-events":                             return "XML Events";
 			}
-			return ns;
+			return String(ns); // Can be null for #text
 		},
 		stop: function() {
 			this.context.stop();
@@ -902,6 +959,16 @@ function init() {
 				if(!onlyStop)
 					this.navigateDown();
 			}
+			if(ctrlOrCtrlShift && e.keyCode == e.DOM_VK_RIGHT) { // Ctrl+Right
+				this.stopEvent(e);
+				if(!onlyStop)
+					this.navigateNext();
+			}
+			else if(ctrlOrCtrlShift && e.keyCode == e.DOM_VK_LEFT) { // Ctrl+Left
+				this.stopEvent(e);
+				if(!onlyStop)
+					this.navigatePrev();
+			}
 			else if(ctrlShift && e.keyCode == e.DOM_VK_C) // keydown || keyup
 				this.stopEvent(e);
 			else if(ctrlShift && e.keyCode == 0 && String.fromCharCode(e.charCode) == "C") { // Ctrl+Shift+C
@@ -947,7 +1014,11 @@ function init() {
 			else if(nodes.length == 1) {
 				var node = nodes[0];
 				var childs = node.childNodes;
-				if(!childs.length && "getAnonymousNodes" in node.ownerDocument)
+				if(
+					!childs.length
+					&& node instanceof XULElement
+					&& "getAnonymousNodes" in node.ownerDocument
+				)
 					childs = node.ownerDocument.getAnonymousNodes(node);
 				if(childs) for(var i = 0, l = childs.length; i < l; ++i) {
 					var node = childs[i];
@@ -957,6 +1028,37 @@ function init() {
 						break;
 					}
 				}
+			}
+		},
+		navigateNext: function() {
+			this.navigateSibling(true);
+		},
+		navigatePrev: function() {
+			this.navigateSibling(false);
+		},
+		navigateSibling: function(toNext) {
+			var nodes = this._nodes;
+			if(!nodes.length)
+				return;
+			var node = nodes[0];
+			var sibling = toNext ? node.nextSibling : node.previousSibling;
+			if(sibling) {
+				// Update screen position for mousemoveHandler()
+				var rect = this.getScreenRect(sibling);
+				if(
+					rect
+					&& rect.width > 0 && rect.height > 0 // Wrong coordinates for hidden nodes
+					&& (this.fxVersion < 3 || this.fxVersion > 3.5)
+				) {
+					var x = rect.screenX;
+					var y = rect.screenY + rect.height;
+					if(x != undefined && y != undefined) {
+						this._lastScreenX = x;
+						this._lastScreenY = y - 22 + 8;
+					}
+				}
+				this._nodes = [sibling];
+				this.handleNode(sibling);
 			}
 		},
 		copyTootipContent: function() {
