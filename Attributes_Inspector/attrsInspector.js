@@ -413,6 +413,7 @@ function init() {
 				df.appendChild(this.getItem("namespaceURI", this.getNS(nodeNS)));
 
 			if(!node.attributes) {
+				df.appendChild(this.getItem("nodeValue", node.nodeValue));
 				tt.appendChild(df);
 				return;
 			}
