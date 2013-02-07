@@ -54,7 +54,7 @@ if(!tab) {
 	tab.closing = true; // See "visibleTabs" getter in chrome://browser/content/tabbrowser.xml
 	window.addEventListener("TabSelect", dontSelectHiddenTab, false);
 }
-if(
+else if(
 	tab.getAttribute("pending") == "true" // Gecko >= 9.0
 	|| tab.linkedBrowser.contentDocument.readyState == "uninitialized"
 	// || tab.linkedBrowser.__SS_restoreState == 1
