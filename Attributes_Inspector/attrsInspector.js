@@ -42,6 +42,9 @@ var _addedColor = "-moz-hyperlinktext";
 var _removedColor = "grayText";
 var _changedColor = "-moz-visitedhyperlinktext";
 
+var _excludeChildTextNodes = true;
+var _excludeSiblingTextNodes = false;
+
 var _forbidTooltips = true; // Prevent all other tooltips
 var _popupLocker = 1;
 // Lock all popups in window while DOM Inspector is opened (or until Escape was not pressed)
@@ -1022,7 +1025,7 @@ function init() {
 					childs = node.ownerDocument.getAnonymousNodes(node);
 				if(childs) for(var i = 0, l = childs.length; i < l; ++i) {
 					var node = childs[i];
-					if("attributes" in node && node.attributes) {
+					if(!_excludeChildTextNodes || node instanceof Element) {
 						this._nodes = [node];
 						this.handleNode(node);
 						break;
@@ -1041,25 +1044,27 @@ function init() {
 			if(!nodes.length)
 				return;
 			var node = nodes[0];
-			var sibling = toNext ? node.nextSibling : node.previousSibling;
-			if(sibling) {
-				// Update screen position for mousemoveHandler()
-				var rect = this.getScreenRect(sibling);
-				if(
-					rect
-					&& rect.width > 0 && rect.height > 0 // Wrong coordinates for hidden nodes
-					&& (this.fxVersion < 3 || this.fxVersion > 3.5)
-				) {
-					var x = rect.screenX;
-					var y = rect.screenY + rect.height;
-					if(x != undefined && y != undefined) {
-						this._lastScreenX = x;
-						this._lastScreenY = y - 22 + 8;
-					}
+			var sibling = node;
+			do sibling = toNext ? sibling.nextSibling : sibling.previousSibling;
+			while(_excludeSiblingTextNodes && sibling && !(sibling instanceof Element));
+			if(!sibling)
+				return;
+			// Update screen position for mousemoveHandler()
+			var rect = this.getScreenRect(sibling);
+			if(
+				rect
+				&& rect.width > 0 && rect.height > 0 // Wrong coordinates for hidden nodes
+				&& (this.fxVersion < 3 || this.fxVersion > 3.5)
+			) {
+				var x = rect.screenX;
+				var y = rect.screenY + rect.height;
+				if(x != undefined && y != undefined) {
+					this._lastScreenX = x;
+					this._lastScreenY = y - 22 + 8;
 				}
-				this._nodes = [sibling];
-				this.handleNode(sibling);
 			}
+			this._nodes = [sibling];
+			this.handleNode(sibling);
 		},
 		copyTootipContent: function() {
 			var node = this._node;
