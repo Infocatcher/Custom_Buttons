@@ -42,7 +42,10 @@ var _addedColor = "-moz-hyperlinktext";
 var _removedColor = "grayText";
 var _changedColor = "-moz-visitedhyperlinktext";
 
-var _excludeChildTextNodes = true;
+var _excludeChildTextNodes = 1;
+// 0 - don't exclude
+// 1 - exclude, if found element node
+// 2 - always exclude
 var _excludeSiblingTextNodes = false;
 
 var _forbidTooltips = true; // Prevent all other tooltips
@@ -1023,13 +1026,21 @@ function init() {
 					&& "getAnonymousNodes" in node.ownerDocument
 				)
 					childs = node.ownerDocument.getAnonymousNodes(node);
-				if(childs) for(var i = 0, l = childs.length; i < l; ++i) {
+				if(!childs)
+					return;
+				var child;
+				for(var i = 0, l = childs.length; i < l; ++i) {
 					var node = childs[i];
 					if(!_excludeChildTextNodes || node instanceof Element) {
-						this._nodes = [node];
-						this.handleNode(node);
+						child = node;
 						break;
 					}
+				}
+				if(!child && _excludeChildTextNodes == 1 && l)
+					child = childs[0];
+				if(child) {
+					this._nodes = [child];
+					this.handleNode(child);
 				}
 			}
 		},
