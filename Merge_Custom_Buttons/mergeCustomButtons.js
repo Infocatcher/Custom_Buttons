@@ -126,7 +126,7 @@ this.mergeButtons = {
 			}, 0);
 		}, 0, this);
 	},
-	split: function() {
+	split: function(temporarily) {
 		if(!this.merged)
 			return;
 		this.merged = false;
@@ -137,8 +137,11 @@ this.mergeButtons = {
 		if(
 			next1 && next1.localName == "toolbarseparator"
 			&& next2 && next2.localName == "toolbarseparator"
-		)
-			next1.collapsed = next2.collapsed = false;
+		) {
+			next1.collapsed = false;
+			if(!temporarily)
+				next2.collapsed = false;
+		}
 
 		var df = document.createDocumentFragment();
 		var mp = this.mp;
@@ -152,7 +155,7 @@ this.mergeButtons = {
 	},
 	toggle: function() {
 		if(this.merged)
-			this.split();
+			this.split(true);
 		else
 			this.merge();
 	},
