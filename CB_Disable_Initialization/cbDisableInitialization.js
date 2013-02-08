@@ -1,4 +1,4 @@
-// https://github.com/Infocatcher/Custom_Buttons/tree/master/CB_Disable_Initialization
+п»ї// https://github.com/Infocatcher/Custom_Buttons/tree/master/CB_Disable_Initialization
 
 // Custom Buttons: Disable Initialization button for Custom Buttons
 // (code for "initialization" section)
@@ -16,7 +16,7 @@
 var toggleEnabledLabel = (function() {
 	var locale = (cbu.getPrefs("general.useragent.locale") || "en").match(/^\w*/)[0];
 	if(locale == "ru")
-		return "Включить инициализацию";
+		return "Р’РєР»СЋС‡РёС‚СЊ РёРЅРёС†РёР°Р»РёР·Р°С†РёСЋ";
 	return "Enable initialization";
 })();
 
