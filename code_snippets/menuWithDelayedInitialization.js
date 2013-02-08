@@ -4,7 +4,7 @@
 // Code for "code" and "initialization" sections (see comments)
 
 // (c) Infocatcher 2013
-// version 0.1.0 - 2013-02-08
+// version 0.1.1 - 2013-02-08
 
 
 //== "Code" section:
@@ -13,10 +13,16 @@ if(!event.target) { // Button's hotkey pressed
 	this.open = true;
 	return;
 }
-if(event.target != this)
+if(event.target != this) {
+	LOG("code() from child node");
 	return;
+}
 LOG("code()");
 var mp = this.mp; // See initialization
+addEventListener("command", function(e) {
+	// Button shouldn't handle "command" event from child nodes
+	e.stopPropagation();
+}, false, mp);
 // Create menu contents (just an example):
 var df = document.createDocumentFragment();
 for(var i = 1; i <= 10; ++i) {
