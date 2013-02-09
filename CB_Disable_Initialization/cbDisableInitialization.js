@@ -6,7 +6,7 @@
 // (c) Infocatcher 2012
 // version 0.1.0pre3 - 2012-11-25
 
-// Add "Enabled" checkbox to custom button's context menu.
+// Adds "Enable initialization" checkbox to custom button's context menu.
 // Only for test purposes!
 // "Disabled" mean only "return;" before initealization code.
 

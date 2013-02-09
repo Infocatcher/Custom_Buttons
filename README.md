@@ -19,10 +19,10 @@ Use “Back” command to close tab without “back history”
 Show contents of any bookmarks folder in drop-down menu
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/CB_Disable_Initialization/icon.png)&nbsp;[Custom Buttons: Disable Initialization](CB_Disable_Initialization)
-Add “Enabled” checkbox to custom button's context menu (for test purposes)
+Adds “Enabled” checkbox to custom button's context menu (for test purposes)
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/CB_Editor_Toggle_on_Top/icons/icon.png)&nbsp;[Custom Buttons Editor: Toggle on Top](CB_Editor_Toggle_on_Top)
-Add “On top” button to built-in custom button's editor (doesn't work on some platforms!)
+Adds “On top” button to built-in custom button's editor (doesn't work on some platforms!)
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Check_for_Addons_Updates/icon.png)&nbsp;[Check for Addons Updates](Check_for_Addons_Updates)
 Button just open hidden tab with about:addons and trigger built-in “Check for Updates” function.
