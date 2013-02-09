@@ -1,7 +1,8 @@
 ﻿#### Usage
 * Install **[Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)** extension
-* Open *.html (if exist) and click on custombutton:// link
-* or read instructions in *.js and copy code to the “code” or “initialization” section in custom button editor
+* Go to button directory and click on button name to install the release version (if available)
+* or open *.html (if exist) and click on custombutton:// link
+* or read instructions in *.js and copy code to the “code” or “initialization” section in custom button editor (be careful: this is development version and may contain some bugs)
 
 <hr>
 #### Buttons in alphabetical order
