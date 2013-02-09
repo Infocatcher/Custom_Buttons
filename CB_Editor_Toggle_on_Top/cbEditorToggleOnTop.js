@@ -5,8 +5,8 @@
 // Custom Buttons Editor: Toggle on Top button for Custom Buttons
 // (code for "initialization" section)
 
-// (c) Infocatcher 2012
-// version 0.1.9 - 2012-09-08
+// (c) Infocatcher 2012-2013
+// version 0.1.10 - 2013-02-09
 
 // Hotkey: Ctrl+T
 
@@ -311,9 +311,16 @@ if(!watcher) {
 	Application.storage.set(watcherId, watcher);
 	watcher.init(watcher.REASON_STARTUP);
 }
-this.onDestroy = function(reason) {
+function destructor(reason) {
 	if(reason == "update" || reason == "delete") {
 		watcher.destroy(watcher.REASON_SHUTDOWN);
 		Application.storage.set(watcherId, null);
 	}
-};
+}
+if(
+	typeof addDestructor == "function" // Custom Buttons 0.0.5.6pre4+
+	&& addDestructor != ("addDestructor" in window && window.addDestructor)
+)
+	addDestructor(destructor, this);
+else
+	this.onDestroy = destructor;
