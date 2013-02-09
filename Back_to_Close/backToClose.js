@@ -3,8 +3,8 @@
 // Back to Close button for Custom Buttons
 // (code for "initialization" section)
 
-// (c) Infocatcher 2009-2010, 2012
-// version 0.2.0b1 - 2012-09-25
+// (c) Infocatcher 2009-2010, 2012-2013
+// version 0.2.0b2 - 2013-02-09
 
 if(UpdateBackForwardCommands.toString().indexOf("_cb_backToClose") != -1) {
 	LOG("!!! Second initialization !!!");
@@ -162,7 +162,7 @@ var sss = Components.classes["@mozilla.org/content/style-sheet-service;1"]
 if(!sss.sheetRegistered(cssURI, sss.USER_SHEET))
 	sss.loadAndRegisterSheet(cssURI, sss.USER_SHEET);
 
-this.onDestroy = function(reason) {
+function destructor(reason) {
 	// Note: we don't restore patches from another extensions!
 	if(reason == "update" || reason == "delete" || reason == "constructor") {
 		// Button changed, removed or opened customize toolbar dialog
@@ -186,4 +186,11 @@ this.onDestroy = function(reason) {
 				sss.unregisterSheet(cssURI, sss.USER_SHEET);
 		}
 	}
-};
+}
+if(
+	typeof addDestructor == "function" // Custom Buttons 0.0.5.6pre4+
+	&& addDestructor != ("addDestructor" in window && window.addDestructor)
+)
+	addDestructor(destructor, this);
+else
+	this.onDestroy = destructor;
