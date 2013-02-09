@@ -4,8 +4,8 @@
 // Edit Custom Button in Tab button for Custom Buttons
 // (code for "initialization" section)
 
-// (c) Infocatcher 2012
-// version 0.1.7 - 2012-11-25
+// (c) Infocatcher 2012-2013
+// version 0.1.8 - 2013-02-09
 
 // Note:
 // In Firefox 3.6 and older:
@@ -206,11 +206,18 @@ addEventListener("DOMContentLoaded", function(e) {
 }, true, gBrowser);
 checkTab(gBrowser.selectedTab);
 
-this.onDestroy = function(reason) {
+function destructor(reason) {
 	if(reason == "update" || reason == "delete") {
 		Array.slice(document.getElementsByAttribute("cb_id", editInTabId)).forEach(function(btn) {
 			btn.parentNode.removeChild(btn);
 		});
 		delete window.editCustomButtonInTab;
 	}
-};
+}
+if(
+	typeof addDestructor == "function" // Custom Buttons 0.0.5.6pre4+
+	&& addDestructor != ("addDestructor" in window && window.addDestructor)
+)
+	addDestructor(destructor, this);
+else
+	this.onDestroy = destructor;
