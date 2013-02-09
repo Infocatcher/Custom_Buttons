@@ -3,8 +3,8 @@
 // Custom Buttons: Disable Initialization button for Custom Buttons
 // (code for "initialization" section)
 
-// (c) Infocatcher 2012
-// version 0.1.0pre3 - 2012-11-25
+// (c) Infocatcher 2012-2013
+// version 0.1.0pre4 - 2013-02-09
 
 // Adds "Enable initialization" checkbox to custom button's context menu.
 // Only for test purposes!
@@ -127,7 +127,7 @@ var styleNode = document.insertBefore(
 	document.firstChild
 );
 
-this.onDestroy = function(reason) {
+function destructor(reason) {
 	if(reason == "update" || reason == "delete") {
 		styleNode.parentNode.removeChild(styleNode);
 		Array.slice(document.getElementsByAttribute("cb_id", toggleEnabledId)).forEach(function(btn) {
@@ -135,4 +135,11 @@ this.onDestroy = function(reason) {
 		});
 		delete window.toggleCustomButtonEnabled;
 	}
-};
+}
+if(
+	typeof addDestructor == "function" // Custom Buttons 0.0.5.6pre4+
+	&& addDestructor != ("addDestructor" in window && window.addDestructor)
+)
+	addDestructor(destructor, this);
+else
+	this.onDestroy = destructor;
