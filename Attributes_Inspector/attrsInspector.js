@@ -1585,15 +1585,27 @@ function init() {
 	this.ww.registerNotification(this.evtHandlerGlobal);
 	var btn = this.button;
 	if(btn) {
-		if("onDestroy" in btn)
-			var origOnDestroy = btn._attrsInspectorOrigOnDestroy = btn.onDestroy;
-		btn.onDestroy = function(reason) {
+		var destructor = function(reason) {
 			if(reason == "delete") {
 				_log('"Delete button" pressed -> stop()');
 				context.stop();
 			}
-			origOnDestroy && origOnDestroy.apply(this, arguments);
 		};
+		if(
+			typeof addDestructor == "function" // Custom Buttons 0.0.5.6pre4+
+			&& addDestructor != ("addDestructor" in window && window.addDestructor)
+		) {
+			btn._attrsInspectorHasAddDestructor = true;
+			addDestructor(destructor, this);
+		}
+		else {
+			if("onDestroy" in btn)
+				var origOnDestroy = btn._attrsInspectorOrigOnDestroy = btn.onDestroy;
+			btn.onDestroy = function(reason) {
+				destructor(reason);
+				origOnDestroy && origOnDestroy.apply(this, arguments);
+			};
+		}
 	}
 	_log(
 		"Successfully started!"
@@ -1636,8 +1648,10 @@ function destroy() {
 	if(btn) {
 		if("_attrsInspectorOrigOnDestroy" in btn)
 			btn.onDestroy = btn._attrsInspectorOrigOnDestroy;
-		else
+		else if(!("_attrsInspectorHasAddDestructor" in btn))
 			delete btn.onDestroy;
+		delete btn._attrsInspectorOrigOnDestroy;
+		delete btn._attrsInspectorHasAddDestructor;
 	}
 	delete window[_ns];
 	_log("Shutdown finished!");
