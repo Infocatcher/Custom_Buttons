@@ -3,7 +3,7 @@
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Attributes_Inspector
 
 // (c) Infocatcher 2010-2013
-// version 0.6.1pre - 2013-02-07
+// version 0.6.1pre2 - 2013-02-10
 
 //===================
 // Attributes Inspector button for Custom Buttons
