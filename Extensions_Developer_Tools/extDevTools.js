@@ -978,8 +978,8 @@ this.attrsInspector = function(event) {
 // https://forum.mozilla-russia.org/viewtopic.php?id=56041
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Attributes_Inspector
 
-// (c) Infocatcher 2010-2012
-// version 0.6.0 - 2012-12-20
+// (c) Infocatcher 2010-2013
+// version 0.6.1pre2 - 2013-02-10
 
 //===================
 // Attributes Inspector button for Custom Buttons
@@ -991,9 +991,10 @@ this.attrsInspector = function(event) {
 //   (hold additional Shift key to enable pupup locker)
 //   Hold Shift key to show and don't hide tooltips and popups
 // Hotkeys:
-//   Escape             - cancel or disable popup locker
-//   Ctrl+Up, Ctrl+Down - go to parent/child node
-//   Ctrl+Shift+C       - copy tooltip contents
+//   Escape                - cancel or disable popup locker
+//   Ctrl+Up, Ctrl+Down    - navigate to parent/child node
+//   Ctrl+Left, Ctrl+Right - navigate to previous/next sibling node
+//   Ctrl+Shift+C          - copy tooltip contents
 
 // For more developer tools see Extensions Developer Tools button:
 //   http://infocatcher.ucoz.net/js/cb/extDevTools.js
@@ -1016,6 +1017,12 @@ var _borderStyle = "solid"; // border-style property in CSS
 var _addedColor = "-moz-hyperlinktext";
 var _removedColor = "grayText";
 var _changedColor = "-moz-visitedhyperlinktext";
+
+var _excludeChildTextNodes = 1;
+// 0 - don't exclude
+// 1 - exclude, if found element node
+// 2 - always exclude
+var _excludeSiblingTextNodes = false;
 
 var _forbidTooltips = true; // Prevent all other tooltips
 var _popupLocker = 1;
@@ -1364,17 +1371,9 @@ function init() {
 				return;
 			}
 
-			var rect = "getBoundingClientRect" in node
-				? node.getBoundingClientRect()
-				: node instanceof XULElement
-					? node.boxObject
-					: node.ownerDocument && node.ownerDocument.getBoxObjectFor(node);
-			if(!("width" in rect)) {
-				rect.width = rect.right - rect.left;
-				rect.height = rect.bottom - rect.top;
-			}
-			var w = rect.width;
-			var h = rect.height;
+			var rect = this.getRect(node);
+			var w = rect && rect.width;
+			var h = rect && rect.height;
 			if(!w && !h)
 				df.appendChild(this.getItem(node.nodeName));
 			else {
@@ -1390,6 +1389,7 @@ function init() {
 				df.appendChild(this.getItem("namespaceURI", this.getNS(nodeNS)));
 
 			if(!node.attributes) {
+				df.appendChild(this.getItem("nodeValue", node.nodeValue));
 				tt.appendChild(df);
 				return;
 			}
@@ -1447,6 +1447,94 @@ function init() {
 			}, this);
 			tt.appendChild(df);
 		},
+		getRect: function(node) {
+			if(!(node instanceof Element)) try {
+				var rng = node.ownerDocument.createRange();
+				rng.selectNodeContents(node);
+				node = rng;
+			}
+			catch(e) {
+				Components.utils.reportError(e);
+			}
+			try {
+				var rect = "getBoundingClientRect" in node
+					? node.getBoundingClientRect()
+					: node instanceof XULElement
+						? node.boxObject
+						: node.ownerDocument && "getBoxObjectFor" in node.ownerDocument
+							&& node.ownerDocument.getBoxObjectFor(node);
+			}
+			catch(e) {
+			}
+			if(rect && !("width" in rect)) {
+				rect.width = rect.right - rect.left;
+				rect.height = rect.bottom - rect.top;
+			}
+			return rect;
+		},
+		getScreenRect: function(node) {
+			var win = node.ownerDocument.defaultView;
+			var scale = 1;
+			try {
+				var utils = win.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+					.getInterface(Components.interfaces.nsIDOMWindowUtils);
+				scale = utils.screenPixelsPerCSSPixel || 1;
+			}
+			catch(e) {
+				Components.utils.reportError(e);
+			}
+
+			if("getBoundingClientRect" in node) {
+				var rect = node.getBoundingClientRect();
+				return {
+					x: rect.left*scale,
+					y: rect.top*scale,
+					screenX: (rect.left + win.mozInnerScreenX)*scale,
+					screenY: (rect.top + win.mozInnerScreenY)*scale,
+					width: (rect.right - rect.left)*scale,
+					height: (rect.bottom - rect.top)*scale
+				};
+			}
+
+			try {
+				var bo = node instanceof XULElement && node.boxObject
+					|| node.ownerDocument && "getBoxObjectFor" in node.ownerDocument
+						&& node.ownerDocument.getBoxObjectFor(node);
+			}
+			catch(e) {
+			}
+			if(bo) {
+				if(!("width" in bo)) {
+					bo.width = bo.right - bo.left;
+					bo.height = bo.bottom - bo.top;
+				}
+				return {
+					x: bo.x*scale,
+					y: bo.y*scale,
+					screenX: bo.screenX*scale,
+					screenY: bo.screenY*scale,
+					width: bo.width*scale,
+					height: bo.height*scale
+				};
+			}
+			return null;
+		},
+		isNodeVisible: function(node, rect) {
+			if(!rect)
+				rect = this.getRect(node);
+			if(rect.width == 0 && rect.height == 0)
+				return false;
+			for(var p = node; p; p = p.parentNode) {
+				if(
+					p instanceof XULElement
+					&& (p.localName == "menupopup" || p.localName == "popup")
+					&& "state" in p
+					&& p.state == "closed"
+				)
+					return false;
+			}
+			return true;
+		},
 		getNS: function(ns) {
 			if(_showNamespaceURI == 1)
 				return ns;
@@ -1463,7 +1551,7 @@ function init() {
 				case "http://www.w3.org/1999/02/22-rdf-syntax-ns":                    return "RDF";
 				case "http://www.w3.org/2001/xml-events":                             return "XML Events";
 			}
-			return ns;
+			return String(ns); // Can be null for #text
 		},
 		stop: function() {
 			this.context.stop();
@@ -1878,6 +1966,16 @@ function init() {
 				if(!onlyStop)
 					this.navigateDown();
 			}
+			if(ctrlOrCtrlShift && e.keyCode == e.DOM_VK_RIGHT) { // Ctrl+Right
+				this.stopEvent(e);
+				if(!onlyStop)
+					this.navigateNext(top);
+			}
+			else if(ctrlOrCtrlShift && e.keyCode == e.DOM_VK_LEFT) { // Ctrl+Left
+				this.stopEvent(e);
+				if(!onlyStop)
+					this.navigatePrev(top);
+			}
 			else if(ctrlShift && e.keyCode == e.DOM_VK_C) // keydown || keyup
 				this.stopEvent(e);
 			else if(ctrlShift && e.keyCode == 0 && String.fromCharCode(e.charCode) == "C") { // Ctrl+Shift+C
@@ -1903,12 +2001,7 @@ function init() {
 		},
 		navigateUp: function(top) {
 			var nodes = this._nodes;
-			//var node = nodes.length && nodes[0].parentNode;
-			var node = nodes.length && Components.classes["@mozilla.org/inspector/dom-utils;1"]
-				.getService(Components.interfaces.inIDOMUtils)
-				.getParentForNode(nodes[0], true);
-			if(!node && nodes.length && nodes[0].nodeType == Node.DOCUMENT_NODE && nodes[0] != top.document)
-				node = this.getParentFrame(nodes[0], top.document); // Only for Firefox 1.5
+			var node = nodes.length && this.getParentNode(nodes[0], top);
 			if(node) {
 				nodes.unshift(node);
 				this.handleNode(node);
@@ -1922,18 +2015,120 @@ function init() {
 			}
 			else if(nodes.length == 1) {
 				var node = nodes[0];
-				var childs = node.childNodes;
-				if(!childs.length && "getAnonymousNodes" in node.ownerDocument)
-					childs = node.ownerDocument.getAnonymousNodes(node);
-				if(childs) for(var i = 0, l = childs.length; i < l; ++i) {
-					var node = childs[i];
-					if("attributes" in node && node.attributes) {
-						this._nodes = [node];
-						this.handleNode(node);
+				var childs = this.getChildNodes(node);
+				if(!childs)
+					return;
+				var child;
+				for(var i = 0, l = childs.length; i < l; ++i) {
+					var ch = childs[i];
+					if(!_excludeChildTextNodes || ch instanceof Element) {
+						child = ch;
 						break;
 					}
 				}
+				if(!child && _excludeChildTextNodes == 1 && l)
+					child = childs[0];
+				if(child) {
+					this._nodes = [child];
+					this.handleNode(child);
+				}
 			}
+		},
+		navigateNext: function(top) {
+			this.navigateSibling(true, top);
+		},
+		navigatePrev: function(top) {
+			this.navigateSibling(false, top);
+		},
+		navigateSibling: function(toNext, top) {
+			var nodes = this._nodes;
+			if(!nodes.length)
+				return;
+			var node = nodes[0];
+			//var sibling = node;
+			//do sibling = toNext ? sibling.nextSibling : sibling.previousSibling;
+			//while(_excludeSiblingTextNodes && sibling && !(sibling instanceof Element));
+			var parent = this.getParentNode(node, top);
+			var siblings = parent && this.getChildNodes(parent, node);
+			if(!siblings || siblings.length < 2)
+				return;
+			var max = siblings.length - 1;
+			var pos = Array.indexOf(siblings, node);
+			if(pos == -1)
+				return;
+			var shift = toNext ? 1 : -1;
+			var sibling;
+			for(var i = pos + shift; ; i += shift) {
+				if(i < 0)
+					i = max;
+				else if(i > max)
+					i = 0;
+				if(i == pos)
+					break;
+				var sb = siblings[i];
+				if(sb && (!_excludeSiblingTextNodes || sb instanceof Element)) {
+					sibling = sb;
+					break;
+				}
+			}
+			if(!sibling)
+				return;
+			// Update screen position for mousemoveHandler()
+			var rect = this.getScreenRect(sibling);
+			if(
+				rect
+				&& (this.fxVersion < 3 || this.fxVersion > 3.5)
+				&& this.isNodeVisible(sibling, rect) // Wrong coordinates for hidden nodes
+			) {
+				var x = rect.screenX;
+				var y = rect.screenY + rect.height;
+				if(x != undefined && y != undefined) {
+					this._lastScreenX = x;
+					this._lastScreenY = y - 22 + 8;
+				}
+			}
+			this._nodes = [sibling];
+			this.handleNode(sibling);
+		},
+		get dwu() {
+			delete this.dwu;
+			return this.dwu = Components.classes["@mozilla.org/inspector/dom-utils;1"]
+				.getService(Components.interfaces.inIDOMUtils);
+		},
+		getParentNode: function(node, top) {
+			var pn = this.dwu.getParentForNode(node, true);
+			if(!pn && node.nodeType == Node.DOCUMENT_NODE && node != top.document)
+				pn = this.getParentFrame(node, top.document); // Only for Firefox 1.5
+			return pn;
+		},
+		getChildNodes: function(node, child) {
+			var dwu = this.dwu;
+			if("getChildrenForNode" in dwu) // Gecko 7.0+
+				return dwu.getChildrenForNode(node, true);
+			var childNodes = node instanceof XULElement
+				&& "getAnonymousNodes" in node.ownerDocument
+				&& node.ownerDocument.getAnonymousNodes(node)
+				|| node.childNodes;
+			// We can't get child nodes of anonymous node...
+			if(!childNodes || !childNodes.length) {
+				if(!child)
+					child = node.firstChild;
+				if(!child) { // Get nearest not anonymous parent
+					for(var p = node.parentNode; p; p = p.parentNode)
+						if(p.childNodes.length)
+							return p.childNodes;
+				}
+				if(child) {
+					var childNodes = [child];
+					var sibling = child;
+					while((sibling = sibling.previousSibling))
+						childNodes.unshift(sibling);
+					sibling = child;
+					while((sibling = sibling.nextSibling))
+						childNodes.push(sibling);
+				}
+			}
+			return childNodes;
 		},
 		copyTootipContent: function() {
 			var node = this._node;
@@ -2366,15 +2561,27 @@ function init() {
 	this.ww.registerNotification(this.evtHandlerGlobal);
 	var btn = this.button;
 	if(btn) {
-		if("onDestroy" in btn)
-			var origOnDestroy = btn._attrsInspectorOrigOnDestroy = btn.onDestroy;
-		btn.onDestroy = function(reason) {
+		var destructor = function(reason) {
 			if(reason == "delete") {
 				_log('"Delete button" pressed -> stop()');
 				context.stop();
 			}
-			origOnDestroy && origOnDestroy.apply(this, arguments);
 		};
+		if(
+			typeof addDestructor == "function" // Custom Buttons 0.0.5.6pre4+
+			&& addDestructor != ("addDestructor" in window && window.addDestructor)
+		) {
+			btn._attrsInspectorHasAddDestructor = true;
+			addDestructor(destructor, this);
+		}
+		else {
+			if("onDestroy" in btn)
+				var origOnDestroy = btn._attrsInspectorOrigOnDestroy = btn.onDestroy;
+			btn.onDestroy = function(reason) {
+				destructor(reason);
+				origOnDestroy && origOnDestroy.apply(this, arguments);
+			};
+		}
 	}
 	_log(
 		"Successfully started!"
@@ -2417,8 +2624,10 @@ function destroy() {
 	if(btn) {
 		if("_attrsInspectorOrigOnDestroy" in btn)
 			btn.onDestroy = btn._attrsInspectorOrigOnDestroy;
-		else
+		else if(!("_attrsInspectorHasAddDestructor" in btn))
 			delete btn.onDestroy;
+		delete btn._attrsInspectorOrigOnDestroy;
+		delete btn._attrsInspectorHasAddDestructor;
 	}
 	delete window[_ns];
 	_log("Shutdown finished!");
