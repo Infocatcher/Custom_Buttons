@@ -543,6 +543,22 @@ function init() {
 			}
 			return null;
 		},
+		isNodeVisible: function(node, rect) {
+			if(!rect)
+				rect = this.getRect(node);
+			if(rect.width == 0 && rect.height == 0)
+				return false;
+			for(var p = node; p; p = p.parentNode) {
+				if(
+					p instanceof XULElement
+					&& (p.localName == "menupopup" || p.localName == "popup")
+					&& "state" in p
+					&& p.state == "closed"
+				)
+					return false;
+			}
+			return true;
+		},
 		getNS: function(ns) {
 			if(_showNamespaceURI == 1)
 				return ns;
@@ -1085,13 +1101,8 @@ function init() {
 			var rect = this.getScreenRect(sibling);
 			if(
 				rect
-				&& rect.width > 0 && rect.height > 0 // Wrong coordinates for hidden nodes
-				&& ( // Wrong coordinates for hidden <menupopup>'s
-					sibling.localName != "menupopup"
-					|| !("state" in sibling)
-					|| sibling.state != "closed"
-				)
 				&& (this.fxVersion < 3 || this.fxVersion > 3.5)
+				&& this.isNodeVisible(sibling, rect) // Wrong coordinates for hidden nodes
 			) {
 				var x = rect.screenX;
 				var y = rect.screenY + rect.height;
