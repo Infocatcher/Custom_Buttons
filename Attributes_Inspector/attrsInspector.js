@@ -1086,6 +1086,11 @@ function init() {
 			if(
 				rect
 				&& rect.width > 0 && rect.height > 0 // Wrong coordinates for hidden nodes
+				&& ( // Wrong coordinates for hidden <menupopup>'s
+					sibling.localName != "menupopup"
+					|| !("state" in sibling)
+					|| sibling.state != "closed"
+				)
 				&& (this.fxVersion < 3 || this.fxVersion > 3.5)
 			) {
 				var x = rect.screenX;
