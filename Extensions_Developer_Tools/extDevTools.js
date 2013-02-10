@@ -988,13 +988,13 @@ this.attrsInspector = function(event) {
 
 // Usage:
 //   Use middle-click or Ctrl + left-click (or press Ctrl+I) to inspect node in DOM Inspector
-//   (hold additional Shift key to enable pupup locker)
+//   (additionally hold Shift key to enable pupup locker)
 //   Hold Shift key to show and don't hide tooltips and popups
 // Hotkeys:
 //   Escape                - cancel or disable popup locker
 //   Ctrl+Up, Ctrl+Down    - navigate to parent/child node
 //   Ctrl+Left, Ctrl+Right - navigate to previous/next sibling node
-//   Ctrl+Shift+C          - copy tooltip contents
+//   Ctrl+Shift+C          - copy tooltip's contents
 
 // For more developer tools see Extensions Developer Tools button:
 //   http://infocatcher.ucoz.net/js/cb/extDevTools.js
