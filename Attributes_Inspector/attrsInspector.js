@@ -1028,20 +1028,14 @@ function init() {
 			}
 			else if(nodes.length == 1) {
 				var node = nodes[0];
-				var childs = node.childNodes;
-				if(
-					!childs.length
-					&& node instanceof XULElement
-					&& "getAnonymousNodes" in node.ownerDocument
-				)
-					childs = node.ownerDocument.getAnonymousNodes(node);
+				var childs = this.getChildNodes(node);
 				if(!childs)
 					return;
 				var child;
 				for(var i = 0, l = childs.length; i < l; ++i) {
-					var node = childs[i];
-					if(!_excludeChildTextNodes || node instanceof Element) {
-						child = node;
+					var ch = childs[i];
+					if(!_excludeChildTextNodes || ch instanceof Element) {
+						child = ch;
 						break;
 					}
 				}
@@ -1085,6 +1079,12 @@ function init() {
 			}
 			this._nodes = [sibling];
 			this.handleNode(sibling);
+		},
+		getChildNodes: function(node) {
+			return node instanceof XULElement
+				&& "getAnonymousNodes" in node.ownerDocument
+				&& node.ownerDocument.getAnonymousNodes(node)
+				|| node.childNodes;
 		},
 		copyTootipContent: function() {
 			var node = this._node;
