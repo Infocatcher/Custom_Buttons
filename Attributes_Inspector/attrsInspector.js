@@ -1118,14 +1118,23 @@ function init() {
 				&& node.ownerDocument.getAnonymousNodes(node)
 				|| node.childNodes;
 			// We can't get child nodes of anonymous node...
-			if((!childNodes || !childNodes.length) && child) {
-				var childNodes = [child];
-				var sibling = child;
-				while((sibling = sibling.previousSibling))
-					childNodes.unshift(sibling);
-				sibling = child;
-				while((sibling = sibling.nextSibling))
-					childNodes.push(sibling);
+			if(!childNodes || !childNodes.length) {
+				if(!child)
+					child = node.firstChild;
+				if(!child) { // Get nearest not anonymous parent
+					for(var p = node.parentNode; p; p = p.parentNode)
+						if(p.childNodes.length)
+							return p.childNodes;
+				}
+				if(child) {
+					var childNodes = [child];
+					var sibling = child;
+					while((sibling = sibling.previousSibling))
+						childNodes.unshift(sibling);
+					sibling = child;
+					while((sibling = sibling.nextSibling))
+						childNodes.push(sibling);
+				}
 			}
 			return childNodes;
 		},
