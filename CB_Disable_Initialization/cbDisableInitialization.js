@@ -115,7 +115,7 @@ function getBtn() {
 var style = '\
 	@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");\n\
 	toolbarbutton[id^="custombuttons-button"][cb-init^="return;"] {\n\
-		outline: 1px dotted -moz-dialogtext !important;\n\
+		outline: 1px dotted !important;\n\
 		outline-offset: -1px !important;\n\
 	}';
 var styleNode = document.insertBefore(
