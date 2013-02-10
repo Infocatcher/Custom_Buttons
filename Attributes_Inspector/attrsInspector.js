@@ -977,12 +977,12 @@ function init() {
 			if(ctrlOrCtrlShift && e.keyCode == e.DOM_VK_RIGHT) { // Ctrl+Right
 				this.stopEvent(e);
 				if(!onlyStop)
-					this.navigateNext();
+					this.navigateNext(top);
 			}
 			else if(ctrlOrCtrlShift && e.keyCode == e.DOM_VK_LEFT) { // Ctrl+Left
 				this.stopEvent(e);
 				if(!onlyStop)
-					this.navigatePrev();
+					this.navigatePrev(top);
 			}
 			else if(ctrlShift && e.keyCode == e.DOM_VK_C) // keydown || keyup
 				this.stopEvent(e);
@@ -1009,12 +1009,7 @@ function init() {
 		},
 		navigateUp: function(top) {
 			var nodes = this._nodes;
-			//var node = nodes.length && nodes[0].parentNode;
-			var node = nodes.length && Components.classes["@mozilla.org/inspector/dom-utils;1"]
-				.getService(Components.interfaces.inIDOMUtils)
-				.getParentForNode(nodes[0], true);
-			if(!node && nodes.length && nodes[0].nodeType == Node.DOCUMENT_NODE && nodes[0] != top.document)
-				node = this.getParentFrame(nodes[0], top.document); // Only for Firefox 1.5
+			var node = nodes.length && this.getParentNode(nodes[0], top);
 			if(node) {
 				nodes.unshift(node);
 				this.handleNode(node);
@@ -1047,20 +1042,43 @@ function init() {
 				}
 			}
 		},
-		navigateNext: function() {
-			this.navigateSibling(true);
+		navigateNext: function(top) {
+			this.navigateSibling(true, top);
 		},
-		navigatePrev: function() {
-			this.navigateSibling(false);
+		navigatePrev: function(top) {
+			this.navigateSibling(false, top);
 		},
-		navigateSibling: function(toNext) {
+		navigateSibling: function(toNext, top) {
 			var nodes = this._nodes;
 			if(!nodes.length)
 				return;
 			var node = nodes[0];
-			var sibling = node;
-			do sibling = toNext ? sibling.nextSibling : sibling.previousSibling;
-			while(_excludeSiblingTextNodes && sibling && !(sibling instanceof Element));
+			//var sibling = node;
+			//do sibling = toNext ? sibling.nextSibling : sibling.previousSibling;
+			//while(_excludeSiblingTextNodes && sibling && !(sibling instanceof Element));
+			var parent = this.getParentNode(node, top);
+			var siblings = parent && this.getChildNodes(parent, node);
+			if(!siblings || siblings.length < 2)
+				return;
+			var max = siblings.length - 1;
+			var pos = Array.indexOf(siblings, node);
+			if(pos == -1)
+				return;
+			var shift = toNext ? 1 : -1;
+			var sibling;
+			for(var i = pos + shift; ; i += shift) {
+				if(i < 0)
+					i = max;
+				else if(i > max)
+					i = 0;
+				if(i == pos)
+					break;
+				var sb = siblings[i];
+				if(sb && (!_excludeSiblingTextNodes || sb instanceof Element)) {
+					sibling = sb;
+					break;
+				}
+			}
 			if(!sibling)
 				return;
 			// Update screen position for mousemoveHandler()
@@ -1080,11 +1098,36 @@ function init() {
 			this._nodes = [sibling];
 			this.handleNode(sibling);
 		},
-		getChildNodes: function(node) {
-			return node instanceof XULElement
+		get dwu() {
+			delete this.dwu;
+			return this.dwu = Components.classes["@mozilla.org/inspector/dom-utils;1"]
+				.getService(Components.interfaces.inIDOMUtils);
+		},
+		getParentNode: function(node, top) {
+			var pn = this.dwu.getParentForNode(node, true);
+			if(!pn && node.nodeType == Node.DOCUMENT_NODE && node != top.document)
+				pn = this.getParentFrame(node, top.document); // Only for Firefox 1.5
+			return pn;
+		},
+		getChildNodes: function(node, child) {
+			var dwu = this.dwu;
+			if("getChildrenForNode" in dwu) // Gecko 7.0+
+				return dwu.getChildrenForNode(node, true);
+			var childNodes = node instanceof XULElement
 				&& "getAnonymousNodes" in node.ownerDocument
 				&& node.ownerDocument.getAnonymousNodes(node)
 				|| node.childNodes;
+			// We can't get child nodes of anonymous node...
+			if((!childNodes || !childNodes.length) && child) {
+				var childNodes = [child];
+				var sibling = child;
+				while((sibling = sibling.previousSibling))
+					childNodes.unshift(sibling);
+				sibling = child;
+				while((sibling = sibling.nextSibling))
+					childNodes.push(sibling);
+			}
+			return childNodes;
 		},
 		copyTootipContent: function() {
 			var node = this._node;
