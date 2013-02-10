@@ -6,7 +6,7 @@
 // (code for "code" section)
 
 // (c) Infocatcher 2012-2013
-// version 0.2.0 - 2013-02-05
+// version 0.2.1pre - 2013-02-11
 
 var debug = false;
 var maxAttempts = 4;
@@ -71,6 +71,18 @@ function reloadImage(img) {
 }
 function parseWin(win) {
 	Array.forEach(win.frames, parseWin);
-	Array.forEach(win.document.images, reloadImage);
+	var doc = win.document;
+	if("images" in doc) // HTML document
+		Array.forEach(doc.images, reloadImage);
+	else {
+		Array.forEach(
+			doc.getElementsByTagNameNS("http://www.w3.org/1999/xhtml", "img"),
+			reloadImage
+		);
+		Array.forEach(
+			doc.getElementsByTagNameNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "image"),
+			reloadImage
+		);
+	}
 }
 parseWin(content);
