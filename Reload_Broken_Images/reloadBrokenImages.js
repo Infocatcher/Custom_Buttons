@@ -6,7 +6,7 @@
 // (code for "code" section)
 
 // (c) Infocatcher 2012-2013
-// version 0.2.1pre - 2013-02-11
+// version 0.2.1pre2 - 2013-02-12
 
 var debug = false;
 var maxAttempts = 4;
@@ -50,17 +50,28 @@ function reloadImage(img) {
 				debug && Services.console.logStringMessage(logPrefix + src + " => cache.removeEntry() failed");
 				Components.utils.reportError(e);
 			}
-			img.src = "about:blank";
-			setTimeout(function() {
-				img.src = src;
-			}, 0);
+
+			// Workaround for "Image corrupt or truncated" error
+			var req = new XMLHttpRequest();
+			req.open("GET", src, true);
+			req.channel.loadFlags |= Components.interfaces.nsIRequest.LOAD_BYPASS_CACHE;
+			req.onload = req.onerror = resetSrc;
+			req.send(null);
+
+			resetSrc();
 		}
 		else {
-			clearTimeout(stopWaitTimer);
 			destroy();
 		}
 	}
+	function resetSrc() {
+		img.src = "about:blank";
+		setTimeout(function() {
+			img.src = src;
+		}, 0);
+	}
 	function destroy() {
+		clearTimeout(stopWaitTimer);
 		img.removeEventListener("load", check, true);
 		img.removeEventListener("error", check, true);
 	}
