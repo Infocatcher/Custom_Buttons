@@ -17,7 +17,8 @@
 // (and press OK in button editor or reopen window or restart browser)
 
 var options = {
-	hideDropMarker: true,
+	hideDropMarker: true, // Hide "v" after button's icon
+	showLabel: undefined, // Set to true/false to force show/hide button's label
 	useFolderTitle: true
 };
 
@@ -382,23 +383,29 @@ this.bookmarks = {
 
 this.type = "menu";
 this.orient = "horizontal";
-if(options.hideDropMarker) {
+if(options.hideDropMarker || options.showLabel != undefined) {
 	let btn = this;
 	let doc = btn.ownerDocument;
 	let stopTime = Date.now() + 500;
-	setTimeout(function hideDropMarker() { // Wait for menu XBL binding
-		var dm = doc.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-menu-dropmarker");
+	setTimeout(function tweakButton() { // Wait for menu XBL binding
+		var dm = options.hideDropMarker
+			&& doc.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-menu-dropmarker");
+		var lb = options.showLabel != undefined
+			&& doc.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-text");
 		if(dm) {
 			dm.hidden = true;
+			// Hack for Firefox 19 and large icons
 			let icon = doc.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon");
 			if(icon) {
 				let s = doc.defaultView.getComputedStyle(icon, null);
-				if(s.paddingRight != s.paddingLeft) // Hack for Firefox 19 and large icons
+				if(s.paddingRight != s.paddingLeft)
 					icon.style.paddingLeft = icon.style.paddingRight = s.paddingLeft;
 			}
 		}
-		else if(Date.now() < stopTime)
-			setTimeout(hideDropMarker, 10);
+		if(lb)
+			lb.style.display = options.showLabel ? "-moz-box" : "none";
+		if(!dm && !lb && Date.now() < stopTime)
+			setTimeout(tweakButton, 10);
 	}, 0);
 }
 
