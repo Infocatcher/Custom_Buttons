@@ -73,7 +73,8 @@ function convertCode(s) {
 			return convertE4X(s);
 		})
 		// <tag> ... </tag>
-		.replace(/<(\w+)(?:[^>]*[^>\/])?>([\s\S]*?)<\/\1>(?:\s*\.\s*toXMLString\s*\(\))?/g, function(s) {
+		//.replace(/<(\w+)(?:[^>]*[^>\/])?>([\s\S]*?)<\/\1>(?:\s*\.\s*toXMLString\s*\(\))?/g, function(s) {
+		.replace(getTagsPattern(), function(s) {
 			if(inE4X(RegExp.leftContext))
 				return s;
 			LOG("<tag> ... </tag>\n" + s);
@@ -100,6 +101,31 @@ function convertCode(s) {
 			s += "\n" + addFuncs;
 		out(s);
 	}
+}
+function getTagsPattern() {
+	// I'm too lazy to write a real tags parser, sorry...
+	const recursion = 7;
+	const tagStart = "<(\\w+)(?:[^>]*[^>\\/])?>";
+
+	function getSub(level) {
+		if(++level > recursion)
+			return "[\\s\\S]*?";
+		return "(?:"
+			+ "<\\w+[^>]*\\/>"
+			+ "|" + tagStart + getSub(level) + "<\\/\\" + level + ">"
+			+ "|[\\s\\S]"
+			+ ")*?";
+	}
+	var pattern = tagStart
+		+ getSub(1)
+		+ "<\\/\\1>"
+		+ "(?:\\s*\\.\\s*toXMLString\\s*\\(\\))?";
+
+	var re = new RegExp(pattern, "g");
+	getTagsPattern = function() {
+		return re;
+	};
+	return re;
 }
 function convertCDATA(s) {
 	return "'" + escapeString(s.replace(/['\\]/g, "\\$&")) + "'";
