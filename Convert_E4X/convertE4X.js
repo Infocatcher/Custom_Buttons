@@ -6,7 +6,7 @@
 // Code for "code" section
 
 // (c) Infocatcher 2012-2013
-// version 0.1.0a8 - 2013-02-05
+// version 0.1.0b1pre - 2013-02-11
 
 // Tries convert deprecated E4X to string literals.
 // Click on button and then click on another button with E4X in code (or click on opened page with *.js file).
