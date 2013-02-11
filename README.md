@@ -73,6 +73,9 @@ Drop-down menu with “session” bookmarks: additionally saves session informat
 <br>Use middle-click or left+click with any modifier to add current tab.
 <br>Drag and drop any tab to add new bookmark.
 
+##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Show_Anchors/icon.png)&nbsp;[Show Anchors](Show_Anchors)
+Show/hide all <a href="https://en.wikipedia.org/wiki/HTML_element#Anchor">anchors</a> on the page to easily copy link to some section of the page
+
 ##### [Tabbar Doubleclick](Tabbar_Doubleclick)
 Tab bar double click action example
 
