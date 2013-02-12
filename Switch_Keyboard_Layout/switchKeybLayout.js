@@ -5,7 +5,7 @@
 // (code for "code" section)
 
 // (c) Infocatcher 2009, 2013
-// version 0.1.1 - 2013-02-12
+// version 0.2.0pre - 2013-02-12
 
 // Convert text, typed in wrong keyboard layout.
 // Configured for Russian <-> English
@@ -118,32 +118,76 @@ var keybUtils = {
 		return res;
 	},
 	switchSelKeybLayout: function() {
-		var ta = document.commandDispatcher.focusedElement;
-		if(!(ta instanceof HTMLInputElement) && !(ta instanceof HTMLTextAreaElement))
+		var fe = document.commandDispatcher.focusedElement;
+		if(!fe)
 			return;
-		try {
-			var val = ta.value;
-			var sel = val.substring(ta.selectionStart, ta.selectionEnd);
+		if(fe instanceof HTMLInputElement || fe instanceof HTMLTextAreaElement) {
+			var ta = fe;
+			try {
+				var val = ta.value;
+				var sel = val.substring(ta.selectionStart, ta.selectionEnd);
+			}
+			catch(e) { // Non-text HTMLInputElement
+				return;
+			}
+			if(!sel && val && this.noSelUseFullText) {
+				ta.selectionStart = 0;
+				ta.selectionEnd = val.length;
+				sel = val;
+			}
+			if(!sel)
+				return;
+			var res = this.switchKeybLayout(
+				sel,
+				this.inPrimaryLayout(sel)
+					? this.convTableForward
+					: this.convTableBackward
+			);
+			if(res != sel)
+				this.insertText(ta, res);
 		}
-		catch(e) { // Non-text HTMLInputElement
-			return;
-		}
-		if(!sel && val && this.noSelUseFullText) {
-			ta.selectionStart = 0;
-			ta.selectionEnd = val.length;
-			sel = val;
-		}
-		if(!sel)
-			return;
+		else if(fe.contentEditable == "true") {
+			var doc = fe.ownerDocument;
+			var sel = doc.defaultView.getSelection();
+			var rng = sel.rangeCount && sel.getRangeAt(0);
+			var tmpNode;
+			if(!rng || rng.collapsed) {
+				var r = doc.createRange();
+				r.selectNodeContents(fe);
+				sel.removeAllRanges();
+				sel.addRange(r);
+				tmpNode = fe.cloneNode(true);
+			}
+			else {
+				tmpNode = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
+				tmpNode.appendChild(fe.ownerDocument.defaultView.getSelection().getRangeAt(0).cloneContents());
+			}
 
-		var res = this.switchKeybLayout(
-			sel,
-			this.inPrimaryLayout(sel)
+			var orig = tmpNode.innerHTML;
+			var convTable = this.inPrimaryLayout(tmpNode.textContent)
 				? this.convTableForward
-				: this.convTableBackward
-		);
-		if(res != sel)
-			this.insertText(ta, res);
+				: this.convTableBackward;
+
+			var _this = this;
+			var parseChildNodes = function(node) {
+				if(node instanceof Element) {
+					var childNodes = node.childNodes;
+					for(var i = childNodes.length - 1; i >= 0; --i)
+						parseChildNodes(childNodes[i]);
+				}
+				else if(node.nodeType == node.TEXT_NODE) {
+					var text = node.nodeValue;
+					var newText = _this.switchKeybLayout(node.nodeValue, convTable);
+					if(newText != text)
+						node.parentNode.replaceChild(doc.createTextNode(newText), node);
+				}
+			}
+			parseChildNodes(tmpNode);
+
+			var res = tmpNode.innerHTML;
+			if(res != orig)
+				doc.execCommand("insertHTML", false, res);
+		}
 	},
 	insertText: function(ta, text) {
 		var editor = ta.QueryInterface(Components.interfaces.nsIDOMNSEditableElement)
