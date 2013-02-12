@@ -168,11 +168,13 @@ var keybUtils = {
 };
 
 var btn = this;
-addEventListener("command", function(e) {
-	if(e.target != btn)
-		return;
-	e.preventDefault();
-	e.stopPropagation();
-	keybUtils.switchSelKeybLayout();
-}, true, this.parentNode);
+if(btn instanceof XULElement && addEventListener.length > 3) {
+	addEventListener("command", function(e) {
+		if(e.target != btn)
+			return;
+		e.preventDefault();
+		e.stopPropagation();
+		keybUtils.switchSelKeybLayout();
+	}, true, this.parentNode);
+}
 keybUtils.switchSelKeybLayout();
