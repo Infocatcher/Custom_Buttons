@@ -76,6 +76,9 @@ Drop-down menu with “session” bookmarks: additionally saves session informat
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Show_Anchors/icon.png)&nbsp;[Show Anchors](Show_Anchors)
 Show/hide all <a href="https://en.wikipedia.org/wiki/HTML_element#Anchor">anchors</a> on the page to easily copy link to some section of the page
 
+##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Switch_Keyboard_Layout/icon.png)&nbsp;[Switch Keyboard Layout](Switch_Keyboard_Layout)
+Convert text, typed in wrong keyboard layout
+
 ##### [Tabbar Doubleclick](Tabbar_Doubleclick)
 Tab bar double click action example
 
