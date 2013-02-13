@@ -8,11 +8,31 @@
 // version 0.2.0pre - 2013-02-12
 
 // Convert text, typed in wrong keyboard layout.
-// Configured for Russian <-> English
+// Configured for Russian <-> English.
 
 var keybUtils = {
 	//== Options
-	noSelUseFullText: true,
+	noSelBehavior: { // Shift+Home
+		ctrlKey:  false,
+		altKey:   false,
+		shiftKey: true,
+		metaKey:  false,
+		keyCode:  KeyEvent.DOM_VK_HOME,
+		charCode: 0
+	},
+	// 0 - do nothing
+	// 1 - convert all text
+	// Or use object like following to simulate "keypress" event:
+	/*
+	noSelBehavior: { // Ctrl+Shift+Left
+		ctrlKey:  true,
+		altKey:   false,
+		shiftKey: true,
+		metaKey:  false,
+		keyCode:  KeyEvent.DOM_VK_LEFT,
+		charCode: 0
+	}
+	*/
 	convTableForward: { // ru -> en
 		"\"": "@",
 		":": "^",
@@ -117,7 +137,7 @@ var keybUtils = {
 		}
 		return res;
 	},
-	switchSelKeybLayout: function() {
+	switchSelKeybLayout: function(_subCall) {
 		var fe = document.commandDispatcher.focusedElement;
 		if(!fe)
 			return;
@@ -130,10 +150,16 @@ var keybUtils = {
 			catch(e) { // Non-text HTMLInputElement
 				return;
 			}
-			if(!sel && val && this.noSelUseFullText) {
-				ta.selectionStart = 0;
-				ta.selectionEnd = val.length;
-				sel = val;
+			if(!sel && val && this.noSelBehavior && !_subCall) {
+				if(this.noSelBehavior == 1) {
+					ta.selectionStart = 0;
+					ta.selectionEnd = val.length;
+					sel = val;
+				}
+				else {
+					this.handleNoSel(ta);
+					return;
+				}
 			}
 			if(!sel)
 				return;
@@ -152,11 +178,19 @@ var keybUtils = {
 			var rng = sel.rangeCount && sel.getRangeAt(0);
 			var tmpNode;
 			if(!rng || rng.collapsed) {
-				var r = doc.createRange();
-				r.selectNodeContents(fe);
-				sel.removeAllRanges();
-				sel.addRange(r);
-				tmpNode = fe.cloneNode(true);
+				if(!this.noSelBehavior || _subCall)
+					return;
+				if(this.noSelBehavior == 1) {
+					var r = doc.createRange();
+					r.selectNodeContents(fe);
+					sel.removeAllRanges();
+					sel.addRange(r);
+					tmpNode = fe.cloneNode(true);
+				}
+				else {
+					this.handleNoSel(fe);
+					return;
+				}
 			}
 			else {
 				tmpNode = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
@@ -188,6 +222,22 @@ var keybUtils = {
 			if(res != orig)
 				doc.execCommand("insertHTML", false, res);
 		}
+	},
+	handleNoSel: function(node) {
+		this.select(node);
+		this.switchSelKeybLayout(true);
+	},
+	select: function(node) {
+		var e = this.noSelBehavior;
+		if(!e || typeof e != "object")
+			return;
+		var evt = document.createEvent("KeyboardEvent");
+		evt.initKeyEvent(
+			"keypress", true /*bubbles*/, true /*cancelable*/, node.ownerDocument.defaultView,
+			e.ctrlKey, e.altKey, e.shiftKey, e.metaKey,
+			e.keyCode, e.charCode
+		);
+		node.dispatchEvent(evt);
 	},
 	insertText: function(ta, text) {
 		var editor = ta.QueryInterface(Components.interfaces.nsIDOMNSEditableElement)
