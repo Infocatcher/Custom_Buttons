@@ -5,7 +5,7 @@
 // (code for "code" section)
 
 // (c) Infocatcher 2009, 2013
-// version 0.2.0pre - 2013-02-12
+// version 0.2.0pre2 - 2013-02-13
 
 // Convert text, typed in wrong keyboard layout.
 // Configured for Russian <-> English.
@@ -174,6 +174,16 @@ var keybUtils = {
 		}
 		else if(fe.contentEditable == "true") {
 			var doc = fe.ownerDocument;
+
+			var docURI = doc.documentURI;
+			if(
+				docURI.substr(0, 5) == "data:"
+				&& docURI.indexOf("chrome://browser/skin/devtools/") != -1
+			) {
+				//~ todo: seems like we only can use paste from clipboard here...
+				return;
+			}
+
 			var sel = doc.defaultView.getSelection();
 			var rng = sel.rangeCount && sel.getRangeAt(0);
 			var tmpNode;
