@@ -160,7 +160,7 @@ var keybUtils = {
 			}
 			else {
 				tmpNode = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
-				tmpNode.appendChild(fe.ownerDocument.defaultView.getSelection().getRangeAt(0).cloneContents());
+				tmpNode.appendChild(rng.cloneContents());
 			}
 
 			var orig = tmpNode.innerHTML;
