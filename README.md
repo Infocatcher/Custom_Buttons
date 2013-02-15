@@ -86,7 +86,7 @@ Tab bar double click action example
 Show window title (if original title was hidden by some reasons)
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Toggle_Flash/icon.png)&nbsp;[Toggle Flash](Toggle_Flash)
-Toggle Shockwave Flash plugin
+Toggle Shockwave Flash plugin (also may be easily configured to toggle any other add-on)
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Toggle_GIF_Animation/icon.png)&nbsp;[Toggle GIF Animation](Toggle_GIF_Animation)
 Disable or enable GIF animation on current page
