@@ -4,11 +4,12 @@
 // Toggle Flash button for Custom Buttons
 // (code for "initialization" section)
 
-// (c) Infocatcher 2012
-// version 0.1.3 - 2012-09-18
+// (c) Infocatcher 2012-2013
+// version 0.1.3.1 - 2013-02-16
 
 var options = {
 	pluginName: "Shockwave Flash", // Or name of any other plugin
+	searchInTypes: ["plugin"], // Use "extension" to toggle restartless extensions
 	checkedStyle: false,
 	disabledGrayscale: true,
 	disabledOpacity: 0.65 // 0..1, use 0 to disable
@@ -52,7 +53,7 @@ this.initAddonListener = function() {
 };
 
 var btn = this;
-AddonManager.getAddonsByTypes(["plugin"], function(addons) {
+AddonManager.getAddonsByTypes(options.searchInTypes, function(addons) {
 	addons.some(function(addon) {
 		if(addon.name.indexOf(options.pluginName) == -1)
 			return false;
