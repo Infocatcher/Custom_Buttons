@@ -2059,11 +2059,15 @@ function init() {
 			var shift = toNext ? 1 : -1;
 			var sibling;
 			for(var i = pos + shift; ; i += shift) {
+				/* Uncomment to use cycle navigation
 				if(i < 0)
 					i = max;
 				else if(i > max)
 					i = 0;
 				if(i == pos)
+					break;
+				*/
+				if(i < 0 || i > max)
 					break;
 				var sb = siblings[i];
 				if(sb && (!_excludeSiblingTextNodes || sb instanceof Element)) {
