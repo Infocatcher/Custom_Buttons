@@ -6,7 +6,7 @@
 // Code for "code" section
 
 // (c) Infocatcher 2012-2013
-// version 0.1.0b1pre - 2013-02-11
+// version 0.1.0b1pre2 - 2013-02-17
 
 // Tries convert deprecated E4X to string literals.
 // Click on button and then click on another button with E4X in code (or click on opened page with *.js file).
@@ -60,14 +60,14 @@ function convertCode(s) {
 		})
 		// <![CDATA[ ... ]]>
 		.replace(/(?:<>)?<!\[CDATA\[([\s\S]+?)\]\]>(?:<\/>)?(?:\s*\.\s*toString\s*\(\))?/g, function(s, cdata) {
-			if(inE4X(RegExp.leftContext))
+			if(inE4X(RegExp.leftContext) || alreadyConverted(cdata))
 				return s;
 			LOG("<![CDATA[ ... ]]>\n" + s);
 			return convertCDATA(cdata);
 		})
 		// <tag ... />
 		.replace(/<\w+\s([^>]+?)\/>(?:\s*\.\s*toXMLString\s*\(\))?/g, function(s) {
-			if(inE4X(RegExp.leftContext))
+			if(inE4X(RegExp.leftContext) || alreadyConverted(s) || /^(?:\\n)?\\[\n\r]/.test(RegExp.rightContext))
 				return s;
 			LOG("<tag ... />\n" + s);
 			return convertE4X(s);
@@ -75,7 +75,7 @@ function convertCode(s) {
 		// <tag> ... </tag>
 		//.replace(/<(\w+)(?:[^>]*[^>\/])?>([\s\S]*?)<\/\1>(?:\s*\.\s*toXMLString\s*\(\))?/g, function(s) {
 		.replace(getTagsPattern(), function(s) {
-			if(inE4X(RegExp.leftContext))
+			if(inE4X(RegExp.leftContext) || alreadyConverted(s))
 				return s;
 			LOG("<tag> ... </tag>\n" + s);
 			return convertE4X(s);
@@ -131,7 +131,10 @@ function convertCDATA(s) {
 	return "'" + escapeString(s.replace(/['\\]/g, "\\$&")) + "'";
 }
 function inE4X(prev) {
-	return />\s*(?:\\n\\[\n\r]\s*)?$/.test(prev);
+	return />\s*(?:(?:\\n)?\\[\n\r]\s*)?$/.test(prev);
+}
+function alreadyConverted(s) {
+	return /['">][ \t]*(?:\\n)?\\[\n\r]/.test(s);
 }
 function convertE4X(s) {
 	var cdates = [];
