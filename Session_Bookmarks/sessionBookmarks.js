@@ -1287,9 +1287,11 @@ this.bookmarks = {
 			let ssData = mi.getAttribute("cb_ssData");
 
 			let link = '<a href="' + this.encodeHTML(uri) + '">' + this.encodeHTML(label) + '</a>';
-			dt.mozSetDataAt("text/unicode",   uri,  0);
-			dt.mozSetDataAt("text/html",      link, 0);
-			dt.mozSetDataAt("text/x-moz-url", uri,  0);
+			dt.mozSetDataAt("text/unicode",        uri,                 0);
+			dt.mozSetDataAt("text/html",           link,                0);
+			dt.mozSetDataAt("text/x-moz-url",      uri + "\n" + label,  0);
+			dt.mozSetDataAt("text/x-moz-url-data", uri,                 0);
+			dt.mozSetDataAt("text/x-moz-url-desc", label,               0);
 
 			dt.mozSetDataAt(dragNS + "tagname", "menuitem", 0);
 			dt.mozSetDataAt(dragNS + "label",   label,      0);
