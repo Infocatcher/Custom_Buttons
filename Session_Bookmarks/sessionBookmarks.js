@@ -1482,12 +1482,18 @@ this.bookmarks = {
 		}
 		else if(e.view.top == content) {
 			var trg = e.target;
-			if(trg instanceof HTMLInputElement || trg instanceof HTMLTextAreaElement) try {
-				if(typeof trg.selectionStart == "number")
-					return;
-			}
-			catch(e) {
-			}
+			//if(trg instanceof HTMLTextAreaElement || trg.contentEditable == "true")
+			//	return;
+			//if(trg instanceof HTMLInputElement) try {
+			//	if(typeof trg.selectionStart == "number")
+			//		return;
+			//}
+			//catch(e) {
+			//}
+			var cs = trg.ownerDocument.defaultView.getComputedStyle(trg, null);
+			var userModify = "userModify" in cs ? cs.userModify : cs.MozUserModify;
+			if(userModify == "read-write")
+				return;
 			tab = gBrowser.selectedTab;
 			tabs = gBrowser.tabContainer;
 		}
