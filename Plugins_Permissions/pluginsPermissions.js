@@ -142,6 +142,7 @@ if(!this.hasOwnProperty("defaultContextId"))
 this.oncontextmenu = function(e) {
 	if(e.target != this)
 		return;
+	this.permissions.initContextOnce();
 	this.setAttribute(
 		"context",
 		this.permissions.hasModifier(e)
@@ -188,6 +189,7 @@ this.permissions = {
 	},
 
 	initialized: false,
+	mp: null,
 	init: function() {
 		if(this.initialized)
 			return;
@@ -195,83 +197,6 @@ this.permissions = {
 
 		if(this.options.moveToStatusBar.enabled)
 			this.moveToStatusBar();
-
-		this.mpId = this.button.id + "-context";
-		var pm = this.pm;
-		var noTempPermissions = !this.options.showTempPermissions || !this.hasTempPermissions;
-		var mp = this.mp = this.button.appendChild(this.parseXULFromString('\
-			<menupopup xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"\
-				id="' + this.mpId + '"\
-				class="' + this.popupClass + '"\
-				onpopupshowing="\
-					if(event.target != this)\
-						return true;\
-					document.popupNode = this.parentNode;\
-					return this.parentNode.permissions.updMenu();"\
-				onpopuphidden="if(event.target == this) document.popupNode = null;">\
-				<menuitem type="radio" cb_permission="' + pm.UNKNOWN_ACTION + '"\
-					oncommand="this.parentNode.parentNode.permissions.removePermission();"\
-					label="' + _localize("defaultLabel") + '"\
-					accesskey="' + _localize("defaultAccesskey") + '" />\
-				<menuseparator />\
-				<menuitem type="radio" cb_permission="' + pm.DENY_ACTION + '"\
-					oncommand="this.parentNode.parentNode.permissions.addPermission(Components.interfaces.nsIPermissionManager.DENY_ACTION);"\
-					label="' + _localize("denyLabel") + '"\
-					accesskey="' + _localize("denyAccesskey") + '" />\
-				<menuitem type="radio" cb_permission="' + pm.DENY_ACTION + '-temp"\
-					collapsed="' + noTempPermissions + '"\
-					class="cbTempPermission"\
-					oncommand="this.parentNode.parentNode.permissions.addPermission(Components.interfaces.nsIPermissionManager.DENY_ACTION, true);"\
-					label="' + _localize("denyTempLabel") + '"\
-					accesskey="' + _localize("denyTempAccesskey") + '" />\
-				<menuitem type="radio" cb_permission="' + pm.ALLOW_ACTION + '"\
-					oncommand="this.parentNode.parentNode.permissions.addPermission(Components.interfaces.nsIPermissionManager.ALLOW_ACTION);"\
-					label="' + _localize("allowLabel") + '"\
-					accesskey="' + _localize("allowAccesskey") + '" />\
-				<menuitem type="radio" cb_permission="' + pm.ALLOW_ACTION + '-temp"\
-					collapsed="' + noTempPermissions + '"\
-					class="cbTempPermission"\
-					oncommand="this.parentNode.parentNode.permissions.addPermission(Components.interfaces.nsIPermissionManager.ALLOW_ACTION, true);"\
-					label="' + _localize("allowTempLabel") + '"\
-					accesskey="' + _localize("allowTempAccesskey") + '" />\
-				<menuseparator />\
-				<menuitem\
-					cb_id="toggleBlock"\
-					type="checkbox"\
-					oncommand="this.parentNode.parentNode.permissions.toggleBlock(this.getAttribute(\'checked\') == \'true\');"\
-					label="' + _localize("blockPluginsLabel") + '"\
-					accesskey="' + _localize("blockPluginsAccesskey") + '" />\
-				<menuitem\
-					cb_id="removeTempPermissions"\
-					hidden="' + noTempPermissions + '"\
-					oncommand="this.parentNode.parentNode.permissions.removeTempPermissions();"\
-					label="' + _localize("removeTempPermissionsLabel") + '"\
-					accesskey="' + _localize("removeTempPermissionsAccesskey") + '" />\
-				<menuseparator />\
-				<menuitem\
-					cb_id="openPermissions"\
-					oncommand="this.parentNode.parentNode.permissions.openPermissions();"\
-					label="' + _localize("showPermissionsLabel") + '"\
-					accesskey="' + _localize("showPermissionsAccesskey") + '" />\
-				<menuseparator />\
-				<menu\
-					label="' + _localize("buttonMenu") + '"\
-					accesskey="' + _localize("buttonMenuAccesskey") + '" />\
-			</menupopup>'
-		));
-		var cbPopup = document.getElementById(this.button.defaultContextId);
-		if(!cbPopup)
-			Components.utils.reportError(this.errPrefix + "cb menu not found");
-		else {
-			cbPopup = cbPopup.cloneNode(true);
-			let id = "-" + this.button.id.match(/\d*$/)[0] + "-cloned";
-			cbPopup.id += id;
-			Array.slice(cbPopup.getElementsByAttribute("id", "*")).forEach(function(node) {
-				node.id += id;
-			});
-			let menu = mp.lastChild;
-			menu.appendChild(cbPopup);
-		}
 
 		var dummy = function() {};
 		this.progressListener = {
@@ -388,6 +313,86 @@ this.permissions = {
 			this.prefs.branch.removeObserver("", this.prefs);
 		this.progressListener = this.permissionsObserver = this.prefs = null;
 	},
+	initContextOnce: function() {
+		this.initContextOnce = function() {};
+
+		this.mpId = this.button.id + "-context";
+		var pm = this.pm;
+		var noTempPermissions = !this.options.showTempPermissions || !this.hasTempPermissions;
+		var mp = this.mp = this.button.appendChild(this.parseXULFromString('\
+			<menupopup xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"\
+				id="' + this.mpId + '"\
+				class="' + this.popupClass + '"\
+				onpopupshowing="\
+					if(event.target != this)\
+						return true;\
+					document.popupNode = this.parentNode;\
+					return this.parentNode.permissions.updMenu();"\
+				onpopuphidden="if(event.target == this) document.popupNode = null;">\
+				<menuitem type="radio" cb_permission="' + pm.UNKNOWN_ACTION + '"\
+					oncommand="this.parentNode.parentNode.permissions.removePermission();"\
+					label="' + _localize("defaultLabel") + '"\
+					accesskey="' + _localize("defaultAccesskey") + '" />\
+				<menuseparator />\
+				<menuitem type="radio" cb_permission="' + pm.DENY_ACTION + '"\
+					oncommand="this.parentNode.parentNode.permissions.addPermission(Components.interfaces.nsIPermissionManager.DENY_ACTION);"\
+					label="' + _localize("denyLabel") + '"\
+					accesskey="' + _localize("denyAccesskey") + '" />\
+				<menuitem type="radio" cb_permission="' + pm.DENY_ACTION + '-temp"\
+					collapsed="' + noTempPermissions + '"\
+					class="cbTempPermission"\
+					oncommand="this.parentNode.parentNode.permissions.addPermission(Components.interfaces.nsIPermissionManager.DENY_ACTION, true);"\
+					label="' + _localize("denyTempLabel") + '"\
+					accesskey="' + _localize("denyTempAccesskey") + '" />\
+				<menuitem type="radio" cb_permission="' + pm.ALLOW_ACTION + '"\
+					oncommand="this.parentNode.parentNode.permissions.addPermission(Components.interfaces.nsIPermissionManager.ALLOW_ACTION);"\
+					label="' + _localize("allowLabel") + '"\
+					accesskey="' + _localize("allowAccesskey") + '" />\
+				<menuitem type="radio" cb_permission="' + pm.ALLOW_ACTION + '-temp"\
+					collapsed="' + noTempPermissions + '"\
+					class="cbTempPermission"\
+					oncommand="this.parentNode.parentNode.permissions.addPermission(Components.interfaces.nsIPermissionManager.ALLOW_ACTION, true);"\
+					label="' + _localize("allowTempLabel") + '"\
+					accesskey="' + _localize("allowTempAccesskey") + '" />\
+				<menuseparator />\
+				<menuitem\
+					cb_id="toggleBlock"\
+					type="checkbox"\
+					oncommand="this.parentNode.parentNode.permissions.toggleBlock(this.getAttribute(\'checked\') == \'true\');"\
+					label="' + _localize("blockPluginsLabel") + '"\
+					accesskey="' + _localize("blockPluginsAccesskey") + '" />\
+				<menuitem\
+					cb_id="removeTempPermissions"\
+					hidden="' + noTempPermissions + '"\
+					oncommand="this.parentNode.parentNode.permissions.removeTempPermissions();"\
+					label="' + _localize("removeTempPermissionsLabel") + '"\
+					accesskey="' + _localize("removeTempPermissionsAccesskey") + '" />\
+				<menuseparator />\
+				<menuitem\
+					cb_id="openPermissions"\
+					oncommand="this.parentNode.parentNode.permissions.openPermissions();"\
+					label="' + _localize("showPermissionsLabel") + '"\
+					accesskey="' + _localize("showPermissionsAccesskey") + '" />\
+				<menuseparator />\
+				<menu\
+					label="' + _localize("buttonMenu") + '"\
+					accesskey="' + _localize("buttonMenuAccesskey") + '" />\
+			</menupopup>'
+		));
+		var cbPopup = document.getElementById(this.button.defaultContextId);
+		if(!cbPopup)
+			Components.utils.reportError(this.errPrefix + "cb menu not found");
+		else {
+			cbPopup = cbPopup.cloneNode(true);
+			let id = "-" + this.button.id.match(/\d*$/)[0] + "-cloned";
+			cbPopup.id += id;
+			Array.slice(cbPopup.getElementsByAttribute("id", "*")).forEach(function(node) {
+				node.id += id;
+			});
+			let menu = mp.lastChild;
+			menu.appendChild(cbPopup);
+		}
+	},
 	moveToStatusBar: function() {
 		var insPoint;
 		this.options.moveToStatusBar.insertAfter
@@ -454,8 +459,10 @@ this.permissions = {
 
 	showMenu: function(e, isContext, mp) {
 		document.popupNode = this.button.ownerDocument.popupNode = this.button;
-		if(!mp)
+		if(!mp) {
+			this.initContextOnce();
 			mp = this.mp;
+		}
 		if("openPopupAtScreen" in mp)
 			mp.openPopupAtScreen(e.screenX, e.screenY, isContext);
 		else
@@ -515,6 +522,8 @@ this.permissions = {
 		return true;
 	},
 	updToggleBlockItem: function() {
+		if(!this.mp) // Context menu not yet created
+			return;
 		this.mp.getElementsByAttribute("cb_id", "toggleBlock")[0]
 			.setAttribute(
 				"checked",

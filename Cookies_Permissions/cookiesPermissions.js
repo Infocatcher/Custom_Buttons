@@ -178,6 +178,7 @@ if(!this.hasOwnProperty("defaultContextId"))
 this.oncontextmenu = function(e) {
 	if(e.target != this)
 		return;
+	this.permissions.initContextOnce();
 	this.setAttribute(
 		"context",
 		this.permissions.hasModifier(e)
@@ -232,6 +233,7 @@ this.permissions = {
 	},
 
 	initialized: false,
+	mp: null,
 	init: function() {
 		if(this.initialized)
 			return;
@@ -239,6 +241,104 @@ this.permissions = {
 
 		if(this.options.moveToStatusBar.enabled)
 			this.moveToStatusBar();
+
+		var dummy = function() {};
+		this.progressListener = {
+			context: this,
+			onStateChange: dummy,
+			onProgressChange: dummy,
+			onLocationChange: function(aWebProgress, aRequest, aLocation) {
+				this.context.updButtonState();
+			},
+			onStatusChange: dummy,
+			onSecurityChange: dummy
+		};
+		gBrowser.addProgressListener(this.progressListener/*, Components.interfaces.nsIWebProgress.NOTIFY_LOCATION*/);
+
+		this.permissionsObserver = {
+			context: this,
+			observe: function(subject, topic, data) {
+				if(topic != "perm-changed")
+					return;
+				var permission = subject.QueryInterface(Components.interfaces.nsIPermission);
+				var type = this.context.permissionType;
+				if(permission.type != type)
+					return;
+				this.context.updButtonState();
+				if(data == "deleted") {
+					// See chrome://browser/content/preferences/permissions.js
+					// observe: function (aSubject, aTopic, aData)
+					let win = this.context.wm.getMostRecentWindow("Browser:Permissions");
+					if(win && "gPermissionManager" in win && win.gPermissionManager._type == type) {
+						let pm = win.gPermissionManager;
+						let perms = pm._permissions;
+						for(let i = 0, l = perms.length; i < l; ++i) {
+							if(perms[i].host == permission.host) {
+								perms.splice(i, 1);
+								--pm._view._rowCount;
+								pm._tree.treeBoxObject.rowCountChanged(i, -1);
+								pm._tree.treeBoxObject.invalidate();
+								break;
+							}
+						}
+					}
+				}
+			}
+		};
+		this.oSvc.addObserver(this.permissionsObserver, "perm-changed", false);
+
+		if(this.options.showDefaultPolicy) {
+			let po = this.prefsObserver = {
+				context: this,
+				get prefs() {
+					delete this.prefs;
+					return this.prefs = Components.classes["@mozilla.org/preferences-service;1"]
+						.getService(Components.interfaces.nsIPrefService)
+						.getBranch("network.cookie.")
+						.QueryInterface(Components.interfaces.nsIPrefBranch2 || Components.interfaces.nsIPrefBranch);
+				},
+				getIntPref: function(name) {
+					try {
+						return this.prefs.getIntPref(name);
+					}
+					catch(e) {
+						Components.utils.reportError(e);
+					}
+					return 0;
+				},
+				observe: function(subject, topic, data) {
+					if(topic != "nsPref:changed")
+						return;
+					if(data != "cookieBehavior" && data != "lifetimePolicy")
+						return;
+					this.context.prefs[data] = this.getIntPref(data);
+					this.context.updButtonState();
+				}
+			};
+			this.prefs = {
+				"cookieBehavior": po.getIntPref("cookieBehavior"),
+				"lifetimePolicy": po.getIntPref("lifetimePolicy"),
+				__proto__: null
+			};
+			po.prefs.addObserver("", po, false);
+		}
+
+		this.initCleanupTimer();
+		this.updButtonState();
+	},
+	destroy: function() {
+		if(!this.initialized)
+			return;
+		this.initialized = false;
+
+		gBrowser.removeProgressListener(this.progressListener);
+		this.oSvc.removeObserver(this.permissionsObserver, "perm-changed");
+		if(this.options.showDefaultPolicy)
+			this.prefsObserver.prefs.removeObserver("", this.prefsObserver);
+		this.progressListener = this.permissionsObserver = this.prefsObserver = null;
+	},
+	initContextOnce: function() {
+		this.initContextOnce = function() {};
 
 		this.mpId = this.button.id + "-context";
 		var cp = this.cp;
@@ -349,101 +449,6 @@ this.permissions = {
 			let menu = mp.lastChild;
 			menu.appendChild(cbPopup);
 		}
-
-		var dummy = function() {};
-		this.progressListener = {
-			context: this,
-			onStateChange: dummy,
-			onProgressChange: dummy,
-			onLocationChange: function(aWebProgress, aRequest, aLocation) {
-				this.context.updButtonState();
-			},
-			onStatusChange: dummy,
-			onSecurityChange: dummy
-		};
-		gBrowser.addProgressListener(this.progressListener/*, Components.interfaces.nsIWebProgress.NOTIFY_LOCATION*/);
-
-		this.permissionsObserver = {
-			context: this,
-			observe: function(subject, topic, data) {
-				if(topic != "perm-changed")
-					return;
-				var permission = subject.QueryInterface(Components.interfaces.nsIPermission);
-				var type = this.context.permissionType;
-				if(permission.type != type)
-					return;
-				this.context.updButtonState();
-				if(data == "deleted") {
-					// See chrome://browser/content/preferences/permissions.js
-					// observe: function (aSubject, aTopic, aData)
-					let win = this.context.wm.getMostRecentWindow("Browser:Permissions");
-					if(win && "gPermissionManager" in win && win.gPermissionManager._type == type) {
-						let pm = win.gPermissionManager;
-						let perms = pm._permissions;
-						for(let i = 0, l = perms.length; i < l; ++i) {
-							if(perms[i].host == permission.host) {
-								perms.splice(i, 1);
-								--pm._view._rowCount;
-								pm._tree.treeBoxObject.rowCountChanged(i, -1);
-								pm._tree.treeBoxObject.invalidate();
-								break;
-							}
-						}
-					}
-				}
-			}
-		};
-		this.oSvc.addObserver(this.permissionsObserver, "perm-changed", false);
-
-		if(this.options.showDefaultPolicy) {
-			let po = this.prefsObserver = {
-				context: this,
-				get prefs() {
-					delete this.prefs;
-					return this.prefs = Components.classes["@mozilla.org/preferences-service;1"]
-						.getService(Components.interfaces.nsIPrefService)
-						.getBranch("network.cookie.")
-						.QueryInterface(Components.interfaces.nsIPrefBranch2 || Components.interfaces.nsIPrefBranch);
-				},
-				getIntPref: function(name) {
-					try {
-						return this.prefs.getIntPref(name);
-					}
-					catch(e) {
-						Components.utils.reportError(e);
-					}
-					return 0;
-				},
-				observe: function(subject, topic, data) {
-					if(topic != "nsPref:changed")
-						return;
-					if(data != "cookieBehavior" && data != "lifetimePolicy")
-						return;
-					this.context.prefs[data] = this.getIntPref(data);
-					this.context.updButtonState();
-				}
-			};
-			this.prefs = {
-				"cookieBehavior": po.getIntPref("cookieBehavior"),
-				"lifetimePolicy": po.getIntPref("lifetimePolicy"),
-				__proto__: null
-			};
-			po.prefs.addObserver("", po, false);
-		}
-
-		this.initCleanupTimer();
-		this.updButtonState();
-	},
-	destroy: function() {
-		if(!this.initialized)
-			return;
-		this.initialized = false;
-
-		gBrowser.removeProgressListener(this.progressListener);
-		this.oSvc.removeObserver(this.permissionsObserver, "perm-changed");
-		if(this.options.showDefaultPolicy)
-			this.prefsObserver.prefs.removeObserver("", this.prefsObserver);
-		this.progressListener = this.permissionsObserver = this.prefsObserver = null;
 	},
 	initCleanupTimer: function() {
 		//if(this.options.removeUnprotectedCookiesInterval > 0) {
@@ -595,8 +600,10 @@ this.permissions = {
 
 	showMenu: function(e, isContext, mp) {
 		document.popupNode = this.button.ownerDocument.popupNode = this.button;
-		if(!mp)
+		if(!mp) {
+			this.initContextOnce();
 			mp = this.mp;
+		}
 		if("openPopupAtScreen" in mp)
 			mp.openPopupAtScreen(e.screenX, e.screenY, isContext);
 		else
