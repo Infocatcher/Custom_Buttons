@@ -446,6 +446,12 @@ this.permissions = {
 			Array.slice(cbPopup.getElementsByAttribute("id", "*")).forEach(function(node) {
 				node.id += id;
 			});
+			cbPopup.setAttribute(
+				"onpopupshowing",
+				'\
+				var btn = document.popupNode = this.parentNode.parentNode.parentNode;\n\
+				custombutton.setContextMenuVisibility(btn);'
+			);
 			let menu = mp.lastChild;
 			menu.appendChild(cbPopup);
 		}
