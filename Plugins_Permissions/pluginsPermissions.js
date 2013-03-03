@@ -5,8 +5,8 @@
 // Plugins Permissions button for Custom Buttons
 // (code for "initialization" section)
 
-// (c) Infocatcher 2012
-// version 0.1.0pre4 - 2012-12-05
+// (c) Infocatcher 2012-2013
+// version 0.1.0 - 2013-03-02
 
 // Based on Cookies Permissions button
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Cookies_Permissions
