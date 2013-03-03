@@ -3,4 +3,4 @@
 <br>Also shows permissions for current site and has some cookies-related features.
 
 ##### Screenshot:
-<img src="https://raw.github.com/Infocatcher/Custom_Buttons/master/Cookies_Permissions/cookiesPermissions-en.png" alt="Button context menu" align="top">
+<img src="https://raw.github.com/Infocatcher/Custom_Buttons/master/Cookies_Permissions/cookiesPermissions-en.png" alt="Button's context menu" align="top">
