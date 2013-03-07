@@ -41,6 +41,7 @@ for(var uid in extensions) if(extensions.hasOwnProperty(uid)) {
 	mi.setAttribute("cb_uid", uid);
 	mi.setAttribute("label", ext.name);
 	mi.setAttribute("tooltiptext", ext.dir);
+	mi.setAttribute("onmousedown", "this.setAttribute('closemenu', event.shiftKey ? 'none' : 'auto');");
 	setIcon(mi, uid);
 	mp.appendChild(mi);
 }
@@ -59,7 +60,7 @@ mp.installExtension = function(e) {
 		return;
 	var ext = extensions[uid];
 
-	var make = !event.ctrlKey && !event.shiftKey && !event.altKey && !event.metaKey;
+	var make = !event.ctrlKey && !event.altKey && !event.metaKey;
 
 	var dir = ext.dir;
 	function expandDir(s) {
