@@ -83,16 +83,19 @@ mp.installExtension = function(e) {
 
 	Components.utils.import("resource://gre/modules/Services.jsm");
 	if(isCb) {
-		++btn._extInstallerInProgress;
+		if(!btn._extInstallerInProgress++)
+			btn._extInstallerOrigImage = btn.image;
 		var imgConnecting = "chrome://browser/skin/tabbrowser/connecting.png";
 		var imgLoading = "chrome://browser/skin/tabbrowser/loading.png";
 		if(Services.appinfo.name == "SeaMonkey")
 			imgConnecting = imgLoading = "chrome://communicator/skin/icons/loading.gif";
-		var origImg = btn.image;
+		var origImg = "_extInstallerOrigImage" in btn ? btn._extInstallerOrigImage : btn.image;
 		btn.image = imgConnecting;
 		var restore = function() {
-			if(!--btn._extInstallerInProgress)
+			if(!--btn._extInstallerInProgress) {
 				btn.image = origImg;
+				delete btn._extInstallerOrigImage;
+			}
 			unlock();
 		};
 	}
