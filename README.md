@@ -45,8 +45,8 @@ Add “Edit button in tab…” to custom button's context menu
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Extensions_Developer_Tools/icon.png)&nbsp;[Extensions Developer Tools](Extensions_Developer_Tools)
 Some tools for extensions or custom buttons developers
 
-##### [Extensions Installer](Extensions_Installer)
-For extensions developers: installs extension from given link
+##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Extensions_Installer/icon.png)&nbsp;[Extensions Installer](Extensions_Installer)
+For extensions developers: installs extension from given link, useful to test restartless extensions
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Merge_Custom_Buttons/icon.png)&nbsp;[Merge Custom Buttons](Merge_Custom_Buttons)
 Merge many custom buttons into one
