@@ -1151,13 +1151,15 @@ function init() {
 	top.document.documentElement.appendChild(tt);
 
 	// Resolve -moz-* and system colors (for copy tooltip contents feature)
-	tt.style.color = _addedColor;
-	_addedColor = top.getComputedStyle(tt, null).color;
-	tt.style.color = _removedColor;
-	_removedColor = top.getComputedStyle(tt, null).color;
-	tt.style.color = _changedColor;
-	_changedColor = top.getComputedStyle(tt, null).color;
-	tt.style.color = "";
+	var tts = tt.style;
+	var ttcs = top.getComputedStyle(tt, null);
+	tts.color = _addedColor;
+	_addedColor = ttcs.color;
+	tts.color = _removedColor;
+	_removedColor = ttcs.color;
+	tts.color = _changedColor;
+	_changedColor = ttcs.color;
+	tts.color = "";
 
 	if(!_highlightUsingFlasher) {
 		this.hlAttrNS = "urn:attrsInspectorNS";
@@ -1360,6 +1362,7 @@ function init() {
 			//while(tt.hasChildNodes())
 			//	tt.removeChild(tt.lastChild);
 			tt.textContent = "";
+			tt.width = tt.height = null; // Force reset size
 
 			var df = tt.ownerDocument.createDocumentFragment();
 
