@@ -384,6 +384,7 @@ function init() {
 			//while(tt.hasChildNodes())
 			//	tt.removeChild(tt.lastChild);
 			tt.textContent = "";
+			tt.width = tt.height = null; // Force reset size
 
 			var df = tt.ownerDocument.createDocumentFragment();
 
