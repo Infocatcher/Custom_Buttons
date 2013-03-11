@@ -266,7 +266,14 @@ var cmds = this.commands = {
 			function(mi) {
 				var cbId = mi.getAttribute("cb_id");
 				mi.setAttribute("default", cbId == defaultAction);
-				if(cbId == "attrsInspector") {
+				if(cbId == "switchLocale") {
+					mi.setAttribute(
+						"label",
+						_localize("Switch locale to “%S”")
+							.replace("%S", this.switchLocale(true))
+					);
+				}
+				else if(cbId == "attrsInspector") {
 					//~ Note: should be "inspectDOMNode" in window for Firefox 1.5
 					this.setPartiallyAvailable(
 						mi,
@@ -821,7 +828,6 @@ this.appendChild(parseXULFromString('\
 			image="' + images.flushCaches + '" />\
 		<menuitem cb_id="switchLocale"\
 			oncommand="this.parentNode.parentNode.commands.switchLocale();"\
-			label="' + _localize("Switch locale to “%S”").replace("%S", cmds.switchLocale(true)) + '"\
 			accesskey="' + _localize("S", "switchLocaleKey") + '"\
 			class="menuitem-iconic"\
 			image="' + images.switchLocale + '" />\
