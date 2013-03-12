@@ -42,15 +42,20 @@ for(var uid in extensions) if(extensions.hasOwnProperty(uid)) {
 	mi.setAttribute("label", ext.name);
 	mi.setAttribute("tooltiptext", ext.dir);
 	mi.setAttribute("onmousedown", "this.setAttribute('closemenu', event.shiftKey ? 'none' : 'auto');");
-	setIcon(mi, uid);
+	setStyle(mi, uid);
 	mp.appendChild(mi);
 }
-function setIcon(mi, uid) {
+function setStyle(mi, uid) {
 	AddonManager.getAddonByID(uid, function(addon) {
 		var icon = addon.iconURL || addon.icon64URL
 			|| "chrome://mozapps/skin/extensions/extensionGeneric-16.png";
 		mi.setAttribute("image", icon);
+		mi.style.color = addon.isActive ? "" : "grayText";
 	});
+	setTimeout(function() {
+		var dir = file(extensions[uid].dir);
+		mi.style.textDecoration = dir.exists() ? "" : "line-through";
+	}, 0);
 }
 
 mp.installExtension = function(e) {
