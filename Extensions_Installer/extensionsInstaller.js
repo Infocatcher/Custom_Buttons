@@ -34,6 +34,7 @@ Components.utils.import("resource://gre/modules/AddonManager.jsm");
 var mp = document.createElement("menupopup");
 mp.setAttribute("oncommand", "this.installExtension(event);");
 mp.setAttribute("onpopupshowing", "this.createMenu();");
+mp.setAttribute("onmousedown", "event.target.setAttribute('closemenu', event.shiftKey ? 'none' : 'auto');");
 
 mp.createMenu = function() {
 	mp.setAttribute("onpopupshowing", "this.updateMenu();");
@@ -45,7 +46,6 @@ mp.createMenu = function() {
 		mi.setAttribute("cb_uid", uid);
 		mi.setAttribute("label", ext.name);
 		mi.setAttribute("tooltiptext", ext.dir);
-		mi.setAttribute("onmousedown", "this.setAttribute('closemenu', event.shiftKey ? 'none' : 'auto');");
 		setStyle(mi, uid);
 		mp.appendChild(mi);
 	}
