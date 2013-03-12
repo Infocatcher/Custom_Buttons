@@ -53,7 +53,7 @@ function setStyle(mi, uid) {
 		mi.style.color = addon.isActive ? "" : "grayText";
 	});
 	setTimeout(function() {
-		var dir = file(extensions[uid].dir);
+		var dir = file(expandVariables(extensions[uid].dir));
 		mi.style.textDecoration = dir.exists() ? "" : "line-through";
 	}, 0);
 }
@@ -67,7 +67,7 @@ mp.installExtension = function(e) {
 
 	var make = !event.ctrlKey && !event.altKey && !event.metaKey;
 
-	var dir = ext.dir;
+	var dir = expandVariables(ext.dir);
 	function expandDir(s) {
 		return s.replace(/^%d/, dir);
 	}
