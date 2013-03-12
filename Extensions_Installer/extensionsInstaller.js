@@ -35,6 +35,7 @@ var mp = document.createElement("menupopup");
 mp.setAttribute("oncommand", "this.installExtension(event);");
 mp.setAttribute("onpopupshowing", "this.createMenu();");
 mp.setAttribute("onmousedown", "event.target.setAttribute('closemenu', event.shiftKey ? 'none' : 'auto');");
+mp.setAttribute("onclick", "if(event.button == 1) this.toggleExtension(event.target);");
 
 mp.createMenu = function() {
 	mp.setAttribute("onpopupshowing", "this.updateMenu();");
@@ -58,15 +59,28 @@ mp.updateMenu = function() {
 		}
 	);
 };
-function setStyle(mi, uid) {
+mp.toggleExtension = function(mi) {
+	var uid = mi.getAttribute("cb_uid");
+	if(!uid)
+		return;
 	AddonManager.getAddonByID(uid, function(addon) {
-		if(!addon)
-			return;
+		if(addon) {
+			addon.userDisabled = !addon.userDisabled;
+			setStyle(mi, uid, addon);
+		}
+	});
+};
+function setStyle(mi, uid, addon) {
+	function getAddonCallback(addon) {
 		var icon = addon.iconURL || addon.icon64URL
 			|| "chrome://mozapps/skin/extensions/extensionGeneric-16.png";
 		mi.setAttribute("image", icon);
 		mi.style.color = addon.isActive ? "" : "grayText";
-	});
+	}
+	if(addon)
+		getAddonCallback(addon);
+	else
+		AddonManager.getAddonByID(uid, getAddonCallback);
 	setTimeout(function() {
 		var dir = file(expandVariables(extensions[uid].dir));
 		mi.style.textDecoration = dir.exists() ? "" : "line-through";
