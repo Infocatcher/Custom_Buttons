@@ -6,7 +6,7 @@
 // Place code to "initialization" section to create a "normal" menu.
 
 // (c) Infocatcher 2013
-// version 0.3.0pre - 2013-03-07
+// version 0.3.0pre2 - 2013-03-12
 
 var extensions = {
 	"extensionsId1@example": {
