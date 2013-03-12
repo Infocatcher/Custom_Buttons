@@ -33,18 +33,31 @@ Components.utils.import("resource://gre/modules/AddonManager.jsm");
 
 var mp = document.createElement("menupopup");
 mp.setAttribute("oncommand", "this.installExtension(event);");
+mp.setAttribute("onpopupshowing", "this.createMenu();");
 
-for(var uid in extensions) if(extensions.hasOwnProperty(uid)) {
-	var ext = extensions[uid];
-	var mi = document.createElement("menuitem");
-	mi.className = "menuitem-iconic";
-	mi.setAttribute("cb_uid", uid);
-	mi.setAttribute("label", ext.name);
-	mi.setAttribute("tooltiptext", ext.dir);
-	mi.setAttribute("onmousedown", "this.setAttribute('closemenu', event.shiftKey ? 'none' : 'auto');");
-	setStyle(mi, uid);
-	mp.appendChild(mi);
-}
+mp.createMenu = function() {
+	mp.setAttribute("onpopupshowing", "this.updateMenu();");
+
+	for(var uid in extensions) if(extensions.hasOwnProperty(uid)) {
+		var ext = extensions[uid];
+		var mi = document.createElement("menuitem");
+		mi.className = "menuitem-iconic";
+		mi.setAttribute("cb_uid", uid);
+		mi.setAttribute("label", ext.name);
+		mi.setAttribute("tooltiptext", ext.dir);
+		mi.setAttribute("onmousedown", "this.setAttribute('closemenu', event.shiftKey ? 'none' : 'auto');");
+		setStyle(mi, uid);
+		mp.appendChild(mi);
+	}
+};
+mp.updateMenu = function() {
+	Array.forEach(
+		mp.getElementsByTagName("menuitem"),
+		function(mi) {
+			setStyle(mi, mi.getAttribute("cb_uid"));
+		}
+	);
+};
 function setStyle(mi, uid) {
 	AddonManager.getAddonByID(uid, function(addon) {
 		var icon = addon.iconURL || addon.icon64URL
