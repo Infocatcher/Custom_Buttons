@@ -1418,7 +1418,9 @@ function init() {
 			//while(tt.hasChildNodes())
 			//	tt.removeChild(tt.lastChild);
 			tt.textContent = "";
-			tt.width = tt.height = null; // Force reset size
+			// Firefox sometimes sets width/height to limit very huge tooltip
+			tt.removeAttribute("width");
+			tt.removeAttribute("height");
 
 			var df = tt.ownerDocument.createDocumentFragment();
 
