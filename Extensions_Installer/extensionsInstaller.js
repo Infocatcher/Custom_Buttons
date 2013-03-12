@@ -60,6 +60,8 @@ mp.updateMenu = function() {
 };
 function setStyle(mi, uid) {
 	AddonManager.getAddonByID(uid, function(addon) {
+		if(!addon)
+			return;
 		var icon = addon.iconURL || addon.icon64URL
 			|| "chrome://mozapps/skin/extensions/extensionGeneric-16.png";
 		mi.setAttribute("image", icon);
