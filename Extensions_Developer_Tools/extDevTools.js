@@ -25,6 +25,11 @@ var options = {
 	closeOptionsMenu: false,
 	restoreErrorConsole: true, // Only for Gecko 2.0+
 	reopenWindowFlushCaches: true,
+	confirm: {
+		reopen: false,
+		restart: false,
+		exit: false
+	},
 	hotkeys: {
 		cleanAndRestart: "control alt shift R",
 		attrsInspector: "control alt I",
@@ -122,6 +127,17 @@ function _localize(s, key) {
 		scratchpadKey: {
 			ru: "р"
 		},
+
+		"Reopen window?": {
+			ru: "Переоткрыть окно?"
+		},
+		"Restart application?": {
+			ru: "Перезапустить приложение?"
+		},
+		"Are you sure you want to exit?": {
+			ru: "Вы уверены, что вы хотите выйти?"
+		},
+
 		"Options": {
 			ru: "Настройки"
 		},
@@ -320,7 +336,10 @@ var cmds = this.commands = {
 		return this.canReopenWindow = ss && "getWindowState" in ss && "setWindowState" in ss
 			&& "gBrowser" in window && gBrowser.localName == "tabbrowser";
 	},
-	reopenWindow: function(flushCaches) {
+	reopenWindow: function() {
+		return this.confirm("reopen", "_reopenWindow", arguments);
+	},
+	_reopenWindow: function(flushCaches) {
 		this.button.disabled = true;
 
 		var ss = this.ss;
@@ -383,6 +402,9 @@ var cmds = this.commands = {
 			&& "swapBrowsersAndCloseOther" in gBrowser;
 	},
 	moveTabsToNewWindow: function() {
+		return this.confirm("reopen", "_moveTabsToNewWindow", arguments);
+	},
+	_moveTabsToNewWindow: function() {
 		this.button.disabled = true;
 
 		var win = this.openBrowserWindow();
@@ -455,6 +477,9 @@ var cmds = this.commands = {
 		);
 	},
 	restart: function() {
+		return this.confirm("restart", "_restart", arguments);
+	},
+	_restart: function() {
 		const pId = "browser.tabs.warnOnClose";
 		var woc = this.getPref(pId);
 		if(woc != undefined)
@@ -472,6 +497,9 @@ var cmds = this.commands = {
 			this.setPref(pId, woc);
 	},
 	cleanAndRestart: function() {
+		return this.confirm("restart", "_cleanAndRestart", arguments);
+	},
+	_cleanAndRestart: function() {
 		var xr = Components.classes["@mozilla.org/xre/app-info;1"]
 			.getService(Components.interfaces.nsIXULRuntime);
 		if("invalidateCachesOnRestart" in xr)
@@ -504,7 +532,7 @@ var cmds = this.commands = {
 				}
 			});
 		}
-		this.restart();
+		this._restart();
 	},
 	flushCaches: function() {
 		// See resource://gre/modules/XPIProvider.jsm
@@ -526,19 +554,20 @@ var cmds = this.commands = {
 		if(onlyGet)
 			return locale;
 		this.setPref(localePref, locale);
-		if(
-			!this.options.forceRestartOnLocaleChange
+		var reopen = !this.options.forceRestartOnLocaleChange
 			&& this.canReopenWindow
-			&& this.platformVersion >= 18
-		) {
-			this.reopenWindow(true);
+			&& this.platformVersion >= 18;
+		if(!this.confirm(reopen ? "reopen" : "restart"))
+			return;
+		if(reopen) {
+			this._reopenWindow(true);
 			this.savePrefFile(true);
 		}
 		else {
 			if(this.platformVersion >= 2)
-				this.cleanAndRestart();
+				this._cleanAndRestart();
 			else
-				this.restart();
+				this._restart();
 		}
 		return locale;
 	},
@@ -552,6 +581,8 @@ var cmds = this.commands = {
 			);
 	},
 	saveSessionAndExit: function() {
+		if(!this.confirm("exit"))
+			return;
 		//~ todo: browser.showQuitWarning, browser.warnOnQuit - ?
 		var woq = this.getPref("browser.warnOnQuit");
 		if(woq != undefined)
@@ -706,6 +737,25 @@ var cmds = this.commands = {
 			undefined,
 			this.defaultBranch
 		) != undefined;
+	},
+
+	confirm: function(key, method, args) {
+		var msg;
+		switch(key) {
+   			case "reopen":  msg = "Reopen window?";       break;
+   			case "restart": msg = "Restart application?"; break;
+   			case "exit":    msg = "Are you sure you want to exit?";
+		}
+		if(
+			!this.options.confirm[key]
+			|| Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
+				.getService(Components.interfaces.nsIPromptService)
+				.confirm(window, _localize("Extensions Developer Tools"), _localize(msg))
+		) {
+			method && this[method].apply(this, args);
+			return true;
+		}
+		return false;
 	},
 
 	initPrefsMenu: function(popup) {
