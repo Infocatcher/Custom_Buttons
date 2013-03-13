@@ -25,6 +25,10 @@ var options = {
 	closeOptionsMenu: false,
 	restoreErrorConsole: true, // Only for Gecko 2.0+
 	reopenWindowFlushCaches: true,
+	changeButtonIcon: true,
+	// Use icon of default menu item as button icon
+	// (middle-click on menu item to mark it as default,
+	// middle-click on button to execute default action)
 	confirm: {
 		reopen: false,
 		restart: false,
@@ -318,16 +322,19 @@ var cmds = this.commands = {
 		this.setDefaultActionTip();
 		this.savePrefFile(true);
 	},
-	setDefaultActionTip: function() {
+	setDefaultActionTip: function(delay) {
 		var _this = this;
 		setTimeout(function() {
 			var mi = _this.defaultActionItem;
-			_this.button.tooltipText = _this.button.tooltipText.replace(/ \n.*$/, "") + (
+			var btn = _this.button;
+			btn.tooltipText = btn.tooltipText.replace(/ \n.*$/, "") + (
 				mi
 					? " \n" + _localize("Middle-click: %S").replace("%S", mi.getAttribute("label"))
 					: ""
 			);
-		}, 100);
+			if(_this.options.changeButtonIcon)
+				btn.image = mi.getAttribute("image");
+		}, delay || 0);
 	},
 
 	get canReopenWindow() {
@@ -1019,7 +1026,7 @@ if(!cmds.onlyPopup) for(var kId in options.hotkeys) if(options.hotkeys.hasOwnPro
 }
 
 if(!cmds.onlyPopup)
-	cmds.setDefaultActionTip();
+	cmds.setDefaultActionTip(100);
 if(options.restoreErrorConsole && !cmds.onlyPopup)
 	cmds.initErrorConsoleRestoring();
 
