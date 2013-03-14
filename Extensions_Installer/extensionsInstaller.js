@@ -6,7 +6,7 @@
 // Place code to "initialization" section to create a "normal" menu.
 
 // (c) Infocatcher 2013
-// version 0.3.0pre2 - 2013-03-12
+// version 0.3.0pre3 - 2013-03-14
 
 var extensions = {
 	"extensionsId1@example": {
@@ -25,6 +25,7 @@ var extensions = {
 var _makeExe = "%COMMANDER_PATH%\\utils\\Delayed_Start\\ds.exe";
 var _makeArgs = [
 	"-w",
+	"-k999",
 	"%d\\make.bat",
 	"nodelay"
 ];
@@ -151,7 +152,9 @@ mp.installExtension = function(e) {
 		var process = Components.classes["@mozilla.org/process/util;1"]
 			.createInstance(Components.interfaces.nsIProcess);
 		process.init(file(expandVariables(expandDir(makeExe))));
+		//var t = Date.now();
 		process.runw(true, makeArgs.map(expandDir).map(expandVariables), makeArgs.length);
+		//LOG("[Extensions Installer] process.runw() done in " + (Date.now() - t) + "ms");
 		setTimeout(window.focus, 0); // Strange things happens...
 	}
 	catch(e) {
