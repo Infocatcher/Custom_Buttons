@@ -584,6 +584,11 @@ this.permissions = {
 			.getService(Components.interfaces.nsIXULAppInfo)
 			.name == "SeaMonkey";
 	},
+	getHost: function(useBaseDomain) {
+		return useBaseDomain
+			? this.currentBaseDomain
+			: this.currentHost;
+	},
 	getURI: function(host) {
 		if(host.indexOf(":") != -1 && /^[:\da-f.]+$/.test(host)) // IPv6
 			host = "[" + host + "]";
@@ -674,9 +679,7 @@ this.permissions = {
 	},
 
 	openPermissions: function() {
-		var host = this.options.useBaseDomain.openPermissions
-			? this.currentBaseDomain
-			: this.currentHost;
+		var host = this.getHost(this.options.useBaseDomain.openPermissions);
 
 		if(this.isSeaMonkey) {
 			this.openPermissionsSM(host);
@@ -792,9 +795,7 @@ this.permissions = {
 		//  this.cp.ACCESS_SESSION
 		//  this.cp.ACCESS_DENY (this.pm.DENY_ACTION)
 
-		var host = this.options.useBaseDomain.addPermission
-			? this.currentBaseDomain
-			: this.currentHost;
+		var host = this.getHost(this.options.useBaseDomain.addPermission);
 		if(!host)
 			return;
 
@@ -916,9 +917,7 @@ this.permissions = {
 		return this.cp.ACCESS_ALLOW;
 	},
 	showCookies: function() {
-		var host = this.options.useBaseDomain.showCookies
-			? this.currentBaseDomain
-			: this.currentHost;
+		var host = this.getHost(this.options.useBaseDomain.showCookies);
 		if("coomanPlus" in window && "coomanPlusCore" in window && this.options.useCookiesManagerPlus) {
 			// https://addons.mozilla.org/firefox/addon/cookies-manager-plus/
 			this.showCookiesCMP(host);
@@ -1015,9 +1014,7 @@ this.permissions = {
 		], checkCookieHosts);
 	},
 	get removeCurrentSiteCookiesHost() {
-		return this.options.useBaseDomain.removeCurrentSiteCookies
-			? this.currentBaseDomain
-			: this.currentHost;
+		return this.getHost(this.options.useBaseDomain.removeCurrentSiteCookies);
 	},
 	removeCurrentSiteCookies: function() {
 		var host = this.removeCurrentSiteCookiesHost;
