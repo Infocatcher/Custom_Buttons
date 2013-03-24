@@ -10,6 +10,7 @@
 
 var {Application, Components} = window; // Prevent garbage collection in Firefox 3.6 and older
 
+var cp = Components.interfaces.nsICookiePermission;
 var options = {
 	removeUnprotectedCookiesInterval: -1,
 	// Periodically remove unprotected cookies (leave only cookies with "Allow" permission)
@@ -28,8 +29,8 @@ var options = {
 		preserveCurrentSitesCookies: true // For "removeAllUnprotectedCookies: false"
 	},
 	showDefaultPolicy: true, // Show default cookies policy
-	toggleMode: Components.interfaces.nsICookiePermission.ACCESS_ALLOW,
-	// ACCESS_DENY, ACCESS_SESSION or ACCESS_ALLOW
+	toggleMode: [cp.ACCESS_ALLOW, cp.ACCESS_DENY, cp.ACCESS_DEFAULT],
+	// ACCESS_DENY, ACCESS_SESSION, ACCESS_ALLOW or ACCESS_DEFAULT
 	useCookiesManagerPlus: true, // https://addons.mozilla.org/firefox/addon/cookies-manager-plus/
 	reusePermissionsWindow: false, // Use any already opened permissions window
 	// E.g. "Show Exceptions" may convert "Allowed Sites - Add-ons Installation" to "Exceptions - Cookies"
@@ -840,11 +841,26 @@ this.permissions = {
 			pm.remove(host, this.permissionType);
 		}
 	},
-	togglePermission: function(capability) {
-		var permission = this.getPermission();
+	togglePermission: function(capabilities) {
+		//var cp = this.cp;
+		//function cpName(n) {
+		//	for(var p in cp)
+		//		if(cp[p] == n)
+		//			return p;
+		//	return n;
+		//}
+
+		//var permission = this.getPermission();
+		var permission = this.getPermissionEx(this.getHost(this.options.useBaseDomain.addPermission), true);
+		if(permission instanceof Components.interfaces.nsIPermission)
+			permission = permission.capability;
+		//LOG("Current: " + cpName(permission));
 		if(permission == this.PERMISSIONS_NOT_SUPPORTED)
 			return;
-		if(permission == capability)
+		var capability = capabilities[(capabilities.indexOf(permission) + 1) % capabilities.length];
+		//LOG("=> " + cpName(capability));
+
+		if(capability == this.cp.ACCESS_DEFAULT)
 			this.removePermission();
 		else
 			this.addPermission(capability);
@@ -878,10 +894,11 @@ this.permissions = {
 			? this.pm.testPermission(this.getURI(host), this.permissionType)
 			: this.PERMISSIONS_NOT_SUPPORTED;
 	},
-	getPermissionEx: function() {
+	getPermissionEx: function(host, dontGetInherited) {
 		// Unfortunately no API like nsIPermissionManager.testPermission()
 		// for temporary permissions
-		var host = this.currentHost;
+		if(!host)
+			host = this.currentHost;
 		if(!host)
 			return this.PERMISSIONS_NOT_SUPPORTED;
 		var pm = this.pm;
@@ -896,6 +913,8 @@ this.permissions = {
 			var permissionHost = permission.host;
 			if(permissionHost == host)
 				return permission;
+			if(dontGetInherited)
+				continue;
 			var hostLen = permissionHost.length;
 			if(
 				hostLen > maxHostLen
