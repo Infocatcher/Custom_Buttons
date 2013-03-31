@@ -699,8 +699,13 @@ function init() {
 			if(!node)
 				return;
 			this._hl = null;
-			if(!("removeAttributeNS" in node))
+			try {
+				if(!("removeAttributeNS" in node))
+					return;
+			}
+			catch(e) { // TypeError: can't access dead object
 				return;
+			}
 
 			if(_highlightUsingFlasher) {
 				this.flasher.repaintElement(node);
