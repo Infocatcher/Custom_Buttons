@@ -708,9 +708,11 @@ function init() {
 			}
 
 			if(_highlightUsingFlasher) {
+				var win = node.ownerDocument.defaultView;
+				win.clearInterval(this._hlInterval);
 				this.flasher.repaintElement(node);
-				this.flasher.repaintElement(node.ownerDocument.documentElement);
-				node.ownerDocument.defaultView.clearInterval(this._hlInterval);
+				//this.flasher.repaintElement(node.ownerDocument.documentElement);
+				this.flasher.repaintElement(this.getTopWindow(win.top).document.documentElement);
 				return;
 			}
 
@@ -1138,6 +1140,15 @@ function init() {
 			if(!pn && node.nodeType == Node.DOCUMENT_NODE && node != top.document)
 				pn = this.getParentFrame(node, top.document); // Only for Firefox 1.5
 			return pn;
+		},
+		getTopWindow: function(window) {
+			for(;;) {
+				var browser = this.dwu.getParentForNode(window.document, true);
+				if(!browser)
+					break;
+				window = browser.ownerDocument.defaultView.top;
+			}
+			return window;
 		},
 		getChildNodes: function(node, child) {
 			var dwu = this.dwu;
