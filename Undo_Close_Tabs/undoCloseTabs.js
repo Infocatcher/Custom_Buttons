@@ -6,7 +6,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2009-2013
-// version 0.3.0 - 2013-01-23
+// version 0.3.1pre - 2013-04-01
 
 var options = {
 	menuTemplate: [
@@ -579,6 +579,8 @@ this.undoCloseTabsList = {
 		return this.crop(uri, crop);
 	},
 	cachedIcon: function(src) {
+		if(src.slice(-22) == "#-moz-resolution=16,16") // Firefox 22.0a1
+			src = src.slice(0, -22);
 		if(
 			!/^https?:/.test(src)
 			// IDN, see https://bugzilla.mozilla.org/show_bug.cgi?id=311045
