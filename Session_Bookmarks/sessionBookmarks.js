@@ -6,7 +6,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011-2013
-// version 0.2.1pre - 2013-04-01
+// version 0.2.1pre2 - 2013-04-04
 
 // Usage:
 //   Use middle-click or left+click with any modifier to add current tab
@@ -32,6 +32,7 @@ var options = {
 	checkDuplicates: true, // Forbid duplicates
 	// Note: session data are checked too
 	deleteAfterOpen: false, // Delete opened bookmarks
+	removeAddedTab: false, // Remove tab after bookmark will be added
 	itemInPageContextMenu: false, // Show "Session Bookmark This Page" item in page context menu
 
 	useSessions: true, // Save and restore session data
@@ -685,7 +686,8 @@ this.bookmarks = {
 			label:  tab.label,
 			uri:    tab.linkedBrowser && tab.linkedBrowser.currentURI.spec,
 			icon:   this.cachedIcon(tab.image),
-			ssData: ssData
+			ssData: ssData,
+			tab:    tab
 		});
 	},
 	cleanupSessionData: function(data) {
@@ -759,6 +761,16 @@ this.bookmarks = {
 		this.onBookmarksChanged(true);
 		this.blink();
 		this.scheduleSave();
+		if(this.options.removeAddedTab) setTimeout(function() {
+			var tab = td.tab;
+			if(!tab.parentNode) // Already closed?
+				return;
+			// Browser may be closed with last tab, so will add new empty tab
+			var tabs = gBrowser.visibleTabs || gBrowser.tabs || gBrowser.tabContainer.childNodes;
+			if(tabs.length <= 1)
+				BrowserOpenTab();
+			gBrowser.removeTab(tab);
+		}, 0);
 		return mi;
 	},
 	addSeparator: function(insPoint) {
