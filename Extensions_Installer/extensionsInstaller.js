@@ -6,7 +6,7 @@
 // Place code to "initialization" section to create a "normal" menu.
 
 // (c) Infocatcher 2013
-// version 0.3.0pre3 - 2013-03-14
+// version 0.3.0pre4 - 2013-04-05
 
 var extensions = {
 	"extensionsId1@example": {
@@ -141,11 +141,6 @@ mp.installExtension = function(e) {
 	}
 
 	var xpiFile = file(xpi);
-	if(!xpiFile.exists()) {
-		restore();
-		notify("Error", "File not found:\n" + xpi);
-		return;
-	}
 	xpi = Services.io.newFileURI(xpiFile).spec;
 
 	if(make) try {
@@ -165,6 +160,12 @@ mp.installExtension = function(e) {
 			+ expandVariables(makeExe) + "\n" + makeArgs.map(expandVariables).join("\n")
 		);
 		Components.utils.reportError(e);
+		return;
+	}
+
+	if(!xpiFile.exists()) {
+		restore();
+		notify("Error", "File not found:\n" + xpi);
 		return;
 	}
 
