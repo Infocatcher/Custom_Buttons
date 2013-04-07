@@ -3,8 +3,7 @@
 <br>Note: *plugins.click_to_play* in about:config (“Block plugins” checkbox in button's context menu) should be enabled.
 <br>
 <br>Unfortunately since Firefox 20 (Gecko 20) global exclusions doesn't work, only on per-plugin basis.
-<br>So you should change "plugin:flash" in the source (and create copy of this button) to menage other plugins.
-<br>Note: seems like in SeaMonkey 2.17 exclusions doesn't work at all.
+<br>So you should change "Shockwave Flash" and "plugin:flash" in the source (and create copy of this button) to menage other plugins.
 
 ##### Screenshot:
 <img src="https://raw.github.com/Infocatcher/Custom_Buttons/master/Plugins_Permissions/pluginsPermissions-en.png" alt="Button's context menu" align="top">
