@@ -6,12 +6,15 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2012-2013
-// version 0.1.0 - 2013-03-02
+// version 0.1.1 - 2013-04-07
 
 // Based on Cookies Permissions button
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Cookies_Permissions
 
 // Note: plugins.click_to_play in about:config ("Block plugins" checkbox) should be enabled
+// Unfortunately since Firefox 20 (Gecko 20) global exclusions doesn't work, only on per-plugin basis.
+// So you should change "plugin:flash" in the source (and create copy of this button) to menage other plugins.
+// Note: seems like in SeaMonkey 2.17 exclusions doesn't work at all.
 
 var options = {
 	showTempPermissions: true, // Show items about temporary permissions (only Gecko 2.0+)
@@ -152,7 +155,13 @@ this.oncontextmenu = function(e) {
 };
 
 this.permissions = {
-	permissionType: "plugins",
+	//permissionType: "plugins",
+	get permissionType() {
+		delete this.permissionType;
+		return this.permissionType = parseFloat(this.appInfo.platformVersion) >= 20
+			? "plugin:flash"
+			: "plugins";
+	},
 	popupClass: "cbPluginsPermissionsPopup",
 
 	button: this,
@@ -437,11 +446,14 @@ this.permissions = {
 	get currentBaseDomain() {
 		return this.getBaseDomain(this.currentHost);
 	},
+	get appInfo() {
+		delete this.appInfo;
+		return this.appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
+			.getService(Components.interfaces.nsIXULAppInfo);
+	},
 	get isSeaMonkey() {
 		delete this.isSeaMonkey;
-		return this.isSeaMonkey = Components.classes["@mozilla.org/xre/app-info;1"]
-			.getService(Components.interfaces.nsIXULAppInfo)
-			.name == "SeaMonkey";
+		return this.isSeaMonkey = this.appInfo.name == "SeaMonkey";
 	},
 	getURI: function(host) {
 		if(host.indexOf(":") != -1 && /^[:\da-f.]+$/.test(host)) // IPv6
