@@ -872,7 +872,7 @@ var cssStr = ('\
 		}\n\
 	}')
 	.replace(/%button%/g, "#" + this.id)
-	.replace(/%attr%/g, "cb_" + this.permissions.permissionType);
+	.replace(/%attr%/g, "cb_" + this.permissions.permissionType.replace(/[:.]/g, "\\$&"));
 var cssURI = this.cssURI = Components.classes["@mozilla.org/network/io-service;1"]
 	.getService(Components.interfaces.nsIIOService)
 	.newURI("data:text/css," + encodeURIComponent(cssStr), null, null);
