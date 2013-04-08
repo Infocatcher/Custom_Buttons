@@ -6,7 +6,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011-2013
-// version 0.1.1pre3 - 2013-03-31
+// version 0.1.1pre4 - 2013-04-08
 
 // Includes Attributes Inspector
 //   http://infocatcher.ucoz.net/js/cb/attrsInspector.js
@@ -332,8 +332,15 @@ var cmds = this.commands = {
 					? " \n" + _localize("Middle-click: %S").replace("%S", mi.getAttribute("label"))
 					: ""
 			);
-			if(_this.options.changeButtonIcon)
+			if(!_this.options.changeButtonIcon)
+				return;
+			if(mi) {
+				btn._origImage = btn.image;
 				btn.image = mi.getAttribute("image");
+			}
+			else if("_origImage" in btn) {
+				btn.image = btn._origImage;
+			}
 		}, delay || 0);
 	},
 
