@@ -559,12 +559,12 @@ var cmds = this.commands = {
 	switchLocale: function(onlyGet) {
 		const localePref = "general.useragent.locale";
 		var prefs = this.prefs;
-		var locale = this.getPref(localePref);
+		var curLocale = this.getPref(localePref);
 		var locales = this.options.locales;
-		var i = locales.indexOf(locale);
+		var i = locales.indexOf(curLocale);
 		if(i == -1 || ++i >= locales.length)
 			i = 0;
-		locale = locales[i];
+		var locale = locales[i];
 		if(onlyGet)
 			return locale;
 		this.setPref(localePref, locale);
@@ -572,7 +572,7 @@ var cmds = this.commands = {
 			&& this.canReopenWindow
 			&& this.platformVersion >= 18;
 		if(!this.confirm(reopen ? "reopen" : "restart"))
-			return;
+			return curLocale;
 		if(reopen) {
 			this._reopenWindow(true);
 			this.savePrefFile(true);
