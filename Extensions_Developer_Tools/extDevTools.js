@@ -568,7 +568,7 @@ var cmds = this.commands = {
 		var locale = locales[i];
 		if(onlyGet)
 			return locale;
-		return setLocale(locale);
+		return this.setLocale(locale);
 	},
 	switchLocaleCustom: function() {
 		this.button.open = false;
