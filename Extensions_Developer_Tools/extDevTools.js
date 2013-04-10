@@ -107,6 +107,9 @@ function _localize(s, key) {
 		switchLocaleKey: {
 			ru: "л"
 		},
+		"Switch locale to:": {
+			ru: "Переключить локаль на:"
+		},
 		"Save session and exit": {
 			ru: "Сохранить сессию и выйти"
 		},
@@ -557,9 +560,7 @@ var cmds = this.commands = {
 		obs.notifyObservers(null, "chrome-flush-caches", null);
 	},
 	switchLocale: function(onlyGet) {
-		const localePref = "general.useragent.locale";
-		var prefs = this.prefs;
-		var curLocale = this.getPref(localePref);
+		var curLocale = this.getPref("general.useragent.locale");
 		var locales = this.options.locales;
 		var i = locales.indexOf(curLocale);
 		if(i == -1 || ++i >= locales.length)
@@ -567,12 +568,33 @@ var cmds = this.commands = {
 		var locale = locales[i];
 		if(onlyGet)
 			return locale;
-		this.setPref(localePref, locale);
+		return setLocale(locale);
+	},
+	switchLocaleCustom: function() {
+		this.button.open = false;
+		var locale = {
+			value: this.switchLocale(true)
+		};
+		var ok = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
+			.getService(Components.interfaces.nsIPromptService)
+			.prompt(
+				window,
+				_localize("Extensions Developer Tools"),
+				_localize("Switch locale to:"),
+				locale,
+				null,
+				{}
+			);
+		if(ok && locale.value)
+			this.setLocale(locale.value);
+	},
+	setLocale: function(locale) {
+		this.setPref("general.useragent.locale", locale);
 		var reopen = !this.options.forceRestartOnLocaleChange
 			&& this.canReopenWindow
 			&& this.platformVersion >= 18;
 		if(!this.confirm(reopen ? "reopen" : "restart"))
-			return curLocale;
+			return false;
 		if(reopen) {
 			this._reopenWindow(true);
 			this.savePrefFile(true);
@@ -892,6 +914,8 @@ this.appendChild(parseXULFromString('\
 			image="' + images.flushCaches + '" />\
 		<menuitem cb_id="switchLocale"\
 			oncommand="this.parentNode.parentNode.commands.switchLocale();"\
+			onclick="if(event.button == 2) { this.parentNode.parentNode.commands.switchLocaleCustom(); }"\
+			oncontextmenu="return false;"\
 			accesskey="' + _localize("S", "switchLocaleKey") + '"\
 			class="menuitem-iconic"\
 			image="' + images.switchLocale + '" />\
