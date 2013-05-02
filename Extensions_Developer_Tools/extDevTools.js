@@ -227,6 +227,8 @@ this.onmouseover = function(e) {
 		},
 		this
 	);
+	if(this.commands.updateTipOnMouseover)
+		this.commands.setDefaultActionTip();
 };
 this.onclick = function(e) {
 	if(e.target != this || e.button != 1 || this.disabled)
@@ -292,18 +294,8 @@ var cmds = this.commands = {
 			function(mi) {
 				var cbId = mi.getAttribute("cb_id");
 				mi.setAttribute("default", cbId == defaultAction);
-				if(cbId == "switchLocale") {
-					mi.setAttribute(
-						"label",
-						_localize("Switch locale to “%S”")
-							.replace("%S", this.switchLocale(true))
-					);
-					mi.setAttribute(
-						"tooltiptext",
-						_localize("Current locale: %S")
-							.replace("%S", this.currentLocale || "???")
-					);
-				}
+				if(cbId == "switchLocale")
+					this.initSwitchLocaleItem(mi);
 				else if(cbId == "attrsInspector") {
 					//~ Note: should be "inspectDOMNode" in window for Firefox 1.5
 					this.setPartiallyAvailable(
@@ -317,6 +309,18 @@ var cmds = this.commands = {
 				}
 			},
 			this
+		);
+	},
+	initSwitchLocaleItem: function(mi) {
+		mi.setAttribute(
+			"label",
+			_localize("Switch locale to “%S”")
+				.replace("%S", this.switchLocale(true))
+		);
+		mi.setAttribute(
+			"tooltiptext",
+			_localize("Current locale: %S")
+				.replace("%S", this.currentLocale || "???")
 		);
 	},
 	setPartiallyAvailable: function(mi, available) {
@@ -333,10 +337,18 @@ var cmds = this.commands = {
 		this.setDefaultActionTip();
 		this.savePrefFile(true);
 	},
+	updateTipOnMouseover: false,
 	setDefaultActionTip: function(delay) {
 		var _this = this;
 		setTimeout(function() {
 			var mi = _this.defaultActionItem;
+			if(mi && mi.getAttribute("cb_id") == "switchLocale") {
+				_this.updateTipOnMouseover = true;
+				_this.initSwitchLocaleItem(mi);
+			}
+			else {
+				_this.updateTipOnMouseover = false;
+			}
 			var btn = _this.button;
 			btn.tooltipText = btn.tooltipText.replace(/ \n.*$/, "") + (
 				mi
