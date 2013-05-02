@@ -107,6 +107,9 @@ function _localize(s, key) {
 		switchLocaleKey: {
 			ru: "л"
 		},
+		"Current locale: %S": {
+			ru: "Текущая локаль: %S"
+		},
 		"Switch locale to:": {
 			ru: "Переключить локаль на:"
 		},
@@ -294,6 +297,11 @@ var cmds = this.commands = {
 						"label",
 						_localize("Switch locale to “%S”")
 							.replace("%S", this.switchLocale(true))
+					);
+					mi.setAttribute(
+						"tooltiptext",
+						_localize("Current locale: %S")
+							.replace("%S", this.currentLocale || "???")
 					);
 				}
 				else if(cbId == "attrsInspector") {
@@ -559,8 +567,11 @@ var cmds = this.commands = {
 		obs.notifyObservers(null, "chrome-flush-skin-caches", null);
 		obs.notifyObservers(null, "chrome-flush-caches", null);
 	},
+	get currentLocale() {
+		return this.getPref("general.useragent.locale");
+	},
 	switchLocale: function(onlyGet) {
-		var curLocale = this.getPref("general.useragent.locale");
+		var curLocale = this.currentLocale;
 		var locales = this.options.locales;
 		var i = locales.indexOf(curLocale);
 		if(i == -1 || ++i >= locales.length)
