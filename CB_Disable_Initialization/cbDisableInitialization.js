@@ -4,7 +4,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2012-2013
-// version 0.1.0pre4 - 2013-02-09
+// version 0.1.0 - 2013-05-05
 
 // Adds "Enable initialization" checkbox to custom button's context menu.
 // Only for test purposes!
@@ -114,7 +114,7 @@ function getBtn() {
 
 var style = '\
 	@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");\n\
-	toolbarbutton[id^="custombuttons-button"][cb-init^="return;"] {\n\
+	toolbarbutton[id^="custombuttons-button"][cb-init^="return;"]:not([cb-edit-state]) {\n\
 		outline: 1px dotted !important;\n\
 		outline-offset: -1px !important;\n\
 	}';
