@@ -807,8 +807,7 @@ this.bookmarks = {
 		this.scheduleSave();
 	},
 	cachedIcon: function(src) {
-		if(src.slice(-22) == "#-moz-resolution=16,16") // Firefox 22.0a1
-			src = src.slice(0, -22);
+		src = src.replace(/[&#]-moz-resolution=\d+,\d+$/, ""); // Firefox 22.0a1
 		if(
 			!/^https?:/.test(src)
 			// IDN, see https://bugzilla.mozilla.org/show_bug.cgi?id=311045
