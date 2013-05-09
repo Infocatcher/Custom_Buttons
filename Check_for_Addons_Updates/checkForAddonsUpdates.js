@@ -120,7 +120,7 @@ function processAddonsTab(e) {
 		if(!updEnabled)
 			cbu.setPrefs(updEnabledPref, false);
 
-		if(!notFound.hidden || !noneFound.hidden) {
+		if(!notFound.hidden) {
 			if(tab.collapsed)
 				gBrowser.removeTab(tab);
 			notify(notFound.getAttribute("value"));
