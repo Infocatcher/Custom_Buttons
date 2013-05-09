@@ -89,11 +89,11 @@ function processAddonsTab(e) {
 	var updEnabled = cbu.getPrefs(updEnabledPref);
 	if(!updEnabled)
 		cbu.setPrefs(updEnabledPref, true);
-	
+
 	//Avoid getting false results from the past update check (May not be required for "noneFound")
 	doc.getElementById("updates-noneFound").hidden = true;
 	doc.getElementById("updates-installed").hidden = true;
-	
+
 	doc.getElementById("cmd_findAllUpdates").doCommand();
 
 	var wait = setInterval(function() {
@@ -106,14 +106,18 @@ function processAddonsTab(e) {
 		if(!inProgress.hidden)
 			return;
 		var autoUpdate = doc.getElementById("utils-autoUpdateDefault");
-		var autoUpdateChecked = (autoUpdate.getAttribute("checked").toLowerCase() === 'true');
+		var autoUpdateChecked = autoUpdate.getAttribute("checked") == "true";
 		var updated = doc.getElementById("updates-installed");
 		var found = doc.getElementById("updates-manualUpdatesFound-btn");
 		var notFound = doc.getElementById("updates-noneFound");
-		
-		if((found.hidden && notFound.hidden && !autoUpdateChecked) || (autoUpdateChecked && updated.hidden && notFound.hidden)) // Too early?
+
+		if(
+			autoUpdateChecked
+				? updated.hidden && notFound.hidden
+				: found.hidden && notFound.hidden
+		) // Too early?
 			return;
-		
+
 		stopWait();
 		tab.closing = false;
 
@@ -126,23 +130,21 @@ function processAddonsTab(e) {
 			notify(notFound.getAttribute("value"));
 			return;
 		}
-		else if(autoUpdateChecked) {
+		if(autoUpdateChecked) {
 			if(tab.collapsed)
 				gBrowser.removeTab(tab);
 			notify(updated.getAttribute("value"));
 			return;
 		}
-		else {
-			tab.collapsed = false;
-			doc.getElementById("categories").selectedItem = doc.getElementById("category-availableUpdates");
-			var tabWin = tab.ownerDocument.defaultView;
-			tabWin.gBrowser.selectedTab = tab;
-			setTimeout(function() {
-				tabWin.focus();
-				doc.defaultView.focus();
-				doc.getElementById("addon-list").focus();
-			}, 0);
-		}
+		tab.collapsed = false;
+		doc.getElementById("categories").selectedItem = doc.getElementById("category-availableUpdates");
+		var tabWin = tab.ownerDocument.defaultView;
+		tabWin.gBrowser.selectedTab = tab;
+		setTimeout(function() {
+			tabWin.focus();
+			doc.defaultView.focus();
+			doc.getElementById("addon-list").focus();
+		}, 0);
 	}, 50);
 	function stopWait() {
 		clearInterval(wait);
