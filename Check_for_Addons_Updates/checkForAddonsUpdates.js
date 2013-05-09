@@ -162,7 +162,7 @@ function processAddonsTab(e) {
 			.getService(Components.interfaces.nsIAlertsService)
 			.showAlertNotification(
 				"chrome://mozapps/skin/extensions/extensionGeneric.png",
-				"Auto-Updater",
+				btn.label,
 				msg, false, "", null
 			);
 	}
