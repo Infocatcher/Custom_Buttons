@@ -593,6 +593,7 @@ this.permissions = {
 	getURI: function(host) {
 		if(host.indexOf(":") != -1 && /^[:\da-f.]+$/.test(host)) // IPv6
 			host = "[" + host + "]";
+		host = host.replace(/^\./, "");
 		try {
 			return this.io.newURI("http://" + host, null, null);
 		}
