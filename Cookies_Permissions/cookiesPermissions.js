@@ -1058,10 +1058,15 @@ this.permissions = {
 				//LOG("Don't remove: " + cookieHost);
 				continue;
 			}
-			//LOG("!!! Remove: " + cookieHost);
 			let uri = this.getURI(cookieHost);
+			//LOG(
+			//	"!!! Host: " + cookieHost
+			//	+ ", uri " + uri.spec
+			//	+ ", testPermission: " + pm.testPermission(uri, this.permissionType)
+			//);
 			if(types && types.indexOf(pm.testPermission(uri, this.permissionType)) == -1)
 				continue;
+			//LOG("!!! Remove: " + cookieHost);
 			cm.remove(cookieHost, cookie.name, cookie.path, false);
 		}
 	},
