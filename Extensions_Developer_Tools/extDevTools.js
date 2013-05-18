@@ -6,7 +6,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011-2013
-// version 0.1.1pre4 - 2013-04-08
+// version 0.1.1pre5 - 2013-05-19
 
 // Includes Attributes Inspector
 //   http://infocatcher.ucoz.net/js/cb/attrsInspector.js
