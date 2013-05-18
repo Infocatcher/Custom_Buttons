@@ -357,13 +357,10 @@ var cmds = this.commands = {
 			);
 			if(!_this.options.changeButtonIcon)
 				return;
-			if(mi) {
-				btn._origImage = btn.image;
-				btn.image = mi.getAttribute("image");
-			}
-			else if("_origImage" in btn) {
-				btn.image = btn._origImage;
-			}
+			var icon = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon");
+			icon.src = mi
+				? mi.getAttribute("image")
+				: btn.image;
 		}, delay || 0);
 	},
 
