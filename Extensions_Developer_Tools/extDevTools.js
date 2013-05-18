@@ -603,7 +603,9 @@ var cmds = this.commands = {
 			.prompt(
 				window,
 				_localize("Extensions Developer Tools"),
-				_localize("Switch locale to:"),
+				_localize("Current locale: %S")
+					.replace("%S", this.currentLocale || "???")
+				+ "\n" + _localize("Switch locale to:"),
 				locale,
 				null,
 				{}
