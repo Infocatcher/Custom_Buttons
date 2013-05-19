@@ -6,7 +6,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011-2013
-// version 0.1.1pre5 - 2013-05-19
+// version 0.1.1 - 2013-05-19
 
 // Includes Attributes Inspector
 //   http://infocatcher.ucoz.net/js/cb/attrsInspector.js
@@ -1095,7 +1095,7 @@ this.attrsInspector = function(event) {
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Attributes_Inspector
 
 // (c) Infocatcher 2010-2013
-// version 0.6.1pre3 - 2013-03-31
+// version 0.6.1 - 2013-05-19
 
 //===================
 // Attributes Inspector button for Custom Buttons
@@ -1139,6 +1139,10 @@ var _excludeChildTextNodes = 1;
 // 1 - exclude, if found element node
 // 2 - always exclude
 var _excludeSiblingTextNodes = false;
+
+var _preferNotAnonymousChildNodes = false;
+// true  - use not anonymous child nodes, if any (as in version 0.6.1pre and older)
+// false - always try get real child nodes (may work wrong in Gecko < 7.0)
 
 var _forbidTooltips = true; // Prevent all other tooltips
 var _popupLocker = 1;
@@ -2243,6 +2247,12 @@ function init() {
 			return window;
 		},
 		getChildNodes: function(node, child) {
+			if(_preferNotAnonymousChildNodes) {
+				var childNodes = node.childNodes;
+				if(!childNodes.length && "getAnonymousNodes" in node.ownerDocument)
+					childNodes = node.ownerDocument.getAnonymousNodes(node);
+				return childNodes;
+			}
 			var dwu = this.dwu;
 			if("getChildrenForNode" in dwu) // Gecko 7.0+
 				return dwu.getChildrenForNode(node, true);
