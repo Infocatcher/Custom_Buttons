@@ -19,7 +19,11 @@
 var options = {
 	hideDropMarker: true, // Hide "v" after button's icon
 	showLabel: undefined, // Set to true/false to force show/hide button's label
-	useFolderTitle: true
+	useFolderTitle: true,
+	// "Select folder" dialog:
+	dialogWidth: 400,
+	dialogHeight: 350,
+	dialogPersist: "" // Example: "screenX screenY width height"
 };
 
 function _localize(s, key) {
@@ -205,6 +209,11 @@ this.bookmarks = {
 		// Note: <property name="view"> from chrome://communicator/content/places/tree.xml#places-tree
 		// are null sometimes.
 		// We are trying to re-apply binding as a workaround.
+		var persist = options.dialogPersist;
+		if(persist) {
+			persist = '\n\
+				persist="' + persist + '"';
+		}
 		var winSrc = '\
 			<?xml version="1.0"?>\n\
 			<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>'
@@ -216,8 +225,8 @@ this.bookmarks = {
 				buttons="accept,cancel"\n\
 				onload="init();"\n\
 				ondialogaccept="return dialogCallback();"\n\
-				width="400"\n\
-				height="350">\n\
+				width="' + options.dialogWidth + '"\n\
+				height="' + options.dialogHeight + '"' + persist + '>\n\
 				<keyset>\n\
 					<key id="key-accept" keycode="VK_RETURN" modifiers="control"\n\
 						oncommand="document.documentElement.acceptDialog();" />\n\
