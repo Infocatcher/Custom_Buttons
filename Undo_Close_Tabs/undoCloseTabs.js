@@ -518,8 +518,9 @@ this.undoCloseTabsList = {
 			if(this.cm)
 				mi.setAttribute("context", this.cmId);
 			var selectedTab = tabs[undoItem.selected - 1];
-			if(selectedTab.attributes && selectedTab.attributes.image)
-				mi.setAttribute("image", this.cachedIcon(selectedTab.attributes.image));
+			var icon = selectedTab.image || selectedTab.attributes && selectedTab.attributes.image;
+			if(icon)
+				mi.setAttribute("image", this.cachedIcon(icon));
 			//if(selectedTab.entries && selectedTab.entries.length) // Can be [] for about:blank
 			//	mi.setAttribute("tooltiptext", selectedTab.entries[selectedTab.index - 1].url);
 			var uris = [];
