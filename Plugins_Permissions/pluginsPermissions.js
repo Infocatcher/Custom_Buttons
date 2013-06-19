@@ -643,7 +643,10 @@ this.permissions = {
 					}
 				}
 			}, "dataman-loaded", false);
-			content.gDataman.loadView("|permissions");
+			//content.gDataman.loadView("|permissions");
+			var ml = content.document.getElementById("typeSelect");
+			ml.value = "Permissions";
+			ml.doCommand();
 		});
 	},
 	tweakWindow: function(win) {
