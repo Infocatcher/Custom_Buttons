@@ -631,25 +631,55 @@ this.permissions = {
 		switchToTabHavingURI("about:data", true, function(browser) {
 			var win = browser.contentWindow;
 			var content = win.wrappedJSObject || win;
-			_this.oSvc.addObserver(function observer(subject, topic, data) {
-				if(subject != win && subject != content)
-					return;
-				_this.oSvc.removeObserver(observer, topic);
 
+			function selectDomain() {
 				var gDomains = content.gDomains;
 				var domains = gDomains.displayedDomains;
 				for(var i = 0, l = domains.length; i < l; ++i) {
 					var domain = domains[i];
 					if(domain.title == host) {
 						gDomains.tree.view.selection.select(i);
+						// For SeaMonkey 2.20a1
+						var tab = content.document.getElementById("permissionsTab");
+						if(tab && !tab.disabled)
+							tab.parentNode.selectedItem = tab;
 						break;
 					}
 				}
+			}
+
+			if(parseFloat(_this.appInfo.version) > 2.19) {
+				//LOG("Workaround");
+				var ml = content.document.getElementById("typeSelect");
+				ml.value = "Permissions";
+				ml.doCommand();
+
+				var gDomains = content.gDomains;
+				var oldDomainsCount = gDomains.displayedDomains.length;
+				var stopWait = Date.now() + 5e3;
+				var waitTimer = setTimeout(function wait() {
+					var newDomainsCount = gDomains.displayedDomains.length;
+					//LOG(oldDomainsCount + " -> " + newDomainsCount);
+					if(
+						newDomainsCount > 1 && newDomainsCount == oldDomainsCount
+						|| Date.now() > stopWait
+					) {
+						selectDomain();
+						return;
+					}
+					oldDomainsCount = newDomainsCount;
+					waitTimer = setTimeout(wait, 20);
+				}, 20);
+				return;
+			}
+
+			_this.oSvc.addObserver(function observer(subject, topic, data) {
+				if(subject != win && subject != content)
+					return;
+				_this.oSvc.removeObserver(observer, topic);
+				selectDomain();
 			}, "dataman-loaded", false);
-			//content.gDataman.loadView("|permissions");
-			var ml = content.document.getElementById("typeSelect");
-			ml.value = "Permissions";
-			ml.doCommand();
+			content.gDataman.loadView("|permissions");
 		});
 	},
 	tweakWindow: function(win) {
