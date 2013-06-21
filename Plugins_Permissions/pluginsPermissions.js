@@ -622,15 +622,18 @@ this.permissions = {
 	},
 	openPermissionsSM: function(host) {
 		if(!this.options.useBaseDomain.openPermissions)
-			host = this.getBaseDomain(host);
+			host = this.getBaseDomain(host); // Only base domains are displayed in the list
 
 		//gBrowser.selectedTab = gBrowser.addTab("about:data");
 		//toDataManager("|permissions");
 		// See chrome://communicator/content/tasksOverlay.js
 		var _this = this;
 		switchToTabHavingURI("about:data", true, function(browser) {
-			var content = browser.contentWindow.wrappedJSObject;
+			var win = browser.contentWindow;
+			var content = win.wrappedJSObject || win;
 			_this.oSvc.addObserver(function observer(subject, topic, data) {
+				if(subject != win && subject != content)
+					return;
 				_this.oSvc.removeObserver(observer, topic);
 
 				var gDomains = content.gDomains;
