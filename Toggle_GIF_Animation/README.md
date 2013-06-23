@@ -1,3 +1,3 @@
-![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Toggle_GIF_Animation/icon.png)&nbsp;<a href="http://infocatcher.github.com/Custom_Buttons/install/toggleGifAnimation.html"><strong>Toggle GIF Animation</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Toggle_GIF_Animation/icon.png)&nbsp;<a href="http://infocatcher.github.io/Custom_Buttons/install/toggleGifAnimation.html"><strong>Toggle GIF Animation</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
 <br>Disable or enable GIF animation on current page.
 <br>You can use <a href="https://github.com/Infocatcher/Custom_Buttons/blob/66f0f21b0f04825f886e8056a4fd607eda162df7/Toggle_GIF_Animation/toggleGifAnimation.js">old version</a> for hotkeys or mouse gestures.

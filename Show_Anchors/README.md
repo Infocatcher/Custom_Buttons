@@ -1,3 +1,3 @@
-![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Show_Anchors/icon.png)&nbsp;<a href="http://infocatcher.github.com/Custom_Buttons/install/showAnchors.html"><strong>Show Anchors</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Show_Anchors/icon.png)&nbsp;<a href="http://infocatcher.github.io/Custom_Buttons/install/showAnchors.html"><strong>Show Anchors</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
 <br>Show/hide all <a href="https://en.wikipedia.org/wiki/HTML_element#Anchor">anchors</a> on the page to easily copy link to some section of the page.
 <br>See <a href="https://github.com/Infocatcher/Bookmarklets">bookmarklet</a> with the same name for <a href="https://github.com/Infocatcher/Bookmarklets/blob/master/showAnchors.js">source code</a>.

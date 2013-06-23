@@ -1,4 +1,4 @@
-![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Bookmarks_Folder/icon.png)&nbsp;<a href="http://infocatcher.github.com/Custom_Buttons/install/bookmarksFolder.html"><strong>Bookmarks Folder</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Bookmarks_Folder/icon.png)&nbsp;<a href="http://infocatcher.github.io/Custom_Buttons/install/bookmarksFolder.html"><strong>Bookmarks Folder</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
 <br>Show contents of any bookmarks folder in drop-down menu.
 <br>Use middle-click (or left-click with any modifier) on button to change folder.
 

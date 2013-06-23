@@ -1,4 +1,4 @@
-![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Session_Bookmarks/icon.png)&nbsp;<a href="http://infocatcher.github.com/Custom_Buttons/install/sessionBookmarks.html"><strong>Session Bookmarks</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Session_Bookmarks/icon.png)&nbsp;<a href="http://infocatcher.github.io/Custom_Buttons/install/sessionBookmarks.html"><strong>Session Bookmarks</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
 <br>Drop-down menu with “session” bookmarks: additionally saves session information (such as scroll position and controls state).
 <br>Use middle-click or left+click with any modifier to add current tab.
 <br>Drag and drop any tab to add new bookmark.

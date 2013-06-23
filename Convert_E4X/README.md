@@ -1,3 +1,3 @@
-![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Convert_E4X/icon.png)&nbsp;<a href="http://infocatcher.github.com/Custom_Buttons/install/convertE4X.html"><strong>Convert E4X</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Convert_E4X/icon.png)&nbsp;<a href="http://infocatcher.github.io/Custom_Buttons/install/convertE4X.html"><strong>Convert E4X</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
 <br>Tries convert [deprecated](http://custombuttons.sf.net/forum/viewtopic.php?f=2&t=365) [E4X](https://developer.mozilla.org/en-US/docs/E4X) to string literals.
 <br>Click on button and then click on another button with E4X in code (or click on opened page with *.js file).
