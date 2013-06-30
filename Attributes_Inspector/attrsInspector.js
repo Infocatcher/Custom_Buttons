@@ -1018,7 +1018,7 @@ function init() {
 			}
 			else if(ctrlShift && e.keyCode == e.DOM_VK_C) // keydown || keyup
 				this.stopEvent(e);
-			else if(ctrlShift && e.keyCode == 0 && String.fromCharCode(e.charCode) == "C") { // Ctrl+Shift+C
+			else if(ctrlShift && e.keyCode == 0 && String.toUpperCase(String.fromCharCode(e.charCode)) == "C") {// Ctrl+Shift+C
 				this.stopEvent(e);
 				if(!onlyStop)
 					this.copyTootipContent();
