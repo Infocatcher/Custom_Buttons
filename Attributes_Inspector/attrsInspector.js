@@ -1295,6 +1295,13 @@ function init() {
 			inspect && inspect(node, top, forcePopupLocker);
 			this.closeMenus(node);
 			this.hideUnclosedPopups();
+			if(!inspect) {
+				var label = this.context.button && this.context.button.label
+					|| "Attributes Inspector";
+				Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
+					.getService(Components.interfaces.nsIPromptService)
+					.alert(top, label, "DOM Inspector isn't found!");
+			}
 		},
 		getPopup: function(node) {
 			for(; node && "tagName" in node; node = node.parentNode)
