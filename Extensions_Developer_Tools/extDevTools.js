@@ -6,7 +6,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011-2013
-// version 0.1.1 - 2013-05-19
+// version 0.1.2pre - 2013-07-03
 
 // Includes Attributes Inspector
 //   http://infocatcher.ucoz.net/js/cb/attrsInspector.js
@@ -1095,7 +1095,7 @@ this.attrsInspector = function(event) {
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Attributes_Inspector
 
 // (c) Infocatcher 2010-2013
-// version 0.6.1 - 2013-05-19
+// version 0.6.2pre - 2013-07-01
 
 //===================
 // Attributes Inspector button for Custom Buttons
@@ -2110,7 +2110,11 @@ function init() {
 			}
 			else if(ctrlShift && e.keyCode == e.DOM_VK_C) // keydown || keyup
 				this.stopEvent(e);
-			else if(ctrlShift && e.keyCode == 0 && String.fromCharCode(e.charCode) == "C") { // Ctrl+Shift+C
+			else if(
+				ctrlShift
+				&& e.keyCode == 0
+				&& String.fromCharCode(e.charCode).toUpperCase() == "C"
+			) { // Ctrl+Shift+C
 				this.stopEvent(e);
 				if(!onlyStop)
 					this.copyTootipContent();
@@ -2383,6 +2387,13 @@ function init() {
 			inspect && inspect(node, top, forcePopupLocker);
 			this.closeMenus(node);
 			this.hideUnclosedPopups();
+			if(!inspect) {
+				var label = this.context.button && this.context.button.label
+					|| "Attributes Inspector";
+				Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
+					.getService(Components.interfaces.nsIPromptService)
+					.alert(top, label, "DOM Inspector isn't found!");
+			}
 		},
 		getPopup: function(node) {
 			for(; node && "tagName" in node; node = node.parentNode)
