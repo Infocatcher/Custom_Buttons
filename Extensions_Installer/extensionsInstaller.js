@@ -6,7 +6,7 @@
 // Place code to "initialization" section to create a "normal" menu.
 
 // (c) Infocatcher 2013
-// version 0.3.0pre4 - 2013-04-05
+// version 0.3.0pre5 - 2013-07-15
 
 var extensions = {
 	"extensionsId1@example": {
@@ -73,12 +73,19 @@ mp.toggleExtension = function(mi) {
 };
 function setStyle(mi, uid, addon) {
 	function getAddonCallback(addon) {
-		var icon = addon.iconURL || addon.icon64URL
-			|| "chrome://mozapps/skin/extensions/extensionGeneric-16.png";
+		var icon = "";
+		var color = "grayText";
+		if(addon) {
+			icon = addon.iconURL
+				|| addon.icon64URL
+				|| "chrome://mozapps/skin/extensions/extensionGeneric-16.png";
+			if(addon.isActive)
+				color = "";
+		}
 		mi.setAttribute("image", icon);
-		mi.style.color = addon.isActive ? "" : "grayText";
+		mi.style.color = color;
 	}
-	if(addon)
+	if(addon !== undefined)
 		getAddonCallback(addon);
 	else
 		AddonManager.getAddonByID(uid, getAddonCallback);
