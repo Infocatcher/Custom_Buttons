@@ -63,6 +63,8 @@ var images = {
 	saveSessionAndExit: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1goUDSQ2q/JqlwAAAlZJREFUOMulkz9PU2EUxn/vvbe3rf2DpVyQ2MZYtKKRhNEPgH9CgokLAT8ADsYQHcQPwOCgMW4kDjIpCQtKXJRRBBaDkUGCbQcFsSmkFNpLafseBwgKNTj4Jmd5z5PfOU9yHiUi/M+zDn8opcxoNHo5mUzGRATDMFBKobVGa02tphGB1dUfm8vL398gInXV29v/rFoVyeU2ZG2tIOvrBcnl8pLN5mVlJSeFwo4MDz+cBYJ/20B1d19nZuYjIyNP8Pv9WNaubGzsJSLCxMQ7XHenClh1ABGRrp4btZoIbW0J+vr78Nk+AEZHn6PUvg4A4zDAVMqTyOWilVIJfzCIE20i6uxWPB7HcZyjAQInBzJLV9WLURDB8HjYG0ok0khjY/RowCnweR0n0L5TpCuVolLTVLTmw/R75uZmCQSOHdAbAK+93sl0PD7/LRabH4/FXgVMU/l8fuKZDMXHj9BKUdjaYuDWwL4FrfXvO/A0NFyK9PQ0VbTmnGFQ3diglkrhsW2CU1PUDJNrQ/dJpzJYpnXAggVgFIvl6vQ02nUpuy6qXMasVGB7G7taZTlynDjQfr6dUnGzHlB2XdlaWEBrjQ2E9xo28Lmjg+ztO7ipr7Q4DpFIZM/CH4CbIg9MkQRQboATn2AwAMZiZyeZoSHakmextebMhYuk02kAwuGQB9BKRFBKmYAJEIQrBcuafCuyc6+1dcZobl4Keb21UCisbNvezufzXqWM09nsz+XFxS9P63LgVSpxNxwebzXNQSB6uA8ooAVoBfzqcJyVUjYQAkoi4v4rzr8AOtoq54WTN98AAAAASUVORK5CYII=",
 	// https://addons.mozilla.org/firefox/addon/console%C2%B2/
 	errorConsole: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAz1JREFUeNpMU11oVEcYPTP33uy9m5sN5gdLtYkvgjQgaEKVPBgoxR9okCoV7Yu1T30vFEqlFYUgYi1U+lRqiZZKIxFjobUtJoYm0RcRi1KtQRKzu7nJ7ia7m937s/fOTL+7WyUD8zDDnHO+75z5mFIK61d8ruRXWhUUB1j9jjEGKQQ0ziu1hBG2pVKv3uvrwaHn4t7Zc4dEduG8aScTxAb1P0HkVpF/Mvv45/TiRx//9GN6YNeuBvnLCkQY4s7nJ4805dLf9/Vus/WgQpcCiOJdAzcM5Moefrv2x4Ph3Oqhz26Oze0bGGgQhJ6HyS9PHU0sL/zQ+1aPyZbTkKSoogiu69V5LBXB7OhEVTfxy8jv94czy4dPT9yeZwRm00NDB9ncsyt9u3ts5DJ1MJPkRdUD238E2mubEVy+iJZSHlrnRlSaLNwavf1gxI8Oc7/qpkT6xTd9O7fazFmArFLpUkL5PqpGEvaevTDf6EawViEvNARODpbr4uB7b+9oK5dPcikVt5qThrFWgCgXqd+IdghVC4BmGyyRwNLYCMzCIiSZLCtVuE+fo8kPoCetFKWgKKJIyoDMDGsA16DCiMhK4O2bEORzCG6Noq1SRkh3IqREPIGovTUOXTayjpOIVclMuVKAzDkQTpYUbJTu3kGzMx+7DUnFSTJUyFi28Uf0OERFYLm6ArnkNPjIwBigiEhmXsCmN5GsW1NPREhW14z/h67oFJaKCd5CPVPfisd/S8HnBtzZJ7Cob6YlCMga6oIq4QRMaLFIEzd07hed/MOCbkNv7wAjklqRzHz/BLaM3UXUtRVh1afeY38VIsXQ2tMNxw9R8WuPdE/j7rXF5ePFbObGu/v6epMigj/vwZuZxvN//oUxOwulmQhDBRIncBcKzMCViYeXfi2uXmDkP8anpjA0OLjleOeG6wfe2bnDdDJYezaHKBDQLRsCHJJxpN7sJrCOyxN/f/ets/gpOtqLr2ZhfGYGZ/bu7/7w9Y7RwT3bey1qRZCZikqOzdNNHUteDcN/Pbr0VTb7SWhZpanJScXWj/P49DQuHPuga6PnfaF03vJylBtTB+o5ePpnufy1tXnT6sjVq+jv78d/AgwAz5rMGbA9L4wAAAAASUVORK5CYII=",
+	// chrome://global/skin/icons/warning-16.png
+	browserConsole: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAq5JREFUeNqMk19IU1Ecx3/37t5uXmRuKyndalMpFcl0NHFE0UMOVGIP0hqh5FPTiVRKTCeIPQh7EHwIcWSLkBFBPQYFUY+9SS4RQdLNP0Q6y+sftqn33tPv3FBIV3TYh/Pbub/f93zPj3MYQghkGwzDmHEqR3aRGcxLZsvjRkdHjyz6/f4iu91+c2hoqEWSpFRHR0cUBSPd3d2pIwImkymbcPnIyIhPPL5anKfXQ39//4/29vYJnuc/HU5kDy94vd7Kzs7ORqv1dPHmah+k10Pgcrnqq6urr4ZCIcsRB/F44uBPb29PDt29q6vrdmL+GVReYCCzvQKzyx9gcHCwuaGhYcJoNC7/y0FFJBJp4bktQ17ua2j0COC9K8Ax+QmUlFgrPB6PKxAIlGUVwN3zzWazs6mp6Xp8LgRnLTxkMgBb2wDnbTJ8W3wF6KyFOozH47APi5aAQj+MjT1tln5OCrbCL0BkBtLptAZR98DIvgBBkE+hA3c4HL70h4O2Nl9RXV3dNYfDXjM/EwS9yIGSzhwIZNaTcFKQYPXrY2htbfUWFBQ4UUTUBBRF1XYfGHh0ZynxFsqsEuxIK7CzsY7WNzXIHmgU8h9hLTktBIPBeqypEkURGAwqfb42X0/gvj/x+QaUntnEJaL9FhZ1mk1LvgJ4ClDxTs4mrWBzRgEb2huLxaJU4NbkZCy8thQ1lOrH8Q4TvMYAG1sqeB/magJvhlOaANnDvqQIfDf2wfaubdrtdj9gHY4al14vGHI2xkHJEFCx8wqi7tD3wGrQmBZTER5NK3PDUHXxQgX24gqHb4lRsQ2W2pfAsizodBQdiBi/f4eFNAHPo2LSbwick3EmWu909AiXa2ud90ymEwae54DjKDptpoK0SFEUjf1YlmVYwDE1NfWc+dtz/t/xS4ABAFPwJo86gIiiAAAAAElFTkSuQmCC",
 	// nuove by Alexander Moore, http://www.iconsearch.ru/detailed/278/1/
 	attrsInspector: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACW0lEQVQ4jW2TQUsbQRiG3/l2ui4hPaSbCBZPsR6kMXrwYP9AK+JJKOJZKPgD1KMXf0ELPffsoRDpxUv2aLUHKamHikJxi1gQktXNzrqbna+HJJPE9oNhGJh55n3f+UYwM7a2tuzNzc13RETMTADAzOjN/bVGr7Isw+rq6vuzszMtAWB8fDxXKBQ+EBHSNIXWGpZlGYgQAkIIEBGEENBaw3XdjwASCQCO41Cr1YLv+8jlchBCIAxDFItFlEolc5CZDaxarUoDsG3nme//xuLiK3NDlmmcn/9EEAQoFAp4XBMTExIACAB8/2ppbm4OzAytu1YtizA19QI3Nzf/HBZCoFgsSgCQXdrz6bSjIZIEJGhkY5p2Rtb9yufztlHQaDR81hpRO0a7raDUA1T8gLCtcHd3Z3wPB+o4DhnA/X3wpV73kKYdPCQJokihHUb40WjAdV0T4jDEtu2BhbW1tbhUKuHgoIby1DSeSImLi3Ocnn7DwsICZmcrBtCHSCkHCpgZlUoF6+tv8TRvQ4gUKytL2N7eRr1eR61WGwH0eoKMAgDUk4X5+Xkws2mi3d1d7O3twXEcLC8v97pTQAgxUNAHDHskIhARJicnsbOzA8/z4HketGZkWpvnpu6bW3I4qMejXC5jY2MDx8fHODr6CtYZkiQZAIiIhrz9FzIz8xKv3yzh6uoXpLRwcnISoh/g4eFhNY5jVkqxUoqjKBoZYdjmZjPgZrPFSim+vLz87rquw8zdEJVSrevr60+9L6uZWQshNDNrZuhMs+50Eu2MjSVBEPzZ39//fHt7GwPAX9zKMQVPs/QoAAAAAElFTkSuQmCC",
 	// FatCow icons, http://www.iconfinder.com/icondetails/36398/16/code_script_icon
@@ -124,6 +126,12 @@ function _localize(s, key) {
 		},
 		errorConsoleKey: {
 			ru: "К"
+		},
+		"Browser console": {
+			ru: "Консоль браузера"
+		},
+		browserConsoleKey: {
+			ru: "у"
 		},
 		"Attributes Inspector": {
 			ru: "Инспектор атрибутов"
@@ -686,6 +694,30 @@ var cmds = this.commands = {
 			: "chrome://global/content/console.xul";
 		window.openDialog(consoleURI, "_blank", "chrome,all,centerscreen,resizable,dialog=0");
 	},
+	get canOpenBrowserConsole() {
+		delete this.canOpenBrowserConsole;
+		//return this.canOpenBrowserConsole = "HUDConsoleUI" in window
+		//	&& "toggleBrowserConsole" in HUDConsoleUI;
+		return this.canOpenBrowserConsole = !!document.getElementById("menu_browserConsole");
+	},
+	openBrowserConsole: function() {
+		if("HUDConsoleUI" in window && "toggleBrowserConsole" in HUDConsoleUI) {
+			if(HUDConsoleUI._browserConsoleID) try {
+				var HUDService = Components.utils.import("resource:///modules/HUDService.jsm", {}).HUDService;
+				var hud = HUDService.getHudReferenceById(HUDConsoleUI._browserConsoleID);
+				if(hud && hud.iframeWindow) {
+					hud.iframeWindow.focus();
+					return;
+				}
+			}
+			catch(e) {
+				Components.utils.reportError(e);
+			}
+			HUDConsoleUI.toggleBrowserConsole();
+			return;
+		}
+		document.getElementById("menu_browserConsole").doCommand();
+	},
 	_restoreErrorConsoleObserver: null,
 	get restoreErrorConsolePref() {
 		delete this.restoreErrorConsolePref;
@@ -956,6 +988,14 @@ this.appendChild(parseXULFromString('\
 			accesskey="' + _localize("E", "errorConsoleKey") + '"\
 			class="menuitem-iconic"\
 			image="' + images.errorConsole + '" />\
+		<menuitem cb_id="browserConsole"\
+			oncommand="this.parentNode.parentNode.commands.openBrowserConsole();"\
+			key="key_browserConsole"\
+			label="' + _localize("Browser console") + '"\
+			accesskey="' + _localize("B", "browserConsoleKey") + '"\
+			class="menuitem-iconic"\
+			image="' + images.browserConsole + '"\
+			hidden="' + !cmds.canOpenBrowserConsole + '" />\
 		<menuitem cb_id="attrsInspector"\
 			oncommand="this.parentNode.parentNode.commands.attrsInspector(event);"\
 			label="' + _localize("Attributes Inspector") + '"\
