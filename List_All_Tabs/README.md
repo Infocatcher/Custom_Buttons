@@ -1,0 +1,2 @@
+![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/List_All_Tabs/icon.png)&nbsp;<a href="http://infocatcher.github.io/Custom_Buttons/install/listAllTabs.html"><strong>List All Tabs</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+<br>Shows built-in list of all tabs

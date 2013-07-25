@@ -48,6 +48,9 @@ Some tools for extensions or custom buttons developers
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Extensions_Installer/icon.png)&nbsp;[Extensions Installer](Extensions_Installer)
 For extensions developers: installs extension from given link, useful to test restartless extensions
 
+##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/List_All_Tabs/icon.png)&nbsp;[List All Tabs](List_All_Tabs)
+Shows built-in list of all tabs
+
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Merge_Custom_Buttons/icon.png)&nbsp;[Merge Custom Buttons](Merge_Custom_Buttons)
 Merge many custom buttons into one
 
