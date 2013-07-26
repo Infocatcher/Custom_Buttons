@@ -241,13 +241,13 @@ this.onmouseover = function(e) {
 this.onclick = function(e) {
 	if(e.target != this || this.disabled)
 		return;
-	if(e.button == 1 || e.button == 0 && (e.ctrlKey || e.altKey || e.shiftKey || e.metaKey)) {
+	if(e.button == 1 || e.button == 0 && this.commands.hasModifier(e)) {
 		var mi = this.commands.defaultActionItem;
 		mi && mi.doCommand();
 	}
 };
 this.onmousedown = function(e) {
-	if(e.target == this && e.button == 0 && (e.ctrlKey || e.altKey || e.shiftKey || e.metaKey))
+	if(e.target == this && e.button == 0 && this.commands.hasModifier(e))
 		e.preventDefault();
 };
 
@@ -340,9 +340,20 @@ var cmds = this.commands = {
 	setPartiallyAvailable: function(mi, available) {
 		mi.style.color = available ? "" : "grayText";
 	},
-	setDefaultAction: function(mi) {
+	setCloseMenu: function(e) {
+		var mi = e.target;
+		if(
+			e.button == 0
+			&& mi.hasAttribute("cb_id")
+		)
+			mi.setAttribute("closemenu", this.hasModifier(e) ? "none" : "auto");
+	},
+	setDefaultAction: function(e) {
 		if(this.onlyPopup)
 			return;
+		if(!(e.button == 1 || e.button == 0 && this.hasModifier(e)))
+			return;
+		var mi = e.target;
 		var action = mi.getAttribute("cb_id");
 		if(!action)
 			return;
@@ -835,6 +846,10 @@ var cmds = this.commands = {
 		) != undefined;
 	},
 
+	hasModifier: function(e) {
+		return e.ctrlKey || e.shiftKey || e.altKey || e.metaKey;
+	},
+
 	confirm: function(key, method, args) {
 		var msg;
 		switch(key) {
@@ -933,13 +948,25 @@ var cmds = this.commands = {
 			_this.prefSvc.savePrefFile(null);
 			LOG("savePrefFile()");
 		}, 100, this);
+	},
+
+	handleEvent: function(e) {
+		if(
+			e.type == "command"
+			&& this.hasModifier(e)
+			&& e.target.hasAttribute("cb_id")
+		) {
+			e.preventDefault();
+			e.stopPropagation();
+		}
 	}
 };
 
-this.appendChild(parseXULFromString('\
+var mp = this.appendChild(parseXULFromString('\
 	<menupopup xmlns="' + XULNS + '"\
 		onpopupshowing="if(event.target == this) this.parentNode.commands.initMenu(this);"\
-		onclick="if(event.button == 1) this.parentNode.commands.setDefaultAction(event.target);">\
+		onmousedown="this.parentNode.commands.setCloseMenu(event);"\
+		onclick="this.parentNode.commands.setDefaultAction(event);">\
 		<menuitem cb_id="reopenWindow"\
 			oncommand="this.parentNode.parentNode.commands.reopenWindow();"\
 			hidden="' + !cmds.canReopenWindow + '"\
@@ -1080,6 +1107,9 @@ this.appendChild(parseXULFromString('\
 		</menu>\
 	</menupopup>'
 ));
+
+if(!cmds.onlyPopup)
+	mp.addEventListener("command", cmds, true);
 
 const keyCbId = "custombuttons-extDevTools-key";
 if(!cmds.onlyPopup) for(var kId in options.hotkeys) if(options.hotkeys.hasOwnProperty(kId)) {
@@ -2901,5 +2931,9 @@ this.onDestroy = function(reason) {
 		this.removeEventListener("mouseover", focusManager, true);
 		this.removeEventListener("mouseout", focusManager, true);
 		this.removeEventListener("command", focusManager, true);
+	}
+	if(reason != "constructor") {
+		if(!cmds.onlyPopup)
+			mp.removeEventListener("command", cmds, true);
 	}
 };
