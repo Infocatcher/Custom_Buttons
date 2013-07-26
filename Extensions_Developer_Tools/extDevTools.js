@@ -839,11 +839,7 @@ var cmds = this.commands = {
 	},
 	get canDisableE4X() {
 		delete this.canDisableE4X;
-		return this.canDisableE4X = this.getPref(
-			"javascript.options.xml.chrome",
-			undefined,
-			this.defaultBranch
-		) != undefined;
+		return this.canDisableE4X = this.prefHasDefaultValue("javascript.options.xml.chrome");
 	},
 
 	hasModifier: function(e) {
@@ -934,9 +930,12 @@ var cmds = this.commands = {
 		}
 	},
 	prefHasUserValue: function(pName) {
-		if(this.getPref(pName, null, this.defaultBranch) == null)
+		if(!this.prefHasDefaultValue(pName))
 			return !!this.getPref(pName);
 		return this.prefSvc.prefHasUserValue(pName);
+	},
+	prefHasDefaultValue: function(pName) {
+		return this.getPref(pName, null, this.defaultBranch) != null;
 	},
 
 	prefsChanged: false,
@@ -1091,7 +1090,7 @@ var mp = this.appendChild(parseXULFromString('\
 					tooltiptext="devtools.chrome.enabled"\
 					type="checkbox"\
 					label="' + _localize("Enable developer tools for chrome") + '"\
-					hidden="' + (cmds.platformVersion < 4) + '" />\
+					hidden="' + (cmds.platformVersion < 4 || !cmds.prefHasDefaultValue("devtools.chrome.enabled")) + '" />\
 				<menuseparator hidden="' + !this.commands.canDisableE4X + '" />\
 				<menuitem cb_pref="javascript.options.xml.chrome"\
 					tooltiptext="javascript.options.xml.chrome"\
