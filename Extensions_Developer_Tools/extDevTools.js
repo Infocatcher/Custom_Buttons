@@ -239,10 +239,16 @@ this.onmouseover = function(e) {
 		this.commands.setDefaultActionTip();
 };
 this.onclick = function(e) {
-	if(e.target != this || e.button != 1 || this.disabled)
+	if(e.target != this || this.disabled)
 		return;
-	var mi = this.commands.defaultActionItem;
-	mi && mi.doCommand();
+	if(e.button == 1 || e.button == 0 && (e.ctrlKey || e.altKey || e.shiftKey || e.metaKey)) {
+		var mi = this.commands.defaultActionItem;
+		mi && mi.doCommand();
+	}
+};
+this.onmousedown = function(e) {
+	if(e.target == this && e.button == 0 && (e.ctrlKey || e.altKey || e.shiftKey || e.metaKey))
+		e.preventDefault();
 };
 
 var cmds = this.commands = {
