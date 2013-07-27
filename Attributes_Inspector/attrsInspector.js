@@ -975,10 +975,14 @@ function init() {
 			this.keypressHandler.apply(this, arguments);
 		},
 		keypressHandler: function(e, top) {
-			// keydown => stopEvent()
-			// keypress => stopEvent() + hetkey action
-			// keyup => stopEvent()
-			var onlyStop = e.type == "keydown" || e.type == "keyup";
+			// See https://github.com/Infocatcher/Custom_Buttons/issues/12
+			// keydown  => stopEvent() + hetkey action in Firefox >= 25
+			// keypress => stopEvent() + hetkey action in Firefox < 25
+			// keyup    => stopEvent()
+			var onlyStop = this.fxVersion < 25
+				? e.type == "keydown" || e.type == "keyup"
+				: e.type == "keypress" || e.type == "keyup";
+			//_log(e.type + ": keyCode: " + e.keyCode + " charCode: " + e.charCode);
 			if(e.keyCode == e.DOM_VK_ESCAPE) {
 				this.stopEvent(e);
 				if(onlyStop)
@@ -1016,24 +1020,22 @@ function init() {
 				if(!onlyStop)
 					this.navigatePrev(top);
 			}
-			else if(ctrlShift && e.keyCode == e.DOM_VK_C) // keydown || keyup
-				this.stopEvent(e);
-			else if(
-				ctrlShift
-				&& e.keyCode == 0
-				&& String.fromCharCode(e.charCode).toUpperCase() == "C"
-			) { // Ctrl+Shift+C
+			else if( // Ctrl+Shift+C
+				ctrlShift && (
+					e.keyCode == e.DOM_VK_C // keydown || keyup
+					|| e.keyCode == 0 && String.fromCharCode(e.charCode).toUpperCase() == "C" // keypress
+				)
+			) {
 				this.stopEvent(e);
 				if(!onlyStop)
 					this.copyTootipContent();
 			}
-			else if(ctrlShift && e.keyCode == e.DOM_VK_I) // keydown || keyup
-				this.stopEvent(e);
-			else if(
-				ctrlOrCtrlShift
-				&& e.keyCode == 0
-				&& String.fromCharCode(e.charCode).toUpperCase() == "I"
-			) { // Ctrl+I, Ctrl+Shift+I
+			else if( // Ctrl+I, Ctrl+Shift+I
+				ctrlOrCtrlShift && (
+					e.keyCode == e.DOM_VK_I // keydown || keyup
+					|| e.keyCode == 0 && String.fromCharCode(e.charCode).toUpperCase() == "I" // keypress
+				)
+			) {
 				this._checkPreventDefault(e);
 				this.stopEvent(e);
 				if(onlyStop)
