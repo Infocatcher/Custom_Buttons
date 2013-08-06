@@ -1120,7 +1120,14 @@ this.permissions = {
 //===================
 // Styles
 // Used Fugue and Diagona icons (http://p.yusukekamiyamane.com/)
-this.image = ""; // Styles aren't applied, if button has "image" attribute
+
+// Styles can't override hardcoded icon
+var icon = this.ownerDocument.getAnonymousElementByAttribute(this, "class", "toolbarbutton-icon");
+if(icon)
+	icon.src = "";
+else
+	this.image = "";
+
 var cssStr = ('\
 	@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");\n\
 	@-moz-document url("' + window.location.href + '") {\n\
