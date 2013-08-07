@@ -268,13 +268,14 @@ var cmds = this.commands = {
 			|| Components.classes["@mozilla.org/suite/sessionstore;1"]
 		).getService(Components.interfaces.nsISessionStore);
 	},
+	get appInfo() {
+		delete this.appInfo;
+		return this.appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
+			.getService(Components.interfaces.nsIXULAppInfo);
+	},
 	get platformVersion() {
 		delete this.platformVersion;
-		return this.platformVersion = parseFloat(
-			Components.classes["@mozilla.org/xre/app-info;1"]
-				.getService(Components.interfaces.nsIXULAppInfo)
-				.platformVersion
-		);
+		return this.platformVersion = parseFloat(this.appInfo.platformVersion);
 	},
 
 	get defaultActionPref() {
@@ -404,6 +405,14 @@ var cmds = this.commands = {
 		var ss = this.ss;
 		var state = ss.getWindowState(window);
 
+		var win = this.openBrowserWindow();
+		win.addEventListener("load", function restoreSession(e) {
+			win.removeEventListener(e.type, restoreSession, false);
+			ss.setWindowState(win, state, true);
+			if(!window.closed)
+				window.close();
+		}, false);
+
 		// Try remove closed window from undo history
 		window.addEventListener("unload", function clearUndo(e) {
 			window.removeEventListener(e.type, clearUndo, false);
@@ -446,14 +455,6 @@ var cmds = this.commands = {
 			window.close();
 			this.flushCaches();
 		}
-
-		var win = this.openBrowserWindow();
-		win.addEventListener("load", function restoreSession(e) {
-			win.removeEventListener(e.type, restoreSession, false);
-			ss.setWindowState(win, state, true);
-			if(!window.closed)
-				window.close();
-		}, false);
 	},
 	get canMoveTabsToNewWindow() {
 		delete this.canMoveTabsToNewWindow;
@@ -636,6 +637,15 @@ var cmds = this.commands = {
 			this.setLocale(locale.value);
 	},
 	setLocale: function(locale) {
+		var _this = this;
+		var mi = this.button.getElementsByAttribute("cb_id", "switchLocale")[0];
+		mi.setAttribute("disabled", "true");
+		this.ensureLocaleAvailable(locale, function(ok) {
+			mi.removeAttribute("disabled");
+			_this._setLocale(locale);
+		});
+	},
+	_setLocale: function(locale) {
 		this.setPref("general.useragent.locale", locale);
 		var reopen = !this.options.forceRestartOnLocaleChange
 			&& this.canReopenWindow
@@ -653,6 +663,142 @@ var cmds = this.commands = {
 				this._restart();
 		}
 		return locale;
+	},
+	ensureLocaleAvailable: function(locale, callback, tryESR) {
+		if(locale == this.getPref("general.useragent.locale", null, this.defaultBranch)) {
+			callback(true);
+			return;
+		}
+		try {
+			Components.utils["import"]("resource://gre/modules/AddonManager.jsm");
+		}
+		catch(e) {
+			callback(undefined);
+			return;
+		}
+		var id = "langpack-" + locale + "@firefox.mozilla.org";
+		var _this = this;
+		AddonManager.getAddonByID(id, function(addon) {
+			if(addon && addon.version == _this.appInfo.version) {
+				callback(true);
+				return;
+			}
+			var installURL = _this.getInstallURLForLocale(locale, tryESR);
+			if(!installURL) {
+				callback(false);
+				return;
+			}
+			LOG("installURL: " + installURL);
+			if(
+				!tryESR
+				&& !Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
+					.getService(Components.interfaces.nsIPromptService)
+					.confirm(
+						window,
+						_localize("Extensions Developer Tools"),
+						_localize("Install %S locale?").replace("%S", locale)
+					)
+			) {
+				callback(false);
+				return;
+			}
+
+			var imgConnecting = "chrome://browser/skin/tabbrowser/connecting.png";
+			var imgLoading = "chrome://browser/skin/tabbrowser/loading.png";
+			var appName = _this.appInfo.name;
+			if(appName == "SeaMonkey")
+				imgConnecting = imgLoading = "chrome://communicator/skin/icons/loading.gif";
+			else if(appName == "Thunderbird") {
+				imgConnecting = "chrome://messenger/skin/icons/connecting.png";
+				imgLoading = "chrome://messenger/skin/icons/loading.png";
+			}
+
+			var btn = _this.button;
+			var icon = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon");
+			var origIcon = icon.src;
+			icon.src = imgConnecting;
+
+			AddonManager.getInstallForURL(
+				installURL,
+				function(install) {
+					LOG("[Language pack]: Call install()");
+					install.addListener({
+						onInstallEnded: function(install, addon) {
+							LOG("[Language pack]: Ok");
+							this._done(true);
+						},
+						onDownloadFailed: function(install) {
+							LOG("[Language pack]: Download failed");
+							this._done(false);
+						},
+						onInstallFailed: function(install) {
+							LOG("[Language pack]: Install failed");
+							this._done(false);
+						},
+						_done: function(ok) {
+							icon.src = origIcon;
+							install.removeListener(this);
+							if(!ok) {
+								if(!tryESR && _this.getInstallURLForLocale(locale, true) != installURL) {
+									LOG("[Language pack]: Will try ESR version");
+									_this.ensureLocaleAvailable(locale, callback, true);
+									return;
+								}
+								Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
+									.getService(Components.interfaces.nsIPromptService)
+									.alert(
+										window,
+										_localize("Extensions Developer Tools"),
+										_localize("Can't install %S locale!\nURL: %U")
+											.replace("%S", locale)
+											.replace("%U", installURL)
+									);
+							}
+							callback(ok);
+						}
+					});
+					icon.src = imgLoading;
+					install.install();
+				},
+				"application/x-xpinstall"
+			);
+		});
+	},
+	getInstallURLForLocale: function(locale, useESR) {
+		var appInfo = this.appInfo;
+		var app = appInfo.name.toLowerCase();
+		if(
+			app != "firefox"
+			&& app != "seamonkey"
+			&& app != "thunderbird"
+		)
+			return undefined;
+
+		var version = appInfo.version;
+		var isRelease = /^\d+(\.\d+)*$/.test(version);
+		var os = appInfo.OS;
+		var platform;
+		if(os == "WINNT")       platform = "win32";
+		else if(os == "Darwin") platform = "mac";
+		else                    platform = "linux-i686";
+		if(!isRelease) {
+			// ftp://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/latest-mozilla-central-l10n/win32/xpi/
+			// ftp://ftp.mozilla.org/pub/mozilla.org/seamonkey/nightly/latest-comm-central-trunk-l10n/win32/xpi/
+			// ftp://ftp.mozilla.org/pub/mozilla.org/thunderbird/nightly/latest-comm-central-l10n/win32/xpi/
+			// firefox-25.0a1.fr.langpack.xpi
+			var file = app + "-" + version + "." + locale + ".langpack.xpi";
+			var dir;
+			if(app == "firefox")        dir = "latest-mozilla-central-l10n";
+			else if(app == "seamonkey") dir = "latest-comm-central-trunk-l10n";
+			else                        dir = "latest-comm-central-l10n";
+			return "ftp://ftp.mozilla.org/pub/mozilla.org/" + app + "/nightly/" + dir + "/" + platform + "/xpi/" + file;
+		}
+		var file = locale + ".xpi";
+		var esr = useESR ? "esr" : "";
+		// ftp://ftp.mozilla.org/pub/mozilla.org/firefox/releases/23.0/win32/xpi/
+		// ftp://ftp.mozilla.org/pub/mozilla.org/firefox/releases/23.0/mac/xpi/
+		// ftp://ftp.mozilla.org/pub/mozilla.org/firefox/releases/23.0/linux-i686/xpi/
+		return "ftp://ftp.mozilla.org/pub/mozilla.org/" + app + "/releases/" + version + esr + "/" + platform + "/xpi/" + file;
 	},
 	get canSaveSessionAndExit() {
 		delete this.canSaveSessionAndExit;
@@ -2145,10 +2291,14 @@ function init() {
 			this.keypressHandler.apply(this, arguments);
 		},
 		keypressHandler: function(e, top) {
-			// keydown => stopEvent()
-			// keypress => stopEvent() + hetkey action
-			// keyup => stopEvent()
-			var onlyStop = e.type == "keydown" || e.type == "keyup";
+			// See https://github.com/Infocatcher/Custom_Buttons/issues/12
+			// keydown  => stopEvent() + hetkey action in Firefox >= 25
+			// keypress => stopEvent() + hetkey action in Firefox < 25
+			// keyup    => stopEvent()
+			var onlyStop = this.fxVersion < 25
+				? e.type == "keydown" || e.type == "keyup"
+				: e.type == "keypress" || e.type == "keyup";
+			//_log(e.type + ": keyCode: " + e.keyCode + " charCode: " + e.charCode);
 			if(e.keyCode == e.DOM_VK_ESCAPE) {
 				this.stopEvent(e);
 				if(onlyStop)
@@ -2186,24 +2336,22 @@ function init() {
 				if(!onlyStop)
 					this.navigatePrev(top);
 			}
-			else if(ctrlShift && e.keyCode == e.DOM_VK_C) // keydown || keyup
-				this.stopEvent(e);
-			else if(
-				ctrlShift
-				&& e.keyCode == 0
-				&& String.fromCharCode(e.charCode).toUpperCase() == "C"
-			) { // Ctrl+Shift+C
+			else if( // Ctrl+Shift+C
+				ctrlShift && (
+					e.keyCode == e.DOM_VK_C // keydown || keyup
+					|| e.keyCode == 0 && String.fromCharCode(e.charCode).toUpperCase() == "C" // keypress
+				)
+			) {
 				this.stopEvent(e);
 				if(!onlyStop)
 					this.copyTootipContent();
 			}
-			else if(ctrlShift && e.keyCode == e.DOM_VK_I) // keydown || keyup
-				this.stopEvent(e);
-			else if(
-				ctrlOrCtrlShift
-				&& e.keyCode == 0
-				&& String.fromCharCode(e.charCode).toUpperCase() == "I"
-			) { // Ctrl+I, Ctrl+Shift+I
+			else if( // Ctrl+I, Ctrl+Shift+I
+				ctrlOrCtrlShift && (
+					e.keyCode == e.DOM_VK_I // keydown || keyup
+					|| e.keyCode == 0 && String.fromCharCode(e.charCode).toUpperCase() == "I" // keypress
+				)
+			) {
 				this._checkPreventDefault(e);
 				this.stopEvent(e);
 				if(onlyStop)
