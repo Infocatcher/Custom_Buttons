@@ -115,6 +115,12 @@ function _localize(s, key) {
 		"Switch locale to:": {
 			ru: "Переключить локаль на:"
 		},
+		"Install %S locale?": {
+			ru: "Установить локаль %S?"
+		},
+		"Can't install %L locale!\nURL: %U": {
+			ru: "Не удалось установить локаль %L!\nСсылка: %U"
+		},
 		"Save session and exit": {
 			ru: "Сохранить сессию и выйти"
 		},
@@ -748,8 +754,8 @@ var cmds = this.commands = {
 								_this.ps.alert(
 									window,
 									_localize("Extensions Developer Tools"),
-									_localize("Can't install %S locale!\nURL: %U")
-										.replace("%S", locale)
+									_localize("Can't install %L locale!\nURL: %U")
+										.replace("%L", locale)
 										.replace("%U", installURL)
 								);
 							}
