@@ -943,10 +943,13 @@ var cmds = this.commands = {
 		if(!force && !this.prefsChanged)
 			return;
 		this.prefsChanged = false;
-		setTimeout(function(_this) {
+		var _this = this;
+		var timer = Components.classes["@mozilla.org/timer;1"]
+			.createInstance(Components.interfaces.nsITimer);
+		timer.init(function() {
 			_this.prefSvc.savePrefFile(null);
 			LOG("savePrefFile()");
-		}, 100, this);
+		}, 100, timer.TYPE_ONE_SHOT);
 	},
 
 	handleEvent: function(e) {
