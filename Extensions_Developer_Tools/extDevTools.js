@@ -277,6 +277,11 @@ var cmds = this.commands = {
 		delete this.platformVersion;
 		return this.platformVersion = parseFloat(this.appInfo.platformVersion);
 	},
+	get ps() {
+		delete this.ps;
+		return this.ps = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
+			.getService(Components.interfaces.nsIPromptService);
+	},
 
 	get defaultActionPref() {
 		delete this.defaultActionPref;
@@ -621,18 +626,16 @@ var cmds = this.commands = {
 		var locale = {
 			value: this.switchLocale(true)
 		};
-		var ok = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
-			.getService(Components.interfaces.nsIPromptService)
-			.prompt(
-				window,
-				_localize("Extensions Developer Tools"),
-				_localize("Current locale: %S")
-					.replace("%S", this.currentLocale || "???")
-				+ "\n" + _localize("Switch locale to:"),
-				locale,
-				null,
-				{}
-			);
+		var ok = this.ps.prompt(
+			window,
+			_localize("Extensions Developer Tools"),
+			_localize("Current locale: %S")
+				.replace("%S", this.currentLocale || "???")
+			+ "\n" + _localize("Switch locale to:"),
+			locale,
+			null,
+			{}
+		);
 		if(ok && locale.value)
 			this.setLocale(locale.value);
 	},
@@ -691,13 +694,11 @@ var cmds = this.commands = {
 			LOG("installURL: " + installURL);
 			if(
 				!tryESR
-				&& !Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
-					.getService(Components.interfaces.nsIPromptService)
-					.confirm(
-						window,
-						_localize("Extensions Developer Tools"),
-						_localize("Install %S locale?").replace("%S", locale)
-					)
+				&& !_this.ps.confirm(
+					window,
+					_localize("Extensions Developer Tools"),
+					_localize("Install %S locale?").replace("%S", locale)
+				)
 			) {
 				callback(false);
 				return;
@@ -744,15 +745,13 @@ var cmds = this.commands = {
 									_this.ensureLocaleAvailable(locale, callback, true);
 									return;
 								}
-								Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
-									.getService(Components.interfaces.nsIPromptService)
-									.alert(
-										window,
-										_localize("Extensions Developer Tools"),
-										_localize("Can't install %S locale!\nURL: %U")
-											.replace("%S", locale)
-											.replace("%U", installURL)
-									);
+								_this.ps.alert(
+									window,
+									_localize("Extensions Developer Tools"),
+									_localize("Can't install %S locale!\nURL: %U")
+										.replace("%S", locale)
+										.replace("%U", installURL)
+								);
 							}
 							callback(ok);
 						}
@@ -1001,9 +1000,7 @@ var cmds = this.commands = {
 		}
 		if(
 			!this.options.confirm[key]
-			|| Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
-				.getService(Components.interfaces.nsIPromptService)
-				.confirm(window, _localize("Extensions Developer Tools"), _localize(msg))
+			|| this.ps.confirm(window, _localize("Extensions Developer Tools"), _localize(msg))
 		) {
 			method && this[method].apply(this, args);
 			return true;
