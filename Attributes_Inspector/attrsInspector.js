@@ -307,6 +307,14 @@ function init() {
 			});
 			return this.space;
 		},
+		get colon() {
+			var col = this._colon = this.s(": ");
+			col.className = "attrsInspector-colon";
+			defineGetter(this, "colon", function() {
+				return this._colon.cloneNode(true);
+			});
+			return this.colon;
+		},
 		getValue: function(v, state) {
 			var e = this.s(v);
 			//e.style.whiteSpace = "pre";
@@ -346,12 +354,12 @@ function init() {
 			});
 			return this.overflowBox;
 		},
-		getItem: function(header, value, spaceSep, state) {
+		getItem: function(header, value, separator, state) {
 			var overflowBox = this.overflowBox;
 			var item = overflowBox.firstChild;
 			item.appendChild(this.getHeader(header, state));
 			if(value) {
-				item.appendChild(spaceSep ? this.space : this.separator);
+				item.appendChild(separator || this.separator);
 				item.appendChild(this.getValue(value, state));
 			}
 			return overflowBox;
@@ -414,7 +422,7 @@ function init() {
 					w = w.toFixed(3);
 				if(Math.floor(h) != h)
 					h = h.toFixed(3);
-				df.appendChild(this.getItem(node.nodeName, "[" + w + "\xd7" + h + "]", true));
+				df.appendChild(this.getItem(node.nodeName, "[" + w + "\xd7" + h + "]", this.space));
 			}
 
 			var win = node.ownerDocument.defaultView;
@@ -459,23 +467,23 @@ function init() {
 						changedStyles[p] = true;
 				for(var p in styles)
 					prevStyles[p] = styles[p];
-				df.appendChild(this.getItem("margin", styles.margin, false, {
+				df.appendChild(this.getItem("margin", styles.margin, this.colon, {
 					isChanged: "margin" in changedStyles
 				}));
-				df.appendChild(this.getItem("border", styles.border, false, {
+				df.appendChild(this.getItem("border", styles.border, this.colon, {
 					isChanged: "border" in changedStyles
 				}));
-				df.appendChild(this.getItem("padding", styles.padding, false, {
+				df.appendChild(this.getItem("padding", styles.padding, this.colon, {
 					isChanged: "padding" in changedStyles
 				}));
 			}
 
 			var nodeNS = node.namespaceURI;
 			if(_showNamespaceURI/* && node.nodeName.indexOf(":") == -1*/)
-				df.appendChild(this.getItem("namespaceURI", this.getNS(nodeNS)));
+				df.appendChild(this.getItem("namespaceURI", this.getNS(nodeNS), this.colon));
 
 			if(!node.attributes) {
-				df.appendChild(this.getItem("nodeValue", node.nodeValue));
+				df.appendChild(this.getItem("nodeValue", node.nodeValue, this.colon));
 				tt.appendChild(df);
 				return;
 			}
@@ -525,7 +533,7 @@ function init() {
 				}
 				if(_showNamespaceURI && ns && ns != nodeNS && name.indexOf(":") == -1)
 					name += " [" + this.getNS(ns) + "]";
-				df.appendChild(this.getItem(name, val, false, {
+				df.appendChild(this.getItem(name, val, this.separator, {
 					isAdded:   name in addedAttrs && addedAttrs[name] == ns,
 					isChanged: name in changedAttrs && changedAttrs[name] == ns,
 					isRemoved: name in removedAttrs && removedAttrs[name].namespaceURI == ns
