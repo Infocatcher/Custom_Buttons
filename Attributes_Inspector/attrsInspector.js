@@ -425,6 +425,10 @@ function init() {
 				df.appendChild(this.getItem(node.nodeName, "[" + w + "\xd7" + h + "]", this.space));
 			}
 
+			var nodeNS = node.namespaceURI;
+			if(_showNamespaceURI/* && node.nodeName.indexOf(":") == -1*/)
+				df.appendChild(this.getItem("namespaceURI", this.getNS(nodeNS), this.colon));
+
 			var win = node.ownerDocument.defaultView;
 			if(node instanceof win.Element) {
 				var cs = win.getComputedStyle(node, null);
@@ -453,7 +457,7 @@ function init() {
 					margin: getMargins("margin"),
 					border: getMargins("border", "Width") + (
 						boxSizing == "border-box"
-							&& node.namespaceURI != "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+							&& nodeNS != "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 						? boxSizingNote
 						: ""
 					),
@@ -477,10 +481,6 @@ function init() {
 					isChanged: "padding" in changedStyles
 				}));
 			}
-
-			var nodeNS = node.namespaceURI;
-			if(_showNamespaceURI/* && node.nodeName.indexOf(":") == -1*/)
-				df.appendChild(this.getItem("namespaceURI", this.getNS(nodeNS), this.colon));
 
 			if(!node.attributes) {
 				df.appendChild(this.getItem("nodeValue", node.nodeValue, this.colon));
