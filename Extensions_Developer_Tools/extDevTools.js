@@ -1322,7 +1322,7 @@ this.attrsInspector = function(event) {
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Attributes_Inspector
 
 // (c) Infocatcher 2010-2013
-// version 0.6.2pre - 2013-07-01
+// version 0.6.2 - 2013-08-15
 
 //===================
 // Attributes Inspector button for Custom Buttons
@@ -1376,6 +1376,7 @@ var _popupLocker = 1;
 // Lock all popups in window while DOM Inspector is opened (or until Escape was not pressed)
 // Values: 0 - disable, 1 - only if Shift pressed, 2 - always enable
 var _showNamespaceURI = 2; // 0 - don't show, 1 - show as is, 2 - show pretty name instead of URI
+var _showMargins = 2; // 0 - don't show, 1 - only if Shift pressed, 2 - always show
 var _showFullTree = 2; // 0 - current frame, 1 - top frame, 2 - topmost frame
 var _nodePosition = 0.55; // Position of selected node in DOM Inspector's tree, 0..1 (-1 - don't change)
 
@@ -1626,6 +1627,14 @@ function init() {
 			});
 			return this.space;
 		},
+		get colon() {
+			var col = this._colon = this.s(": ");
+			col.className = "attrsInspector-colon";
+			defineGetter(this, "colon", function() {
+				return this._colon.cloneNode(true);
+			});
+			return this.colon;
+		},
 		getValue: function(v, state) {
 			var e = this.s(v);
 			//e.style.whiteSpace = "pre";
@@ -1665,12 +1674,12 @@ function init() {
 			});
 			return this.overflowBox;
 		},
-		getItem: function(header, value, spaceSep, state) {
+		getItem: function(header, value, separator, state) {
 			var overflowBox = this.overflowBox;
 			var item = overflowBox.firstChild;
 			item.appendChild(this.getHeader(header, state));
 			if(value) {
-				item.appendChild(spaceSep ? this.space : this.separator);
+				item.appendChild(separator || this.separator);
 				item.appendChild(this.getValue(value, state));
 			}
 			return overflowBox;
@@ -1733,15 +1742,70 @@ function init() {
 					w = w.toFixed(3);
 				if(Math.floor(h) != h)
 					h = h.toFixed(3);
-				df.appendChild(this.getItem(node.nodeName, "[" + w + "\xd7" + h + "]", true));
+				df.appendChild(this.getItem(node.nodeName, "[" + w + "\xd7" + h + "]", this.space));
 			}
 
 			var nodeNS = node.namespaceURI;
 			if(_showNamespaceURI/* && node.nodeName.indexOf(":") == -1*/)
-				df.appendChild(this.getItem("namespaceURI", this.getNS(nodeNS)));
+				df.appendChild(this.getItem("namespaceURI", this.getNS(nodeNS), this.colon));
+
+			var win = node.ownerDocument.defaultView;
+			if(_showMargins && node instanceof Element) {
+				var cs = win.getComputedStyle(node, null);
+				var dirs = ["Top", "Right", "Bottom", "Left"];
+				var getMargins = function(prop, propAdd) {
+					if(!propAdd)
+						propAdd = "";
+					var margins = dirs.map(function(dir, i) {
+						var margin = cs[prop + dir + propAdd];
+						if(margin == "0px")
+							return "0";
+						if(/\.\d{4,}px$/.test(margin))
+							return parseFloat(margin).toFixed(3) + "px";
+						return margin;
+					});
+					if(margins[0] == margins[2] && margins[1] == margins[3]) {
+						if(margins[0] == margins[1])
+							return margins[0];
+						return margins[0] + " " + margins[1];
+					}
+					return margins.join(" ");
+				}
+				var boxSizing = "boxSizing" in cs ? cs.boxSizing : cs.MozBoxSizing;
+				var boxSizingNote = " *box-sizing";
+				var styles = {
+					margin: getMargins("margin"),
+					border: getMargins("border", "Width") + (
+						boxSizing == "border-box"
+							&& nodeNS != "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+						? boxSizingNote
+						: ""
+					),
+					padding: getMargins("padding")
+						+ (boxSizing == "padding-box" ? boxSizingNote : "")
+				};
+				var prevStyles = this.prevStyles;
+				var changedStyles = this.changedStyles;
+				for(var p in prevStyles)
+					if(styles[p] != prevStyles[p])
+						changedStyles[p] = true;
+				for(var p in styles)
+					prevStyles[p] = styles[p];
+				if(_showMargins > 1 || this._shiftKey) {
+					df.appendChild(this.getItem("margin", styles.margin, this.colon, {
+						isChanged: "margin" in changedStyles
+					}));
+					df.appendChild(this.getItem("border", styles.border, this.colon, {
+						isChanged: "border" in changedStyles
+					}));
+					df.appendChild(this.getItem("padding", styles.padding, this.colon, {
+						isChanged: "padding" in changedStyles
+					}));
+				}
+			}
 
 			if(!node.attributes) {
-				df.appendChild(this.getItem("nodeValue", node.nodeValue));
+				df.appendChild(this.getItem("nodeValue", node.nodeValue, this.colon));
 				tt.appendChild(df);
 				return;
 			}
@@ -1791,7 +1855,7 @@ function init() {
 				}
 				if(_showNamespaceURI && ns && ns != nodeNS && name.indexOf(":") == -1)
 					name += " [" + this.getNS(ns) + "]";
-				df.appendChild(this.getItem(name, val, false, {
+				df.appendChild(this.getItem(name, val, this.separator, {
 					isAdded:   name in addedAttrs && addedAttrs[name] == ns,
 					isChanged: name in changedAttrs && changedAttrs[name] == ns,
 					isRemoved: name in removedAttrs && removedAttrs[name].namespaceURI == ns
@@ -2181,6 +2245,10 @@ function init() {
 		},
 		handleNodeFromEvent: function(node, e) {
 			this.hl(node);
+			if(node != this._node) {
+				this.prevStyles    = { __proto__: null };
+				this.changedStyles = { __proto__: null };
+			}
 			this.setData(node);
 			this.watchAttrs(node);
 			this.mousemoveHandler(e);
