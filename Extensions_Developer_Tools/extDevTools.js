@@ -118,6 +118,9 @@ function _localize(s, key) {
 		"Install %S locale?": {
 			ru: "Установить локаль %S?"
 		},
+		"Update %S locale?": {
+			ru: "Обновить локаль %S?"
+		},
 		"Can't install %L locale!\nURL: %U": {
 			ru: "Не удалось установить локаль %L!\nСсылка: %U"
 		},
@@ -688,7 +691,8 @@ var cmds = this.commands = {
 		var id = "langpack-" + locale + "@firefox.mozilla.org";
 		var _this = this;
 		AddonManager.getAddonByID(id, function(addon) {
-			if(addon && addon.version == _this.appInfo.version) {
+			var wrongVersion = addon && addon.version != _this.appInfo.version;
+			if(addon && !wrongVersion) {
 				callback(true);
 				return;
 			}
@@ -703,7 +707,8 @@ var cmds = this.commands = {
 				&& !_this.ps.confirm(
 					window,
 					_localize("Extensions Developer Tools"),
-					_localize("Install %S locale?").replace("%S", locale)
+					_localize(wrongVersion ? "Update %S locale?" : "Install %S locale?")
+						.replace("%S", locale)
 				)
 			) {
 				callback(false);
