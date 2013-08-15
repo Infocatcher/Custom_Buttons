@@ -691,8 +691,7 @@ var cmds = this.commands = {
 		var id = "langpack-" + locale + "@firefox.mozilla.org";
 		var _this = this;
 		AddonManager.getAddonByID(id, function(addon) {
-			var wrongVersion = addon && addon.version != _this.appInfo.version;
-			if(addon && !wrongVersion) {
+			if(addon && addon.isCompatible) {
 				callback(true);
 				return;
 			}
@@ -707,7 +706,7 @@ var cmds = this.commands = {
 				&& !_this.ps.confirm(
 					window,
 					_localize("Extensions Developer Tools"),
-					_localize(wrongVersion ? "Update %S locale?" : "Install %S locale?")
+					_localize(addon && !addon.isCompatible ? "Update %S locale?" : "Install %S locale?")
 						.replace("%S", locale)
 				)
 			) {
