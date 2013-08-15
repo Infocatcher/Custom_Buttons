@@ -441,15 +441,33 @@ function init() {
 				}
 				var boxSizing = "boxSizing" in cs ? cs.boxSizing : cs.MozBoxSizing;
 				var boxSizingNote = " *box-sizing";
-				df.appendChild(this.getItem("margin", getMargins("margin")));
-				df.appendChild(this.getItem("border", getMargins("border", "Width") + (
-					boxSizing == "border-box"
-						&& node.namespaceURI != "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-					? boxSizingNote
-					: ""
-				)));
-				df.appendChild(this.getItem("padding", getMargins("padding")
-					+ (boxSizing == "padding-box" ? boxSizingNote : "")));
+				var styles = {
+					margin: getMargins("margin"),
+					border: getMargins("border", "Width") + (
+						boxSizing == "border-box"
+							&& node.namespaceURI != "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+						? boxSizingNote
+						: ""
+					),
+					padding: getMargins("padding")
+						+ (boxSizing == "padding-box" ? boxSizingNote : "")
+				};
+				var prevStyles = this.prevStyles;
+				var changedStyles = this.changedStyles;
+				for(var p in prevStyles)
+					if(styles[p] != prevStyles[p])
+						changedStyles[p] = true;
+				for(var p in styles)
+					prevStyles[p] = styles[p];
+				df.appendChild(this.getItem("margin", styles.margin, false, {
+					isChanged: "margin" in changedStyles
+				}));
+				df.appendChild(this.getItem("border", styles.border, false, {
+					isChanged: "border" in changedStyles
+				}));
+				df.appendChild(this.getItem("padding", styles.padding, false, {
+					isChanged: "padding" in changedStyles
+				}));
 			}
 
 			var nodeNS = node.namespaceURI;
@@ -897,6 +915,10 @@ function init() {
 		},
 		handleNodeFromEvent: function(node, e) {
 			this.hl(node);
+			if(node != this._node) {
+				this.prevStyles    = { __proto__: null };
+				this.changedStyles = { __proto__: null };
+			}
 			this.setData(node);
 			this.watchAttrs(node);
 			this.mousemoveHandler(e);
