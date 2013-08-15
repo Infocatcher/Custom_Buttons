@@ -431,7 +431,7 @@ function init() {
 				df.appendChild(this.getItem("namespaceURI", this.getNS(nodeNS), this.colon));
 
 			var win = node.ownerDocument.defaultView;
-			if(_showMargins && node instanceof win.Element) {
+			if(_showMargins && node instanceof Element) {
 				var cs = win.getComputedStyle(node, null);
 				var dirs = ["Top", "Right", "Bottom", "Left"];
 				var getMargins = function(prop, propAdd) {
