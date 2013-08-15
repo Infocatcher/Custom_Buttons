@@ -417,6 +417,41 @@ function init() {
 				df.appendChild(this.getItem(node.nodeName, "[" + w + "\xd7" + h + "]", true));
 			}
 
+			var win = node.ownerDocument.defaultView;
+			if(node instanceof win.Element) {
+				var cs = win.getComputedStyle(node, null);
+				var dirs = ["Top", "Right", "Bottom", "Left"];
+				var getMargins = function(prop, propAdd) {
+					if(!propAdd)
+						propAdd = "";
+					var margins = dirs.map(function(dir, i) {
+						var margin = cs[prop + dir + propAdd];
+						if(margin == "0px")
+							return "0";
+						if(/\.\d{4,}px$/.test(margin))
+							return parseFloat(margin).toFixed(3) + "px";
+						return margin;
+					});
+					if(margins[0] == margins[2] && margins[1] == margins[3]) {
+						if(margins[0] == margins[1])
+							return margins[0];
+						return margins[0] + " " + margins[1];
+					}
+					return margins.join(" ");
+				}
+				var boxSizing = "boxSizing" in cs ? cs.boxSizing : cs.MozBoxSizing;
+				var boxSizingNote = " *box-sizing";
+				df.appendChild(this.getItem("margin", getMargins("margin")));
+				df.appendChild(this.getItem("border", getMargins("border", "Width") + (
+					boxSizing == "border-box"
+						&& node.namespaceURI != "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+					? boxSizingNote
+					: ""
+				)));
+				df.appendChild(this.getItem("padding", getMargins("padding")
+					+ (boxSizing == "padding-box" ? boxSizingNote : "")));
+			}
+
 			var nodeNS = node.namespaceURI;
 			if(_showNamespaceURI/* && node.nodeName.indexOf(":") == -1*/)
 				df.appendChild(this.getItem("namespaceURI", this.getNS(nodeNS)));
