@@ -871,7 +871,7 @@ var cmds = this.commands = {
 	openBrowserConsole: function() {
 		if("HUDConsoleUI" in window && "toggleBrowserConsole" in HUDConsoleUI) {
 			if(HUDConsoleUI._browserConsoleID) try {
-				var HUDService = Components.utils.import("resource:///modules/HUDService.jsm", {}).HUDService;
+				var HUDService = Components.utils["import"]("resource:///modules/HUDService.jsm", {}).HUDService;
 				var hud = HUDService.getHudReferenceById(HUDConsoleUI._browserConsoleID);
 				if(hud && hud.iframeWindow) {
 					hud.iframeWindow.focus();
