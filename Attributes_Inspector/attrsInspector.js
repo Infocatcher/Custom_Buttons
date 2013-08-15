@@ -57,6 +57,7 @@ var _popupLocker = 1;
 // Lock all popups in window while DOM Inspector is opened (or until Escape was not pressed)
 // Values: 0 - disable, 1 - only if Shift pressed, 2 - always enable
 var _showNamespaceURI = 2; // 0 - don't show, 1 - show as is, 2 - show pretty name instead of URI
+var _showMargins = 2; // 0 - don't show, 1 - only if Shift pressed, 2 - always show
 var _showFullTree = 2; // 0 - current frame, 1 - top frame, 2 - topmost frame
 var _nodePosition = 0.55; // Position of selected node in DOM Inspector's tree, 0..1 (-1 - don't change)
 
@@ -430,7 +431,7 @@ function init() {
 				df.appendChild(this.getItem("namespaceURI", this.getNS(nodeNS), this.colon));
 
 			var win = node.ownerDocument.defaultView;
-			if(node instanceof win.Element) {
+			if(_showMargins && node instanceof win.Element) {
 				var cs = win.getComputedStyle(node, null);
 				var dirs = ["Top", "Right", "Bottom", "Left"];
 				var getMargins = function(prop, propAdd) {
@@ -471,15 +472,17 @@ function init() {
 						changedStyles[p] = true;
 				for(var p in styles)
 					prevStyles[p] = styles[p];
-				df.appendChild(this.getItem("margin", styles.margin, this.colon, {
-					isChanged: "margin" in changedStyles
-				}));
-				df.appendChild(this.getItem("border", styles.border, this.colon, {
-					isChanged: "border" in changedStyles
-				}));
-				df.appendChild(this.getItem("padding", styles.padding, this.colon, {
-					isChanged: "padding" in changedStyles
-				}));
+				if(_showMargins > 1 || this._shiftKey) {
+					df.appendChild(this.getItem("margin", styles.margin, this.colon, {
+						isChanged: "margin" in changedStyles
+					}));
+					df.appendChild(this.getItem("border", styles.border, this.colon, {
+						isChanged: "border" in changedStyles
+					}));
+					df.appendChild(this.getItem("padding", styles.padding, this.colon, {
+						isChanged: "padding" in changedStyles
+					}));
+				}
 			}
 
 			if(!node.attributes) {
