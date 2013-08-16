@@ -68,6 +68,14 @@ Menage plugins permissions: block or allow.
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Purge_Tabs_History/icon.png)&nbsp;[Purge Tab(s) History](Purge_Tabs_History)
 Purge back/forward history for current tab (left-click) or all tabs (middle-click)
 
+##### [Quick Filter by Recipient](Quick_Filter_by_Recipient)
+(for <a href="http://getthunderbird.com/">Thunderbird</a>)
+<br>Uses built-in quick filter to filter all messages from any recipient of selected message
+
+##### [Quick Filter by Sender](Quick_Filter_by_Sender)
+(for <a href="http://getthunderbird.com/">Thunderbird</a>)
+<br>Uses built-in quick filter to filter all messages from sender of selected message
+
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Reload_Broken_Images/icon.png)&nbsp;[Reload Broken Images](Reload_Broken_Images)
 Reload broken or not loaded images
 
