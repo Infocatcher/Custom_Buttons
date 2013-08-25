@@ -86,9 +86,25 @@ mp.handleEvent = function(e) {
 	var addon = mi._cbAddon;
 	var hasMdf = hasModifier(e);
 	if(e.type == "command" && (!hasMdf || e.shiftKey)) {
-		let dis = !addon.userDisabled;
-		addon.userDisabled = dis;
-		setDisabled(mi, dis);
+		// disabled -> STATE_ASK_TO_ACTIVATE -> enabled -> ...
+		let curDis = addon.userDisabled;
+		let newDis;
+		if("STATE_ASK_TO_ACTIVATE" in AddonManager && curDis == AddonManager.STATE_ASK_TO_ACTIVATE)
+			newDis = false;
+		else if(!curDis)
+			newDis = true;
+		else {
+			if(
+				addon.type == "plugin"
+				&& "STATE_ASK_TO_ACTIVATE" in AddonManager
+				&& Application.prefs.getValue("plugins.click_to_play", false)
+			)
+				newDis = AddonManager.STATE_ASK_TO_ACTIVATE;
+			else
+				newDis = false;
+		}
+		addon.userDisabled = newDis;
+		setDisabled(mi, newDis);
 	}
 	else if(e.type == "command" && hasMdf || e.type == "click" && e.button == 1) {
 		openAddonPage(addon);
