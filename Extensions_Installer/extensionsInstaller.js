@@ -148,7 +148,6 @@ mp.installExtension = function(e) {
 	}
 
 	var xpiFile = file(xpi);
-	xpi = Services.io.newFileURI(xpiFile).spec;
 
 	if(make) try {
 		var process = Components.classes["@mozilla.org/process/util;1"]
@@ -176,8 +175,8 @@ mp.installExtension = function(e) {
 		return;
 	}
 
-	AddonManager.getInstallForURL(
-		xpi,
+	AddonManager.getInstallForFile(
+		xpiFile,
 		function(install) {
 			if(isCb)
 				btn.image = imgLoading;
