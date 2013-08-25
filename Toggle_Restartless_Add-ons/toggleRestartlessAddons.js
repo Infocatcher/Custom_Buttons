@@ -107,7 +107,12 @@ mp.destroyMenu = function() {
 	}, 5000);
 };
 function setDisabled(mi, disabled) {
-	if(disabled)
+	var askToActivate = "STATE_ASK_TO_ACTIVATE" in AddonManager && disabled == AddonManager.STATE_ASK_TO_ACTIVATE;
+	if(askToActivate)
+		mi.classList.add("toggleRestartlessAddons-askToActivate");
+	else
+		mi.classList.remove("toggleRestartlessAddons-askToActivate");
+	if(disabled && !askToActivate)
 		mi.classList.add("toggleRestartlessAddons-disabled");
 	else
 		mi.classList.remove("toggleRestartlessAddons-disabled");
@@ -259,6 +264,9 @@ function addStyle() {
 		.toggleRestartlessAddons-disabled > .menu-iconic-text,\n\
 		.toggleRestartlessAddons-disabled > .menu-accel-container {\n\
 			opacity: 0.5;\n\
+		}\n\
+		.toggleRestartlessAddons-askToActivate {\n\
+			color: -moz-nativehyperlinktext;\n\
 		}';
 	addStyle._style = document.insertBefore(
 		document.createProcessingInstruction(
