@@ -67,12 +67,12 @@ if(!watcher) {
 				var code = cbEditor.value;
 				cbEditor.__defineGetter__("value", function() {
 					if("__orion" in this)
-						return this.__orion.getText();
+						return this.__orion.getText().replace(/\r\n?|\n\r?/g, "\n");
 					return this.textbox.value;
 				});
 				cbEditor.__defineSetter__("value", function(v) {
 					if("__orion" in this)
-						return this.__orion.setText(v);
+						return this.__orion.setText(v.replace(/\r\n?|\n\r?/g, "\n"));
 					return this.textbox.value = v;
 				});
 				se.init(
