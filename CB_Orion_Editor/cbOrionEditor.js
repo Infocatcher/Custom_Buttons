@@ -4,8 +4,8 @@
 // Orion Editor button for Custom Buttons
 // (code for "initialization" section)
 
-// (c) Infocatcher 2012
-// version 0.1.0a1 - 2012-08-15
+// (c) Infocatcher 2012-2013
+// version 0.1.0a2pre - 2013-08-30
 
 const watcherId = "customButtonsOrionEditor_" + this.id;
 var {Application, Components} = window; // Prevent garbage collection in Firefox 3.6 and older
