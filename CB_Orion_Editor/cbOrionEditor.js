@@ -87,6 +87,12 @@ if(!watcher) {
 					}
 				);
 			}, this);
+
+			window.addEventListener("load", function ensureObserversAdded() {
+				window.removeEventListener("load", ensureObserversAdded, false);
+				window.setTimeout(function() { window.editor.removeObservers(); }, 0);
+				window.setTimeout(function() { window.editor.addObservers();    }, 0);
+			}, false);
 		},
 		destroyWindow: function(window, reason) {
 			if(reason == this.REASON_WINDOW_CLOSED)
