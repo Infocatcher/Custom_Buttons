@@ -1,4 +1,5 @@
-﻿// http://infocatcher.ucoz.net/js/cb/cbOrionEditor.js
+﻿// https://github.com/Infocatcher/Custom_Buttons/tree/master/CB_Orion_Editor
+// http://infocatcher.ucoz.net/js/cb/cbOrionEditor.js
 
 // Orion Editor button for Custom Buttons
 // (code for "initialization" section)
