@@ -22,6 +22,14 @@ var showVersions = 0;
 var separateDisabledAddons = false;
 // false - sort add-ons of each type alphabetically
 // true  - show enabled add-ons (of each type) first
+var closeMenu = true;
+// Close menu after left-click (use Shift+click to invert this behavior)
+var closeMenuClickToPlay = -1;
+// For click to play plugins:
+// -1 - invert Shift+click behavior
+// 0  - do nothing special
+// 1  - always don't close menu
+
 
 var mp = document.createElement("menupopup");
 mp.setAttribute("onpopupshowing", "this.updateMenu();");
@@ -79,11 +87,14 @@ mp.handleEvent = function(e) {
 	var mi = e.target;
 	if(!("_cbAddon" in mi))
 		return;
+	var addon = mi._cbAddon;
 	if(e.type == "mousedown") {
-		mi.setAttribute("closemenu", e.shiftKey ? "none" : "auto");
+		var stayOpen = closeMenu ? e.shiftKey : !e.shiftKey;
+		if(closeMenuClickToPlay && isAskToActivateAddon(addon))
+			stayOpen = closeMenuClickToPlay == -1 ? !stayOpen : true;
+		mi.setAttribute("closemenu", stayOpen ? "none" : "auto");
 		return;
 	}
-	var addon = mi._cbAddon;
 	var hasMdf = hasModifier(e);
 	if(e.type == "command" && (!hasMdf || e.shiftKey)) {
 		// disabled -> STATE_ASK_TO_ACTIVATE -> enabled -> ...
@@ -94,11 +105,7 @@ mp.handleEvent = function(e) {
 		else if(!curDis)
 			newDis = true;
 		else {
-			if(
-				addon.type == "plugin"
-				&& "STATE_ASK_TO_ACTIVATE" in AddonManager
-				&& Application.prefs.getValue("plugins.click_to_play", false)
-			)
+			if(isAskToActivateAddon(addon))
 				newDis = AddonManager.STATE_ASK_TO_ACTIVATE;
 			else
 				newDis = false;
@@ -122,6 +129,11 @@ mp.destroyMenu = function() {
 		mp.textContent = "";
 	}, 5000);
 };
+function isAskToActivateAddon(addon) {
+	return addon.type == "plugin"
+		&& "STATE_ASK_TO_ACTIVATE" in AddonManager
+		&& Application.prefs.getValue("plugins.click_to_play", false);
+}
 function setDisabled(mi, disabled) {
 	var askToActivate = "STATE_ASK_TO_ACTIVATE" in AddonManager && disabled == AddonManager.STATE_ASK_TO_ACTIVATE;
 	if(askToActivate)
