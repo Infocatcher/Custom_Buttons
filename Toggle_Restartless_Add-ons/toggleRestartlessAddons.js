@@ -14,22 +14,23 @@
 // (c) Infocatcher 2013
 // version 0.1.1 - 2013-02-04
 
-const addonTypes = ["extension", "plugin"];
-var showVersions = 0;
-// 0 - don't show versions
-// 1 - show after name: "Addon Name 1.2"
-// 2 - show as "acceltext" (in place for hotkey text)
-var separateDisabledAddons = false;
-// false - sort add-ons of each type alphabetically
-// true  - show enabled add-ons (of each type) first
-var closeMenu = true;
-// Close menu after left-click (use Shift+click to invert this behavior)
-var closeMenuClickToPlay = -1;
-// For click to play plugins:
-// -1 - invert Shift+click behavior
-// 0  - do nothing special
-// 1  - always don't close menu
-
+var options = {
+	addonTypes: ["extension", "plugin"],
+	showVersions: 0,
+	// 0 - don't show versions
+	// 1 - show after name: "Addon Name 1.2"
+	// 2 - show as "acceltext" (in place for hotkey text)
+	separateDisabledAddons: false,
+	// false - sort add-ons of each type alphabetically
+	// true  - show enabled add-ons (of each type) first
+	closeMenu: true,
+	// Close menu after left-click (use Shift+click to invert this behavior)
+	closeMenuClickToPlay: -1
+	// For click to play plugins:
+	// -1 - invert Shift+click behavior
+	// 0  - do nothing special
+	// 1  - always don't close menu
+};
 
 var mp = document.createElement("menupopup");
 mp.setAttribute("onpopupshowing", "this.updateMenu();");
@@ -43,12 +44,12 @@ var cleanupTimer = 0;
 mp.updateMenu = function() {
 	clearTimeout(cleanupTimer);
 	addStyle();
-	getRestartlessAddons(addonTypes, function(addons) {
+	getRestartlessAddons(options.addonTypes, function(addons) {
 		var df = document.createDocumentFragment();
 		var prevType;
 		function key(addon) {
-			return addonTypes.indexOf(addon.type)
-				+ (separateDisabledAddons ? "\n" + +!addon.isActive : "")
+			return options.addonTypes.indexOf(addon.type)
+				+ (options.separateDisabledAddons ? "\n" + +!addon.isActive : "")
 				+ "\n" + addon.name.toLowerCase();
 		}
 		addons.sort(function(a, b) {
@@ -67,9 +68,9 @@ mp.updateMenu = function() {
 			var mi = document.createElement("menuitem");
 			mi.className = "menuitem-iconic";
 			var label = addon.name;
-			if(showVersions == 1)
+			if(options.showVersions == 1)
 				label += " " + addon.version;
-			else if(showVersions == 2)
+			else if(options.showVersions == 2)
 				mi.setAttribute("acceltext", addon.version);
 			mi.setAttribute("label", label);
 			mi.setAttribute("image", icon);
@@ -89,9 +90,9 @@ mp.handleEvent = function(e) {
 		return;
 	var addon = mi._cbAddon;
 	if(e.type == "mousedown") {
-		var stayOpen = closeMenu ? e.shiftKey : !e.shiftKey;
-		if(closeMenuClickToPlay && isAskToActivateAddon(addon))
-			stayOpen = closeMenuClickToPlay == -1 ? !stayOpen : true;
+		var stayOpen = options.closeMenu ? e.shiftKey : !e.shiftKey;
+		if(options.closeMenuClickToPlay && isAskToActivateAddon(addon))
+			stayOpen = options.closeMenuClickToPlay == -1 ? !stayOpen : true;
 		mi.setAttribute("closemenu", stayOpen ? "none" : "auto");
 		return;
 	}
