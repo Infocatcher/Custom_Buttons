@@ -16,6 +16,9 @@
 
 var options = {
 	addonTypes: ["extension", "plugin"],
+	// Possible values: "extension", "plugin"
+	// From extensions: "userstyle" (Stylish), "greasemonkey-user-script" (Greasemonkey), "userscript" (Scriptish)
+	// (swap to reorder in the menu)
 	showVersions: 0,
 	// 0 - don't show versions
 	// 1 - show after name: "Addon Name 1.2"
