@@ -22,6 +22,7 @@
 var options = {
 	locales: ["ru", "en-US"],
 	forceRestartOnLocaleChange: false,
+	updateLocales: true,
 	closeOptionsMenu: false,
 	restoreErrorConsole: true, // Only for Gecko 2.0+
 	reopenWindowFlushCaches: true,
@@ -649,6 +650,10 @@ var cmds = this.commands = {
 			this.setLocale(locale.value);
 	},
 	setLocale: function(locale) {
+		if(!this.options.updateLocales) {
+			this._setLocale(locale);
+			return;
+		}
 		var _this = this;
 		var mi = this.button.getElementsByAttribute("cb_id", "switchLocale")[0];
 		mi.setAttribute("disabled", "true");
