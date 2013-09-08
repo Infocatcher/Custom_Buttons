@@ -755,12 +755,18 @@ var cmds = this.commands = {
 									_this.ensureLocaleAvailable(locale, callback, true);
 									return;
 								}
+								var installURLs = [installURL];
+								if(tryESR) {
+									var installURLNoESR = _this.getInstallURLForLocale(locale, false);
+									if(installURLNoESR != installURL)
+										installURLs.unshift(installURLNoESR);
+								}
 								_this.ps.alert(
 									window,
 									_localize("Extensions Developer Tools"),
 									_localize("Can't install %L locale!\nURL: %U")
 										.replace("%L", locale)
-										.replace("%U", installURL)
+										.replace("%U", installURLs.join("\n"))
 								);
 							}
 							callback(ok);
