@@ -105,6 +105,7 @@ if(!watcher) {
 			Array.slice(document.getElementsByTagName("cbeditor")).forEach(function(cbEditor) {
 				if("__orion" in cbEditor)
 					return;
+				var code = cbEditor.value;
 				var se = new SourceEditor();
 				var orionElt = document.createElement("hbox");
 				orionElt.className = "orionEditor";
@@ -116,7 +117,6 @@ if(!watcher) {
 				cbEditor.parentNode.appendChild(cbEditor);
 				cbEditor.__orion = se;
 				cbEditor.__orionElt = orionElt;
-				var code = cbEditor.value;
 				cbEditor.__defineGetter__("value", function() {
 					if("__orion" in this) {
 						var orion = this.__orion;
@@ -230,12 +230,21 @@ if(!watcher) {
 				Array.slice(document.getElementsByTagName("cbeditor")).forEach(function(cbEditor) {
 					if(!("__orion" in cbEditor))
 						return;
+					var val = cbEditor.value;
+					delete cbEditor.value;
+					delete cbEditor.selectLine;
+
 					var orionElt = cbEditor.__orionElt;
 					orionElt.parentNode.insertBefore(cbEditor, orionElt);
 					orionElt.parentNode.removeChild(orionElt);
 					delete cbEditor.__orionElt;
 					delete cbEditor.__orion;
 					delete orionElt.__orion;
+
+					cbEditor.value = val;
+					window.setTimeout(function() {
+						cbEditor.removeAttribute("collapsed");
+					}, 0);
 				}, this);
 				delete window.SourceEditor;
 			}
