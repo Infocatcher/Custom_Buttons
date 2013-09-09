@@ -22,7 +22,7 @@ Show contents of any bookmarks folder in drop-down menu
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/CB_Disable_Initialization/icon.png)&nbsp;[Custom Buttons: Disable Initialization](CB_Disable_Initialization)
 Adds “Enabled” checkbox to custom button's context menu (for test purposes)
 
-##### [Custom Buttons: Orion Editor](CB_Orion_Editor)
+##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/CB_Orion_Editor/icon.png)&nbsp;[Custom Buttons: Orion Editor](CB_Orion_Editor)
 Allows to highlight code in Custom Buttons editor using [Orion](https://developer.mozilla.org/en-US/docs/Mozilla/JavaScript_code_modules/source-editor.jsm) module.
 <br>Beware: many things doesn't work and strange bugs may happens!
 
