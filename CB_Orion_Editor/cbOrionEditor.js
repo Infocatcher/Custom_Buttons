@@ -215,8 +215,6 @@ if(!watcher) {
 			var document = window.document;
 
 			if(reason == this.REASON_SHUTDOWN) {
-				//~ note: we doesn't remove things from chrome://global/content/globalOverlay.js and from
-				// chrome://global/content/editMenuOverlay.xul => view-source:chrome://global/content/editMenuOverlay.js
 				[
 					"orionEditorPopupset",
 					"editMenuCommands",
@@ -226,6 +224,16 @@ if(!watcher) {
 				].forEach(function(id) {
 					var node = document.getElementById(id);
 					node && node.parentNode.removeChild(node);
+				});
+				[
+					// chrome://global/content/globalOverlay.js
+					"closeWindow", "canQuitApplication", "goQuitApplication", "goUpdateCommand", "goDoCommand",
+					"goSetCommandEnabled", "goSetMenuValue", "goSetAccessKey", "goOnEvent", "visitLink",
+					"setTooltipText", "NS_ASSERT",
+					// chrome://global/content/editMenuOverlay.xul => view-source:chrome://global/content/editMenuOverlay.js
+					"goUpdateGlobalEditMenuItems", "goUpdateUndoEditMenuItems", "goUpdatePasteMenuItems"
+				].forEach(function(p) {
+					delete window[p];
 				});
 				Array.slice(document.getElementsByTagName("cbeditor")).forEach(function(cbEditor) {
 					if(!("__orion" in cbEditor))
