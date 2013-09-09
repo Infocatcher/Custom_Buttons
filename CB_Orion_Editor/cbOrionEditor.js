@@ -89,6 +89,28 @@ if(!watcher) {
 					}
 					return this.textbox.value = v;
 				});
+				cbEditor.selectLine = function(lineNumber) {
+					if("__orion" in this) {
+						var orion = this.__orion;
+						if(!orion.__initialized) {
+							var _this = this, args = arguments;
+							orion.__onLoadCallbacks.push(function() {
+								_this.selectLine.apply(_this, args);
+							});
+							return undefined;
+						}
+						//~ todo: optimize
+						var val = this.value;
+						var lines = val.split("\n");
+						var ss = 0;
+						for(var i = 0, max = Math.min(lineNumber - 1, lines.length); i < max; ++i)
+							ss += lines[i].length + 1;
+						var se = ss + (lines[i] && lines[i].length || 0);
+						orion.focus();
+						return orion.setSelection(ss, se);
+					}
+					return this.__proto__.selectLine.apply(this, arguments);
+				};
 				se.__initialized = false;
 				se.__onLoadCallbacks = [];
 				se.__value = code;
