@@ -186,7 +186,9 @@ if(!watcher) {
 		}
 	};
 	Application.storage.set(watcherId, watcher);
-	watcher.init(watcher.REASON_STARTUP);
+	setTimeout(function() {
+		watcher.init(watcher.REASON_STARTUP);
+	}, 50);
 }
 this.onDestroy = function(reason) {
 	if(reason == "update" || reason == "delete") {
