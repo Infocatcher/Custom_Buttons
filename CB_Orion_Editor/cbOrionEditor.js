@@ -67,24 +67,51 @@ if(!watcher) {
 				cbEditor.__orionElt = orionElt;
 				var code = cbEditor.value;
 				cbEditor.__defineGetter__("value", function() {
-					if("__orion" in this)
-						return this.__orion.getText().replace(/\r\n?|\n\r?/g, "\n");
+					if("__orion" in this) {
+						var orion = this.__orion;
+						if(!orion.__initialized)
+							return orion.__value;
+						return orion.getText().replace(/\r\n?|\n\r?/g, "\n");
+					}
 					return this.textbox.value;
 				});
 				cbEditor.__defineSetter__("value", function(v) {
-					if("__orion" in this)
-						return this.__orion.setText(v.replace(/\r\n?|\n\r?/g, "\n"));
+					if("__orion" in this) {
+						var orion = this.__orion;
+						if(!orion.__initialized) {
+							var _this = this;
+							orion.__onLoadCallbacks.push(function() {
+								_this.value = v;
+							});
+							return orion.__value = v;
+						}
+						return orion.setText(v.replace(/\r\n?|\n\r?/g, "\n"));
+					}
 					return this.textbox.value = v;
 				});
+				se.__initialized = false;
+				se.__onLoadCallbacks = [];
+				se.__value = code;
 				se.init(
 					orionElt,
 					{
 						mode: this.SourceEditor.MODES.JAVASCRIPT,
 						showLineNumbers: true,
 						initialText: code,
-						placeholderText: code
+						placeholderText: code // For backward compatibility
 					},
 					function callback() {
+						se.__initialized = true;
+						se.__onLoadCallbacks.forEach(function(fn) {
+							try {
+								fn();
+							}
+							catch(e) {
+								Components.utils.reportError(e);
+							}
+						});
+						delete se.__onLoadCallbacks;
+						delete se.__value;
 					}
 				);
 			}, this);
