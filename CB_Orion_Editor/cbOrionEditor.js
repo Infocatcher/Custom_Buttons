@@ -51,14 +51,65 @@ if(!watcher) {
 				return;
 			var document = window.document;
 
-			Components.utils.import("resource:///modules/source-editor.jsm", this);
+			// See view-source:chrome://browser/content/devtools/scratchpad.xul
+			// + view-source:chrome://browser/content/devtools/source-editor-overlay.xul
+			var psXUL = ('<popupset id="orionEditorPopupset"\
+				xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">\
+				<menupopup id="orionEditorContext"\
+					onpopupshowing="goUpdateSourceEditorMenuItems()">\
+					<menuitem id="se-menu-undo"/>\
+					<menuitem id="se-menu-redo"/>\
+					<menuseparator/>\
+					<menuitem id="se-menu-cut"/>\
+					<menuitem id="se-menu-copy"/>\
+					<menuitem id="se-menu-paste"/>\
+					<menuseparator/>\
+					<menuitem id="se-menu-selectAll"/>\
+					<menuseparator/>\
+					<menuitem id="se-menu-find"/>\
+					<menuitem id="se-menu-findAgain"/>\
+					<menuseparator/>\
+					<menuitem id="se-menu-gotoLine"/>\
+				</menupopup>\
+			</popupset>')
+			.replace(/>\s+</g, "><");
+			var ps = new DOMParser().parseFromString(psXUL, "application/xml").documentElement;
+			var cm = ps.firstChild;
+			document.documentElement.appendChild(ps);
+
+			window.setTimeout(function() {
+				function appendNode(nodeName, id) {
+					var node = document.createElement(nodeName);
+					node.id = id;
+					document.documentElement.appendChild(node);
+				}
+				appendNode("commandset", "editMenuCommands");
+				appendNode("commandset", "sourceEditorCommands");
+				appendNode("keyset", "sourceEditorKeys");
+				appendNode("keyset", "editMenuKeys");
+			}, 50);
+			window.setTimeout(function() {
+				document.loadOverlay("chrome://global/content/editMenuOverlay.xul", null);
+				window.setTimeout(function() {
+					document.loadOverlay("chrome://browser/content/devtools/source-editor-overlay.xul", null);
+				}, 500);
+			}, 700);
+
+			Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
+				.getService(Components.interfaces.mozIJSSubScriptLoader)
+				.loadSubScript("chrome://global/content/globalOverlay.js", window);
+
+			Components.utils.import("resource:///modules/source-editor.jsm", window);
+			var SourceEditor = window.SourceEditor;
+
 			Array.slice(document.getElementsByTagName("cbeditor")).forEach(function(cbEditor) {
 				if("__orion" in cbEditor)
 					return;
-				var se = new this.SourceEditor();
+				var se = new SourceEditor();
 				var orionElt = document.createElement("hbox");
 				orionElt.className = "orionEditor";
 				orionElt.setAttribute("flex", 1);
+				orionElt.__orion = se;
 				cbEditor.parentNode.insertBefore(orionElt, cbEditor);
 				//cbEditor.setAttribute("hidden", "true");
 				cbEditor.setAttribute("collapsed", "true");
@@ -117,10 +168,11 @@ if(!watcher) {
 				se.init(
 					orionElt,
 					{
-						mode: this.SourceEditor.MODES.JAVASCRIPT,
+						mode: SourceEditor.MODES.JAVASCRIPT,
 						showLineNumbers: true,
 						initialText: code,
-						placeholderText: code // For backward compatibility
+						placeholderText: code, // For backward compatibility
+						contextMenu: "orionEditorContext"
 					},
 					function callback() {
 						se.__initialized = true;
@@ -134,6 +186,17 @@ if(!watcher) {
 						});
 						delete se.__onLoadCallbacks;
 						delete se.__value;
+
+						// Hack to use selected editor
+						var controller = se.ui._controller;
+						var tabs = document.getElementById("custombuttons-editbutton-tabbox");
+						controller.__defineGetter__("_editor", function() {
+							var orionElt = tabs.selectedPanel;
+							var orion = orionElt && orionElt.__orion
+								|| document.getElementsByTagName("cbeditor")[0].__orion;
+							return orion;
+						});
+						controller.__defineSetter__("_editor", function() {});
 					}
 				);
 			}, this);
@@ -152,6 +215,18 @@ if(!watcher) {
 			var document = window.document;
 
 			if(reason == this.REASON_SHUTDOWN) {
+				//~ note: we doesn't remove things from chrome://global/content/globalOverlay.js and from
+				// chrome://global/content/editMenuOverlay.xul => view-source:chrome://global/content/editMenuOverlay.js
+				[
+					"orionEditorPopupset",
+					"editMenuCommands",
+					"sourceEditorCommands",
+					"sourceEditorKeys",
+					"editMenuKeys"
+				].forEach(function(id) {
+					var node = document.getElementById(id);
+					node && node.parentNode.removeChild(node);
+				});
 				Array.slice(document.getElementsByTagName("cbeditor")).forEach(function(cbEditor) {
 					if(!("__orion" in cbEditor))
 						return;
@@ -160,7 +235,9 @@ if(!watcher) {
 					orionElt.parentNode.removeChild(orionElt);
 					delete cbEditor.__orionElt;
 					delete cbEditor.__orion;
+					delete orionElt.__orion;
 				}, this);
+				delete window.SourceEditor;
 			}
 		},
 		isTargetWindow: function(window) {
