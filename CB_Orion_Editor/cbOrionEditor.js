@@ -60,7 +60,8 @@ if(!watcher) {
 				orionElt.className = "orionEditor";
 				orionElt.setAttribute("flex", 1);
 				cbEditor.parentNode.insertBefore(orionElt, cbEditor);
-				cbEditor.setAttribute("hidden", true);
+				//cbEditor.setAttribute("hidden", "true");
+				cbEditor.setAttribute("collapsed", "true");
 				cbEditor.parentNode.appendChild(cbEditor);
 				cbEditor.__orion = se;
 				cbEditor.__orionElt = orionElt;
