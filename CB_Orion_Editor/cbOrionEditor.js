@@ -150,13 +150,8 @@ if(!watcher) {
 							});
 							return undefined;
 						}
-						//~ todo: optimize
-						var val = this.value;
-						var lines = val.split("\n");
-						var ss = 0;
-						for(var i = 0, max = Math.min(lineNumber - 1, lines.length); i < max; ++i)
-							ss += lines[i].length + 1;
-						var se = ss + (lines[i] && lines[i].length || 0);
+						var ss = orion.getLineStart(lineNumber - 1);
+						var se = orion.getLineEnd(lineNumber - 1, false);
 						orion.focus();
 						return orion.setSelection(ss, se);
 					}
