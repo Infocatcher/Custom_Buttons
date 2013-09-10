@@ -202,6 +202,33 @@ if(!watcher) {
 				);
 			}, this);
 
+			var origExecCmd = window.editor.execute_oncommand_code;
+			window.editor.execute_oncommand_code = function() {
+				var cd = document.commandDispatcher;
+				var cdFake = {
+					__proto__: cd,
+					get focusedElement() {
+						var tabs = document.getElementById("custombuttons-editbutton-tabbox");
+						var selectedTab = tabs.selectedTab;
+						if(selectedTab && selectedTab.id == "code-tab")
+							return document.getElementById("code").textbox.inputField;
+						return cd.focusedElement;
+					}
+				};
+				document.__defineGetter__("commandDispatcher", function() {
+					return cdFake;
+				});
+				try {
+					var ret = origExecCmd.apply(this, arguments);
+				}
+				catch(e) {
+					Components.utils.reportError(e);
+				}
+				// document.hasOwnProperty("commandDispatcher") == false, so we cat just delete our fake property
+				delete document.commandDispatcher;
+				return ret;
+			};
+
 			window.addEventListener("load", function ensureObserversAdded() {
 				window.removeEventListener("load", ensureObserversAdded, false);
 				window.setTimeout(function() { window.editor.removeObservers(); }, 0);
@@ -242,6 +269,7 @@ if(!watcher) {
 			}, this);
 
 			if(reason == this.REASON_SHUTDOWN) {
+				delete window.editor.execute_oncommand_code;
 				[
 					"orionEditorPopupset",
 					"editMenuCommands",
