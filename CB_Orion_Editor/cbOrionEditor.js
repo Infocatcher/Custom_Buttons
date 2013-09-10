@@ -320,9 +320,16 @@ if(!watcher) {
 		watcher.init(watcher.REASON_STARTUP);
 	}, 50);
 }
-this.onDestroy = function(reason) {
+function destructor(reason) {
 	if(reason == "update" || reason == "delete") {
 		watcher.destroy(watcher.REASON_SHUTDOWN);
 		Application.storage.set(watcherId, null);
 	}
-};
+}
+if(
+	typeof addDestructor == "function" // Custom Buttons 0.0.5.6pre4+
+	&& addDestructor != ("addDestructor" in window && window.addDestructor)
+)
+	addDestructor(destructor, this);
+else
+	this.onDestroy = destructor;
