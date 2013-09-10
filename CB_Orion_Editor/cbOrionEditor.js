@@ -182,6 +182,8 @@ if(!watcher) {
 						delete se.__onLoadCallbacks;
 						delete se.__value;
 
+						se.resetUndo && se.resetUndo();
+
 						// Hack to use selected editor
 						var controller = se.ui._controller;
 						var tabs = document.getElementById("custombuttons-editbutton-tabbox");
