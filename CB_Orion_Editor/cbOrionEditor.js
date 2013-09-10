@@ -183,6 +183,10 @@ if(!watcher) {
 						delete se.__value;
 
 						se.resetUndo && se.resetUndo();
+						var onTextChanged = se.__onTextChanged = function() {
+							window.editor.changed = true;
+						};
+						se.addEventListener(SourceEditor.EVENTS.TEXT_CHANGED, onTextChanged);
 
 						// Hack to use selected editor
 						var controller = se.ui._controller;
@@ -215,6 +219,8 @@ if(!watcher) {
 				if(!("__orion" in cbEditor))
 					return;
 				var se = cbEditor.__orion;
+				se.removeEventListener(window.SourceEditor.EVENTS.TEXT_CHANGED, se.__onTextChanged);
+				delete se.__onTextChanged;
 				if(reason == this.REASON_SHUTDOWN) {
 					var val = cbEditor.value;
 					delete cbEditor.value;
