@@ -3,6 +3,9 @@ This is some code snippets related to <a href="https://addons.mozilla.org/addon/
 ###### <a href="menuWithDelayedInitialization.js">menuWithDelayedInitialization.js</a>
 Example menu with delayed initialization, <a href="http://infocatcher.github.io/Custom_Buttons/install/menuWithDelayedInitialization.html">install page</a>
 
+###### <a href="mergeInitialization.js">mergeInitialization.js</a>
+Example for safely use only one button for initialization of many “buttons” without UI
+
 ###### <a href="oneTimeCommand.js">oneTimeCommand.js</a>
 Lazy initialize button using “code” section
 
