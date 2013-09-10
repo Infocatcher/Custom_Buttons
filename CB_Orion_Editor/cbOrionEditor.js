@@ -211,6 +211,30 @@ if(!watcher) {
 				return;
 			var document = window.document;
 
+			Array.slice(document.getElementsByTagName("cbeditor")).forEach(function(cbEditor) {
+				if(!("__orion" in cbEditor))
+					return;
+				var se = cbEditor.__orion;
+				if(reason == this.REASON_SHUTDOWN) {
+					var val = cbEditor.value;
+					delete cbEditor.value;
+					delete cbEditor.selectLine;
+
+					var orionElt = cbEditor.__orionElt;
+					orionElt.parentNode.insertBefore(cbEditor, orionElt);
+					orionElt.parentNode.removeChild(orionElt);
+					delete cbEditor.__orionElt;
+					delete cbEditor.__orion;
+					delete orionElt.__orion;
+
+					cbEditor.value = val;
+					window.setTimeout(function() {
+						cbEditor.removeAttribute("collapsed");
+					}, 0);
+				}
+				se.destroy();
+			}, this);
+
 			if(reason == this.REASON_SHUTDOWN) {
 				[
 					"orionEditorPopupset",
@@ -232,25 +256,6 @@ if(!watcher) {
 				].forEach(function(p) {
 					delete window[p];
 				});
-				Array.slice(document.getElementsByTagName("cbeditor")).forEach(function(cbEditor) {
-					if(!("__orion" in cbEditor))
-						return;
-					var val = cbEditor.value;
-					delete cbEditor.value;
-					delete cbEditor.selectLine;
-
-					var orionElt = cbEditor.__orionElt;
-					orionElt.parentNode.insertBefore(cbEditor, orionElt);
-					orionElt.parentNode.removeChild(orionElt);
-					delete cbEditor.__orionElt;
-					delete cbEditor.__orion;
-					delete orionElt.__orion;
-
-					cbEditor.value = val;
-					window.setTimeout(function() {
-						cbEditor.removeAttribute("collapsed");
-					}, 0);
-				}, this);
 				delete window.SourceEditor;
 			}
 		},
