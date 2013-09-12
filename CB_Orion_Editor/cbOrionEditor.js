@@ -74,7 +74,6 @@ if(!watcher) {
 			</popupset>')
 			.replace(/>\s+</g, "><");
 			var ps = new DOMParser().parseFromString(psXUL, "application/xml").documentElement;
-			var cm = ps.firstChild;
 			document.documentElement.appendChild(ps);
 
 			window.setTimeout(function() {
