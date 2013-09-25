@@ -33,6 +33,11 @@ if(!watcher) {
 				.getService(Components.interfaces.nsIWindowMediator);
 		},
 		init: function(reason) {
+			if("Services" in window && parseFloat(Services.appinfo.platformVersion) < 27) {
+				this.isBrowserWindow = function() {
+					return false; // CodeMirror is available only since Firefox 27.0a1 (2013-09-24)
+				};
+			}
 			this.obs.addObserver(this, "quit-application-granted", false);
 			var ws = this.wm.getEnumerator(null);
 			while(ws.hasMoreElements())
@@ -46,8 +51,12 @@ if(!watcher) {
 				this.destroyWindow(ws.getNext(), reason);
 			this.ww.unregisterNotification(this);
 		},
-		initWindow: function(window, reason) {
-			if(!this.isTargetWindow(window))
+		initWindow: function(window, reason, isFrame) {
+			if(this.isBrowserWindow(window)) {
+				this.initBrowserWindow(window, reason);
+				return;
+			}
+			if(!this.isEditorWindow(window))
 				return;
 			var document = window.document;
 
@@ -208,7 +217,7 @@ if(!watcher) {
 					se.appendTo(seElt).then(function() {
 						window.setTimeout(function() {
 							se.on("change", onTextChanged);
-						}, 0);
+						}, isFrame ? 50 : 0); // Oh, magic delays...
 						done();
 					});
 				}
@@ -275,10 +284,14 @@ if(!watcher) {
 				window.setTimeout(function() { window.editor.addObservers();    }, 0);
 			}, false);
 		},
-		destroyWindow: function(window, reason) {
+		destroyWindow: function(window, reason, isFrame) {
 			if(reason == this.REASON_WINDOW_CLOSED)
 				window.removeEventListener("DOMContentLoaded", this, false); // Window can be closed before DOMContentLoaded
-			if(!this.isTargetWindow(window))
+			if(this.isBrowserWindow(window)) {
+				this.destroyBrowserWindow(window, reason);
+				return;
+			}
+			if(!this.isEditorWindow(window) || !("SourceEditor" in window))
 				return;
 			var document = window.document;
 
@@ -337,8 +350,27 @@ if(!watcher) {
 				delete window.SourceEditor;
 			}
 		},
-		isTargetWindow: function(window) {
+		initBrowserWindow: function(window, reason) {
+			window.addEventListener("DOMContentLoaded", this, false);
+			window.addEventListener("unload", this, false);
+			Array.forEach(window.frames, function(frame) {
+				this.initWindow(frame, reason, true);
+			}, this);
+		},
+		destroyBrowserWindow: function(window, reason) {
+			window.removeEventListener("DOMContentLoaded", this, false);
+			window.removeEventListener("unload", this, false);
+			Array.forEach(window.frames, function(frame) {
+				this.destroyWindow(frame, reason, true);
+			}, this);
+		},
+		isEditorWindow: function(window) {
 			return window.location.href.substr(0, 41) == "chrome://custombuttons/content/editor.xul";
+		},
+		isBrowserWindow: function(window) {
+			var loc = window.location.href;
+			return loc == "chrome://browser/content/browser.xul"
+				|| loc == "chrome://navigator/content/navigator.xul";
 		},
 		observe: function(subject, topic, data) {
 			if(topic == "quit-application-granted")
@@ -349,13 +381,16 @@ if(!watcher) {
 				this.destroyWindow(subject, this.REASON_WINDOW_CLOSED);
 		},
 		handleEvent: function(e) {
-			var trg = e.originalTarget || e.target;
-			var window;
 			switch(e.type) {
 				case "DOMContentLoaded":
-					window = trg.defaultView;
-					window.removeEventListener("DOMContentLoaded", this, false);
+					var window = e.currentTarget;
+					window.removeEventListener(e.type, this, false);
 					this.initWindow(window, this.REASON_WINDOW_LOADED);
+				break;
+				case "unload":
+					var window = e.currentTarget;
+					window.removeEventListener(e.type, this, false);
+					this.destroyWindow(window, this.REASON_WINDOW_CLOSED, true);
 			}
 		}
 	};
