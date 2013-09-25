@@ -98,14 +98,30 @@ if(!watcher) {
 				.getService(Components.interfaces.mozIJSSubScriptLoader)
 				.loadSubScript("chrome://global/content/globalOverlay.js", window);
 
-			Components.utils.import("resource:///modules/source-editor.jsm", window);
-			var SourceEditor = window.SourceEditor;
+			var isCodeMirror = false;
+			try { // See chrome://browser/content/devtools/scratchpad.js
+				Components.utils.import("resource:///modules/source-editor.jsm", window);
+				var SourceEditor = window.SourceEditor;
+			}
+			catch(e) {
+				var require = Components.utils.import("resource://gre/modules/devtools/Loader.jsm", {}).devtools.require;
+				var SourceEditor = window.SourceEditor = require("devtools/sourceeditor/editor");
+				isCodeMirror = true;
+			}
 
 			Array.slice(document.getElementsByTagName("cbeditor")).forEach(function(cbEditor) {
 				if("__orion" in cbEditor)
 					return;
 				var code = cbEditor.value;
-				var se = new SourceEditor();
+				var se = isCodeMirror
+					? new SourceEditor({
+						mode: SourceEditor.modes.js,
+						value: code,
+						lineNumbers: true,
+						contextMenu: "orionEditorContext"
+					})
+					: new SourceEditor();
+				se.__isCodeMirror = isCodeMirror;
 				var orionElt = document.createElement("hbox");
 				orionElt.className = "orionEditor";
 				orionElt.setAttribute("flex", 1);
@@ -149,56 +165,81 @@ if(!watcher) {
 							});
 							return undefined;
 						}
-						var ss = orion.getLineStart(lineNumber - 1);
-						var se = orion.getLineEnd(lineNumber - 1, false);
-						orion.focus();
-						return orion.setSelection(ss, se);
+						if(orion.__isCodeMirror) {
+							//orion.focus();
+							//orion.setCursor({ line: lineNumber - 1, ch: 0 });
+							//~ todo: optimize
+							var val = this.value;
+							var lines = val.split("\n");
+							var line = Math.min(lineNumber - 1, lines.length);
+							var ch = lines[line].length;
+							orion.focus();
+							return orion.setSelection({ line: line, ch: 0 }, { line: line, ch: ch });
+						}
+						else {
+							var ss = orion.getLineStart(lineNumber - 1);
+							var se = orion.getLineEnd(lineNumber - 1, false);
+							orion.focus();
+							return orion.setSelection(ss, se);
+						}
 					}
 					return this.__proto__.selectLine.apply(this, arguments);
 				};
 				se.__initialized = false;
 				se.__onLoadCallbacks = [];
 				se.__value = code;
-				se.init(
-					orionElt,
-					{
-						mode: SourceEditor.MODES.JAVASCRIPT,
-						showLineNumbers: true,
-						initialText: code,
-						placeholderText: code, // For backward compatibility
-						contextMenu: "orionEditorContext"
-					},
-					function callback() {
-						se.__initialized = true;
-						se.__onLoadCallbacks.forEach(function(fn) {
-							try {
-								fn();
-							}
-							catch(e) {
-								Components.utils.reportError(e);
-							}
-						});
-						delete se.__onLoadCallbacks;
-						delete se.__value;
+				var onTextChanged = se.__onTextChanged = function() {
+					window.editor.changed = true;
+				};
+				function done() {
+					se.__initialized = true;
+					se.__onLoadCallbacks.forEach(function(fn) {
+						try {
+							fn();
+						}
+						catch(e) {
+							Components.utils.reportError(e);
+						}
+					});
+					delete se.__onLoadCallbacks;
+					delete se.__value;
+				}
+				if(isCodeMirror) {
+					se.appendTo(orionElt).then(function() {
+						window.setTimeout(function() {
+							se.on("change", onTextChanged);
+						}, 0);
+						done();
+					});
+				}
+				else {
+					se.init(
+						orionElt,
+						{
+							mode: SourceEditor.MODES.JAVASCRIPT,
+							showLineNumbers: true,
+							initialText: code,
+							placeholderText: code, // For backward compatibility
+							contextMenu: "orionEditorContext"
+						},
+						function callback() {
+							done();
+							se.resetUndo && se.resetUndo();
+							se.addEventListener(SourceEditor.EVENTS.TEXT_CHANGED, onTextChanged);
 
-						se.resetUndo && se.resetUndo();
-						var onTextChanged = se.__onTextChanged = function() {
-							window.editor.changed = true;
-						};
-						se.addEventListener(SourceEditor.EVENTS.TEXT_CHANGED, onTextChanged);
-
-						// Hack to use selected editor
-						var controller = se.ui._controller;
-						var tabs = document.getElementById("custombuttons-editbutton-tabbox");
-						controller.__defineGetter__("_editor", function() {
-							var orionElt = tabs.selectedPanel;
-							var orion = orionElt && orionElt.__orion
-								|| document.getElementsByTagName("cbeditor")[0].__orion;
-							return orion;
-						});
-						controller.__defineSetter__("_editor", function() {});
-					}
-				);
+							// Hack to use selected editor
+							var controller = se.ui._controller;
+							var tabs = document.getElementById("custombuttons-editbutton-tabbox");
+							controller.__defineGetter__("_editor", function() {
+								var orionElt = tabs.selectedPanel;
+								var orion = orionElt && orionElt.__orion
+									|| document.getElementsByTagName("cbeditor")[0].__orion;
+								return orion;
+							});
+							controller.__defineSetter__("_editor", function() {});
+						}
+					);
+				}
 			}, this);
 
 			var origExecCmd = window.editor.execute_oncommand_code;
@@ -245,7 +286,11 @@ if(!watcher) {
 				if(!("__orion" in cbEditor))
 					return;
 				var se = cbEditor.__orion;
-				se.removeEventListener(window.SourceEditor.EVENTS.TEXT_CHANGED, se.__onTextChanged);
+				var isCodeMirror = se.__isCodeMirror;
+				if(isCodeMirror)
+					se.off("change", se.__onTextChanged);
+				else
+					se.removeEventListener(window.SourceEditor.EVENTS.TEXT_CHANGED, se.__onTextChanged);
 				delete se.__onTextChanged;
 				if(reason == this.REASON_SHUTDOWN) {
 					var val = cbEditor.value;
