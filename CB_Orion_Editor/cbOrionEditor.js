@@ -5,7 +5,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2012-2013
-// version 0.1.0a3 - 2013-09-12
+// version 0.1.0a4pre - 2013-09-26
 
 const watcherId = "customButtonsSourceEditor_" + this.id;
 var {Application, Components} = window; // Prevent garbage collection in Firefox 3.6 and older
