@@ -1,13 +1,13 @@
 ﻿// https://github.com/Infocatcher/Custom_Buttons/tree/master/CB_Orion_Editor
 // http://infocatcher.ucoz.net/js/cb/cbOrionEditor.js
 
-// Orion Editor button for Custom Buttons
+// Source Editor (formerly Orion Editor) button for Custom Buttons
 // (code for "initialization" section)
 
 // (c) Infocatcher 2012-2013
 // version 0.1.0a3 - 2013-09-12
 
-const watcherId = "customButtonsOrionEditor_" + this.id;
+const watcherId = "customButtonsSourceEditor_" + this.id;
 var {Application, Components} = window; // Prevent garbage collection in Firefox 3.6 and older
 var watcher = Application.storage.get(watcherId, null);
 if(!watcher) {
@@ -53,9 +53,9 @@ if(!watcher) {
 
 			// See view-source:chrome://browser/content/devtools/scratchpad.xul
 			// + view-source:chrome://browser/content/devtools/source-editor-overlay.xul
-			var psXUL = ('<popupset id="orionEditorPopupset"\
+			var psXUL = ('<popupset id="sourceEditorPopupset"\
 				xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">\
-				<menupopup id="orionEditorContext"\
+				<menupopup id="sourceEditorContext"\
 					onpopupshowing="goUpdateSourceEditorMenuItems()">\
 					<menuitem id="se-menu-undo"/>\
 					<menuitem id="se-menu-redo"/>\
@@ -110,7 +110,7 @@ if(!watcher) {
 			}
 
 			Array.slice(document.getElementsByTagName("cbeditor")).forEach(function(cbEditor) {
-				if("__orion" in cbEditor)
+				if("__sourceEditor" in cbEditor)
 					return;
 				var code = cbEditor.value;
 				var se = isCodeMirror
@@ -118,69 +118,69 @@ if(!watcher) {
 						mode: SourceEditor.modes.js,
 						value: code,
 						lineNumbers: true,
-						contextMenu: "orionEditorContext"
+						contextMenu: "sourceEditorContext"
 					})
 					: new SourceEditor();
 				se.__isCodeMirror = isCodeMirror;
-				var orionElt = document.createElement("hbox");
-				orionElt.className = "orionEditor";
-				orionElt.setAttribute("flex", 1);
-				orionElt.__orion = se;
-				cbEditor.parentNode.insertBefore(orionElt, cbEditor);
+				var seElt = document.createElement("hbox");
+				seElt.className = "sourceEditor";
+				seElt.setAttribute("flex", 1);
+				seElt.__sourceEditor = se;
+				cbEditor.parentNode.insertBefore(seElt, cbEditor);
 				//cbEditor.setAttribute("hidden", "true");
 				cbEditor.setAttribute("collapsed", "true");
 				cbEditor.parentNode.appendChild(cbEditor);
-				cbEditor.__orion = se;
-				cbEditor.__orionElt = orionElt;
+				cbEditor.__sourceEditor = se;
+				cbEditor.__sourceEditorElt = seElt;
 				cbEditor.__defineGetter__("value", function() {
-					if("__orion" in this) {
-						var orion = this.__orion;
-						if(!orion.__initialized)
-							return orion.__value;
-						return orion.getText().replace(/\r\n?|\n\r?/g, "\n");
+					if("__sourceEditor" in this) {
+						var se = this.__sourceEditor;
+						if(!se.__initialized)
+							return se.__value;
+						return se.getText().replace(/\r\n?|\n\r?/g, "\n");
 					}
 					return this.textbox.value;
 				});
 				cbEditor.__defineSetter__("value", function(v) {
-					if("__orion" in this) {
-						var orion = this.__orion;
-						if(!orion.__initialized) {
+					if("__sourceEditor" in this) {
+						var se = this.__sourceEditor;
+						if(!se.__initialized) {
 							var _this = this;
-							orion.__onLoadCallbacks.push(function() {
+							se.__onLoadCallbacks.push(function() {
 								_this.value = v;
 							});
-							return orion.__value = v;
+							return se.__value = v;
 						}
-						return orion.setText(v.replace(/\r\n?|\n\r?/g, "\n"));
+						return se.setText(v.replace(/\r\n?|\n\r?/g, "\n"));
 					}
 					return this.textbox.value = v;
 				});
 				cbEditor.selectLine = function(lineNumber) {
-					if("__orion" in this) {
-						var orion = this.__orion;
-						if(!orion.__initialized) {
+					if("__sourceEditor" in this) {
+						var se = this.__sourceEditor;
+						if(!se.__initialized) {
 							var _this = this, args = arguments;
-							orion.__onLoadCallbacks.push(function() {
+							se.__onLoadCallbacks.push(function() {
 								_this.selectLine.apply(_this, args);
 							});
 							return undefined;
 						}
-						if(orion.__isCodeMirror) {
-							//orion.focus();
-							//orion.setCursor({ line: lineNumber - 1, ch: 0 });
+						if(se.__isCodeMirror) {
+							//se.focus();
+							//se.setCursor({ line: lineNumber - 1, ch: 0 });
 							//~ todo: optimize
 							var val = this.value;
 							var lines = val.split("\n");
 							var line = Math.min(lineNumber - 1, lines.length);
 							var ch = lines[line].length;
-							orion.focus();
-							return orion.setSelection({ line: line, ch: 0 }, { line: line, ch: ch });
+							se.focus();
+							return se.setSelection({ line: line, ch: 0 }, { line: line, ch: ch });
 						}
 						else {
-							var ss = orion.getLineStart(lineNumber - 1);
-							var se = orion.getLineEnd(lineNumber - 1, false);
-							orion.focus();
-							return orion.setSelection(ss, se);
+							var selStart = se.getLineStart(lineNumber - 1);
+							var selEnd = se.getLineEnd(lineNumber - 1, false);
+							se.focus();
+							return se.setSelection(selStart, selEnd);
 						}
 					}
 					return this.__proto__.selectLine.apply(this, arguments);
@@ -205,7 +205,7 @@ if(!watcher) {
 					delete se.__value;
 				}
 				if(isCodeMirror) {
-					se.appendTo(orionElt).then(function() {
+					se.appendTo(seElt).then(function() {
 						window.setTimeout(function() {
 							se.on("change", onTextChanged);
 						}, 0);
@@ -214,13 +214,13 @@ if(!watcher) {
 				}
 				else {
 					se.init(
-						orionElt,
+						seElt,
 						{
 							mode: SourceEditor.MODES.JAVASCRIPT,
 							showLineNumbers: true,
 							initialText: code,
 							placeholderText: code, // For backward compatibility
-							contextMenu: "orionEditorContext"
+							contextMenu: "sourceEditorContext"
 						},
 						function callback() {
 							done();
@@ -231,10 +231,10 @@ if(!watcher) {
 							var controller = se.ui._controller;
 							var tabs = document.getElementById("custombuttons-editbutton-tabbox");
 							controller.__defineGetter__("_editor", function() {
-								var orionElt = tabs.selectedPanel;
-								var orion = orionElt && orionElt.__orion
-									|| document.getElementsByTagName("cbeditor")[0].__orion;
-								return orion;
+								var seElt = tabs.selectedPanel;
+								var se = seElt && seElt.__sourceEditor
+									|| document.getElementsByTagName("cbeditor")[0].__sourceEditor;
+								return se;
 							});
 							controller.__defineSetter__("_editor", function() {});
 						}
@@ -283,9 +283,9 @@ if(!watcher) {
 			var document = window.document;
 
 			Array.slice(document.getElementsByTagName("cbeditor")).forEach(function(cbEditor) {
-				if(!("__orion" in cbEditor))
+				if(!("__sourceEditor" in cbEditor))
 					return;
-				var se = cbEditor.__orion;
+				var se = cbEditor.__sourceEditor;
 				var isCodeMirror = se.__isCodeMirror;
 				if(isCodeMirror)
 					se.off("change", se.__onTextChanged);
@@ -297,12 +297,12 @@ if(!watcher) {
 					delete cbEditor.value;
 					delete cbEditor.selectLine;
 
-					var orionElt = cbEditor.__orionElt;
-					orionElt.parentNode.insertBefore(cbEditor, orionElt);
-					orionElt.parentNode.removeChild(orionElt);
-					delete cbEditor.__orionElt;
-					delete cbEditor.__orion;
-					delete orionElt.__orion;
+					var seElt = cbEditor.__sourceEditorElt;
+					seElt.parentNode.insertBefore(cbEditor, seElt);
+					seElt.parentNode.removeChild(seElt);
+					delete cbEditor.__sourceEditorElt;
+					delete cbEditor.__sourceEditor;
+					delete seElt.__sourceEditor;
 
 					cbEditor.value = val;
 					window.setTimeout(function() {
@@ -315,7 +315,7 @@ if(!watcher) {
 			if(reason == this.REASON_SHUTDOWN) {
 				delete window.editor.execute_oncommand_code;
 				[
-					"orionEditorPopupset",
+					"sourceEditorPopupset",
 					"editMenuCommands",
 					"sourceEditorCommands",
 					"sourceEditorKeys",
