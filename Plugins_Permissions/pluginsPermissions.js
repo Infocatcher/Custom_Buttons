@@ -13,8 +13,8 @@
 
 // Note: plugins.click_to_play in about:config ("Block plugins" checkbox) should be enabled
 // Unfortunately since Firefox 20 (Gecko 20) global exclusions doesn't work, only on per-plugin basis.
-// So you should change "Shockwave Flash" and "plugin:flash" in the source (and create copy of this
-// button) to menage other plugins.
+// So you should change "Flash", "Shockwave Flash" and "plugin:flash" in the source
+// (and create copy of this button) to menage other plugins.
 
 var options = {
 	showTempPermissions: true, // Show items about temporary permissions (only Gecko 2.0+)
@@ -42,16 +42,20 @@ var options = {
 
 function _localize(sid) {
 	var strings = {
+		// Note: %p will be replaced with "Plugins" (Firefox < 20) or plugin name (Firefox >= 20)
 		en: {
-			defaultTooltiptext: "Plugins: Default",
-			denyTooltiptext: "Plugins: Block",
-			allowTooltiptext: "Plugins: Allow",
-			notAvailableTooltiptext: "Plugins: n/a",
-			unknownTooltiptext: "Plugins: ???",
-			errorTooltiptext: "Plugins: Error!",
+			plugins: "Plugins",
+			pluginName: "Flash",
 
-			defaultDenyTooltiptext: "Plugins: Block (Default)",
-			defaultAllowTooltiptext: "Plugins: Allow (Default)",
+			defaultTooltiptext: "%p: Default",
+			denyTooltiptext: "%p: Block",
+			allowTooltiptext: "%p: Allow",
+			notAvailableTooltiptext: "%p: n/a",
+			unknownTooltiptext: "%p: ???",
+			errorTooltiptext: "%p: Error!",
+
+			defaultDenyTooltiptext: "%p: Block (Default)",
+			defaultAllowTooltiptext: "%p: Allow (Default)",
 
 			defaultLabel: "Default",
 			defaultAccesskey: "D",
@@ -75,21 +79,24 @@ function _localize(sid) {
 			buttonMenu: "Button Menu",
 			buttonMenuAccesskey: "M",
 
-			exceptionsTitle: "Exceptions — Plugins",
+			exceptionsTitle: "Exceptions — %p",
 			exceptionsDesc: "You can specify which websites are always or never allowed to \
 				play plugins. Type the exact address of the site you want to manage and \
 				then click Block or Allow."
 		},
 		ru: {
-			defaultTooltiptext: "Плагины: По умолчанию",
-			denyTooltiptext: "Плагины: Блокировать",
-			allowTooltiptext: "Плагины: Разрешить",
-			notAvailableTooltiptext: "Плагины: н/д",
-			unknownTooltiptext: "Плагины: ???",
-			errorTooltiptext: "Плагины: Ошибка!",
+			plugins: "Плагины",
+			pluginName: "Flash",
 
-			defaultDenyTooltiptext: "Плагины: Блокировать (по умолчанию)",
-			defaultAllowTooltiptext: "Плагины: Разрешить (по умолчанию)",
+			defaultTooltiptext: "%p: По умолчанию",
+			denyTooltiptext: "%p: Блокировать",
+			allowTooltiptext: "%p: Разрешить",
+			notAvailableTooltiptext: "%p: н/д",
+			unknownTooltiptext: "%p: ???",
+			errorTooltiptext: "%p: Ошибка!",
+
+			defaultDenyTooltiptext: "%p: Блокировать (по умолчанию)",
+			defaultAllowTooltiptext: "%p: Разрешить (по умолчанию)",
 
 			defaultLabel: "По умолчанию",
 			defaultAccesskey: "у",
@@ -113,7 +120,7 @@ function _localize(sid) {
 			buttonMenu: "Меню кнопки",
 			buttonMenuAccesskey: "М",
 
-			exceptionsTitle: "Исключения — Плагины",
+			exceptionsTitle: "Исключения — %p",
 			exceptionsDesc: "Вы можете указать, каким веб-сайтам разрешено или запрещено \
 				автоматически проигрывать плагины. Введите точный адрес сайта и нажмите \
 				кнопку «Блокировать» или «Разрешить»."
@@ -180,6 +187,13 @@ this.permissions = {
 		}
 		delete this.permissionType;
 		return this.permissionType = permissionType;
+	},
+	get pluginName() {
+		var name = parseFloat(this.appInfo.platformVersion) >= 20
+			? _localize("pluginName")
+			: _localize("plugins");
+		delete this.pluginName;
+		return this.pluginName = name;
 	},
 	popupClass: "cbPluginsPermissionsPopup",
 
@@ -590,7 +604,7 @@ this.permissions = {
 					   allowVisible   : true,
 					   prefilledHost  : host,
 					   permissionType : this.permissionType,
-					   windowTitle    : _localize("exceptionsTitle"),
+					   windowTitle    : _localize("exceptionsTitle").replace("%p", this.pluginName),
 					   introText      : _localize("exceptionsDesc") };
 		var win = this.wm.getMostRecentWindow("Browser:Permissions");
 		if(
@@ -883,7 +897,9 @@ this.permissions = {
 			return;
 		btn.disabled = permission == this.PERMISSIONS_NOT_SUPPORTED;
 		btn.setAttribute(attr, key);
-		btn.tooltipText = _localize(key + "Tooltiptext") + ttAdd;
+		btn.tooltipText = _localize(key + "Tooltiptext")
+			.replace("%p", this.pluginName)
+			+ ttAdd;
 	},
 
 	hasModifier: function(e) {
