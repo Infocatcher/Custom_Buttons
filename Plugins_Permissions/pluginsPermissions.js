@@ -13,8 +13,8 @@
 
 // Note: plugins.click_to_play in about:config ("Block plugins" checkbox) should be enabled
 // Unfortunately since Firefox 20 (Gecko 20) global exclusions doesn't work, only on per-plugin basis.
-// So you should change "Flash", "Shockwave Flash" and "plugin:flash" in the source
-// (and create copy of this button) to menage other plugins.
+// So you should change "Flash", "Shockwave Flash" and "plugin:flash" in the source (and create copy
+// of this button) to menage other plugins, see "// Rename to use button for another plugin" comments.
 
 var options = {
 	showTempPermissions: true, // Show items about temporary permissions (only Gecko 2.0+)
@@ -45,7 +45,7 @@ function _localize(sid) {
 		// Note: %p will be replaced with "Plugins" (Firefox < 20) or plugin name (Firefox >= 20)
 		en: {
 			plugins: "Plugins",
-			pluginName: "Flash",
+			pluginName: "Flash", // Rename to use button for another plugin
 
 			defaultTooltiptext: "%p: Default",
 			denyTooltiptext: "%p: Block",
@@ -86,7 +86,7 @@ function _localize(sid) {
 		},
 		ru: {
 			plugins: "Плагины",
-			pluginName: "Flash",
+			pluginName: "Flash", // Rename to use button for another plugin
 
 			defaultTooltiptext: "%p: По умолчанию",
 			denyTooltiptext: "%p: Блокировать",
@@ -166,6 +166,7 @@ this.permissions = {
 	get permissionType() {
 		var permissionType = "plugins";
 		if(this.perPluginPermissions) try {
+			// Rename to use button for another plugin
 			let pluginName = "Shockwave Flash";
 			permissionType = "plugin:flash"; // Fallback value
 
