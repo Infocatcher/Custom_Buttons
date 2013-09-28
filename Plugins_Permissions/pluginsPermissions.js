@@ -165,7 +165,7 @@ this.permissions = {
 	//permissionType: "plugins",
 	get permissionType() {
 		var permissionType = "plugins";
-		if(parseFloat(this.appInfo.platformVersion) >= 20) try {
+		if(this.perPluginPermissions) try {
 			let pluginName = "Shockwave Flash";
 			permissionType = "plugin:flash"; // Fallback value
 
@@ -189,11 +189,15 @@ this.permissions = {
 		return this.permissionType = permissionType;
 	},
 	get pluginName() {
-		var name = parseFloat(this.appInfo.platformVersion) >= 20
+		var name = this.perPluginPermissions
 			? _localize("pluginName")
 			: _localize("plugins");
 		delete this.pluginName;
 		return this.pluginName = name;
+	},
+	get perPluginPermissions() {
+		delete this.perPluginPermissions;
+		return this.perPluginPermissions = parseFloat(this.appInfo.platformVersion) >= 20;
 	},
 	popupClass: "cbPluginsPermissionsPopup",
 
