@@ -423,7 +423,19 @@ var cmds = this.commands = {
 		var win = this.openBrowserWindow();
 		win.addEventListener("load", function restoreSession(e) {
 			win.removeEventListener(e.type, restoreSession, false);
-			ss.setWindowState(win, state, true);
+			var tryCount = 10;
+			(function restore() {
+				try { // May fail in SeaMonkey
+					ss.setWindowState(win, state, true);
+				}
+				catch(e) {
+					Components.utils.reportError(e);
+					if(!--tryCount)
+						return;
+					LOG("nsISessionStore.setWindowState() failed, will try again…");
+					win.setTimeout(restore, 50);
+				}
+			})();
 			if(!window.closed)
 				window.close();
 		}, false);
