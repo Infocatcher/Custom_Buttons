@@ -50,6 +50,7 @@ this.historyManager = {
 			case "TabOpen":
 			case "SSTabRestored":
 				this.updButtonStateDelayed(250); // Slow restoring during browser startup
+			break;
 			case "TabClose":
 				this.updButtonStateDelayed();
 			break;
@@ -70,7 +71,7 @@ this.historyManager = {
 	onStateChange: dummy,
 	onProgressChange: dummy,
 	onLocationChange: function(aWebProgress, aRequest, aLocation) {
-		this.updButtonState();
+		this.updButtonStateDelayed();
 	},
 	onStatusChange: dummy,
 	onSecurityChange: dummy,
