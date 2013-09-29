@@ -1,3 +1,4 @@
+// https://github.com/Infocatcher/Custom_Buttons/tree/master/Purge_Tabs_History
 // http://infocatcher.ucoz.net/js/cb/purgeTabsHistory.js
 
 // Purge Tab(s) History
