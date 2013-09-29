@@ -620,6 +620,9 @@ var cmds = this.commands = {
 	get currentLocale() {
 		return this.getPref("general.useragent.locale");
 	},
+	get defaultLocale() {
+		return this.getPref("general.useragent.locale", null, this.defaultBranch);
+	},
 	switchLocale: function(onlyGet) {
 		var curLocale = this.currentLocale;
 		var locales = this.options.locales;
@@ -682,7 +685,7 @@ var cmds = this.commands = {
 		return locale;
 	},
 	ensureLocaleAvailable: function(locale, callback, tryESR) {
-		if(locale == this.getPref("general.useragent.locale", null, this.defaultBranch)) {
+		if(locale == this.defaultLocale) {
 			callback(true);
 			return;
 		}
