@@ -126,6 +126,7 @@ this.historyManager = {
 			_this.updButtonState();
 		}, delay || 0, this);
 	},
+	_forceSaveSessionTimer: 0,
 	forceSaveSession: function() {
 		const key = "custombuttonsPurgeTabHistoryForceSaveSession";
 		var ss = ( // Firefox or SeaMonkey
@@ -133,9 +134,10 @@ this.historyManager = {
 			|| Components.classes["@mozilla.org/suite/sessionstore;1"]
 		).getService(Components.interfaces.nsISessionStore);
 		ss.setWindowValue(window, key, Date.now());
-		setTimeout(function() {
+		clearTimeout(this._forceSaveSessionTimer);
+		this._forceSaveSessionTimer = setTimeout(function() {
 			ss.deleteWindowValue(window, key);
-		}, 5000);
+		}, 20e3);
 	}
 };
 
