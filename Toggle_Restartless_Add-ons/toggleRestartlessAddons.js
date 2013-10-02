@@ -23,9 +23,15 @@ var options = {
 	// 0 - don't show versions
 	// 1 - show after name: "Addon Name 1.2"
 	// 2 - show as "acceltext" (in place for hotkey text)
-	separateDisabledAddons: false,
-	// false - sort add-ons of each type alphabetically
-	// true  - show enabled add-ons (of each type) first
+	sort: {
+		enabled:     0,
+		clickToPlay: 0,
+		disabled:    0
+		// Sort order:
+		// 0, 0, 0 - sort add-ons of each type alphabetically
+		// 0, 0, 1 - show enabled add-ons (of each type) first
+		// 0, 1, 2 - enabled add-ons, then click-to-play and then disabled
+	},
 	closeMenu: true,
 	// Close menu after left-click (use Shift+click to invert this behavior)
 	closeMenuClickToPlay: -1
@@ -50,9 +56,16 @@ mp.updateMenu = function() {
 	getRestartlessAddons(options.addonTypes, function(addons) {
 		var df = document.createDocumentFragment();
 		var prevType;
+		function sortPosition(addon) {
+			if("STATE_ASK_TO_ACTIVATE" in AddonManager && addon.userDisabled == AddonManager.STATE_ASK_TO_ACTIVATE)
+				return options.sort.clickToPlay;
+			if(addon.isActive)
+				return options.sort.enabled;
+			return options.sort.disabled;
+		}
 		function key(addon) {
 			return options.addonTypes.indexOf(addon.type)
-				+ (options.separateDisabledAddons ? "\n" + +!addon.isActive : "")
+				+ "\n" + sortPosition(addon)
 				+ "\n" + addon.name.toLowerCase();
 		}
 		addons.sort(function(a, b) {
