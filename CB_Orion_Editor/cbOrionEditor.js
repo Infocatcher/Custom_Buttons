@@ -100,6 +100,26 @@ if(!watcher) {
 				document.loadOverlay("chrome://global/content/editMenuOverlay.xul", null);
 				window.setTimeout(function() {
 					document.loadOverlay("chrome://browser/content/devtools/source-editor-overlay.xul", null);
+					if(isCodeMirror) window.setTimeout(function() {
+						// See view-source:chrome://browser/content/devtools/scratchpad.xul in Firefox 27.0a1
+						window.goUpdateSourceEditorMenuItems = function() {
+							goUpdateGlobalEditMenuItems();
+							var commands = ["cmd_undo", "cmd_redo", "cmd_cut", "cmd_paste", "cmd_delete", "cmd_findAgain"];
+							commands.forEach(goUpdateCommand);
+						};
+						var cmdsMap = {
+							"se-menu-undo":  "cmd_undo",
+							"se-menu-redo":  "cmd_redo",
+							"se-menu-cut":   "cmd_cut",
+							"se-menu-copy":  "cmd_copy",
+							"se-menu-paste": "cmd_paste",
+							__proto__: null
+						};
+						for(var id in cmdsMap) {
+							var mi = document.getElementById(id);
+							mi && mi.setAttribute("command", cmdsMap[id]);
+						}
+					}, 50);
 				}, 500);
 			}, 700);
 
