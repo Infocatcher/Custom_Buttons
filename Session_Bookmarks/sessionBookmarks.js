@@ -881,8 +881,20 @@ this.bookmarks = {
 			this.deleteBookmark(mi);
 	},
 	openAllBookmarks: function() {
+		var mis = this.mp.getElementsByAttribute("cb_uri", "*");
+		if(
+			"PlacesUIUtils" in window
+			&& "_confirmOpenInTabs" in PlacesUIUtils
+			&& mis.length
+		) try {
+			if(!PlacesUIUtils._confirmOpenInTabs(mis.length, window))
+				return;
+		}
+		catch(e) {
+			Components.utils.reportError(e);
+		}
 		Array.forEach(
-			this.mp.getElementsByAttribute("cb_uri", "*"),
+			mis,
 			function(mi) {
 				var uri = mi.getAttribute("cb_uri");
 				var tab = gBrowser.addTab(this.options.useSessions ? "about:blank" : uri);
