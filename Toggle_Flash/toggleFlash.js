@@ -21,6 +21,8 @@ this.__defineGetter__("pluginEnabled", function() {
 	return this._pluginEnabled;
 });
 this.__defineSetter__("pluginEnabled", function(enabled) {
+	if(this._pluginEnabled == enabled)
+		return;
 	this._pluginEnabled = enabled;
 	if(options.checkedStyle)
 		this.checked = enabled;
@@ -73,6 +75,7 @@ this.onclick = function(e) {
 		alert(options.pluginName + " not installed!");
 		return;
 	}
+	this.pluginEnabled = !this._pluginEnabled; // Faster than callback
 	AddonManager.getAddonByID(addonId, function(addon) {
 		addon.userDisabled = !addon.userDisabled;
 	});
