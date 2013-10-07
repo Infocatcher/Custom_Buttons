@@ -239,6 +239,36 @@ if(!watcher) {
 							se.on("change", onTextChanged);
 						}, isFrame ? 50 : 0); // Oh, magic delays...
 						done();
+
+						// See resource:///modules/devtools/sourceeditor/editor.js
+						// doc.defaultView.controllers.insertControllerAt(0, controller(this, doc.defaultView));
+						var controllers = window.controllers; // nsIControllers
+						var controller = se.__cmdController = controllers.getControllerAt(0);
+						var tabs = document.getElementById("custombuttons-editbutton-tabbox");
+						if("__cmdControllers" in tabs)
+							tabs.__cmdControllers.push(controller);
+						else {
+							tabs.__cmdControllers = [controller];
+							var onSelect = tabs.__onSelect = function() {
+								var seElt = tabs.selectedPanel;
+								if(!seElt || !("__sourceEditor" in seElt))
+									return;
+								var se = seElt.__sourceEditor;
+								var curController = se.__cmdController;
+								tabs.__cmdControllers.forEach(function(controller) {
+									try {
+										if(controller == curController)
+											controllers.insertControllerAt(0, controller);
+										else
+											controllers.removeController(controller);
+									}
+									catch(e) {
+									}
+								});
+							};
+							tabs.addEventListener("select", onSelect, false);
+							window.setTimeout(onSelect, 0); // Activate controller from selected tab
+						}
 					});
 				}
 				else {
@@ -315,6 +345,13 @@ if(!watcher) {
 				return;
 			var document = window.document;
 
+			var tabs = document.getElementById("custombuttons-editbutton-tabbox");
+			if("__onSelect" in tabs) {
+				tabs.removeEventListener("select", tabs.__onSelect, false);
+				delete tabs.__onSelect;
+				delete tabs.__cmdControllers;
+			}
+
 			Array.slice(document.getElementsByTagName("cbeditor")).forEach(function(cbEditor) {
 				if(!("__sourceEditor" in cbEditor))
 					return;
@@ -343,6 +380,14 @@ if(!watcher) {
 					}, 0);
 				}
 				se.destroy();
+				if("__cmdController" in se) {
+					try {
+						window.controllers.removeController(se.__cmdController);
+					}
+					catch(e) {
+					}
+					delete se.__cmdController;
+				}
 			}, this);
 
 			if(reason == this.REASON_SHUTDOWN) {
@@ -369,6 +414,8 @@ if(!watcher) {
 				});
 				delete window.SourceEditor;
 			}
+			//~ todo: we have one not removed controller!
+			//LOG("getControllerCount(): " + window.controllers.getControllerCount());
 		},
 		initBrowserWindow: function(window, reason) {
 			window.addEventListener("DOMContentLoaded", this, false);
