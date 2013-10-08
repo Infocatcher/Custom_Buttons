@@ -115,3 +115,6 @@ Allows restore recently closed tabs and windows
 <hr>
 #### [Code snippets](code_snippets)
 Some code snippets related to Custom Buttons.
+
+#### [Tests](tests)
+Some buttons for test purposes.
