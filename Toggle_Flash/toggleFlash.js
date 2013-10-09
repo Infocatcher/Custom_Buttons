@@ -1,4 +1,4 @@
-// http://infocatcher.ucoz.net/js/cb/toggleFlash.js
+﻿// http://infocatcher.ucoz.net/js/cb/toggleFlash.js
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Toggle_Flash
 
 // Toggle Flash button for Custom Buttons
@@ -39,6 +39,32 @@ var options = {
 	}
 };
 
+function _localize(s, key) {
+	var strings = {
+		"%N: %S": { // Example: "Some plugin: Enabled"
+			ru: "%N: %S"
+		},
+		"Enabled": {
+			ru: "Включено"
+		},
+		"Disabled": {
+			ru: "Выключено"
+		},
+		"Ask to activate": {
+			ru: "Включать по запросу"
+		}
+	};
+	var locale = Application.prefs.getValue("general.useragent.locale", "en").match(/^[a-z]*/)[0];
+	_localize = !locale || locale == "en"
+		? function(s) {
+			return s;
+		}
+		: function(s) {
+			return strings[s] && strings[s][locale] || s;
+		};
+	return _localize.apply(this, arguments);
+}
+
 var _addon, _addonId;
 this._pluginDisabled = undefined;
 this.__defineGetter__("pluginDisabled", function() {
@@ -50,12 +76,19 @@ this.__defineSetter__("pluginDisabled", function(dis) {
 	this._pluginDisabled = dis;
 
 	var style;
-	if("STATE_ASK_TO_ACTIVATE" in AddonManager && dis == AddonManager.STATE_ASK_TO_ACTIVATE)
+	var state;
+	if("STATE_ASK_TO_ACTIVATE" in AddonManager && dis == AddonManager.STATE_ASK_TO_ACTIVATE) {
 		style = options.styleClickToPlay;
-	else if(!dis)
+		state = _localize("Ask to activate");
+	}
+	else if(!dis) {
 		style = options.styleEnabled;
-	else
+		state = _localize("Enabled");
+	}
+	else {
 		style = options.styleDisabled;
+		state = _localize("Disabled");
+	}
 
 	if(style.hasOwnProperty("checked"))
 		this.checked = style.checked;
@@ -76,6 +109,10 @@ this.__defineSetter__("pluginDisabled", function(dis) {
 				icon.style.opacity = style.iconOpacity;
 		}
 	}
+
+	this.tooltipText = _localize("%N: %S")
+		.replace("%N", options.pluginName)
+		.replace("%S", state);
 });
 Components.utils.import("resource://gre/modules/AddonManager.jsm");
 
