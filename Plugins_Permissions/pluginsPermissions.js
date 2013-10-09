@@ -177,8 +177,9 @@ this.permissions = {
 			for(let i = 0, l = tags.length; i < l; ++i) {
 				let tag = tags[i];
 				if(tag.name == pluginName) {
-					let mimeType = tag.getMimeTypes()[0].type;
-					permissionType = pluginHost.getPermissionStringForType(mimeType);
+					let mimeType = tag.getMimeTypes()[0]; // This is string since Firefox 24
+					let mimeTypeString = mimeType.type || mimeType;
+					permissionType = pluginHost.getPermissionStringForType(mimeTypeString);
 					break;
 				}
 			}
