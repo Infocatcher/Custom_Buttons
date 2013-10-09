@@ -88,10 +88,16 @@ this.initAddonListener = function() {
 		onDisabled: function(addon) {
 			this._updateButton(addon);
 		},
+		//onInstalled: function(addon) {},
+		//onUninstalled: function(addon) {},
+		onPropertyChanged: function(addon, properties) {
+			if(properties && properties.indexOf("userDisabled") != -1)
+				this._updateButton(addon);
+		},
 		_updateButton: function(addon) {
 			if(addon.id == _addonId)
 				this.button.pluginDisabled = addon.userDisabled;
-		},
+		}
 	};
 	AddonManager.addAddonListener(addonListener);
 	this.onDestroy = function() {
