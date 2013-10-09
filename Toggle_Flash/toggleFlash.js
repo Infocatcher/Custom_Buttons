@@ -88,8 +88,23 @@ this.initAddonListener = function() {
 		onDisabled: function(addon) {
 			this._updateButton(addon);
 		},
-		//onInstalled: function(addon) {},
-		//onUninstalled: function(addon) {},
+		onInstalled: function(addon) {
+			if(
+				!_addon
+				&& options.searchInTypes.indexOf(addon.type) != -1
+				&& addon.name.indexOf(options.pluginName) != -1
+			) {
+				_addon = addon;
+				_addonId = addon.id;
+				this.button.pluginDisabled = addon.userDisabled;
+			}
+		},
+		onUninstalled: function(addon) {
+			if(_addon && addon.id == _addonId) {
+				_addon = _addonId = undefined;
+				this.button.pluginDisabled = true;
+			}
+		},
 		onPropertyChanged: function(addon, properties) {
 			if(properties && properties.indexOf("userDisabled") != -1)
 				this._updateButton(addon);
@@ -110,14 +125,14 @@ AddonManager.getAddonsByTypes(options.searchInTypes, function(addons) {
 	addons.some(function(addon) {
 		if(addon.name.indexOf(options.pluginName) == -1)
 			return false;
-		_addonId = addon.id;
 		_addon = addon;
+		_addonId = addon.id;
 		btn.pluginDisabled = addon.userDisabled;
-		btn.initAddonListener();
 		return true;
 	});
 	if(!_addon)
 		btn.pluginDisabled = true;
+	btn.initAddonListener();
 });
 
 this.onclick = function(e) {
