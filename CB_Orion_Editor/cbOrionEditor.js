@@ -243,7 +243,7 @@ if(!watcher) {
 								var cm = seGlobal.editors.get(se);
 								cm.clearHistory();
 							}
-						}, isFrame ? 50 : 0); // Oh, magic delays...
+						}, isFrame ? 50 : 15); // Oh, magic delays...
 						done();
 
 						// See resource:///modules/devtools/sourceeditor/editor.js
