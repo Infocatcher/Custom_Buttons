@@ -220,6 +220,7 @@ if(!watcher) {
 				var onTextChanged = se.__onTextChanged = function() {
 					window.editor.changed = true;
 				};
+				var isLoaded = reason == this.REASON_WINDOW_LOADED;
 				function done() {
 					se.__initialized = true;
 					se.__onLoadCallbacks.forEach(function(fn) {
@@ -237,10 +238,11 @@ if(!watcher) {
 					se.appendTo(seElt).then(function() {
 						window.setTimeout(function() {
 							se.on("change", onTextChanged);
-
-							var seGlobal = Components.utils.getGlobalForObject(SourceEditor.prototype);
-							var cm = seGlobal.editors.get(se);
-							cm.clearHistory();
+							if(isLoaded) {
+								var seGlobal = Components.utils.getGlobalForObject(SourceEditor.prototype);
+								var cm = seGlobal.editors.get(se);
+								cm.clearHistory();
+							}
 						}, isFrame ? 50 : 0); // Oh, magic delays...
 						done();
 
@@ -287,7 +289,7 @@ if(!watcher) {
 						},
 						function callback() {
 							done();
-							se.resetUndo && se.resetUndo();
+							isLoaded && se.resetUndo && se.resetUndo();
 							se.addEventListener(SourceEditor.EVENTS.TEXT_CHANGED, onTextChanged);
 
 							// Hack to use selected editor
