@@ -26,6 +26,15 @@ var options = {
 		"separator",
 		"buttonMenu"
 	],
+	showInTabContextMenu: false,
+	/*
+	menuTemplateTabContext: [ // like menuTemplate
+		"closedTabs",
+		"separator",
+		"restoreClosedTabs",
+		"clearClosedTabs"
+	],
+	*/
 	hideRestoreAllForSingleEntry: false,
 	allowDeleteEntries: true,
 	openMenuOnMouseover: false,
@@ -56,7 +65,10 @@ function _localize(sid) {
 			deleteUndoEntry: "Delete",
 
 			buttonMenu: "Button menu",
-			buttonMenuAccesskey: "m"
+			buttonMenuAccesskey: "m",
+
+			tabContextMenu: "Recently Closed Tabs",
+			tabContextMenuAccesskey: "y"
 		},
 		ru: {
 			restoreTab: "Восстановить последнюю закрытую вкладку",
@@ -80,7 +92,10 @@ function _localize(sid) {
 			deleteUndoEntry: "Удалить",
 
 			buttonMenu: "Меню кнопки",
-			buttonMenuAccesskey: "М"
+			buttonMenuAccesskey: "М",
+
+			tabContextMenu: "Недавно закрытые вкладки",
+			tabContextMenuAccesskey: "о"
 		}
 	};
 	var locale = (cbu.getPrefs("general.useragent.locale") || "en").match(/^[a-z]*/)[0];
@@ -237,7 +252,8 @@ this.undoCloseTabsList = {
 		cbPopup.setAttribute(
 			"onpopupshowing",
 			'\
-			var btn = document.popupNode = this.parentNode.parentNode.parentNode;\n\
+			var btn = document.popupNode = this.parentNode.parentNode.parentNode\n\
+				.undoCloseTabsList.button;\n\
 			custombutton.setContextMenuVisibility(btn);'
 		);
 		delete this.cbMenu;
@@ -268,6 +284,64 @@ this.undoCloseTabsList = {
 		this.mp.addEventListener("DOMMenuItemActive",   this, false);
 		this.mp.addEventListener("DOMMenuItemInactive", this, false);
 		this.updUIGlobal();
+		if(this.options.showInTabContextMenu) setTimeout(function(_this) {
+			_this.initTabContext();
+		}, 100, this);
+	},
+	initTabContext: function() {
+		var origMi = document.getElementById("context_undoCloseTab");
+		if(!origMi) {
+			LOG("#context_undoCloseTab not found!");
+			return;
+		}
+		var menu = this.createElement("menu", {
+			id: this.button.id + "-tabContextMenu",
+			label: _localize("tabContextMenu"),
+			accesskey: _localize("tabContextMenuAccesskey")
+		});
+		menu.undoCloseTabsList = this;
+		var origMp = this.mp;
+		var mp = origMp.cloneNode(true);
+		mp.id = this.button.id + "-tabContext";
+		var _this = this;
+		function drawUndoList() {
+			var ok = false;
+			var opts = _this.options;
+			var origTemplate = opts.menuTemplate;
+			opts.menuTemplate = opts.menuTemplateTabContext || origTemplate;
+			_this.mp = mp;
+			try {
+				ok = _this.drawUndoList();
+			}
+			catch(e) {
+				Components.utils.reportError(e);
+			}
+			opts.menuTemplate = origTemplate;
+			_this.mp = origMp;
+			return ok;
+		}
+		mp._updatePopup = function(e) {
+			if(e.target != this)
+				return;
+			document.popupNode = _this.button;
+			drawUndoList();
+		};
+		mp.setAttribute("onpopupshowing", "this._updatePopup(event);");
+		menu.appendChild(mp);
+		addEventListener("popupshown", function(e) {
+			if(e.target != e.currentTarget)
+				return;
+			setTimeout(function() { // Pseudo async
+				if(drawUndoList())
+					menu.removeAttribute("disabled");
+				else
+					menu.setAttribute("disabled", "true");
+			}, 0);
+		}, false, origMi.parentNode);
+		addEventListener("DOMMenuItemActive",   this, false, mp);
+		addEventListener("DOMMenuItemInactive", this, false, mp);
+		origMi.parentNode.insertBefore(menu, origMi.nextSibling);
+		origMi.setAttribute("hidden", "true");
 	},
 	destroy: function() {
 		window.removeEventListener("TabClose",       this, false);
@@ -275,6 +349,11 @@ this.undoCloseTabsList = {
 		window.removeEventListener("unload",         this, false);
 		this.mp.removeEventListener("DOMMenuItemActive",   this, false);
 		this.mp.removeEventListener("DOMMenuItemInactive", this, false);
+		var menu = document.getElementById(this.button.id + "-tabContextMenu");
+		if(menu) {
+			menu.parentNode.removeChild(menu);
+			document.getElementById("context_undoCloseTab").removeAttribute("hidden");
+		}
 	},
 	handleEvent: function(e) {
 		switch(e.type) {
