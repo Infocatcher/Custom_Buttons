@@ -35,7 +35,17 @@ function _localize(s, key) {
 			ru: "Корневая папка"
 		}
 	};
-	var locale = Application.prefs.getValue("general.useragent.locale", "en").match(/^[a-z]*/)[0];
+	var locale = (function() {
+		var prefs = Services.prefs;
+		if(!prefs.getBoolPref("intl.locale.matchOS")) {
+			var locale = prefs.getCharPref("general.useragent.locale");
+			if(locale.substr(0, 9) != "chrome://")
+				return locale;
+		}
+		return Components.classes["@mozilla.org/chrome/chrome-registry;1"]
+			.getService(Components.interfaces.nsIXULChromeRegistry)
+			.getSelectedLocale("global");
+	})().match(/^[a-z]*/)[0];
 	_localize = !locale || locale == "en"
 		? function(s) {
 			return s;

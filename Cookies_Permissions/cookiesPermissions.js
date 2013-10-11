@@ -153,7 +153,19 @@ function _localize(sid) {
 			buttonMenuAccesskey: "М"
 		}
 	};
-	var locale = (cbu.getPrefs("general.useragent.locale") || "en").match(/^[a-z]*/)[0];
+	var locale = (function() {
+		//var prefs = Services.prefs;
+		var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+			.getService(Components.interfaces.nsIPrefBranch);
+		if(!prefs.getBoolPref("intl.locale.matchOS")) {
+			var locale = prefs.getCharPref("general.useragent.locale");
+			if(locale.substr(0, 9) != "chrome://")
+				return locale;
+		}
+		return Components.classes["@mozilla.org/chrome/chrome-registry;1"]
+			.getService(Components.interfaces.nsIXULChromeRegistry)
+			.getSelectedLocale("global");
+	})().match(/^[a-z]*/)[0];
 	_localize = function(sid) {
 		return strings[locale] && strings[locale][sid] || strings.en[sid] || sid;
 	};
