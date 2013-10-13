@@ -5,7 +5,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2012-2013
-// version 0.1.3.1 - 2013-02-16
+// version 0.1.4 - 2013-10-14
 
 var options = {
 	pluginName: "Shockwave Flash", // Or name of any other plugin
