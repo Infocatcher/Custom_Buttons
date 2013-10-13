@@ -186,7 +186,7 @@ this.onclick = function(e) {
 	if(e.button != 0)
 		return;
 	if(!_addon) {
-		alert(options.pluginName + " not installed!");
+		Services.prompt.alert(window, this.label, options.pluginName + " not installed!");
 		return;
 	}
 	// Note: we manually updates styles because this is a bit faster, than callback in case of addon changes
