@@ -52,6 +52,9 @@ function _localize(s, key) {
 		},
 		"Ask to activate": {
 			ru: "Включать по запросу"
+		},
+		"Not installed": {
+			ru: "Не установлено"
 		}
 	};
 	var locale = (function() {
@@ -77,6 +80,7 @@ function _localize(s, key) {
 
 var _addon, _addonId;
 this._pluginDisabled = undefined;
+var stateNotInstalled = "notInstalled";
 this.__defineGetter__("pluginDisabled", function() {
 	return this._pluginDisabled;
 });
@@ -94,6 +98,10 @@ this.__defineSetter__("pluginDisabled", function(dis) {
 	else if(!dis) {
 		style = options.styleEnabled;
 		state = _localize("Enabled");
+	}
+	else if(dis == stateNotInstalled) {
+		style = options.styleDisabled;
+		state = _localize("Not installed");
 	}
 	else {
 		style = options.styleDisabled;
@@ -149,7 +157,7 @@ this.initAddonListener = function() {
 		onUninstalled: function(addon) {
 			if(_addon && addon.id == _addonId) {
 				_addon = _addonId = undefined;
-				this.button.pluginDisabled = true;
+				this.button.pluginDisabled = stateNotInstalled;
 			}
 		},
 		onPropertyChanged: function(addon, properties) {
@@ -178,7 +186,7 @@ AddonManager.getAddonsByTypes(options.searchInTypes, function(addons) {
 		return true;
 	});
 	if(!_addon)
-		btn.pluginDisabled = true;
+		btn.pluginDisabled = stateNotInstalled;
 	btn.initAddonListener();
 });
 
