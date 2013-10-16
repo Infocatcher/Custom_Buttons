@@ -24,4 +24,10 @@ if(/%3Cimage%3E%3C%21%5BCDATA%5B(data%3A\S+)%5D%5D%3E%3C\/image%3E/.test(a.href)
 	document.documentElement.insertBefore(link, document.documentElement.firstChild);
 }
 </script>
+<script type="text/javascript" src="http://infocatcher.github.io/Custom_Buttons/viewCustomButton.js"></script>
+<script type="text/javascript">
+if("viewCustomButtonCode" in window) setTimeout(function() {
+	viewCustomButtonCode(a.href);
+}, 0);
+</script>
 </body>
