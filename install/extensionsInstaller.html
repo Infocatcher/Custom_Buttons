@@ -16,6 +16,7 @@ if(/%3Cimage%3E%3C%21%5BCDATA%5B(data%3A\S+)%5D%5D%3E%3C\/image%3E/.test(a.href)
 	img.alt = "";
 	img.style.verticalAlign = "middle";
 	img.style.marginRight = "4px";
+	img.style.border = "none";
 	a.insertBefore(img, a.firstChild);
 
 	var link = document.createElement("link");
