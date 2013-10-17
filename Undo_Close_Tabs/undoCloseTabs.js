@@ -301,9 +301,9 @@ this.undoCloseTabsList = {
 		}, 100, this);
 	},
 	initTabContext: function() {
-		var origMi = document.getElementById("context_undoCloseTab");
+		var origMi = this.tabContextUndoClose;
 		if(!origMi) {
-			LOG("#context_undoCloseTab not found!");
+			LOG("Can't find \"Undo Close Tab\" item in tab context menu");
 			return;
 		}
 		var menu = this.createElement("menu", {
@@ -364,7 +364,7 @@ this.undoCloseTabsList = {
 		var menu = document.getElementById(this.button.id + "-tabContextMenu");
 		if(menu) {
 			menu.parentNode.removeChild(menu);
-			document.getElementById("context_undoCloseTab").removeAttribute("hidden");
+			this.tabContextUndoClose.removeAttribute("hidden");
 		}
 	},
 	handleEvent: function(e) {
@@ -398,6 +398,10 @@ this.undoCloseTabsList = {
 		if(attrs) for(var attrName in attrs) if(attrs.hasOwnProperty(attrName))
 			node.setAttribute(attrName, attrs[attrName]);
 		return node;
+	},
+	get tabContextUndoClose() {
+		return document.getElementById("context_undoCloseTab")
+			|| document.getAnonymousElementByAttribute(gBrowser, "tbattr", "tabbrowser-undoclosetab");
 	},
 	get closedWindowCount() {
 		if(!("getClosedWindowCount" in this.ss)) {
