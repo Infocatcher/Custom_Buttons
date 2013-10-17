@@ -332,6 +332,12 @@ this.undoCloseTabsList = {
 			_this.mp = origMp;
 			return ok;
 		}
+		function updMenu() {
+			if(drawUndoList())
+				menu.removeAttribute("disabled");
+			else
+				menu.setAttribute("disabled", "true");
+		}
 		mp._updatePopup = function(e) {
 			if(e.target != this)
 				return;
@@ -339,16 +345,14 @@ this.undoCloseTabsList = {
 			drawUndoList();
 		};
 		mp.setAttribute("onpopupshowing", "this._updatePopup(event);");
+		mp.onclick = function(e) {
+			if(e.button == 1)
+				setTimeout(updMenu, 0);
+		};
 		menu.appendChild(mp);
 		addEventListener("popupshown", function(e) {
-			if(e.target != e.currentTarget)
-				return;
-			setTimeout(function() { // Pseudo async
-				if(drawUndoList())
-					menu.removeAttribute("disabled");
-				else
-					menu.setAttribute("disabled", "true");
-			}, 0);
+			if(e.target == e.currentTarget)
+				setTimeout(updMenu, 0); // Pseudo async
 		}, false, origMi.parentNode);
 		addEventListener("DOMMenuItemActive",   this, false, mp);
 		addEventListener("DOMMenuItemInactive", this, false, mp);
