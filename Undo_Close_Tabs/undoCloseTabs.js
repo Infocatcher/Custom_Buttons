@@ -213,6 +213,7 @@ this.undoCloseTabsList = {
 	get mp() {
 		var mp = this.createElement("menupopup", {
 			id: this.mpId,
+			onclick: "this.parentNode.undoCloseTabsList.checkForMiddleClick(event);",
 			onpopupshowing: "if(event.target == this) document.popupNode = this.parentNode;",
 			onpopuphidden: "if(event.target == this) document.popupNode = null;"
 		});
@@ -346,8 +347,7 @@ this.undoCloseTabsList = {
 		};
 		mp.setAttribute("onpopupshowing", "this._updatePopup(event);");
 		mp.onclick = function(e) {
-			if(e.button == 1)
-				setTimeout(updMenu, 0);
+			_this.checkForMiddleClick(e, updMenu);
 		};
 		menu.appendChild(mp);
 		addEventListener("popupshown", function(e) {
@@ -426,7 +426,7 @@ this.undoCloseTabsList = {
 		else // SeaMonkey
 			gBrowser.undoCloseTab(i);
 	},
-	clearUndoTabsList: function(redrawList) {
+	clearUndoTabsList: function() {
 		var closedTabCount = this.closedTabCount;
 		if(!closedTabCount)
 			return;
@@ -441,9 +441,8 @@ this.undoCloseTabsList = {
 			cbu.setPrefs(pName, val);
 		}
 		this.updUIGlobal();
-		redrawList && this.drawUndoList();
 	},
-	clearUndoWindowsList: function(redrawList) {
+	clearUndoWindowsList: function() {
 		var closedWindowCount = this.closedWindowCount;
 		if(!closedWindowCount)
 			return;
@@ -453,7 +452,6 @@ this.undoCloseTabsList = {
 		else
 			this.ss.setWindowState(window, '{"windows":[{}],"_closedWindows":[]}', false);
 		this.updUIGlobal();
-		redrawList && this.drawUndoList();
 	},
 	clearAllLists: function() {
 		this.clearUndoTabsList();
@@ -526,8 +524,7 @@ this.undoCloseTabsList = {
 						label: _localize("clearWindowsHistory"),
 						accesskey: _localize("clearWindowsHistoryAccesskey"),
 						tooltiptext: "",
-						oncommand: "this.parentNode.parentNode.undoCloseTabsList.clearUndoWindowsList();",
-						onclick: "if(event.button == 1) this.parentNode.parentNode.undoCloseTabsList.clearUndoWindowsList(true);"
+						oncommand: "this.parentNode.parentNode.undoCloseTabsList.clearUndoWindowsList();"
 					}));
 				break;
 				case "closedTabs":
@@ -539,7 +536,7 @@ this.undoCloseTabsList = {
 						label: _localize("restoreAllTabs"),
 						accesskey: _localize("restoreAllTabsAccesskey"),
 						tooltiptext: "",
-						oncommand: "for(var i = 0; i < " + this._undoTabItems.length + "; ++i) this.parentNode.parentNode.undoCloseTabsList.undoCloseTab();",
+						oncommand: "for(var i = 0; i < " + this._undoTabItems.length + "; ++i) this.parentNode.parentNode.undoCloseTabsList.undoCloseTab();"
 					}));
 				break;
 				case "clearClosedTabs":
@@ -547,8 +544,7 @@ this.undoCloseTabsList = {
 						label: _localize("clearTabsHistory"),
 						accesskey: _localize("clearTabsHistoryAccesskey"),
 						tooltiptext: "",
-						oncommand: "this.parentNode.parentNode.undoCloseTabsList.clearUndoTabsList();",
-						onclick: "if(event.button == 1) this.parentNode.parentNode.undoCloseTabsList.clearUndoTabsList(true);"
+						oncommand: "this.parentNode.parentNode.undoCloseTabsList.clearUndoTabsList();"
 					}));
 				break;
 				case "clearAll":
@@ -610,7 +606,6 @@ this.undoCloseTabsList = {
 					.replace("%count", tabs.length),
 				"class": "menuitem-iconic bookmark-item menuitem-with-favicon",
 				oncommand: "undoCloseWindow(" + i + ");",
-				onclick: "if(event.button == 1) { undoCloseWindow(" + i + "); this.parentNode.parentNode.undoCloseTabsList.drawUndoList(); }",
 				cb_index: i,
 				cb_type: "window"
 			});
@@ -645,7 +640,6 @@ this.undoCloseTabsList = {
 				label: undoItem.title,
 				class: "menuitem-iconic bookmark-item menuitem-with-favicon",
 				oncommand: "this.parentNode.parentNode.undoCloseTabsList.undoCloseTab(" + i + ");",
-				onclick: "if(event.button == 1) { this.parentNode.parentNode.undoCloseTabsList.undoCloseTab(" + i + "); this.parentNode.parentNode.undoCloseTabsList.drawUndoList(); }",
 				tooltiptext: this.convertURI(undoItem.state.entries[undoItem.state.index - 1].url),
 				cb_index: i,
 				cb_type: "tab"
@@ -660,6 +654,20 @@ this.undoCloseTabsList = {
 				mi.setAttribute("key", "key_undoCloseTab");
 			undoPopup.appendChild(mi);
 		}, this);
+	},
+	checkForMiddleClick: function(e, upd) {
+		var mi = e.target;
+		if(
+			"doCommand" in mi
+			&& e.button == 1
+			&& mi.parentNode == e.currentTarget
+		) {
+			mi.doCommand();
+			if(upd)
+				upd();
+			else
+				this.drawUndoList();
+		}
 	},
 	crop: function(s, crop) {
 		if(crop == undefined)
