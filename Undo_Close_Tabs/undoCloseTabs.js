@@ -37,6 +37,11 @@ var options = {
 	*/
 	hideRestoreAllForSingleEntry: false,
 	allowDeleteEntries: true,
+	accesskeys: { // Empty string ("") to disable or string with possible values ("0123...", "abcd...")
+		closedTabs: "",
+		closedWindows: ""
+	},
+	accesskeyPostfix: " ", // <accesskey><postfix><label>
 	openMenuOnMouseover: false,
 	useMenu: false
 };
@@ -598,12 +603,16 @@ this.undoCloseTabsList = {
 		// Based on code from chrome://browser/content/browser.js
 		// Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.3a1pre) Gecko/20090824 Minefield/3.7a1pre
 
+		var keys = this.options.accesskeys.closedWindows;
 		this._undoWindowItems.forEach(function(undoItem, i) {
 			var tabs = undoItem.tabs;
+			var key = keys && keys.charAt(i % keys.length);
+			var keyPrefix = keys && (key + this.options.accesskeyPostfix);
 			var mi = this.createElement("menuitem", {
-				label: "(%count) %title"
+				label: keyPrefix + "(%count) %title"
 					.replace("%title", undoItem.title)
 					.replace("%count", tabs.length),
+				accesskey: key,
 				"class": "menuitem-iconic bookmark-item menuitem-with-favicon",
 				oncommand: "undoCloseWindow(" + i + ");",
 				cb_index: i,
@@ -635,9 +644,13 @@ this.undoCloseTabsList = {
 		// Based on code from chrome://browser/content/browser.js
 		// Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.3a1pre) Gecko/20090824 Minefield/3.7a1pre
 
+		var keys = this.options.accesskeys.closedTabs;
 		this._undoTabItems.forEach(function(undoItem, i) {
+			var key = keys && keys.charAt(i % keys.length);
+			var keyPrefix = keys && (key + this.options.accesskeyPostfix);
 			var mi = this.createElement("menuitem", {
-				label: undoItem.title,
+				label: keyPrefix + undoItem.title,
+				accesskey: key,
 				class: "menuitem-iconic bookmark-item menuitem-with-favicon",
 				oncommand: "this.parentNode.parentNode.undoCloseTabsList.undoCloseTab(" + i + ");",
 				tooltiptext: this.convertURI(undoItem.state.entries[undoItem.state.index - 1].url),
