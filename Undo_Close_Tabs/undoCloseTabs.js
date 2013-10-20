@@ -6,7 +6,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2009-2013
-// version 0.3.1pre - 2013-04-01
+// version 0.3.1 - 2013-10-20
 
 var options = {
 	menuTemplate: [
