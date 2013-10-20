@@ -198,15 +198,11 @@ this.onmouseover = function(e) {
 		},
 		this
 	);
-	if(!this.undoCloseTabsList.options.openMenuOnMouseover)
-		return;
-	if(!this.undoCloseTabsList.drawUndoList())
-		return;
-	var mp = this.undoCloseTabsList.mp;
-	if("openPopup" in mp)
-		mp.openPopup(this, "after_start");
-	else
-		mp.showPopup(this, -1, -1, "popup", "bottomleft", "topleft");
+	if(
+		this.undoCloseTabsList.options.openMenuOnMouseover
+		&& this.undoCloseTabsList.drawUndoList()
+	)
+		this.undoCloseTabsList.openMenu();
 };
 
 this.undoCloseTabsList = {
@@ -490,6 +486,13 @@ this.undoCloseTabsList = {
 			mp.openPopupAtScreen(e.screenX, e.screenY, isContext);
 		else
 			mp.showPopup(btn, e.screenX, e.screenY, isContext ? "context" : "popup", null, null);
+	},
+	openMenu: function() {
+		var mp = this.mp;
+		if("openPopup" in mp)
+			mp.openPopup(this.button, "after_start");
+		else
+			mp.showPopup(this.button, -1, -1, "popup", "bottomleft", "topleft");
 	},
 	drawUndoList: function() {
 		var mp = this.mp;
