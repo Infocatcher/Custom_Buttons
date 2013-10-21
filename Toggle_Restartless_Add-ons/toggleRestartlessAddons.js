@@ -114,20 +114,7 @@ mp.handleEvent = function(e) {
 	}
 	var hasMdf = hasModifier(e);
 	if(e.type == "command" && (!hasMdf || e.shiftKey)) {
-		// disabled -> STATE_ASK_TO_ACTIVATE -> enabled -> ...
-		let curDis = addon.userDisabled;
-		let newDis;
-		if("STATE_ASK_TO_ACTIVATE" in AddonManager && curDis == AddonManager.STATE_ASK_TO_ACTIVATE)
-			newDis = false;
-		else if(!curDis)
-			newDis = true;
-		else {
-			if(isAskToActivateAddon(addon))
-				newDis = AddonManager.STATE_ASK_TO_ACTIVATE;
-			else
-				newDis = false;
-		}
-		addon.userDisabled = newDis;
+		let newDis = setNewDisabled(addon);
 		setDisabled(mi, newDis);
 	}
 	else if(e.type == "command" && hasMdf || e.type == "click" && e.button == 1) {
@@ -150,6 +137,41 @@ function isAskToActivateAddon(addon) {
 	return addon.type == "plugin"
 		&& "STATE_ASK_TO_ACTIVATE" in AddonManager
 		&& Application.prefs.getValue("plugins.click_to_play", false);
+}
+function setNewDisabled(addon) {
+	var newDis = getNewDisabled(addon);
+	var oldDis = addon.userDisabled;
+	addon.userDisabled = newDis;
+	var realDis = addon.userDisabled;
+	if(realDis != newDis) { // We can't enable vulnerable plugins
+		var err = "Can't set addon.userDisabled to " + newDis + ", real value: " + realDis;
+		if(newDis)
+			Components.utils.reportError(err);
+		else {
+			LOG(err + "\nVulnerable plugin?");
+			if(oldDis == AddonManager.STATE_ASK_TO_ACTIVATE)
+				newDis = true;
+			else
+				newDis = AddonManager.STATE_ASK_TO_ACTIVATE;
+			addon.userDisabled = newDis;
+		}
+	}
+	return addon.userDisabled;
+}
+function getNewDisabled(addon) {
+	// disabled -> STATE_ASK_TO_ACTIVATE -> enabled -> ...
+	var curDis = addon.userDisabled;
+	if("STATE_ASK_TO_ACTIVATE" in AddonManager && curDis == AddonManager.STATE_ASK_TO_ACTIVATE)
+		newDis = false;
+	else if(!curDis)
+		newDis = true;
+	else {
+		if(isAskToActivateAddon(addon))
+			newDis = AddonManager.STATE_ASK_TO_ACTIVATE;
+		else
+			newDis = false;
+	}
+	return newDis;
 }
 function setDisabled(mi, disabled) {
 	var askToActivate = "STATE_ASK_TO_ACTIVATE" in AddonManager && disabled == AddonManager.STATE_ASK_TO_ACTIVATE;

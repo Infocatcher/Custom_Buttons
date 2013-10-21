@@ -198,8 +198,28 @@ this.onclick = function(e) {
 		return;
 	}
 	// Note: we manually updates styles because this is a bit faster, than callback in case of addon changes
-	_addon.userDisabled = this.pluginDisabled = getNewDisabled(_addon);
+	this.pluginDisabled = setNewDisabled(_addon);
 };
+function setNewDisabled(addon) {
+	var newDis = getNewDisabled(addon);
+	var oldDis = addon.userDisabled;
+	addon.userDisabled = newDis;
+	var realDis = addon.userDisabled;
+	if(realDis != newDis) { // We can't enable vulnerable plugins
+		var err = "Can't set addon.userDisabled to " + newDis + ", real value: " + realDis;
+		if(newDis)
+			Components.utils.reportError(err);
+		else {
+			LOG(err + "\nVulnerable plugin?");
+			if(oldDis == AddonManager.STATE_ASK_TO_ACTIVATE)
+				newDis = true;
+			else
+				newDis = AddonManager.STATE_ASK_TO_ACTIVATE;
+			addon.userDisabled = newDis;
+		}
+	}
+	return addon.userDisabled;
+}
 function getNewDisabled(addon) {
 	// disabled -> STATE_ASK_TO_ACTIVATE -> enabled -> ...
 	var curDis = addon.userDisabled;
