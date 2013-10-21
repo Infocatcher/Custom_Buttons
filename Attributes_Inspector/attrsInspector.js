@@ -1312,7 +1312,7 @@ function init() {
 					inspWin.setTimeout(function selectWindow() {
 						var brDoc = browser.contentDocument;
 						var tree = brDoc.getElementById("treeJSObject");
-						if(tree && tree.columns && tree.view) {
+						if(tree && tree.columns && tree.view && tree.view.selection) {
 							var keyCol = tree.columns.getKeyColumn();
 							var view = tree.view;
 							for(var i = 0, rowCount = view.rowCount; i < rowCount; ++i) {
