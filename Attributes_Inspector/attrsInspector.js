@@ -1301,7 +1301,8 @@ function init() {
 				var stopTime = Date.now() + 3e3;
 				inspWin.setTimeout(function selectJsPanel() {
 					var panel = doc.getElementById("bxDocPanel");
-					var js = doc.getAnonymousElementByAttribute(panel, "viewerListEntry", "8");
+					var js = doc.getAnonymousElementByAttribute(panel, "viewerListEntry", "8")
+						|| doc.getAnonymousElementByAttribute(panel, "viewerListEntry", "7"); // DOM Inspector 1.8.1.x, Firefox 2.0.0.x
 					if(!js && Date.now() < stopTime) {
 						inspWin.setTimeout(selectJsPanel, 50);
 						return;
@@ -1315,7 +1316,12 @@ function init() {
 						if(tree && tree.columns && tree.view && tree.view.selection) {
 							var keyCol = tree.columns.getKeyColumn();
 							var view = tree.view;
-							for(var i = 0, rowCount = view.rowCount; i < rowCount; ++i) {
+							var rowCount = view.rowCount;
+							if(rowCount == 1) { // DOM Inspector 1.8.1.x, Firefox 2.0.0.x
+								tree.changeOpenState(0, true);
+								rowCount = view.rowCount;
+							}
+							for(var i = 0; i < rowCount; ++i) {
 								var cellText = view.getCellText(i, keyCol);
 								if(cellText == "defaultView") {
 									tree.changeOpenState(i, true);
