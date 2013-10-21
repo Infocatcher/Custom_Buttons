@@ -1112,6 +1112,26 @@ function init() {
 				var nodes = this._nodes;
 				nodes.length && this.inspect(nodes[0], top, e.shiftKey);
 			}
+			else if( // Ctrl+W, Ctrl+Shift+W
+				ctrlOrCtrlShift && (
+					e.keyCode == e.DOM_VK_W // keydown || keyup
+					|| e.keyCode == 0 && String.fromCharCode(e.charCode).toUpperCase() == "W" // keypress
+				)
+			) {
+				this._checkPreventDefault(e);
+				this.stopEvent(e);
+				if(onlyStop)
+					return;
+				this.stopSingleEvent(top, "keyup");
+				this.stop();
+				this.hideUnclosedPopups();
+				var nodes = this._nodes;
+				var node = nodes.length && nodes[0];
+				if(node) {
+					this.closeMenus(node);
+					this.inspectWindow(top, node);
+				}
+			}
 		},
 		navigateUp: function(top) {
 			var nodes = this._nodes;
@@ -1262,6 +1282,55 @@ function init() {
 				}
 			}
 			return childNodes;
+		},
+		inspectWindow: function(top, node) {
+			if(!("@mozilla.org/commandlinehandler/general-startup;1?type=inspector" in Components.classes)) {
+				_log("DOM Inspector not installed!");
+				return null;
+			}
+			var inspWin = top.openDialog(
+				"chrome://inspector/content/",
+				"_blank",
+				"chrome,all,dialog=no",
+				//node.ownerDocument || node
+				node
+			);
+			inspWin.addEventListener("load", function load(e) {
+				inspWin.removeEventListener(e.type, load, false);
+				var doc = inspWin.document;
+				var stopTime = Date.now() + 3e3;
+				inspWin.setTimeout(function selectJsPanel() {
+					var panel = doc.getElementById("bxDocPanel");
+					var js = doc.getAnonymousElementByAttribute(panel, "viewerListEntry", "8");
+					if(!js && Date.now() < stopTime) {
+						inspWin.setTimeout(selectJsPanel, 50);
+						return;
+					}
+					js.doCommand();
+					var browser = doc.getAnonymousElementByAttribute(panel, "anonid", "viewer-iframe");
+					stopTime = Date.now() + 3e3;
+					inspWin.setTimeout(function selectWindow() {
+						var brDoc = browser.contentDocument;
+						var tree = brDoc.getElementById("treeJSObject");
+						if(tree && tree.columns && tree.view) {
+							var keyCol = tree.columns.getKeyColumn();
+							var view = tree.view;
+							for(var i = 0, rowCount = view.rowCount; i < rowCount; ++i) {
+								var cellText = view.getCellText(i, keyCol);
+								if(cellText == "defaultView") {
+									tree.changeOpenState(i, true);
+									view.selection.select(i);
+									tree.treeBoxObject.scrollByLines(i);
+									tree.treeBoxObject.ensureRowIsVisible(i);
+									return;
+								}
+							}
+						}
+						if(Date.now() < stopTime)
+							inspWin.setTimeout(selectWindow, 50);
+					}, 0);
+				}, 0);
+			}, false);
 		},
 		copyTootipContent: function() {
 			var node = this._node;
