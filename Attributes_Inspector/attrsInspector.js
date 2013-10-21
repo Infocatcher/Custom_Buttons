@@ -1286,7 +1286,7 @@ function init() {
 		inspectWindow: function(top, node) {
 			if(!("@mozilla.org/commandlinehandler/general-startup;1?type=inspector" in Components.classes)) {
 				_log("DOM Inspector not installed!");
-				return null;
+				return;
 			}
 			var inspWin = top.openDialog(
 				"chrome://inspector/content/",
