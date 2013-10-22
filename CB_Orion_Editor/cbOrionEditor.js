@@ -119,6 +119,11 @@ if(!watcher) {
 							var mi = document.getElementById(id);
 							mi && mi.setAttribute("command", cmdsMap[id]);
 						}
+						// We can't use command="cmd_selectAll", menuitem will be wrongly disabled sometimes
+						var selectAll = document.getElementById("se-menu-selectAll");
+						selectAll.removeAttribute("command");
+						selectAll.removeAttribute("disabled");
+						selectAll.setAttribute("oncommand", "goDoCommand('cmd_selectAll');");
 					}, 50);
 				}, 500);
 			}, 700);
