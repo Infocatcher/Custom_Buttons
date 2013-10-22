@@ -104,7 +104,7 @@ if(!watcher) {
 						// See view-source:chrome://browser/content/devtools/scratchpad.xul in Firefox 27.0a1
 						window.goUpdateSourceEditorMenuItems = function() {
 							goUpdateGlobalEditMenuItems();
-							var commands = ["cmd_undo", "cmd_redo", "cmd_cut", "cmd_paste", "cmd_delete", "cmd_findAgain"];
+							var commands = ["cmd_undo", "cmd_redo", "cmd_cut", "cmd_paste", "cmd_delete"];
 							commands.forEach(goUpdateCommand);
 						};
 						var cmdsMap = {
@@ -120,10 +120,19 @@ if(!watcher) {
 							mi && mi.setAttribute("command", cmdsMap[id]);
 						}
 						// We can't use command="cmd_selectAll", menuitem will be wrongly disabled sometimes
-						var selectAll = document.getElementById("se-menu-selectAll");
-						selectAll.removeAttribute("command");
-						selectAll.removeAttribute("disabled");
-						selectAll.setAttribute("oncommand", "goDoCommand('cmd_selectAll');");
+						var enabledCmdsMap = {
+							"se-menu-selectAll": "cmd_selectAll",
+							"se-menu-findAgain": "cmd_findAgain",
+							__proto__: null
+						};
+						for(var id in enabledCmdsMap) {
+							var mi = document.getElementById(id);
+							if(mi) {
+								mi.removeAttribute("command");
+								mi.removeAttribute("disabled");
+								mi.setAttribute("oncommand", "goDoCommand('" + enabledCmdsMap[id] + "');");
+							}
+						}
 					}, 50);
 				}, 500);
 			}, 700);
