@@ -101,6 +101,21 @@ if(!watcher) {
 				document.loadOverlay("chrome://global/content/editMenuOverlay.xul", null);
 				window.setTimeout(function() {
 					document.loadOverlay("chrome://browser/content/devtools/source-editor-overlay.xul", null);
+					window.setTimeout(function() {
+						var mp = document.getElementById("sourceEditorContext");
+						if(mp.state == "closed")
+							return;
+						Array.forEach(
+							mp.getElementsByAttribute("command", "*"),
+							function(mi) {
+								var cmd = mi.getAttribute("command");
+								var controller = document.commandDispatcher
+									.getControllerForCommand(cmd);
+								if(controller && !controller.isCommandEnabled(cmd))
+									mi.setAttribute("disabled", "true");
+							}
+						);
+					}, 60);
 					if(isCodeMirror) window.setTimeout(function() {
 						// See view-source:chrome://browser/content/devtools/scratchpad.xul in Firefox 27.0a1
 						window.goUpdateSourceEditorMenuItems = function() {
