@@ -72,6 +72,7 @@ if(!watcher) {
 					<menuitem id="se-menu-cut"/>\
 					<menuitem id="se-menu-copy"/>\
 					<menuitem id="se-menu-paste"/>\
+					<menuitem id="se-menu-delete"/>\
 					<menuseparator/>\
 					<menuitem id="se-menu-selectAll"/>\
 					<menuseparator/>\
@@ -108,11 +109,12 @@ if(!watcher) {
 							commands.forEach(goUpdateCommand);
 						};
 						var cmdsMap = {
-							"se-menu-undo":  "cmd_undo",
-							"se-menu-redo":  "cmd_redo",
-							"se-menu-cut":   "cmd_cut",
-							"se-menu-copy":  "cmd_copy",
-							"se-menu-paste": "cmd_paste",
+							"se-menu-undo":   "cmd_undo",
+							"se-menu-redo":   "cmd_redo",
+							"se-menu-cut":    "cmd_cut",
+							"se-menu-copy":   "cmd_copy",
+							"se-menu-paste":  "cmd_paste",
+							"se-menu-delete": "cmd_delete",
 							__proto__: null
 						};
 						for(var id in cmdsMap) {
