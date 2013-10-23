@@ -99,27 +99,27 @@ if(!watcher) {
 				appendNode("commandset", "sourceEditorCommands");
 				appendNode("keyset", "sourceEditorKeys");
 				appendNode("keyset", "editMenuKeys");
-			}, 50);
-			window.setTimeout(function() {
-				document.loadOverlay("chrome://global/content/editMenuOverlay.xul", null);
-				window.setTimeout(function() {
-					document.loadOverlay("chrome://browser/content/devtools/source-editor-overlay.xul", null);
-					window.setTimeout(function() {
-						var mp = document.getElementById("sourceEditorContext");
-						if(mp.state == "closed")
+
+				this.loadOverlays(
+					window,
+					function done() {
+						window.setTimeout(function() {
+							var mp = document.getElementById("sourceEditorContext");
+							if(mp.state == "closed")
+								return;
+							Array.forEach(
+								mp.getElementsByAttribute("command", "*"),
+								function(mi) {
+									var cmd = mi.getAttribute("command");
+									var controller = document.commandDispatcher
+										.getControllerForCommand(cmd);
+									if(controller && !controller.isCommandEnabled(cmd))
+										mi.setAttribute("disabled", "true");
+								}
+							);
+						}, 0);
+						if(!isCodeMirror)
 							return;
-						Array.forEach(
-							mp.getElementsByAttribute("command", "*"),
-							function(mi) {
-								var cmd = mi.getAttribute("command");
-								var controller = document.commandDispatcher
-									.getControllerForCommand(cmd);
-								if(controller && !controller.isCommandEnabled(cmd))
-									mi.setAttribute("disabled", "true");
-							}
-						);
-					}, 60);
-					if(isCodeMirror) window.setTimeout(function() {
 						// See view-source:chrome://browser/content/devtools/scratchpad.xul in Firefox 27.0a1
 						window.goUpdateSourceEditorMenuItems = function() {
 							goUpdateGlobalEditMenuItems();
@@ -153,9 +153,15 @@ if(!watcher) {
 								mi.setAttribute("oncommand", "goDoCommand('" + enabledCmdsMap[id] + "');");
 							}
 						}
-					}, 50);
-				}, 500);
-			}, 700);
+					},
+					["chrome://global/content/editMenuOverlay.xul", function check(window) {
+						return window.document.getElementById("editMenuCommands").hasChildNodes();
+					}],
+					["chrome://browser/content/devtools/source-editor-overlay.xul", function check(window) {
+						return window.document.getElementById("sourceEditorCommands").hasChildNodes();
+					}]
+				);
+			}.bind(this), 500); // We should wait to not break other extensions with document.loadOverlay()
 
 			Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
 				.getService(Components.interfaces.mozIJSSubScriptLoader)
@@ -505,6 +511,45 @@ if(!watcher) {
 					window.removeEventListener(e.type, this, false);
 					this.destroyWindow(window, this.REASON_WINDOW_CLOSED, true);
 			}
+		},
+		loadOverlays: function() {
+			this.runGenerator(this.loadOverlaysGen, this, arguments);
+		},
+		loadOverlaysGen: function loadOverlaysGen(window, callback/*, overlayData1, ...*/) {
+			var gen = loadOverlaysGen.__generator;
+			for(var i = 2, l = arguments.length; i < l; ++i) {
+				var overlayData = arguments[i];
+				this.loadOverlay(window, overlayData[0], overlayData[1], function() {
+					gen.next();
+				});
+				yield 0;
+			}
+			callback();
+			yield 0;
+		},
+		loadOverlay: function(window, uri, check, callback) {
+			var document = window.document;
+			var stopWait = Date.now() + 4500;
+			window.setTimeout(function load() {
+				_log("loadOverlay(): " + uri);
+				var tryAgain = Date.now() + 800;
+				document.loadOverlay(uri, null);
+				window.setTimeout(function ensureLoaded() {
+					if(check(window))
+						window.setTimeout(callback, 0);
+					else if(Date.now() > stopWait)
+						return;
+					else if(Date.now() > tryAgain)
+						window.setTimeout(load, 0);
+					else
+						window.setTimeout(ensureLoaded, 50);
+				}, 50);
+			}, 0);
+		},
+		runGenerator: function(genFunc, context, args) {
+			var gen = genFunc.apply(context, args);
+			genFunc.__generator = gen;
+			gen.next();
 		}
 	};
 	Application.storage.set(watcherId, watcher);
