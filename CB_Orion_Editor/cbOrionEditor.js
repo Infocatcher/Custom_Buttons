@@ -58,7 +58,10 @@ if(!watcher) {
 			}
 			if(!this.isEditorWindow(window))
 				return;
+			_log("initWindow(): isFrame: " + isFrame);
 			var document = window.document;
+			if(isFrame)
+				window.addEventListener("unload", this, false);
 
 			// See view-source:chrome://browser/content/devtools/scratchpad.xul
 			// + view-source:chrome://browser/content/devtools/source-editor-overlay.xul
@@ -380,7 +383,10 @@ if(!watcher) {
 			}
 			if(!this.isEditorWindow(window) || !("SourceEditor" in window))
 				return;
+			_log("destroyWindow(): isFrame: " + isFrame);
 			var document = window.document;
+			if(isFrame)
+				window.removeEventListener("unload", this, false);
 
 			var tabs = document.getElementById("custombuttons-editbutton-tabbox");
 			if("__onSelect" in tabs) {
@@ -455,15 +461,15 @@ if(!watcher) {
 			//LOG("getControllerCount(): " + window.controllers.getControllerCount());
 		},
 		initBrowserWindow: function(window, reason) {
+			_log("initBrowserWindow()");
 			window.addEventListener("DOMContentLoaded", this, false);
-			window.addEventListener("unload", this, false);
 			Array.forEach(window.frames, function(frame) {
 				this.initWindow(frame, reason, true);
 			}, this);
 		},
 		destroyBrowserWindow: function(window, reason) {
+			_log("destroyBrowserWindow()");
 			window.removeEventListener("DOMContentLoaded", this, false);
-			window.removeEventListener("unload", this, false);
 			Array.forEach(window.frames, function(frame) {
 				this.destroyWindow(frame, reason, true);
 			}, this);
@@ -487,12 +493,15 @@ if(!watcher) {
 		handleEvent: function(e) {
 			switch(e.type) {
 				case "DOMContentLoaded":
-					var window = e.currentTarget;
+					//var window = e.currentTarget;
+					var window = e.target.defaultView;
 					window.removeEventListener(e.type, this, false);
-					this.initWindow(window, this.REASON_WINDOW_LOADED);
+					var isFrame = window != e.currentTarget;
+					this.initWindow(window, this.REASON_WINDOW_LOADED, isFrame);
 				break;
 				case "unload":
-					var window = e.currentTarget;
+					//var window = e.currentTarget;
+					var window = e.target.defaultView;
 					window.removeEventListener(e.type, this, false);
 					this.destroyWindow(window, this.REASON_WINDOW_CLOSED, true);
 			}
@@ -516,3 +525,10 @@ if(
 	addDestructor(destructor, this);
 else
 	this.onDestroy = destructor;
+
+function _log(s) {
+	var d = new Date();
+	var ms = d.getMilliseconds();
+	var ts = d.toLocaleFormat("%M:%S:") + "000".substr(String(ms).length) + ms + " ";
+	Services.console.logStringMessage("[Custom Buttons :: Source Editor] " + ts + s);
+}
