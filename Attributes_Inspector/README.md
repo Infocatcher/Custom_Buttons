@@ -11,6 +11,7 @@
 * Ctrl+Up, Ctrl+Down – navigate to parent/child node
 * Ctrl+Left, Ctrl+Right – navigate to previous/next sibling node (since v. 0.6.1pre)
 * Ctrl+Shift+C – copy tooltip's contents
+* Ctrl+W – inspect node's window object in DOM Inspector (since v. 0.6.3pre)
 
 ##### Screenshot:
 <img src="https://raw.github.com/Infocatcher/Custom_Buttons/master/Attributes_Inspector/attrsInspector-en.png" alt="Tooltip with all attributes" align="top">
