@@ -1123,11 +1123,11 @@ function init() {
 				if(onlyStop)
 					return;
 				this.stopSingleEvent(top, "keyup");
-				this.stop();
-				this.hideUnclosedPopups();
 				var nodes = this._nodes;
 				var node = nodes.length && nodes[0];
 				if(node) {
+					this.stop();
+					this.hideUnclosedPopups();
 					this.closeMenus(node);
 					this.inspectWindow(top, node);
 				}
