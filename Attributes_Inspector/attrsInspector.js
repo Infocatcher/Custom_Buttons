@@ -3,7 +3,7 @@
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Attributes_Inspector
 
 // (c) Infocatcher 2010-2013
-// version 0.6.2 - 2013-08-15
+// version 0.6.3pre - 2013-10-24
 
 //===================
 // Attributes Inspector button for Custom Buttons
@@ -19,6 +19,7 @@
 //   Ctrl+Up, Ctrl+Down    - navigate to parent/child node
 //   Ctrl+Left, Ctrl+Right - navigate to previous/next sibling node
 //   Ctrl+Shift+C          - copy tooltip's contents
+//   Ctrl+W                - inspect node's window object in DOM Inspector
 
 // For more developer tools see Extensions Developer Tools button:
 //   http://infocatcher.ucoz.net/js/cb/extDevTools.js
