@@ -435,6 +435,7 @@ var cmds = this.commands = {
 		var win = this.openBrowserWindow();
 		win.addEventListener("load", function restoreSession(e) {
 			win.removeEventListener(e.type, restoreSession, false);
+			win.focus();
 			var tryCount = 10;
 			(function restore() {
 				try { // May fail in SeaMonkey
