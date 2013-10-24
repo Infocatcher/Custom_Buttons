@@ -922,22 +922,35 @@ var cmds = this.commands = {
 		return this.canOpenBrowserConsole = !!document.getElementById("menu_browserConsole");
 	},
 	openBrowserConsole: function() {
+		var consoleFrame = this.getBrowserConsole();
+		if(consoleFrame) {
+			consoleFrame.focus();
+			return;
+		}
+		if("HUDService" in window && "toggleBrowserConsole" in window.HUDService) { // Firefox 27.0a1+
+			window.HUDService.toggleBrowserConsole();
+			return;
+		}
 		if("HUDConsoleUI" in window && "toggleBrowserConsole" in HUDConsoleUI) {
-			if(HUDConsoleUI._browserConsoleID) try {
-				var HUDService = Components.utils["import"]("resource:///modules/HUDService.jsm", {}).HUDService;
-				var hud = HUDService.getHudReferenceById(HUDConsoleUI._browserConsoleID);
-				if(hud && hud.iframeWindow) {
-					hud.iframeWindow.focus();
-					return;
-				}
-			}
-			catch(e) {
-				Components.utils.reportError(e);
-			}
 			HUDConsoleUI.toggleBrowserConsole();
 			return;
 		}
 		document.getElementById("menu_browserConsole").doCommand();
+	},
+	getBrowserConsole: function() {
+		if("HUDService" in window && "getBrowserConsole" in window.HUDService) { // Firefox 27.0a1+
+			var hud = window.HUDService.getBrowserConsole();
+			return hud && hud.iframeWindow;
+		}
+		if("HUDConsoleUI" in window && HUDConsoleUI._browserConsoleID) try {
+			var HUDService = Components.utils["import"]("resource:///modules/HUDService.jsm", {}).HUDService;
+			var hud = HUDService.getHudReferenceById(HUDConsoleUI._browserConsoleID);
+			return hud && hud.iframeWindow;
+		}
+		catch(e) {
+			Components.utils.reportError(e);
+		}
+		return null;
 	},
 	_restoreErrorConsoleObserver: null,
 	get restoreErrorConsolePref() {
