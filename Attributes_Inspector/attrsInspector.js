@@ -1324,10 +1324,13 @@ function init() {
 							for(var i = 0; i < rowCount; ++i) {
 								var cellText = view.getCellText(i, keyCol);
 								if(cellText == "defaultView") {
+									var tbo = tree.treeBoxObject;
+									tbo.beginUpdateBatch();
 									tree.changeOpenState(i, true);
 									view.selection.select(i);
-									tree.treeBoxObject.scrollByLines(i);
-									tree.treeBoxObject.ensureRowIsVisible(i);
+									tbo.scrollByLines(i);
+									tbo.ensureRowIsVisible(i);
+									tbo.endUpdateBatch();
 									return;
 								}
 							}
