@@ -24,7 +24,10 @@ var options = {
 	forceRestartOnLocaleChange: false,
 	updateLocales: true,
 	closeOptionsMenu: false,
-	restoreErrorConsole: true, // Only for Gecko 2.0+
+	restoreErrorConsole: 1, // Only for Gecko 2.0+
+	// 0 - disable
+	// 1 - restore old Error Console (if available)
+	// 2 - restore new Browser Console
 	reopenWindowFlushCaches: true,
 	changeButtonIcon: true,
 	// Use icon of default menu item as button icon
@@ -966,12 +969,8 @@ var cmds = this.commands = {
 		var _this = this;
 		var observer = this._restoreErrorConsoleObserver = function() {
 			obs.removeObserver(observer, "quit-application-granted");
-			if(
-				Components.classes["@mozilla.org/appshell/window-mediator;1"]
-					.getService(Components.interfaces.nsIWindowMediator)
-					.getMostRecentWindow("global:console")
-			)
-				_this.setPref(_this.restoreErrorConsolePref, true);
+			if(_this.errorConsoleOpened)
+				_this.setPref(_this.restoreErrorConsolePref, _this.options.restoreErrorConsole);
 		};
 		obs.addObserver(observer, "quit-application-granted", false);
 	},
@@ -982,10 +981,24 @@ var cmds = this.commands = {
 			this.obs.removeObserver(o, "quit-application-granted");
 		}
 	},
+	get errorConsoleOpened() {
+		if(
+			this.options.restoreErrorConsole == 2
+			&& this.canOpenBrowserConsole
+		)
+			return !!this.getBrowserConsole();
+		return !!Components.classes["@mozilla.org/appshell/window-mediator;1"]
+			.getService(Components.interfaces.nsIWindowMediator)
+			.getMostRecentWindow("global:console");
+	},
 	restoreErrorConsole: function() {
-		if(this.getPref(this.restoreErrorConsolePref)) {
+		var restore = this.getPref(this.restoreErrorConsolePref);
+		if(restore) {
 			this.prefSvc.clearUserPref(this.restoreErrorConsolePref);
-			this.openErrorConsole();
+			if(restore == 2 && this.canOpenBrowserConsole)
+				this.openBrowserConsole();
+			else
+				this.openErrorConsole();
 		}
 	},
 	attrsInspector: function(e) {
