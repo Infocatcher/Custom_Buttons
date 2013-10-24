@@ -1216,7 +1216,7 @@ function init() {
 		getParentNode: function(node, top) {
 			var pn = this.dwu.getParentForNode(node, true);
 			if(!pn && node.nodeType == Node.DOCUMENT_NODE && node != top.document)
-				pn = this.getParentFrame(node, top.document); // Only for Firefox 1.5
+				pn = this.getParentBrowser(node, top.document); // Only for Firefox 1.5
 			return pn;
 		},
 		getTopWindow: function(window) {
@@ -1310,7 +1310,7 @@ function init() {
 				}
 			}, true);
 		},
-		getParentFrame: function(document, doc) {
+		getParentBrowser: function(document, doc) {
 			// We don't check anonymous nodes now
 			var browser;
 			const XULNS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
@@ -1329,7 +1329,7 @@ function init() {
 				);
 				if(
 					doc == document
-					|| (br = this.getParentFrame(document, doc))
+					|| (br = this.getParentBrowser(document, doc))
 				) {
 					browser = br.localName.toLowerCase() == "tabbrowser" && br.selectedBrowser || br;
 					return true;
