@@ -397,14 +397,16 @@ function init() {
 			var tt = this.context.tt;
 			this._hasData = true;
 
-			//while(tt.hasChildNodes())
-			//	tt.removeChild(tt.lastChild);
-			tt.textContent = "";
-			// Firefox sometimes sets width/height to limit very huge tooltip
-			tt.removeAttribute("width");
-			tt.removeAttribute("height");
-
 			var df = tt.ownerDocument.createDocumentFragment();
+			function flush() {
+				//while(tt.hasChildNodes())
+				//	tt.removeChild(tt.lastChild);
+				tt.textContent = "";
+				// Firefox sometimes sets width/height to limit very huge tooltip
+				tt.removeAttribute("width");
+				tt.removeAttribute("height");
+				tt.appendChild(df);
+			}
 
 			if(node.nodeType == node.DOCUMENT_NODE) {
 				df.appendChild(this.getItem(node.nodeName));
@@ -434,7 +436,7 @@ function init() {
 				}
 				if("designMode" in node && node.designMode != "off")
 					df.appendChild(this.getItem("designMode", node.designMode, this.colon));
-				tt.appendChild(df);
+				flush();
 				return;
 			}
 
@@ -512,7 +514,7 @@ function init() {
 
 			if(!node.attributes) {
 				df.appendChild(this.getItem("nodeValue", node.nodeValue, this.colon));
-				tt.appendChild(df);
+				flush();
 				return;
 			}
 
@@ -567,7 +569,7 @@ function init() {
 					isRemoved: name in removedAttrs && removedAttrs[name].namespaceURI == ns
 				}));
 			}, this);
-			tt.appendChild(df);
+			flush();
 		},
 		getRect: function(node) {
 			if(!(node instanceof Element)) try {
