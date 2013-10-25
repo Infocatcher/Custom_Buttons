@@ -408,8 +408,32 @@ function init() {
 
 			if(node.nodeType == node.DOCUMENT_NODE) {
 				df.appendChild(this.getItem(node.nodeName));
-				df.appendChild(this.getItem("documentURI", node.documentURI));
-				node.title && df.appendChild(this.getItem("title", node.title));
+				df.appendChild(this.getItem("documentURI", node.documentURI, this.colon));
+				node.title && df.appendChild(this.getItem("title", node.title, this.colon));
+				var doctype = "doctype" in node && node.doctype;
+				if(doctype && doctype == node.firstChild) {
+					var dt;
+					if(doctype.name == "html" && doctype.publicId == "" && doctype.systemId == "")
+						dt = "HTML5";
+					else if(doctype.publicId)
+						dt = String(doctype.publicId).replace(/^-\/\/W3C\/\/DTD\s+|\/\/EN$/ig, "");
+					else
+						dt = doctype.systemId;
+					df.appendChild(this.getItem("doctype", dt, this.colon));
+				}
+				if("contentType" in node)
+					df.appendChild(this.getItem("contentType", node.contentType, this.colon));
+				if("characterSet" in node)
+					df.appendChild(this.getItem("characterSet", node.characterSet, this.colon));
+				if("compatMode" in node)
+					df.appendChild(this.getItem("compatMode", node.compatMode, this.colon));
+				if("lastModified" in node) {
+					var dt = new Date(node.lastModified);
+					var dts = isNaN(dt.getTime()) ? node.lastModified : dt.toLocaleString();
+					df.appendChild(this.getItem("lastModified", dts, this.colon));
+				}
+				if("designMode" in node && node.designMode != "off")
+					df.appendChild(this.getItem("designMode", node.designMode, this.colon));
 				tt.appendChild(df);
 				return;
 			}
