@@ -1401,7 +1401,7 @@ this.attrsInspector = function(event) {
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Attributes_Inspector
 
 // (c) Infocatcher 2010-2013
-// version 0.6.2 - 2013-08-15
+// version 0.6.3pre - 2013-10-24
 
 //===================
 // Attributes Inspector button for Custom Buttons
@@ -1417,6 +1417,7 @@ this.attrsInspector = function(event) {
 //   Ctrl+Up, Ctrl+Down    - navigate to parent/child node
 //   Ctrl+Left, Ctrl+Right - navigate to previous/next sibling node
 //   Ctrl+Shift+C          - copy tooltip's contents
+//   Ctrl+W                - inspect node's window object in DOM Inspector
 
 // For more developer tools see Extensions Developer Tools button:
 //   http://infocatcher.ucoz.net/js/cb/extDevTools.js
@@ -1794,20 +1795,46 @@ function init() {
 			var tt = this.context.tt;
 			this._hasData = true;
 
-			//while(tt.hasChildNodes())
-			//	tt.removeChild(tt.lastChild);
-			tt.textContent = "";
-			// Firefox sometimes sets width/height to limit very huge tooltip
-			tt.removeAttribute("width");
-			tt.removeAttribute("height");
-
 			var df = tt.ownerDocument.createDocumentFragment();
+			function flush() {
+				//while(tt.hasChildNodes())
+				//	tt.removeChild(tt.lastChild);
+				tt.textContent = "";
+				// Firefox sometimes sets width/height to limit very huge tooltip
+				tt.removeAttribute("width");
+				tt.removeAttribute("height");
+				tt.appendChild(df);
+			}
 
 			if(node.nodeType == node.DOCUMENT_NODE) {
 				df.appendChild(this.getItem(node.nodeName));
-				df.appendChild(this.getItem("documentURI", node.documentURI));
-				node.title && df.appendChild(this.getItem("title", node.title));
-				tt.appendChild(df);
+				df.appendChild(this.getItem("documentURI", node.documentURI, this.colon));
+				node.title && df.appendChild(this.getItem("title", node.title, this.colon));
+				var doctype = "doctype" in node && node.doctype;
+				if(doctype && doctype == node.firstChild) {
+					var dt;
+					if(doctype.name == "html" && doctype.publicId == "" && doctype.systemId == "")
+						dt = "HTML5";
+					else if(doctype.publicId)
+						dt = String(doctype.publicId).replace(/^-\/\/W3C\/\/DTD\s+|\/\/EN$/ig, "");
+					else
+						dt = doctype.systemId;
+					df.appendChild(this.getItem("doctype", dt, this.colon));
+				}
+				if("contentType" in node)
+					df.appendChild(this.getItem("contentType", node.contentType, this.colon));
+				if("characterSet" in node)
+					df.appendChild(this.getItem("characterSet", node.characterSet, this.colon));
+				if("compatMode" in node)
+					df.appendChild(this.getItem("compatMode", node.compatMode, this.colon));
+				if("lastModified" in node) {
+					var dt = new Date(node.lastModified);
+					var dts = isNaN(dt.getTime()) ? node.lastModified : dt.toLocaleString();
+					df.appendChild(this.getItem("lastModified", dts, this.colon));
+				}
+				if("designMode" in node && node.designMode != "off")
+					df.appendChild(this.getItem("designMode", node.designMode, this.colon));
+				flush();
 				return;
 			}
 
@@ -1885,7 +1912,7 @@ function init() {
 
 			if(!node.attributes) {
 				df.appendChild(this.getItem("nodeValue", node.nodeValue, this.colon));
-				tt.appendChild(df);
+				flush();
 				return;
 			}
 
@@ -1940,7 +1967,7 @@ function init() {
 					isRemoved: name in removedAttrs && removedAttrs[name].namespaceURI == ns
 				}));
 			}, this);
-			tt.appendChild(df);
+			flush();
 		},
 		getRect: function(node) {
 			if(!(node instanceof Element)) try {
@@ -2510,6 +2537,26 @@ function init() {
 				var nodes = this._nodes;
 				nodes.length && this.inspect(nodes[0], top, e.shiftKey);
 			}
+			else if( // Ctrl+W, Ctrl+Shift+W
+				ctrlOrCtrlShift && (
+					e.keyCode == e.DOM_VK_W // keydown || keyup
+					|| e.keyCode == 0 && String.fromCharCode(e.charCode).toUpperCase() == "W" // keypress
+				)
+			) {
+				this._checkPreventDefault(e);
+				this.stopEvent(e);
+				if(onlyStop)
+					return;
+				this.stopSingleEvent(top, "keyup");
+				var nodes = this._nodes;
+				var node = nodes.length && nodes[0];
+				if(node) {
+					this.stop();
+					this.hideUnclosedPopups();
+					this.closeMenus(node);
+					this.inspectWindow(top, node);
+				}
+			}
 		},
 		navigateUp: function(top) {
 			var nodes = this._nodes;
@@ -2614,7 +2661,7 @@ function init() {
 		getParentNode: function(node, top) {
 			var pn = this.dwu.getParentForNode(node, true);
 			if(!pn && node.nodeType == Node.DOCUMENT_NODE && node != top.document)
-				pn = this.getParentFrame(node, top.document); // Only for Firefox 1.5
+				pn = this.getParentBrowser(node, top.document); // Only for Firefox 1.5
 			return pn;
 		},
 		getTopWindow: function(window) {
@@ -2660,6 +2707,64 @@ function init() {
 				}
 			}
 			return childNodes;
+		},
+		inspectWindow: function(top, node) {
+			if(!("@mozilla.org/commandlinehandler/general-startup;1?type=inspector" in Components.classes)) {
+				_log("DOM Inspector not installed!");
+				return;
+			}
+			var inspWin = top.openDialog(
+				"chrome://inspector/content/",
+				"_blank",
+				"chrome,all,dialog=no",
+				//node.ownerDocument || node
+				node
+			);
+			inspWin.addEventListener("load", function load(e) {
+				inspWin.removeEventListener(e.type, load, false);
+				var doc = inspWin.document;
+				var stopTime = Date.now() + 3e3;
+				inspWin.setTimeout(function selectJsPanel() {
+					var panel = doc.getElementById("bxDocPanel");
+					var js = doc.getAnonymousElementByAttribute(panel, "viewerListEntry", "8")
+						|| doc.getAnonymousElementByAttribute(panel, "viewerListEntry", "7"); // DOM Inspector 1.8.1.x, Firefox 2.0.0.x
+					if(!js && Date.now() < stopTime) {
+						inspWin.setTimeout(selectJsPanel, 50);
+						return;
+					}
+					js.doCommand();
+					var browser = doc.getAnonymousElementByAttribute(panel, "anonid", "viewer-iframe");
+					stopTime = Date.now() + 3e3;
+					inspWin.setTimeout(function selectWindow() {
+						var brDoc = browser.contentDocument;
+						var tree = brDoc.getElementById("treeJSObject");
+						if(tree && tree.columns && tree.view && tree.view.selection) {
+							var keyCol = tree.columns.getKeyColumn();
+							var view = tree.view;
+							var rowCount = view.rowCount;
+							if(rowCount == 1) { // DOM Inspector 1.8.1.x, Firefox 2.0.0.x
+								tree.changeOpenState(0, true);
+								rowCount = view.rowCount;
+							}
+							for(var i = 0; i < rowCount; ++i) {
+								var cellText = view.getCellText(i, keyCol);
+								if(cellText == "defaultView") {
+									var tbo = tree.treeBoxObject;
+									tbo.beginUpdateBatch();
+									tree.changeOpenState(i, true);
+									view.selection.select(i);
+									tbo.scrollByLines(i);
+									tbo.ensureRowIsVisible(i);
+									tbo.endUpdateBatch();
+									return;
+								}
+							}
+						}
+						if(Date.now() < stopTime)
+							inspWin.setTimeout(selectWindow, 50);
+					}, 0);
+				}, 0);
+			}, false);
 		},
 		copyTootipContent: function() {
 			var node = this._node;
@@ -2708,7 +2813,7 @@ function init() {
 				}
 			}, true);
 		},
-		getParentFrame: function(document, doc) {
+		getParentBrowser: function(document, doc) {
 			// We don't check anonymous nodes now
 			var browser;
 			const XULNS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
@@ -2727,7 +2832,7 @@ function init() {
 				);
 				if(
 					doc == document
-					|| (br = this.getParentFrame(document, doc))
+					|| (br = this.getParentBrowser(document, doc))
 				) {
 					browser = br.localName.toLowerCase() == "tabbrowser" && br.selectedBrowser || br;
 					return true;
