@@ -1498,6 +1498,7 @@ function init() {
 				popup: popup,
 				tt: this.context.tt,
 				ww: this.context.ww,
+				fxVersion: this.fxVersion,
 				closeMenus: this.closeMenus,
 				stopEvent: this.stopEvent,
 				stopSingleEvent: this.stopSingleEvent,
@@ -1551,7 +1552,9 @@ function init() {
 						case "keydown":
 						case "keypress":
 						case "keyup":
-							var onlyStop = e.type == "keydown" || e.type == "keyup";
+							var onlyStop = this.fxVersion < 25 // See notes in keypressHandler()
+								? e.type == "keydown" || e.type == "keyup"
+								: e.type == "keypress" || e.type == "keyup";
 							if(e.keyCode == e.DOM_VK_ESCAPE) {
 								this.stopEvent(e);
 								if(onlyStop)
