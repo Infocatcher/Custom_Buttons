@@ -3310,14 +3310,17 @@ var focusManager = {
 	button: this,
 	focusedWindow: null,
 	outTimer: 0,
+	get wm() {
+		delete this.wm;
+		return this.wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+			.getService(Components.interfaces.nsIWindowMediator);
+	},
 	handleEvent: function(e) {
 		switch(e.type) {
 			case "mouseover":
 				clearTimeout(this.outTimer);
 				if(e.target == this.button) {
-					var focusedWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-						.getService(Components.interfaces.nsIWindowMediator)
-						.getMostRecentWindow(null);
+					var focusedWindow = this.wm.getMostRecentWindow(null);
 					this.focusedWindow = focusedWindow != window.top && focusedWindow;
 				}
 			break;
