@@ -128,6 +128,15 @@ function _localize(s, key) {
 		"Can't install %L locale!\nURL: %U": {
 			ru: "Не удалось установить локаль %L!\nСсылка: %U"
 		},
+		"Download language pack…": {
+			ru: "Загрузка языкового пакета…"
+		},
+		"Download language pack: %S%": {
+			ru: "Загрузка языкового пакета: %S%"
+		},
+		"Download language pack: done!": {
+			ru: "Загрузка языкового пакета: готово!"
+		},
 		"Save session and exit": {
 			ru: "Сохранить сессию и выйти"
 		},
@@ -795,6 +804,7 @@ var cmds = this.commands = {
 						_done: function(ok) {
 							icon.src = origIcon;
 							install.removeListener(this);
+							this._progress();
 							if(!ok) {
 								if(!tryESR && _this.getInstallURLForLocale(locale, true) != installURL) {
 									LOG("[Language pack]: Will try ESR version");
@@ -816,6 +826,20 @@ var cmds = this.commands = {
 								);
 							}
 							callback(ok);
+						},
+						onDownloadStarted: function(install) {
+							this._progress(_localize("Download language pack…"));
+						},
+						onDownloadProgress: function(install) {
+							var persent = Math.round(install.progress/install.maxProgress*100);
+							this._progress(_localize("Download language pack: %S%").replace("%S", persent));
+						},
+						onDownloadEnded: function(install) {
+							this._progress(_localize("Download language pack: done!"));
+						},
+						_progress: function(state) {
+							if("XULBrowserWindow" in window)
+								XULBrowserWindow.setOverLink(state || "", null);
 						}
 					});
 					icon.src = imgLoading;
