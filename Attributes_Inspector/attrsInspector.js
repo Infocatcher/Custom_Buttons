@@ -68,9 +68,9 @@ var _debug = typeof event == "object" && event instanceof Event
 	? event.shiftKey || event.ctrlKey || event.altKey || event.metaKey
 	: false;
 
-function _log() {
+function _log(s) {
 	if(!_debug)
-		return _log = function() {};
+		return _log = function(s) {};
 	var cs = Components.classes["@mozilla.org/consoleservice;1"]
 		.getService(Components.interfaces.nsIConsoleService);
 	function ts() {
@@ -78,8 +78,8 @@ function _log() {
 		var ms = d.getMilliseconds();
 		return d.toLocaleFormat("%M:%S:") + "000".substr(String(ms).length) + ms;
 	}
-	_log = function() {
-		cs.logStringMessage("[Attributes Inspector]: " + ts() + " " + Array.map(arguments, String).join("\n"));
+	_log = function(s) {
+		cs.logStringMessage("[Attributes Inspector]: " + ts() + " " + s);
 	};
 	return _log.apply(this, arguments);
 }
