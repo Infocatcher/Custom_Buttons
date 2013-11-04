@@ -733,11 +733,9 @@ function init() {
 			var _timers = this._timers;
 			var timer = _timers[id] = Components.classes["@mozilla.org/timer;1"]
 				.createInstance(Components.interfaces.nsITimer);
-			timer.init({
-				observe: function(subject, topic, data) {
-					delete _timers[id];
-					callback.apply(context, args);
-				}
+			timer.init(function() {
+				delete _timers[id];
+				callback.apply(context, args);
 			}, delay || 0, timer.TYPE_ONE_SHOT);
 			return id;
 		},
