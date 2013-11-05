@@ -490,7 +490,8 @@ function init() {
 						: ""
 					),
 					padding: getMargins("padding")
-						+ (boxSizing == "padding-box" ? boxSizingNote : "")
+						+ (boxSizing == "padding-box" ? boxSizingNote : ""),
+					__proto__: null
 				};
 				var prevStyles = this.prevStyles;
 				var changedStyles = this.changedStyles;
