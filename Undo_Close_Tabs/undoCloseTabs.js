@@ -750,6 +750,13 @@ this.undoCloseTabsList = {
 		)
 			dis = false;
 		this.button.disabled = dis;
+		setTimeout(function(_this) {
+			_this.updTooltip(tabsCount);
+		}, 0, this);
+	},
+	updTooltip: function(tabsCount) {
+		if(tabsCount === undefined)
+			tabsCount = this.closedTabCount;
 		var lastTabTip = "";
 		if(tabsCount) {
 			//~ todo: try optimize JSON.parse() usage (can we use cached this._undoTabItems here?)
