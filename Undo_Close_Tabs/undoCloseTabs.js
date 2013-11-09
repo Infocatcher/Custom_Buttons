@@ -300,7 +300,7 @@ this.undoCloseTabsList = {
 		window.addEventListener("unload",         this, false);
 		this.mp.addEventListener("DOMMenuItemActive",   this, false);
 		this.mp.addEventListener("DOMMenuItemInactive", this, false);
-		this.updUIGlobal();
+		this.ensureSessionsInitialized(this.updUIGlobal, this);
 		if(this.options.showInTabContextMenu) setTimeout(function(_this) {
 			_this.initTabContext();
 		}, 100, this);
@@ -362,6 +362,28 @@ this.undoCloseTabsList = {
 		addEventListener("DOMMenuItemInactive", this, false, mp);
 		origMi.parentNode.insertBefore(menu, origMi.nextSibling);
 		origMi.setAttribute("hidden", "true");
+	},
+	ensureSessionsInitialized: function(callback, context) {
+		var _this = this;
+		var stopTime = Date.now() + 3e3;
+		(function ensureInitialized() {
+			try {
+				_this.ss.getClosedTabCount(window);
+				callback.call(context);
+				return;
+			}
+			catch(e) {
+				if(Date.now() > stopTime) {
+					Components.utils.reportError(
+						_this.errPrefix
+						+ "Can't initialize: nsISessionStore.getClosedTabCount() failed"
+					);
+					Components.utils.reportError(e);
+					return;
+				}
+			}
+			setTimeout(ensureInitialized, 50);
+		})();
 	},
 	destroy: function() {
 		window.removeEventListener("TabClose",       this, false);
