@@ -1321,6 +1321,7 @@ function init() {
 				//node.ownerDocument || node
 				node
 			);
+			var _this = this;
 			inspWin.addEventListener("load", function load(e) {
 				inspWin.removeEventListener(e.type, load, false);
 				var doc = inspWin.document;
@@ -1364,7 +1365,7 @@ function init() {
 						if(Date.now() < stopTime)
 							inspWin.setTimeout(selectWindow, 50);
 					}, 0);
-				}, 0);
+				}, _this.fxVersion == 1.5 ? 200 : 0);
 			}, false);
 		},
 		copyTootipContent: function() {
