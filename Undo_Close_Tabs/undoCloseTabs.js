@@ -774,6 +774,7 @@ if(!this.undoCloseTabsList.options.useMenu && this.undoCloseTabsList.cm) {
 	};
 }
 
+this.disabled = true;
 setTimeout(function(_this) {
 	_this.undoCloseTabsList.init();
 }, 0, this);
