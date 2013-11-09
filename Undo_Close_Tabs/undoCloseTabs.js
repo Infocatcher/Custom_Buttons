@@ -736,15 +736,28 @@ this.undoCloseTabsList = {
 		}
 		this.button.tooltipText = _localize("restoreTab") + lastTabTip;
 	},
+	get wm() {
+		delete this.wm;
+		return this.wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+			.getService(Components.interfaces.nsIWindowMediator);
+	},
 	updUIGlobal: function() {
-		var ws = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-			.getService(Components.interfaces.nsIWindowMediator)
-			.getEnumerator("navigator:browser");
+		var isSeaMonkey = this.appName == "SeaMonkey";
+		var ws = this.wm.getEnumerator(isSeaMonkey ? null : "navigator:browser");
 		const id = this.button.id;
 		while(ws.hasMoreElements()) {
-			let btn = ws.getNext().document.getElementById(id);
-			btn && btn.undoCloseTabsList.updUI();
+			let win = ws.getNext();
+			if(!isSeaMonkey || this.isBrowserWindow(win)) {
+				let btn = win.document.getElementById(id);
+				if(btn && "undoCloseTabsList" in btn)
+					btn.undoCloseTabsList.updUI();
+			}
 		}
+	},
+	isBrowserWindow: function(win) {
+		var loc = window.location.href;
+		return loc == "chrome://browser/content/browser.xul"
+			|| loc == "chrome://navigator/content/navigator.xul";
 	}
 };
 
