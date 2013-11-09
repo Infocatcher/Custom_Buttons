@@ -273,10 +273,13 @@ this.undoCloseTabsList = {
 		delete this.cbMenu;
 		return this.cbMenu = menu;
 	},
-	ss: (
-		Components.classes["@mozilla.org/browser/sessionstore;1"]
-		|| Components.classes["@mozilla.org/suite/sessionstore;1"]
-	).getService(Components.interfaces.nsISessionStore),
+	get ss() {
+		delete this.ss;
+		return this.ss = (
+			Components.classes["@mozilla.org/browser/sessionstore;1"]
+			|| Components.classes["@mozilla.org/suite/sessionstore;1"]
+		).getService(Components.interfaces.nsISessionStore);
+	},
 	get appInfo() {
 		delete this.appInfo;
 		return this.appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
