@@ -1332,41 +1332,46 @@ function init() {
 					var js = doc.getAnonymousElementByAttribute(panel, "viewerListEntry", "8")
 						|| doc.getAnonymousElementByAttribute(panel, "viewerListEntry", "7"); // DOM Inspector 1.8.1.x, Firefox 2.0.0.x
 					if(!js && Date.now() < stopTime) {
-						inspWin.setTimeout(selectJsPanel, 50);
+						inspWin.setTimeout(selectJsPanel, 25);
 						return;
 					}
 					restoreBlink();
-					js.doCommand();
 					var browser = doc.getAnonymousElementByAttribute(panel, "anonid", "viewer-iframe");
-					stopTime = Date.now() + 3e3;
-					inspWin.setTimeout(function selectWindow() {
-						var brDoc = browser.contentDocument;
-						var tree = brDoc.getElementById("treeJSObject");
-						if(tree && tree.columns && tree.view && tree.view.selection) {
-							var keyCol = tree.columns.getKeyColumn();
-							var view = tree.view;
-							var rowCount = view.rowCount;
-							if(rowCount == 1) { // DOM Inspector 1.8.1.x, Firefox 2.0.0.x
-								tree.changeOpenState(0, true);
-								rowCount = view.rowCount;
-							}
-							for(var i = 0; i < rowCount; ++i) {
-								var cellText = view.getCellText(i, keyCol);
-								if(cellText == "defaultView") {
-									var tbo = tree.treeBoxObject;
-									tbo.beginUpdateBatch();
-									tree.changeOpenState(i, true);
-									view.selection.select(i);
-									tbo.scrollByLines(i);
-									tbo.ensureRowIsVisible(i);
-									tbo.endUpdateBatch();
-									return;
+					browser.addEventListener("load", function load(e) {
+						if(e.target.documentURI == "about:blank")
+							return;
+						browser.removeEventListener(e.type, load, true);
+						stopTime = Date.now() + 3e3;
+						inspWin.setTimeout(function selectWindow() {
+							var brDoc = browser.contentDocument;
+							var tree = brDoc.getElementById("treeJSObject");
+							if(tree && tree.view && tree.view.selection && tree.columns) {
+								var keyCol = tree.columns.getKeyColumn();
+								var view = tree.view;
+								var rowCount = view.rowCount;
+								if(rowCount == 1) { // DOM Inspector 1.8.1.x, Firefox 2.0.0.x
+									tree.changeOpenState(0, true);
+									rowCount = view.rowCount;
+								}
+								for(var i = 0; i < rowCount; ++i) {
+									var cellText = view.getCellText(i, keyCol);
+									if(cellText == "defaultView") {
+										var tbo = tree.treeBoxObject;
+										tbo.beginUpdateBatch();
+										tree.changeOpenState(i, true);
+										view.selection.select(i);
+										tbo.scrollByLines(i);
+										tbo.ensureRowIsVisible(i);
+										tbo.endUpdateBatch();
+										return;
+									}
 								}
 							}
-						}
-						if(Date.now() < stopTime)
-							inspWin.setTimeout(selectWindow, 50);
-					}, 0);
+							if(Date.now() < stopTime)
+								inspWin.setTimeout(selectWindow, 25);
+						}, 0);
+					}, true);
+					js.doCommand();
 				}, _this.fxVersion == 1.5 ? 200 : 0);
 			}, false);
 		},
