@@ -1324,6 +1324,7 @@ function init() {
 			var _this = this;
 			inspWin.addEventListener("load", function load(e) {
 				inspWin.removeEventListener(e.type, load, false);
+				var restoreBlink = _this.context.overrideBoolPref("inspector.blink.on", false);
 				var doc = inspWin.document;
 				var stopTime = Date.now() + 3e3;
 				inspWin.setTimeout(function selectJsPanel() {
@@ -1334,6 +1335,7 @@ function init() {
 						inspWin.setTimeout(selectJsPanel, 50);
 						return;
 					}
+					restoreBlink();
 					js.doCommand();
 					var browser = doc.getAnonymousElementByAttribute(panel, "anonid", "viewer-iframe");
 					stopTime = Date.now() + 3e3;
@@ -1718,6 +1720,17 @@ function init() {
 			this.globalHandler[e.type + "Handler"](e, this.currentWindow);
 		}
 	};
+	this.overrideBoolPref = function(prefName, prefVal) {
+		var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+			.getService(Components.interfaces.nsIPrefBranch);
+		var origVal = prefs.getBoolPref(prefName)
+		if(origVal == prefVal)
+			return function restore() {};
+		prefs.setBoolPref(prefName, prefVal);
+		return function restore() {
+			prefs.setBoolPref(prefName, origVal);
+		};
+	};
 	defineGetter(this, "inspector", function() {
 		if(!("@mozilla.org/commandlinehandler/general-startup;1?type=inspector" in Components.classes)) {
 			_log("DOM Inspector not installed!");
@@ -1751,11 +1764,7 @@ function init() {
 						}
 						if(!hash || ("dom" in hash)) {
 							var viewer = inspWin.inspector.getViewer("dom");
-							var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-								.getService(Components.interfaces.nsIPrefBranch);
-							const blinkPref = "inspector.blink.on";
-							var blink = prefs.getBoolPref(blinkPref);
-							blink && prefs.setBoolPref(blinkPref, false);
+							var restoreBlink = context.overrideBoolPref("inspector.blink.on", false);
 							try {
 								if("showNodeInTree" in viewer) // New DOM Inspector
 									viewer.showNodeInTree(node);
@@ -1776,7 +1785,7 @@ function init() {
 								Components.utils.reportError(e2);
 							}
 							finally {
-								blink && prefs.setBoolPref(blinkPref, true);
+								restoreBlink();
 							}
 						}
 					}
