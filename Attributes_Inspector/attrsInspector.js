@@ -1363,6 +1363,14 @@ function init() {
 										tbo.scrollByLines(i);
 										tbo.ensureRowIsVisible(i);
 										tbo.endUpdateBatch();
+										inspWin.setTimeout(function() { // Tree not yet loaded?
+											var di = i - tbo.getFirstVisibleRow();
+											if(di) {
+												_log("Tree content updated => scrollByLines(" + di + ")");
+												tbo.scrollByLines(di);
+												tbo.ensureRowIsVisible(i);
+											}
+										}, 0);
 										return;
 									}
 								}
