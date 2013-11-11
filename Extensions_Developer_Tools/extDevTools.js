@@ -1425,7 +1425,7 @@ this.attrsInspector = function(event) {
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Attributes_Inspector
 
 // (c) Infocatcher 2010-2013
-// version 0.6.3pre - 2013-10-24
+// version 0.6.3pre2 - 2013-11-11
 
 //===================
 // Attributes Inspector button for Custom Buttons
@@ -1490,9 +1490,9 @@ var _debug = typeof event == "object" && event instanceof Event
 	? event.shiftKey || event.ctrlKey || event.altKey || event.metaKey
 	: false;
 
-function _log() {
+function _log(s) {
 	if(!_debug)
-		return _log = function() {};
+		return _log = function(s) {};
 	var cs = Components.classes["@mozilla.org/consoleservice;1"]
 		.getService(Components.interfaces.nsIConsoleService);
 	function ts() {
@@ -1500,8 +1500,8 @@ function _log() {
 		var ms = d.getMilliseconds();
 		return d.toLocaleFormat("%M:%S:") + "000".substr(String(ms).length) + ms;
 	}
-	_log = function() {
-		cs.logStringMessage("[Attributes Inspector]: " + ts() + " " + Array.map(arguments, String).join("\n"));
+	_log = function(s) {
+		cs.logStringMessage("[Attributes Inspector]: " + ts() + " " + s);
 	};
 	return _log.apply(this, arguments);
 }
@@ -1912,7 +1912,8 @@ function init() {
 						: ""
 					),
 					padding: getMargins("padding")
-						+ (boxSizing == "padding-box" ? boxSizingNote : "")
+						+ (boxSizing == "padding-box" ? boxSizingNote : ""),
+					__proto__: null
 				};
 				var prevStyles = this.prevStyles;
 				var changedStyles = this.changedStyles;
@@ -2155,11 +2156,9 @@ function init() {
 			var _timers = this._timers;
 			var timer = _timers[id] = Components.classes["@mozilla.org/timer;1"]
 				.createInstance(Components.interfaces.nsITimer);
-			timer.init({
-				observe: function(subject, topic, data) {
-					delete _timers[id];
-					callback.apply(context, args);
-				}
+			timer.init(function() {
+				delete _timers[id];
+				callback.apply(context, args);
 			}, delay || 0, timer.TYPE_ONE_SHOT);
 			return id;
 		},
@@ -2737,6 +2736,7 @@ function init() {
 				_log("DOM Inspector not installed!");
 				return;
 			}
+			_log("inspectWindow(): open DOM Inspector for <" + node.nodeName + ">");
 			var inspWin = top.openDialog(
 				"chrome://inspector/content/",
 				"_blank",
@@ -2744,8 +2744,11 @@ function init() {
 				//node.ownerDocument || node
 				node
 			);
+			var _this = this;
 			inspWin.addEventListener("load", function load(e) {
 				inspWin.removeEventListener(e.type, load, false);
+				_log("inspectWindow(): DOM Inspector loaded");
+				var restoreBlink = _this.context.overrideBoolPref("inspector.blink.on", false);
 				var doc = inspWin.document;
 				var stopTime = Date.now() + 3e3;
 				inspWin.setTimeout(function selectJsPanel() {
@@ -2753,41 +2756,57 @@ function init() {
 					var js = doc.getAnonymousElementByAttribute(panel, "viewerListEntry", "8")
 						|| doc.getAnonymousElementByAttribute(panel, "viewerListEntry", "7"); // DOM Inspector 1.8.1.x, Firefox 2.0.0.x
 					if(!js && Date.now() < stopTime) {
-						inspWin.setTimeout(selectJsPanel, 50);
+						inspWin.setTimeout(selectJsPanel, 25);
 						return;
 					}
-					js.doCommand();
+					restoreBlink();
 					var browser = doc.getAnonymousElementByAttribute(panel, "anonid", "viewer-iframe");
-					stopTime = Date.now() + 3e3;
-					inspWin.setTimeout(function selectWindow() {
-						var brDoc = browser.contentDocument;
-						var tree = brDoc.getElementById("treeJSObject");
-						if(tree && tree.columns && tree.view && tree.view.selection) {
-							var keyCol = tree.columns.getKeyColumn();
-							var view = tree.view;
-							var rowCount = view.rowCount;
-							if(rowCount == 1) { // DOM Inspector 1.8.1.x, Firefox 2.0.0.x
-								tree.changeOpenState(0, true);
-								rowCount = view.rowCount;
-							}
-							for(var i = 0; i < rowCount; ++i) {
-								var cellText = view.getCellText(i, keyCol);
-								if(cellText == "defaultView") {
-									var tbo = tree.treeBoxObject;
-									tbo.beginUpdateBatch();
-									tree.changeOpenState(i, true);
-									view.selection.select(i);
-									tbo.scrollByLines(i);
-									tbo.ensureRowIsVisible(i);
-									tbo.endUpdateBatch();
-									return;
+					browser.addEventListener("load", function load(e) {
+						if(e.target.documentURI == "about:blank")
+							return;
+						browser.removeEventListener(e.type, load, true);
+						stopTime = Date.now() + 3e3;
+						inspWin.setTimeout(function selectWindow() {
+							var brDoc = browser.contentDocument;
+							var tree = brDoc.getElementById("treeJSObject");
+							if(tree && tree.view && tree.view.selection && tree.columns) {
+								var keyCol = tree.columns.getKeyColumn();
+								var view = tree.view;
+								var rowCount = view.rowCount;
+								if(rowCount == 1) { // DOM Inspector 1.8.1.x, Firefox 2.0.0.x
+									tree.changeOpenState(0, true);
+									rowCount = view.rowCount;
+								}
+								for(var i = 0; i < rowCount; ++i) {
+									var cellText = view.getCellText(i, keyCol);
+									if(cellText == "defaultView") {
+										_log('inspectWindow(): scroll to "defaultView" entry');
+										var tbo = tree.treeBoxObject;
+										tbo.beginUpdateBatch();
+										tree.changeOpenState(i, true);
+										view.selection.select(i);
+										tbo.scrollByLines(i);
+										tbo.ensureRowIsVisible(i);
+										tbo.endUpdateBatch();
+										inspWin.setTimeout(function() { // Tree not yet loaded?
+											var di = i - tbo.getFirstVisibleRow();
+											if(di) {
+												_log("inspectWindow(): tree changed => scrollByLines(" + di + ")");
+												tbo.scrollByLines(di);
+												tbo.ensureRowIsVisible(i);
+											}
+										}, 0);
+										return;
+									}
 								}
 							}
-						}
-						if(Date.now() < stopTime)
-							inspWin.setTimeout(selectWindow, 50);
-					}, 0);
-				}, 0);
+							if(Date.now() < stopTime)
+								inspWin.setTimeout(selectWindow, 25);
+						}, 0);
+					}, true);
+					_log("inspectWindow(): select JavaScript Object panel");
+					js.doCommand();
+				}, _this.fxVersion == 1.5 ? 200 : 0);
 			}, false);
 		},
 		copyTootipContent: function() {
@@ -3140,6 +3159,17 @@ function init() {
 			this.globalHandler[e.type + "Handler"](e, this.currentWindow);
 		}
 	};
+	this.overrideBoolPref = function(prefName, prefVal) {
+		var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+			.getService(Components.interfaces.nsIPrefBranch);
+		var origVal = prefs.getBoolPref(prefName)
+		if(origVal == prefVal)
+			return function restore() {};
+		prefs.setBoolPref(prefName, prefVal);
+		return function restore() {
+			prefs.setBoolPref(prefName, origVal);
+		};
+	};
 	defineGetter(this, "inspector", function() {
 		if(!("@mozilla.org/commandlinehandler/general-startup;1?type=inspector" in Components.classes)) {
 			_log("DOM Inspector not installed!");
@@ -3173,11 +3203,7 @@ function init() {
 						}
 						if(!hash || ("dom" in hash)) {
 							var viewer = inspWin.inspector.getViewer("dom");
-							var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-								.getService(Components.interfaces.nsIPrefBranch);
-							const blinkPref = "inspector.blink.on";
-							var blink = prefs.getBoolPref(blinkPref);
-							blink && prefs.setBoolPref(blinkPref, false);
+							var restoreBlink = context.overrideBoolPref("inspector.blink.on", false);
 							try {
 								if("showNodeInTree" in viewer) // New DOM Inspector
 									viewer.showNodeInTree(node);
@@ -3198,7 +3224,7 @@ function init() {
 								Components.utils.reportError(e2);
 							}
 							finally {
-								blink && prefs.setBoolPref(blinkPref, true);
+								restoreBlink();
 							}
 						}
 					}
