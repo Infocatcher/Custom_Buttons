@@ -1314,6 +1314,7 @@ function init() {
 				_log("DOM Inspector not installed!");
 				return;
 			}
+			_log("inspectWindow(): open DOM Inspector for <" + node.nodeName + ">");
 			var inspWin = top.openDialog(
 				"chrome://inspector/content/",
 				"_blank",
@@ -1324,6 +1325,7 @@ function init() {
 			var _this = this;
 			inspWin.addEventListener("load", function load(e) {
 				inspWin.removeEventListener(e.type, load, false);
+				_log("inspectWindow(): DOM Inspector loaded");
 				var restoreBlink = _this.context.overrideBoolPref("inspector.blink.on", false);
 				var doc = inspWin.document;
 				var stopTime = Date.now() + 3e3;
@@ -1356,6 +1358,7 @@ function init() {
 								for(var i = 0; i < rowCount; ++i) {
 									var cellText = view.getCellText(i, keyCol);
 									if(cellText == "defaultView") {
+										_log('inspectWindow(): scroll to "defaultView" entry');
 										var tbo = tree.treeBoxObject;
 										tbo.beginUpdateBatch();
 										tree.changeOpenState(i, true);
@@ -1366,7 +1369,7 @@ function init() {
 										inspWin.setTimeout(function() { // Tree not yet loaded?
 											var di = i - tbo.getFirstVisibleRow();
 											if(di) {
-												_log("Tree content updated => scrollByLines(" + di + ")");
+												_log("inspectWindow(): tree changed => scrollByLines(" + di + ")");
 												tbo.scrollByLines(di);
 												tbo.ensureRowIsVisible(i);
 											}
@@ -1379,6 +1382,7 @@ function init() {
 								inspWin.setTimeout(selectWindow, 25);
 						}, 0);
 					}, true);
+					_log("inspectWindow(): select JavaScript Object panel");
 					js.doCommand();
 				}, _this.fxVersion == 1.5 ? 200 : 0);
 			}, false);
