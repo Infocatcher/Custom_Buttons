@@ -878,6 +878,11 @@ var cmds = this.commands = {
 			else                        dir = "latest-comm-central-l10n";
 			return "ftp://ftp.mozilla.org/pub/mozilla.org/" + app + "/nightly/" + dir + "/" + platform + "/xpi/" + file;
 		}
+		if(app == "seamonkey") {
+			// ftp://ftp.mozilla.org/pub/mozilla.org/seamonkey/releases/2.17.1/langpack/seamonkey-2.17.1.ru.langpack.xpi
+			return "ftp://ftp.mozilla.org/pub/mozilla.org/seamonkey/releases/"
+				+ version + "/langpack/seamonkey-" + version + "." + locale + ".langpack.xpi";
+		}
 		var file = locale + ".xpi";
 		var esr = useESR ? "esr" : "";
 		// ftp://ftp.mozilla.org/pub/mozilla.org/firefox/releases/23.0/win32/xpi/
