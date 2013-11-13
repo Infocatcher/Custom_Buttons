@@ -30,8 +30,8 @@ var options = {
 	// 2 - always close
 	invertLoadBehavior: false, // true => left-click open bookmark in new tab
 	checkDuplicates: true, // Forbid duplicates
+	checkDuplicatesSession: true, // Also compare session data
 	allowToggleBookmark: false, // Remove already added bookmark using middle-click on button
-	// Note: session data are checked too
 	deleteAfterOpen: false, // Delete opened bookmarks
 	removeAddedTab: false, // Remove tab after bookmark will be added
 	itemInPageContextMenu: false, // Show "Session Bookmark This Page" item in page context menu
@@ -773,7 +773,9 @@ this.bookmarks = {
 			&& (!insPoint || insPoint == this.button);
 		var td = this.getTabData(tab);
 		if(canToggle || this.options.checkDuplicates) {
-			var checkSession = !canToggle;
+			var checkSession = canToggle
+				? false
+				: this.options.checkDuplicatesSession;
 			var mi = this.getItemByTabData(td, checkSession);
 			if(mi) {
 				if(canToggle) {
