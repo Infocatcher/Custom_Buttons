@@ -30,6 +30,7 @@ var options = {
 	// 2 - always close
 	invertLoadBehavior: false, // true => left-click open bookmark in new tab
 	checkDuplicates: true, // Forbid duplicates
+	allowToggleBookmark: false, // Remove already added bookmark using middle-click on button
 	// Note: session data are checked too
 	deleteAfterOpen: false, // Delete opened bookmarks
 	removeAddedTab: false, // Remove tab after bookmark will be added
@@ -751,20 +752,37 @@ this.bookmarks = {
 			}
 		}
 	},
+	getItemByTabData: function(td, checkSession) {
+		var mis = this.mp.getElementsByAttribute("cb_uri", td.uri);
+		var mi = mis.length && mis[0];
+		if(
+			mi
+			&& mi.getAttribute("label") == td.label
+			&& mi.getAttribute("image") == td.icon
+			&& (
+				!checkSession
+				|| !this.options.useSessions
+				|| mi.getAttribute("cb_ssData") == td.ssData
+			)
+		)
+			return mi;
+		return null;
+	},
 	addBookmark: function(insPoint, tab) {
+		var canToggle = this.options.allowToggleBookmark
+			&& (!insPoint || insPoint == this.button);
 		var td = this.getTabData(tab);
-		if(this.options.checkDuplicates) {
-			var mi = this.mp.getElementsByAttribute("cb_uri", td.uri);
-			if(mi.length) {
-				mi = mi[0];
-				if(
-					mi.getAttribute("label") == td.label
-					&& mi.getAttribute("image") == td.icon
-					&& (!this.options.useSessions || mi.getAttribute("cb_ssData") == td.ssData)
-				) {
-					this.blink(mi, "0.5");
+		if(canToggle || this.options.checkDuplicates) {
+			var checkSession = !canToggle;
+			var mi = this.getItemByTabData(td, checkSession);
+			if(mi) {
+				if(canToggle) {
+					this.blink(this.button, 0.05);
+					this.deleteBookmark(mi);
 					return null;
 				}
+				this.blink(mi, 0.5);
+				return null;
 			}
 		}
 		var mi = this.getMenuitem(td.label, td.uri, td.icon, td.ssData);
@@ -840,7 +858,7 @@ this.bookmarks = {
 		var transition = "transition" in stl && "transition"
 			|| "MozTransition" in stl && "MozTransition";
 		stl[transition] = "opacity 0.1s ease-in";
-		stl.opacity = opacity || "0.72";
+		stl.opacity = opacity || 0.72;
 		setTimeout(function() {
 			stl.opacity = "";
 			setTimeout(function() {
