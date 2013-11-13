@@ -655,13 +655,17 @@ this.bookmarks = {
 				if(!Components.isSuccessCode(status))
 					Components.utils.reportError(this.errPrefix + "writeToFileAsync() failed");
 				else {
-					let ws = this.wm.getEnumerator("navigator:browser");
+					// Private windows in SeaMonkey doesn't have "windowtype"
+					let isSeaMonkey = this.appName == "SeaMonkey";
+					let ws = this.wm.getEnumerator(isSeaMonkey ? null : "navigator:browser");
 					while(ws.hasMoreElements()) {
 						let w = ws.getNext();
 						if(w == window)
 							continue;
 						let btn = w.document.getElementById(this.button.id);
-						btn && btn.bookmarks.reload(data);
+						if(btn && btn.bookmarks) w.setTimeout(function(btn) {
+							btn.bookmarks.reload(data);
+						}, 0, btn);
 					}
 				}
 				this._saveInProgress = false;
