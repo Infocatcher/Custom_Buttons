@@ -685,6 +685,12 @@ this.undoCloseTabsList = {
 				cb_index: i,
 				cb_type: "tab"
 			});
+			if(
+				undoItem.state
+				&& "attributes" in undoItem.state
+				&& "privateTab-isPrivate" in undoItem.state.attributes
+			) // https://addons.mozilla.org/addon/private-tab/
+				mi.setAttribute("privateTab-isPrivate", "true");
 			if(this.cm)
 				mi.setAttribute("context", this.cmId);
 			var image = undoItem.image // Firefox
