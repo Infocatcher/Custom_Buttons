@@ -35,6 +35,11 @@ var options = {
 	deleteAfterOpen: false, // Delete opened bookmarks
 	removeAddedTab: false, // Remove tab after bookmark will be added
 	itemInPageContextMenu: false, // Show "Session Bookmark This Page" item in page context menu
+	showNotifications: 1, // Show notifications like "Bookmark added"
+	// 0 - don't show
+	// 1 - show only if menu is closed
+	// 2 - always show
+	notificationHideDelay: 1700,
 
 	useSessions: true, // Save and restore session data
 	saveTabHistory: true, // Only for "useSessions: true"
@@ -125,6 +130,16 @@ function _localize(s, key) {
 		},
 		pageContextItemKey: {
 			ru: "с"
+		},
+
+		"Bookmark added": {
+			ru: "Закладка добавлена"
+		},
+		"Bookmark already exists": {
+			ru: "Закладка уже существует"
+		},
+		"Bookmark removed": {
+			ru: "Закладка удалена"
 		},
 
 		"Session Bookmark Properties": {
@@ -780,10 +795,12 @@ this.bookmarks = {
 			if(mi) {
 				if(canToggle) {
 					this.blink(this.button, 0.05);
+					this.notify(_localize("Bookmark removed"));
 					this.deleteBookmark(mi);
 					return null;
 				}
 				this.blink(mi, 0.5);
+				this.notify(_localize("Bookmark already exists"));
 				return null;
 			}
 		}
@@ -792,6 +809,7 @@ this.bookmarks = {
 		this.addUndo({ action: "remove", mi: mi, pn: mi.parentNode, ns: mi.nextSibling });
 		this.onBookmarksChanged(true);
 		this.blink();
+		this.notify(_localize("Bookmark added"));
 		this.scheduleSave();
 		if(this.options.removeAddedTab) setTimeout(function() {
 			var tab = td.tab;
@@ -867,6 +885,35 @@ this.bookmarks = {
 				stl[transition] = "";
 			}, 150);
 		}, 250);
+	},
+	notify: function(msg) {
+		if(
+			!this.options.showNotifications
+			|| this.options.showNotifications == 1 && this.button.open
+		)
+			return;
+		if("_notifyTip" in this)
+			this._notifyTip.hidePopup();
+		var tip = this._notifyTip = document.createElement("tooltip");
+		tip.className = "sessionBookmarks-notifyTip";
+		tip.setAttribute("label", msg);
+		tip.setAttribute("onmouseover", "this.hidePopup();");
+		var stl = tip.style;
+		stl.opacity = 0.6;
+		document.documentElement.appendChild(tip);
+
+		tip.openPopup(this.button, "end_after");
+		setTimeout(function() {
+			var transition = "transition" in stl && "transition"
+				|| "MozTransition" in stl && "MozTransition";
+			stl[transition] = "opacity 0.15s ease-in";
+			stl.opacity = "";
+		}, 0);
+		setTimeout(function(_this) {
+			tip.hidePopup();
+			tip.parentNode.removeChild(tip);
+			delete _this._notifyTip;
+		}, this.options.notificationHideDelay, this);
 	},
 	openBookmark: function(e) {
 		var mi = e.target;
