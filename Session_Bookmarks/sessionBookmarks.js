@@ -617,7 +617,16 @@ this.bookmarks = {
 			this.load(data);
 	},
 	unsaved: false,
+	_saveInProgress: false,
+	_changed: false,
 	save: function() {
+		if(this._saveInProgress) {
+			this._changed = true;
+			return;
+		}
+		this._saveInProgress = true;
+		this._changed = false;
+
 		var data = [];
 		Array.forEach(
 			this.mp.getElementsByAttribute("cb_bookmarkItem", "*"),
@@ -643,18 +652,22 @@ this.bookmarks = {
 				Components.utils.reportError(this.errPrefix + "copyFileAsync() failed");
 			// Backup failed? But we still can try save user data.
 			this.writeToFileAsync(data.join("\n\n"), this.file, function(status, data) {
-				if(!Components.isSuccessCode(status)) {
+				if(!Components.isSuccessCode(status))
 					Components.utils.reportError(this.errPrefix + "writeToFileAsync() failed");
-					return;
+				else {
+					let ws = this.wm.getEnumerator("navigator:browser");
+					while(ws.hasMoreElements()) {
+						let w = ws.getNext();
+						if(w == window)
+							continue;
+						let btn = w.document.getElementById(this.button.id);
+						btn && btn.bookmarks.reload(data);
+					}
 				}
-				var ws = this.wm.getEnumerator("navigator:browser");
-				while(ws.hasMoreElements()) {
-					let w = ws.getNext();
-					if(w == window)
-						continue;
-					let btn = w.document.getElementById(this.button.id);
-					btn && btn.bookmarks.reload(data);
-				}
+				this._saveInProgress = false;
+				if(this._changed) setTimeout(function(_this) {
+					_this.save();
+				}, 0, this);
 			}, this);
 		}, this);
 		this.unsaved = false;
