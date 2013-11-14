@@ -41,6 +41,11 @@ var options = {
 	// 2 - always show
 	notificationHideDelay: 1700,
 
+	preloadBookmarks: -1,
+	// 0    - disable preload feature (load bookmarks only after menu opening)
+	// -1   - preload on mouseover
+	// 1..N - preload after this time (in ms)
+
 	useSessions: true, // Save and restore session data
 	saveTabHistory: true, // Only for "useSessions: true"
 	// Save back/forward history of tab
@@ -192,6 +197,13 @@ this.onclick = function(e) {
 this.onmouseover = function(e) {
 	if(e.target != this)
 		return;
+	var preload = this.bookmarks.options.preloadBookmarks;
+	if(
+		preload == -1
+		&& this.bookmarks.mp
+		&& this.bookmarks.mp.hasAttribute("onpopupshowing")
+	)
+		this.bookmarks.delayedLoad();
 	Array.some(
 		this.parentNode.getElementsByTagName("*"),
 		function(node) {
@@ -325,13 +337,10 @@ this.bookmarks = {
 		window.addEventListener("drop", this, true);
 		setTimeout(function(_this) {
 			_this.delayedInit();
-			setTimeout(function preload() {
-				if(_this.mp.hasAttribute("onpopupshowing"))
-					_this.delayedLoad();
-			}, 500);
 		}, 0, this);
 	},
 	delayedInit: function() {
+		_log("delayedInit()");
 		this.initIds();
 
 		var mps = this.button.getElementsByTagName("menupopup");
@@ -350,10 +359,21 @@ this.bookmarks = {
 		if(this.options.itemInPageContextMenu) setTimeout(function(_this) {
 			_this.initPageContextMenu();
 		}, 50, this);
+
+		var preload = this.options.preloadBookmarks;
+		if(preload > 0) setTimeout(function(_this) {
+			if(_this.mp.hasAttribute("onpopupshowing"))
+				_this.delayedLoad();
+		}, preload, this);
 	},
 	delayedLoad: function() {
 		_log("delayedLoad()");
-		this.mp.removeAttribute("onpopupshowing");
+		var mp = this.mp;
+		if(mp.hasAttribute("onpopupshowing")) {
+			// Already called listener can't be removed without this
+			mp.setAttribute("onpopupshowing", "");
+			mp.removeAttribute("onpopupshowing");
+		}
 		var file = this.file;
 		if(file.exists())
 			this.readFromFileAsync(file, this.load, this);
