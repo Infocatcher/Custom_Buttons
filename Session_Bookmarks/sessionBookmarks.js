@@ -303,15 +303,62 @@ this.bookmarks = {
 		return document.getElementById(id);
 	},
 
+	initProxy: function() {
+		// Trick: wait for XBL binding tor [type="menu"]
+		_log("initProxy()");
+		var btn = this.button;
+		if("__initTimer" in btn)
+			clearTimeout(btn.__initTimer);
+		if(btn.type == "menu") {
+			_log("initProxy(): menu");
+			this.init();
+			return;
+		}
+		// This behavior may be changed (fixed?) later, so will initialize anyway after small delay
+		btn.__initTimer = setTimeout(function(_this) {
+			_log("initProxy() -> fallback timer");
+			_this.init();
+		}, 500, this);
+	},
 	init: function() {
+		_log("init()");
+		window.addEventListener("drop", this, true);
+		setTimeout(function(_this) {
+			_this.delayedInit();
+			setTimeout(function preload() {
+				if(_this.mp.hasAttribute("onpopupshowing"))
+					_this.delayedLoad();
+			}, 500);
+		}, 0, this);
+	},
+	delayedInit: function() {
+		this.initIds();
+
+		var mps = this.button.getElementsByTagName("menupopup");
+		mps.length && mps[0].parentNode.removeChild(mps[0]); // Hack for SeaMonkey
+		var mp = this.mp = this.createElement("menupopup", {
+			context:        this.cmId,
+			oncommand:      "this.parentNode.bookmarks.openBookmark(event);",
+			onclick:        "this.parentNode.bookmarks.openBookmark(event);",
+			onpopupshowing: "this.parentNode.bookmarks.delayedLoad();",
+			onpopuphidden:  "this.parentNode.bookmarks.checkUnsaved();"
+		});
+		mp.addEventListener("DOMMenuItemActive",   this.showLink, false);
+		mp.addEventListener("DOMMenuItemInactive", this.showLink, false);
+		this.button.appendChild(mp);
+
+		if(this.options.itemInPageContextMenu) setTimeout(function(_this) {
+			_this.initPageContextMenu();
+		}, 50, this);
+	},
+	delayedLoad: function() {
+		_log("delayedLoad()");
+		this.mp.removeAttribute("onpopupshowing");
 		var file = this.file;
 		if(file.exists())
 			this.readFromFileAsync(file, this.load, this);
 		else
 			this.load("");
-		if(this.options.itemInPageContextMenu)
-			this.initPageContextMenu();
-		window.addEventListener("drop", this, true);
 	},
 
 	_label:   "label:   ",
@@ -321,17 +368,9 @@ this.bookmarks = {
 	_sep:     "separator",
 
 	load: function(data) {
-		this.initIds();
 		this.addContextMenu();
 
-		var mp = this.button.getElementsByTagName("menupopup");
-		mp.length && mp[0].parentNode.removeChild(mp[0]); // Hack for SeaMonkey
-		mp = this.mp = this.createElement("menupopup", {
-			context:       this.cmId,
-			oncommand:     "this.parentNode.bookmarks.openBookmark(event);",
-			onclick:       "this.parentNode.bookmarks.openBookmark(event);",
-			onpopuphidden: "this.parentNode.bookmarks.checkUnsaved();"
-		});
+		var mp = this.mp;
 		var typeOffset = this._label.length;
 		data.split("\n\n").forEach(function(section, i) {
 			if(!section)
@@ -364,9 +403,7 @@ this.bookmarks = {
 			label: this.openAllLabel
 		});
 		mp.appendChild(openAll);
-		this.button.appendChild(mp);
-		mp.addEventListener("DOMMenuItemActive",   this.showLink, false);
-		mp.addEventListener("DOMMenuItemInactive", this.showLink, false);
+
 		this.onBookmarksChanged();
 	},
 	destroy: function(force) {
@@ -602,13 +639,7 @@ this.bookmarks = {
 	},
 
 	reload: function(data) {
-		this.destroy();
-
-		var btn = this.button;
-		//while(btn.hasChildNodes())
-		//	btn.removeChild(btn.lastChild);
-		btn.textContent = "";
-
+		this.mp.textContent = "";
 		this._undoStorage.length = 0;
 		this._undoPos = undefined;
 		if(data == undefined)
@@ -1930,7 +1961,7 @@ this.bookmarks = {
 			.replace(/"/g, "&quot;");
 	}
 };
-this.bookmarks.init();
+this.bookmarks.initProxy();
 //LOG("init");
 this.onDestroy = function(reason) {
 	if(reason == "constructor")
@@ -1964,4 +1995,19 @@ if(options.hideDropMarker || options.showLabel != undefined) {
 		if(!dm && !lb && Date.now() < stopTime)
 			setTimeout(tweakButton, 10);
 	}, 0);
+}
+
+
+function _log(s) {
+	var cs = Components.classes["@mozilla.org/consoleservice;1"]
+		.getService(Components.interfaces.nsIConsoleService);
+	function ts() {
+		var d = new Date();
+		var ms = d.getMilliseconds();
+		return d.toLocaleFormat("%M:%S:") + "000".substr(String(ms).length) + ms;
+	}
+	_log = function(s) {
+		cs.logStringMessage("[Session Bookmarks]: " + ts() + " " + s);
+	};
+	return _log.apply(this, arguments);
 }
