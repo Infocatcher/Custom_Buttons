@@ -364,7 +364,7 @@ this.bookmarks = {
 				_this.delayedLoad();
 		}, preload, this);
 	},
-	delayedLoad: function() {
+	delayedLoad: function(callback) {
 		_log("delayedLoad()");
 		var mp = this.mp;
 		if(mp.hasAttribute("onpopupshowing")) {
@@ -373,10 +373,23 @@ this.bookmarks = {
 			mp.removeAttribute("onpopupshowing");
 		}
 		var file = this.file;
-		if(file.exists())
-			this.readFromFileAsync(file, this.load, this);
-		else
+		if(file.exists()) {
+			this.readFromFileAsync(file, function(data) {
+				this.load(data);
+				callback && callback();
+			}, this);
+		}
+		else {
 			this.load("");
+			callback && callback();
+		}
+	},
+	ensureLoaded: function(callback, context, args) {
+		if(this._loaded)
+			return callback.apply(context, args);
+		return this.delayedLoad(function() {
+			callback.apply(context, args);
+		});
 	},
 
 	_label:   "label:   ",
@@ -385,7 +398,9 @@ this.bookmarks = {
 	_session: "session: ",
 	_sep:     "separator",
 
+	_loaded: false,
 	load: function(data) {
+		this._loaded = true;
 		this.addContextMenu();
 
 		var mp = this.mp;
@@ -864,7 +879,10 @@ this.bookmarks = {
 			return mi;
 		return null;
 	},
-	addBookmark: function(insPoint, tab) {
+	addBookmark: function() {
+		return this.ensureLoaded(this._addBookmark, this, arguments);
+	},
+	_addBookmark: function(insPoint, tab) {
 		var canToggle = this.options.allowToggleBookmark
 			&& (!insPoint || insPoint == this.button);
 		var td = this.getTabData(tab);
