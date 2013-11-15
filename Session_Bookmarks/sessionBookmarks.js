@@ -228,12 +228,10 @@ if(!this.hasOwnProperty("defaultContextId"))
 this.onmousedown = function(e) {
 	if(e.target != this || e.button != 2)
 		return;
-	this.setAttribute(
-		"context",
-		e.ctrlKey || e.shiftKey || e.altKey || e.metaKey
-			? this.defaultContextId
-			: this.bookmarks.cmId
-	);
+	var showCbMenu = e.ctrlKey || e.shiftKey || e.altKey || e.metaKey;
+	if(!showCbMenu)
+		this.bookmarks.addContextMenu();
+	this.setAttribute("context", showCbMenu ? this.defaultContextId : this.bookmarks.cmId);
 };
 this.setAttribute("ondraggesture", "return this.bookmarks.handleDragStart(event);");
 this.setAttribute("ondragover",    "return this.bookmarks.handleDragOver(event);");
@@ -487,6 +485,7 @@ this.bookmarks = {
 		this.btnMenuId     = btnId + "-buttonMenu";
 	},
 	addContextMenu: function() {
+		_log("addContextMenu()");
 		this.addContextMenu = function() {};
 
 		var cm = this.$(this.cmId);
@@ -641,10 +640,12 @@ this.bookmarks = {
 		var bmItem = this.bmItem = this.$("context-bookmarkpage");
 		if(!bmItem)
 			return;
+		_log("initPageContextMenu()");
 		var bmPopup = this.bmPopup = bmItem.parentNode;
 		bmPopup.addEventListener("popupshowing", this, true);
 	},
 	destroyPageContextMenu: function(force) {
+		_log("destroyPageContextMenu()");
 		this.bmPopup.removeEventListener("popupshowing", this, true);
 		if(force && this._hasPageContextItem && this.pageContextItem.parentNode)
 			this.bmPopup.removeChild(this.pageContextItem);
