@@ -352,8 +352,8 @@ this.bookmarks = {
 			onpopupshowing: "this.parentNode.bookmarks.delayedLoad();",
 			onpopuphidden:  "this.parentNode.bookmarks.checkUnsaved();"
 		});
-		mp.addEventListener("DOMMenuItemActive",   this.showLink, false);
-		mp.addEventListener("DOMMenuItemInactive", this.showLink, false);
+		mp.addEventListener("DOMMenuItemActive",   this, false);
+		mp.addEventListener("DOMMenuItemInactive", this, false);
 		this.button.appendChild(mp);
 
 		if(this.options.itemInPageContextMenu) setTimeout(function(_this) {
@@ -429,8 +429,8 @@ this.bookmarks = {
 	destroy: function(force) {
 		//LOG("destroy, " + (force ? "force" : "not force"));
 		if(this.mp) {
-			this.mp.removeEventListener("DOMMenuItemActive",   this.showLink, false);
-			this.mp.removeEventListener("DOMMenuItemInactive", this.showLink, false);
+			this.mp.removeEventListener("DOMMenuItemActive",   this, false);
+			this.mp.removeEventListener("DOMMenuItemInactive", this, false);
 			if(!force)
 				this.closePropertiesWindows();
 		}
@@ -443,10 +443,13 @@ this.bookmarks = {
 		window.removeEventListener("drop", this, true);
 	},
 	handleEvent: function(e) {
-		if(e.type == "popupshowing" && e.target == e.currentTarget)
+		var type = e.type;
+		if(type == "popupshowing" && e.target == e.currentTarget)
 			this.updatePageContextItemVisibility();
-		else if(e.type == "drop")
+		else if(type == "drop")
 			this.handleBookmarkDrop(e);
+		else if(type == "DOMMenuItemActive" || type == "DOMMenuItemInactive")
+			this.showLink(e);
 	},
 
 	initIds: function() {
@@ -743,10 +746,19 @@ this.bookmarks = {
 			label: label || "",
 			cb_uri: uri || "",
 			cb_ssData: ssData || "",
-			tooltiptext: uri || "",
+			tooltiptext: this.decodeURI(uri || ""),
 			image: icon || "",
 			cb_bookmarkItem: "true"
 		});
+	},
+	decodeURI: function(uri) {
+		try {
+			return losslessDecodeURI({ spec: uri });
+		}
+		catch(e) {
+			Components.utils.reportError(e);
+		}
+		return uri;
 	},
 	getSeparator: function() {
 		return this.createElement("menuseparator", {
@@ -1779,7 +1791,7 @@ this.bookmarks = {
 		if(!("XULBrowserWindow" in window))
 			return;
 		if(e.type == "DOMMenuItemActive")
-			XULBrowserWindow.setOverLink(e.target.getAttribute("cb_uri") || "", null);
+			XULBrowserWindow.setOverLink(e.target.getAttribute("tooltiptext") || "", null);
 		else if(e.type == "DOMMenuItemInactive")
 			XULBrowserWindow.setOverLink("", null);
 	},
@@ -2019,6 +2031,7 @@ if(options.hideDropMarker || options.showLabel != undefined) {
 
 
 function _log(s) {
+	var id = self.id.match(/\d*$/)[0];
 	var cs = Components.classes["@mozilla.org/consoleservice;1"]
 		.getService(Components.interfaces.nsIConsoleService);
 	function ts() {
@@ -2027,7 +2040,7 @@ function _log(s) {
 		return d.toLocaleFormat("%M:%S:") + "000".substr(String(ms).length) + ms;
 	}
 	_log = function(s) {
-		cs.logStringMessage("[Session Bookmarks]: " + ts() + " " + s);
+		cs.logStringMessage("[Session Bookmarks #" + id + "]: " + ts() + " " + s);
 	};
 	return _log.apply(this, arguments);
 }
