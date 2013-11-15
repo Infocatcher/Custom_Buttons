@@ -635,13 +635,18 @@ this.bookmarks = {
 	get pageContextItem() {
 		this._hasPageContextItem = true;
 		var cbId = "sessionBookmarksPageContextItem";
+		var btnId = this.button.id;
+		Array.slice(document.getElementsByAttribute("cb_buttonId", btnId)).forEach(function(mi) {
+			mi.parentNode.removeChild(mi);
+		});
 		var mi = this.createElement("menuitem", {
 			label: _localize("Session Bookmark This Page"),
 			accesskey: _localize("S", "pageContextItemKey"),
 			tooltiptext: _localize("Button: %S")
 				.replace("%S", this.button.tooltipText || this.button.label),
 			oncommand: "this._bookmarks.addBookmark();",
-			cb_id: cbId
+			cb_id: cbId,
+			cb_buttonId: btnId
 		});
 		mi._bookmarks = this;
 		var insPoint = this.bmItem.nextSibling;
