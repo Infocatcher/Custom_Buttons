@@ -868,10 +868,10 @@ this.bookmarks = {
 			&& (!insPoint || insPoint == this.button);
 		var td = this.getTabData(tab);
 		if(canToggle || this.options.checkDuplicates) {
-			var checkSession = canToggle
+			let checkSession = canToggle
 				? false
 				: this.options.checkDuplicatesSession;
-			var mi = this.getItemByTabData(td, checkSession);
+			let mi = this.getItemByTabData(td, checkSession);
 			if(mi) {
 				if(canToggle) {
 					this.blink(this.button, 0.05);
@@ -1067,10 +1067,10 @@ this.bookmarks = {
 	},
 	setTabSession: function(tab, ssData, uri, mergeHistory, disableForceLoad) {
 		if(ssData && "JSON" in window) try {
-			var data = JSON.parse(ssData);
+			let data = JSON.parse(ssData);
 			if(mergeHistory) {
-				var oldData = JSON.parse(this.ss.getTabState(gBrowser.selectedTab));
-				var tabHistory = oldData.entries.slice(0, oldData.index);
+				let oldData = JSON.parse(this.ss.getTabState(gBrowser.selectedTab));
+				let tabHistory = oldData.entries.slice(0, oldData.index);
 				if(tabHistory[tabHistory.length - 1].url == "about:blank")
 					tabHistory.pop();
 				if(!data.entries.length) // We can get object here
@@ -1238,7 +1238,7 @@ this.bookmarks = {
 			else if(action == "add")
 				o.pn.insertBefore(o.mi, o.ns);
 			else if(action == "attrs") {
-				var mi = o.mi;
+				let mi = o.mi;
 				Array.slice(mi.attributes).forEach(function(attr) {
 					mi.removeAttributeNS(attr.namespaceURI, attr.name);
 				});
@@ -1249,7 +1249,7 @@ this.bookmarks = {
 			else if(action == "move")
 				o.mi.parentNode.insertBefore(o.mi, invert ? o.newPos : o.oldPos);
 			else if(action == "adds" || action == "moves") {
-				var actions = o.actions;
+				let actions = o.actions;
 				if(invert)
 					actions = o.actions.slice().reverse();
 				actions.forEach(function(o) {
@@ -1537,8 +1537,8 @@ this.bookmarks = {
 		//var uri = dt.mozGetDataAt("text/x-moz-text-internal", 0);
 		var tab;
 		if(types.contains("application/x-moz-tabbrowser-tab")) {
-			var insPoint = this.getInsertionPoint(e);
-			for(var i = dt.mozItemCount - 1; i >= 0; --i) {
+			let insPoint = this.getInsertionPoint(e);
+			for(let i = dt.mozItemCount - 1; i >= 0; --i) {
 				tab = dt.mozGetDataAt(TAB_DROP_TYPE, i);
 				tab && this.addBookmark(insPoint, tab);
 			}
@@ -1651,7 +1651,7 @@ this.bookmarks = {
 
 		var tab, tabs;
 		if(e.view.top == window) {
-			var trg = e.originalTarget;
+			let trg = e.originalTarget;
 			for(; trg; trg = trg.parentNode) {
 				if(/(?:^|\s)tabbrowser-tabs?(?:\s|$)/.test(trg.className)) {
 					if(trg.localName == "tabs")
@@ -1665,7 +1665,7 @@ this.bookmarks = {
 			}
 		}
 		else if(e.view.top == content) {
-			var trg = e.target;
+			let trg = e.target;
 			//if(trg instanceof HTMLTextAreaElement || trg.contentEditable == "true")
 			//	return;
 			//if(trg instanceof HTMLInputElement) try {
@@ -1674,8 +1674,8 @@ this.bookmarks = {
 			//}
 			//catch(e) {
 			//}
-			var cs = trg.ownerDocument.defaultView.getComputedStyle(trg, null);
-			var userModify = "userModify" in cs ? cs.userModify : cs.MozUserModify;
+			let cs = trg.ownerDocument.defaultView.getComputedStyle(trg, null);
+			let userModify = "userModify" in cs ? cs.userModify : cs.MozUserModify;
 			if(userModify == "read-write")
 				return;
 			tab = gBrowser.selectedTab;
