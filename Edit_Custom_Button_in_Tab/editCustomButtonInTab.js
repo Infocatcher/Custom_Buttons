@@ -5,7 +5,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2012-2013
-// version 0.1.8 - 2013-02-09
+// version 0.1.8.1 - 2013-11-16
 
 // Note:
 // In Firefox 3.6 and older:
