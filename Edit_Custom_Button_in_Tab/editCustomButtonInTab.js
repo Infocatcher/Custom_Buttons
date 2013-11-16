@@ -92,11 +92,15 @@ window.editCustomButtonInTab = function(btn, newTab) { // Should be global to wo
 
 	// Search for already opened tab
 	var rawParam = unwrap(param);
+	var isSeaMonkey = "Services" in window && Services.appinfo.name == "SeaMonkey";
 	var ws = Components.classes["@mozilla.org/appshell/window-mediator;1"]
 		.getService(Components.interfaces.nsIWindowMediator)
-		.getEnumerator("navigator:browser");
+		.getEnumerator(isSeaMonkey ? null : "navigator:browser");
 	while(ws.hasMoreElements()) {
-		let gBrowser = ws.getNext().gBrowser;
+		let win = ws.getNext();
+		if(isSeaMonkey && win.location.href != "chrome://navigator/content/navigator.xul")
+			continue;
+		let gBrowser = win.gBrowser;
 		let tabs = gBrowser.tabs || gBrowser.tabContainer.childNodes;
 		for(let i = 0, l = tabs.length; i < l; ++i) {
 			let tab = tabs[i];
