@@ -106,12 +106,13 @@ window.editCustomButtonInTab = function(btn, newTab) { // Should be global to wo
 			let win = browser.contentWindow;
 			if(win.location != editorUri)
 				continue;
-			win = unwrap(win);
-			let winParam = "arguments" in win && win.arguments.length
-				? unwrap(win.arguments[0])
-				: win.editor.param;
+			let rawWin = unwrap(win);
+			let winParam = "arguments" in rawWin && rawWin.arguments.length
+				? unwrap(rawWin.arguments[0])
+				: rawWin.editor.param;
 			if(winParam.buttonLink == link) {
 				gBrowser.selectedTab = tab;
+				win.focus();
 				newTab && setTimeout(function() {
 					gBrowser.removeTab(newTab);
 				}, 0);
