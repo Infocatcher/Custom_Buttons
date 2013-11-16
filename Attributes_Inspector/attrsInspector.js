@@ -60,6 +60,7 @@ var _popupLocker = 1;
 var _showNamespaceURI = 2; // 0 - don't show, 1 - show as is, 2 - show pretty name instead of URI
 var _showMargins = 2; // 0 - don't show, 1 - only if Shift pressed, 2 - always show
 var _showFullTree = 2; // 0 - current frame, 1 - top frame, 2 - topmost frame
+// Note: "View - Show Anonymous Content" should be checked to inspect content documents with "_showFullTree = 2"
 var _nodePosition = 0.55; // Position of selected node in DOM Inspector's tree, 0..1 (-1 - don't change)
 
 // Show debug messages in error console:
