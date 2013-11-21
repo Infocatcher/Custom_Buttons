@@ -1768,7 +1768,7 @@ function init() {
 				);
 				var tryDelay = 5;
 				function inspect() {
-					if("inspector" in inspWin) try {
+					if("inspector" in inspWin && inspWin.inspector) try {
 						try {
 							// Avoid warnings in error console after getViewer("dom")
 							var hash = inspWin.inspector.mPanelSet.registry.mViewerHash;
