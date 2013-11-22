@@ -796,7 +796,7 @@ this.bookmarks = {
 		if(!tab)
 			tab = gBrowser.selectedTab;
 		if(this.options.useSessions) {
-			var ssData = this.ss.getTabState(tab);
+			var ssData = this.getTabState(tab);
 			if("JSON" in window) try {
 				let data = JSON.parse(ssData);
 				if(!this.options.saveTabHistory) {
@@ -818,6 +818,36 @@ this.bookmarks = {
 			ssData: ssData,
 			tab:    tab
 		});
+	},
+	getTabState: function(tab) {
+		// Inspired by code from UnloadTab extension
+		// https://addons.mozilla.org/files/compare/233879...223485/file/chrome/content/unloadtab.js#L928
+		// Try flush cached data for tab to get correct scroll position
+		var scope = this.ssTabCacheScope;
+		if(scope) try {
+			scope.TabStateCache.delete(tab);
+		}
+		catch(e) {
+			Components.utils.reportError(e);
+		}
+		return this.ss.getTabState(tab);
+	},
+	get ssTabCacheScope() {
+		var scope;
+		try { // Firefox 28+
+			scope = Components.utils.import("resource:///modules/sessionstore/TabStateCache.jsm", {});
+		}
+		catch(e) {
+		}
+		if(!scope || !("TabStateCache" in scope)) try {
+			scope = Components.utils.import("resource:///modules/sessionstore/SessionStore.jsm", {});
+		}
+		catch(e) {
+		}
+		if(scope && !("TabStateCache" in scope))
+			scope = null;
+		delete this.ssTabCacheScope;
+		return this.ssTabCacheScope = scope;
 	},
 	cleanupSessionData: function(data) {
 		if(!data)
@@ -1093,7 +1123,7 @@ this.bookmarks = {
 		if(ssData && "JSON" in window) try {
 			let data = JSON.parse(ssData);
 			if(mergeHistory) {
-				let oldData = JSON.parse(this.ss.getTabState(gBrowser.selectedTab));
+				let oldData = JSON.parse(this.getTabState(gBrowser.selectedTab));
 				let tabHistory = oldData.entries.slice(0, oldData.index);
 				if(tabHistory[tabHistory.length - 1].url == "about:blank")
 					tabHistory.pop();
