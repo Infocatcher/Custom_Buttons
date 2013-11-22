@@ -111,6 +111,7 @@ var keybUtils = {
 		__proto__: null
 	},
 	//== End of options
+	button: this,
 	get convTableBackward() {
 		var ctb = { __proto__: null };
 		var ctf = this.convTableForward;
@@ -137,7 +138,18 @@ var keybUtils = {
 		}
 		return res;
 	},
-	switchSelKeybLayout: function(_subCall) {
+	switchSelKeybLayout: function(_subCall, _focusFixed) {
+		if(
+			!_focusFixed
+			&& "closeMenus" in window
+			&& document.commandDispatcher.focusedElement == this.button
+		) {
+			closeMenus(this.button);
+			setTimeout(function(_this) {
+				_this.switchSelKeybLayout(_subCall, true);
+			}, 0, this);
+			return;
+		}
 		var fe = document.commandDispatcher.focusedElement;
 		if(!fe)
 			return;
