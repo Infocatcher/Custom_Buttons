@@ -26,9 +26,11 @@ if(btn._allTabsPopup) {
 }
 else if(popup) {
 	btn._allTabsPopup = popup;
+	btn.setAttribute("open", true);
 	document.documentElement.appendChild(popup);
 	popup.addEventListener("popuphidden", function restorePopup(e) {
 		popup.removeEventListener(e.type, restorePopup, true);
+		btn.removeAttribute("open");
 		allTabsBtn.appendChild(popup);
 		btn._allTabsPopup = null;
 	}, true);
@@ -60,11 +62,13 @@ else { // SeaMonkey or old Firefox?
 				}, false);
 			}
 			btn._allTabsPopup = popup;
+			btn.setAttribute("open", true);
 			var markAsClosedTimer = 0;
 			var markAsClosed = function(e) {
 				if(e.type == "popuphidden") {
 					popup.removeEventListener("popuphidden", markAsClosed, true);
 					markAsClosedTimer = setTimeout(function() {
+						btn.removeAttribute("open");
 						btn._allTabsPopup = null;
 					}, 0);
 				}
