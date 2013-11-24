@@ -43,7 +43,8 @@ var options = {
 	},
 	accesskeyPostfix: " ", // <accesskey><postfix><label>
 	openMenuOnMouseover: false,
-	useMenu: false
+	useMenu: false,
+	rightClickToUndoCloseTab: false // Useful with "useMenu: true"
 };
 
 function _localize(sid) {
@@ -143,8 +144,15 @@ this.onclick = function(e) {
 		return;
 	if(e.button == 1 || e.button == 0 && (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey))
 		this.undoCloseTabsList.clearAllLists();
-	else if(e.button == 0) {
-		if(!this.undoCloseTabsList.options.useMenu) {
+	else if(
+		e.button == 0
+		|| e.button == 2 && !e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey
+			&& this.undoCloseTabsList.options.rightClickToUndoCloseTab
+	) {
+		if(
+			e.button == 0 && !this.undoCloseTabsList.options.useMenu
+			|| e.button == 2 && this.undoCloseTabsList.options.rightClickToUndoCloseTab
+		) {
 			if(this.undoCloseTabsList.closedTabCount)
 				this.undoCloseTabsList.undoCloseTab();
 			else
@@ -809,6 +817,12 @@ if(!this.undoCloseTabsList.options.useMenu && this.undoCloseTabsList.cm) {
 			return;
 		e.preventDefault();
 		this.undoCloseTabsList.showMenu(e); // Show menu without "context" flag
+	};
+}
+if(this.undoCloseTabsList.options.rightClickToUndoCloseTab) {
+	this.oncontextmenu = function(e) {
+		if(e.target == this && !e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey)
+			e.preventDefault();
 	};
 }
 
