@@ -160,7 +160,7 @@ mp.installExtension = function(e) {
 	}
 	catch(e) {
 		restore();
-		notify("Error", "Can't make *.xpi!\n" + e);
+		error("Error", "Can't make *.xpi!\n" + e);
 		Components.utils.reportError(
 			"[Extensions Installer] Can't make *.xpi!\nCommand line:\n"
 			+ expandVariables(makeExe) + "\n" + makeArgs.map(expandVariables).join("\n")
@@ -171,7 +171,7 @@ mp.installExtension = function(e) {
 
 	if(!xpiFile.exists()) {
 		restore();
-		notify("Error", "File not found:\n" + xpi);
+		error("Error", "File not found:\n" + xpi);
 		return;
 	}
 
@@ -193,7 +193,7 @@ mp.installExtension = function(e) {
 					var err = "Installation failed\n" + xpi;
 					Components.utils.reportError(err);
 					restore();
-					notify("Error", err);
+					error("Error", err);
 				}
 			});
 			install.install();
@@ -272,14 +272,19 @@ else { // Mouse gestures or something other...
 	mp.openPopupAtScreen(e.screenX, e.screenY);
 }
 
-function notify(title, text) {
+function notify(title, text, isError) {
 	Components.classes["@mozilla.org/alerts-service;1"]
 		.getService(Components.interfaces.nsIAlertsService)
 		.showAlertNotification(
-			"chrome://mozapps/skin/extensions/extensionGeneric.png",
+			isError
+				? "chrome://global/skin/icons/Warning.png"
+				: /*btn && btn.image || */"chrome://mozapps/skin/extensions/extensionGeneric.png",
 			"Extensions Installer: " + title,
 			text
 		);
+}
+function error(title, text) {
+	notify(title, text, true);
 }
 function expandVariables(str) {
 	var props = Components.classes["@mozilla.org/file/directory_service;1"]
