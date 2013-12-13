@@ -75,15 +75,19 @@ function setStyle(mi, uid, addon) {
 	function getAddonCallback(addon) {
 		var icon = "";
 		var color = "grayText";
+		var iconOpacity = "0.5";
 		if(addon) {
 			icon = addon.iconURL
 				|| addon.icon64URL
 				|| "chrome://mozapps/skin/extensions/extensionGeneric-16.png";
 			if(addon.isActive)
-				color = "";
+				color = iconOpacity = "";
 		}
 		mi.setAttribute("image", icon);
 		mi.style.color = color;
+		var icon = mi.ownerDocument.getAnonymousElementByAttribute(mi, "class", "menu-iconic-icon");
+		if(icon)
+			icon.style.opacity = iconOpacity;
 	}
 	if(addon !== undefined)
 		getAddonCallback(addon);
