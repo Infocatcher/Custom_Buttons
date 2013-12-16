@@ -63,9 +63,53 @@ if(!watcher) {
 			if(isFrame)
 				window.addEventListener("unload", this, false);
 
+			Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
+				.getService(Components.interfaces.mozIJSSubScriptLoader)
+				.loadSubScript("chrome://global/content/globalOverlay.js", window);
+
+			var isCodeMirror = false;
+			try { // See chrome://browser/content/devtools/scratchpad.js
+				Components.utils.import("resource:///modules/source-editor.jsm", window);
+				var SourceEditor = window.SourceEditor;
+			}
+			catch(e) {
+				var require = Components.utils.import("resource://gre/modules/devtools/Loader.jsm", {}).devtools.require;
+				var SourceEditor = window.SourceEditor = require("devtools/sourceeditor/editor");
+				isCodeMirror = true;
+			}
+
 			// See view-source:chrome://browser/content/devtools/scratchpad.xul
 			// + view-source:chrome://browser/content/devtools/source-editor-overlay.xul
-			var psXUL = ('<popupset id="sourceEditorPopupset"\
+			var psXUL = (isCodeMirror
+			? '<!DOCTYPE popupset [\
+				<!ENTITY % sourceEditorStrings SYSTEM "chrome://browser/locale/devtools/sourceeditor.dtd">\
+				%sourceEditorStrings;\
+			]>\
+			<popupset id="sourceEditorPopupset"\
+				xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">\
+				<menupopup id="sourceEditorContext"\
+					onpopupshowing="goUpdateSourceEditorMenuItems()">\
+					<menuitem id="menu_undo"/>\
+					<menuitem id="menu_redo"/>\
+					<menuseparator/>\
+					<menuitem id="menu_cut"/>\
+					<menuitem id="menu_copy"/>\
+					<menuitem id="menu_paste"/>\
+					<menuitem id="menu_delete"/>\
+					<menuseparator/>\
+					<menuitem id="menu_selectAll"/>\
+					<menuseparator/>\
+					<menuitem id="menu_find"/>\
+					<menuitem id="menu_findAgain"/>\
+					<menuseparator/>\
+					<menuitem id="se-menu-gotoLine"\
+						label="&gotoLineCmd.label;"\
+						accesskey="&gotoLineCmd.accesskey;"\
+						key="key_gotoLine"\
+						oncommand="goDoCommand(\'cmd_gotoLine\')"/>\
+				</menupopup>\
+			</popupset>'
+			: '<popupset id="sourceEditorPopupset"\
 				xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">\
 				<menupopup id="sourceEditorContext"\
 					onpopupshowing="goUpdateSourceEditorMenuItems()">\
@@ -84,8 +128,9 @@ if(!watcher) {
 					<menuseparator/>\
 					<menuitem id="se-menu-gotoLine"/>\
 				</menupopup>\
-			</popupset>')
-			.replace(/>\s+</g, "><");
+			</popupset>'
+			).replace(/>\s+</g, "><");
+
 			var ps = new DOMParser().parseFromString(psXUL, "application/xml").documentElement;
 			document.documentElement.appendChild(ps);
 
@@ -162,21 +207,6 @@ if(!watcher) {
 					}]
 				);
 			}.bind(this), 500); // We should wait to not break other extensions with document.loadOverlay()
-
-			Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
-				.getService(Components.interfaces.mozIJSSubScriptLoader)
-				.loadSubScript("chrome://global/content/globalOverlay.js", window);
-
-			var isCodeMirror = false;
-			try { // See chrome://browser/content/devtools/scratchpad.js
-				Components.utils.import("resource:///modules/source-editor.jsm", window);
-				var SourceEditor = window.SourceEditor;
-			}
-			catch(e) {
-				var require = Components.utils.import("resource://gre/modules/devtools/Loader.jsm", {}).devtools.require;
-				var SourceEditor = window.SourceEditor = require("devtools/sourceeditor/editor");
-				isCodeMirror = true;
-			}
 
 			Array.slice(document.getElementsByTagName("cbeditor")).forEach(function(cbEditor) {
 				if("__sourceEditor" in cbEditor)
@@ -533,7 +563,13 @@ if(!watcher) {
 			window.setTimeout(function load() {
 				_log("loadOverlay(): " + uri);
 				var tryAgain = Date.now() + 800;
-				document.loadOverlay(uri, null);
+				try {
+					document.loadOverlay(uri, null);
+				}
+				catch(e) {
+					window.setTimeout(callback, 0);
+					return;
+				}
 				window.setTimeout(function ensureLoaded() {
 					if(check(window))
 						window.setTimeout(callback, 0);
