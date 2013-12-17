@@ -306,6 +306,8 @@ this.undoCloseTabsList = {
 		window.addEventListener("TabClose",       this, false);
 		window.addEventListener("SSTabRestoring", this, false);
 		window.addEventListener("unload",         this, false);
+		if(this.appName == "SeaMonkey") // No SSTab* events in SeaMonkey
+			window.addEventListener("TabOpen", this, false);
 		this.mp.addEventListener("DOMMenuItemActive",   this, false);
 		this.mp.addEventListener("DOMMenuItemInactive", this, false);
 		this.ensureSessionsInitialized(this.updUIGlobal, this);
@@ -400,6 +402,8 @@ this.undoCloseTabsList = {
 		window.removeEventListener("TabClose",       this, false);
 		window.removeEventListener("SSTabRestoring", this, false);
 		window.removeEventListener("unload",         this, false);
+		if(this.appName == "SeaMonkey")
+			window.removeEventListener("TabOpen", this, false);
 		this.mp.removeEventListener("DOMMenuItemActive",   this, false);
 		this.mp.removeEventListener("DOMMenuItemInactive", this, false);
 		var menu = document.getElementById(this.button.id + "-tabContextMenu");
@@ -412,6 +416,7 @@ this.undoCloseTabsList = {
 		switch(e.type) {
 			case "TabClose":
 			case "SSTabRestoring":
+			case "TabOpen":
 				setTimeout(function(_this) {
 					_this.updUI();
 				}, 0, this);
