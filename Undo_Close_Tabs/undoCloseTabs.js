@@ -319,8 +319,11 @@ this.undoCloseTabsList = {
 			LOG("Can't find \"Undo Close Tab\" item in tab context menu");
 			return;
 		}
-		var menu = this.createElement("menu", {
-			id: this.button.id + "-tabContextMenu",
+		var menuId = this.button.id + "-tabContextMenu";
+		var menu = document.getElementById(menuId);
+		menu && menu.parentNode.removeChild(menu); // For SeaMonkey
+		menu = this.createElement("menu", {
+			id: menuId,
 			label: _localize("tabContextMenu"),
 			accesskey: _localize("tabContextMenuAccesskey")
 		});
