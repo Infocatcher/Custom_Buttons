@@ -310,7 +310,7 @@ this.undoCloseTabsList = {
 			window.addEventListener("TabOpen", this, false);
 		this.mp.addEventListener("DOMMenuItemActive",   this, false);
 		this.mp.addEventListener("DOMMenuItemInactive", this, false);
-		this.ensureSessionsInitialized(this.updUIGlobal, this);
+		this.updUIGlobal();
 		if(this.options.showInTabContextMenu) setTimeout(function(_this) {
 			_this.initTabContext();
 		}, 100, this);
@@ -803,8 +803,10 @@ this.undoCloseTabsList = {
 			let win = ws.getNext();
 			if(!isSeaMonkey || this.isBrowserWindow(win)) {
 				let btn = win.document.getElementById(id);
-				if(btn && "undoCloseTabsList" in btn)
-					btn.undoCloseTabsList.updUI();
+				if(btn && "undoCloseTabsList" in btn) {
+					let ucl = btn.undoCloseTabsList;
+					ucl.ensureSessionsInitialized(ucl.updUI, ucl);
+				}
 			}
 		}
 	},
