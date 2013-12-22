@@ -376,28 +376,6 @@ this.undoCloseTabsList = {
 		origMi.parentNode.insertBefore(menu, origMi.nextSibling);
 		origMi.setAttribute("hidden", "true");
 	},
-	ensureSessionsInitialized: function(callback, context) {
-		var _this = this;
-		var stopTime = Date.now() + 3e3;
-		(function ensureInitialized() {
-			try {
-				_this.ss.getClosedTabCount(window);
-				callback.call(context);
-				return;
-			}
-			catch(e) {
-				if(Date.now() > stopTime) {
-					Components.utils.reportError(
-						_this.errPrefix
-						+ "Can't initialize: nsISessionStore.getClosedTabCount() failed"
-					);
-					Components.utils.reportError(e);
-					return;
-				}
-			}
-			setTimeout(ensureInitialized, 50);
-		})();
-	},
 	destroy: function() {
 		window.removeEventListener("TabClose",       this, false);
 		window.removeEventListener("SSTabRestoring", this, false);
@@ -814,6 +792,28 @@ this.undoCloseTabsList = {
 		var loc = window.location.href;
 		return loc == "chrome://browser/content/browser.xul"
 			|| loc == "chrome://navigator/content/navigator.xul";
+	},
+	ensureSessionsInitialized: function(callback, context) {
+		var _this = this;
+		var stopTime = Date.now() + 3e3;
+		(function ensureInitialized() {
+			try {
+				_this.ss.getClosedTabCount(window);
+				callback.call(context);
+				return;
+			}
+			catch(e) {
+				if(Date.now() > stopTime) {
+					Components.utils.reportError(
+						_this.errPrefix
+						+ "Can't initialize: nsISessionStore.getClosedTabCount() failed"
+					);
+					Components.utils.reportError(e);
+					return;
+				}
+			}
+			setTimeout(ensureInitialized, 50);
+		})();
 	}
 };
 
