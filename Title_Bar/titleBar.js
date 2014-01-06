@@ -3,8 +3,8 @@
 // Title Bar button for Custom Buttons
 // (code for "initialization" section)
 
-// (c) Infocatcher 2010, 2012
-// version 0.2.2.1 - 2012-12-20
+// (c) Infocatcher 2010, 2012, 2014
+// version 0.2.3 - 2014-01-06
 
 var flexibleWidth = true;
 
@@ -46,6 +46,33 @@ this.__defineSetter__("title", function(val) {
 
 var titleUpdater = {
 	button: this,
+	_mo: null,
+	init: function() {
+		if("MutationObserver" in window) {
+			var _this = this;
+			var mo = this._mo = new MutationObserver(function() {
+				_this.handleMutations.apply(_this, arguments);
+			});
+			// http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#mutation-observers
+			mo.observe(root, {
+				attributes: true,
+				attributeFilter: ["title"]
+			});
+		}
+		else {
+			root.addEventListener("DOMAttrModified", this, true);
+		}
+	},
+	destroy: function() {
+		var mo = this._mo;
+		if(mo) {
+			this._mo = null;
+			mo.disconnect();
+		}
+		else {
+			root.removeEventListener("DOMAttrModified", this, true);
+		}
+	},
 	handleMutations: function(mutations) {
 		this.button.title = document.title;
 	},
@@ -54,19 +81,6 @@ var titleUpdater = {
 			this.button.title = e.newValue;
 	}
 };
-if("MutationObserver" in window) {
-	var mo = new MutationObserver(function() {
-		titleUpdater.handleMutations.apply(titleUpdater, arguments);
-	});
-	// http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#mutation-observers
-	mo.observe(root, {
-		attributes: true,
-		attributeFilter: ["title"]
-	});
-}
-else {
-	root.addEventListener("DOMAttrModified", titleUpdater, true);
-}
 
 var dragHandler = {
 	get sm() {
@@ -184,8 +198,10 @@ function removeStyles() {
 }
 
 this.title = document.title;
+titleUpdater.init();
 
 this.onDestroy = function(reason) {
+	titleUpdater.destroy();
 	if(reason == "update" || reason == "delete")
 		removeStyles()
 	else if(reason == "constructor" && this.parentNode.nodeName == "toolbar")
