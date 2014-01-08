@@ -36,6 +36,7 @@ var options = {
 	showDebugPrefs: 3, // Sum of flags: 1 - extensions, 2 - application
 	debugPrefsInclude: /\.(?:debug|dev(?:el(?:opment)?)?Mode)(?:[-.]?\w+)?$/i,
 	debugPrefsExclude: /\.debugger/i,
+	debugPrefsTrimExtPrefix: true, // Remove leading "extensions." from labels
 	confirm: {
 		reopen: false,
 		restart: false,
@@ -1186,6 +1187,7 @@ var cmds = this.commands = {
 			&& document.createDocumentFragment();
 		var app = showDebugPrefs & 2
 			&& document.createDocumentFragment();
+		var trimPrefix = this.options.debugPrefsTrimExtPrefix ? 11 /*"extensions.".length*/ : 0;
 		this.prefSvc.getBranch("")
 			.getChildList("", {})
 			.filter(function(pName) {
@@ -1196,7 +1198,7 @@ var cmds = this.commands = {
 			.sort()
 			.forEach(function(pName) {
 				if(pName.substr(0, 11) == "extensions.")
-					ext && ext.appendChild(this.createPrefItem(pName));
+					ext && ext.appendChild(this.createPrefItem(pName, trimPrefix));
 				else
 					app && app.appendChild(this.createPrefItem(pName));
 			}, this);
@@ -1216,10 +1218,16 @@ var cmds = this.commands = {
 		else
 			node.parentNode.setAttribute("disabled", "true");
 	},
-	createPrefItem: function(pName) {
+	createPrefItem: function(pName, trimPrefix) {
 		var mi = document.createElement("menuitem");
 		mi.setAttribute("cb_pref", pName);
-		mi.setAttribute("label", pName);
+		if(trimPrefix) {
+			mi.setAttribute("label", pName.substr(trimPrefix));
+			mi.setAttribute("tooltiptext", pName);
+		}
+		else {
+			mi.setAttribute("label", pName);
+		}
 		var pVal = this.getPref(pName);
 		mi.setAttribute("type", "checkbox");
 		if(typeof pVal == "boolean") {
