@@ -289,6 +289,7 @@ var cmds = this.commands = {
 	options: options,
 	button: this,
 	onlyPopup: this.localName == "popupset",
+	popup: null,
 	get btnNum() {
 		delete this.btnNum;
 		return this.btnNum = this.button.id.match(/\d*$/)[0];
@@ -332,16 +333,11 @@ var cmds = this.commands = {
 	},
 	get defaultActionItem() {
 		var defaultAction = this.defaultAction;
-		if(!defaultAction)
-			return null;
-		var mis = this.button.getElementsByAttribute("cb_id", defaultAction);
-		if(!mis.length)
-			return null;
-		return mis[0];
+		return defaultAction && this.$(defaultAction);
 	},
 	initMenu: function(menu) {
 		if(!menu)
-			menu = this.button.lastChild;
+			menu = this.popup;
 		var defaultAction = this.defaultAction;
 		Array.forEach(
 			menu.getElementsByAttribute("cb_id", "*"),
@@ -704,7 +700,7 @@ var cmds = this.commands = {
 			return;
 		}
 		var _this = this;
-		var mi = this.button.getElementsByAttribute("cb_id", "switchLocale")[0];
+		var mi = this.$("switchLocale");
 		mi.setAttribute("disabled", "true");
 		this.ensureLocaleAvailable(locale, function(ok) {
 			mi.removeAttribute("disabled");
@@ -1036,7 +1032,7 @@ var cmds = this.commands = {
 	},
 	setAttrsInspectorActive: function(mi) {
 		if(!mi)
-			mi = this.button.getElementsByAttribute("cb_id", "attrsInspector")[0];
+			mi = this.$("attrsInspector");
 		if("__attributesInspector" in window) {
 			mi.setAttribute("type", "checkbox");
 			mi.setAttribute("checked", "true");
@@ -1122,6 +1118,10 @@ var cmds = this.commands = {
 		return false;
 	},
 
+	$: function(id) {
+		var nodes = this.popup.getElementsByAttribute("cb_id", id);
+		return nodes.length ? nodes[0] : null;
+	},
 	initPrefsMenu: function(popup) {
 		var closeMenu = this.options.closeOptionsMenu ? "auto" : "none";
 		Array.forEach(
@@ -1221,7 +1221,7 @@ var cmds = this.commands = {
 	}
 };
 
-var mp = this.appendChild(parseXULFromString('\
+var mp = cmds.popup = this.appendChild(parseXULFromString('\
 	<menupopup xmlns="' + XULNS + '"\
 		onpopupshowing="if(event.target == this) this.parentNode.commands.initMenu(this);"\
 		onmousedown="this.parentNode.commands.setCloseMenu(event);"\
