@@ -33,6 +33,9 @@ var options = {
 	// Use icon of default menu item as button icon
 	// (middle-click on menu item to mark it as default,
 	// middle-click on button to execute default action)
+	showDebugPrefs: 3, // Sum of flags: 1 - extensions, 2 - application
+	debugPrefsInclude: /\.(?:debug|dev(?:el(?:opment)?)?Mode)(?:[-.]?\w+)?$/i,
+	debugPrefsExclude: /\.debugger/i,
 	confirm: {
 		reopen: false,
 		restart: false,
@@ -217,6 +220,23 @@ function _localize(s, key) {
 		"Enable E4X for content": {
 			ru: "Включить E4X для content"
 		},
+
+		"Debug extensions": {
+			ru: "Отладка расширений"
+		},
+		debugExtKey: {
+			ru: "р"
+		},
+		"Debug application": {
+			ru: "Отладка приложения"
+		},
+		debugAppKey: {
+			ru: "п"
+		},
+		"Change “%S” preference:": {
+			ru: "Изменить настройку «%S»:"
+		},
+
 		"Middle-click: %S": {
 			ru: "Клик средней кнопкой мыши: %S"
 		}
@@ -1122,26 +1142,144 @@ var cmds = this.commands = {
 		var nodes = this.popup.getElementsByAttribute("cb_id", id);
 		return nodes.length ? nodes[0] : null;
 	},
+	delayed: function(func, context, delay) {
+		if(!context)
+			context = this;
+		setTimeout(function() {
+			func.call(context);
+		}, delay || 0);
+	},
 	initPrefsMenu: function(popup) {
+		var knownPrefs = { __proto__: null };
 		var closeMenu = this.options.closeOptionsMenu ? "auto" : "none";
 		Array.forEach(
 			popup.getElementsByAttribute("cb_pref", "*"),
 			function(node) {
+				if(node.parentNode != popup) // Ignore debug prefs
+					return;
 				var pref = node.getAttribute("cb_pref");
+				knownPrefs[pref] = true;
 				node.setAttribute("checked", !!this.getPref(pref));
 				node.setAttribute("closemenu", closeMenu);
 				this.hlPrefItem(node, pref);
 			},
 			this
 		);
+		this.initDebugPrefsMenus(popup, knownPrefs);
 	},
-	doPrefsMenuCommand: function(node) {
-		var pref = node.getAttribute("cb_pref");
-		this.setPref(pref, node.getAttribute("checked") == "true");
-		this.hlPrefItem(node, pref);
+	initDebugPrefsMenus: function(parentPopup, knownPrefs) {
+		var showDebugPrefs = this.options.showDebugPrefs;
+		if(!showDebugPrefs)
+			return;
+		this.$("debugPrefsSeparator").removeAttribute("hidden");
+		if(showDebugPrefs & 1)
+			this.$("debugPrefsExtMenu").removeAttribute("hidden");
+		if(showDebugPrefs & 2)
+			this.$("debugPrefsAppMenu").removeAttribute("hidden");
+		this.delayed(function() {
+			this.fillDebugPrefsPopup(knownPrefs);
+		});
+	},
+	fillDebugPrefsPopup: function(knownPrefs) {
+		var showDebugPrefs = this.options.showDebugPrefs;
+		var ext = showDebugPrefs & 1
+			&& document.createDocumentFragment();
+		var app = showDebugPrefs & 2
+			&& document.createDocumentFragment();
+		this.prefSvc.getBranch("")
+			.getChildList("", {})
+			.filter(function(pName) {
+				return !(pName in knownPrefs)
+					&& this.options.debugPrefsInclude.test(pName)
+					&& !this.options.debugPrefsExclude.test(pName);
+			}, this)
+			.sort()
+			.forEach(function(pName) {
+				if(pName.substr(0, 11) == "extensions.")
+					ext && ext.appendChild(this.createPrefItem(pName));
+				else
+					app && app.appendChild(this.createPrefItem(pName));
+			}, this);
+		ext && this.delayed(function() {
+			this.fillPopup("debugPrefsExtPopup", ext);
+		});
+		app && this.delayed(function() {
+			this.fillPopup("debugPrefsAppPopup", app);
+		});
+	},
+	fillPopup: function(id, df) {
+		var node = this.$(id);
+		node.textContent = "";
+		node.appendChild(df);
+		if(node.hasChildNodes())
+			node.parentNode.removeAttribute("disabled");
+		else
+			node.parentNode.setAttribute("disabled", "true");
+	},
+	createPrefItem: function(pName) {
+		var mi = document.createElement("menuitem");
+		mi.setAttribute("cb_pref", pName);
+		mi.setAttribute("label", pName);
+		var pVal = this.getPref(pName);
+		mi.setAttribute("type", "checkbox");
+		if(typeof pVal == "boolean") {
+			if(this.getPref(pName))
+				mi.setAttribute("checked", "true");
+			if(!this.options.closeOptionsMenu)
+				mi.setAttribute("closemenu", "none");
+		}
+		else {
+			mi.setAttribute("autocheck", "false");
+		}
+		this.showPrefValue(mi, pVal);
+		this.hlPrefItem(mi, pName);
+		return mi;
+	},
+	doPrefsMenuCommand: function(mi) {
+		var pref = mi.getAttribute("cb_pref");
+		if(!pref)
+			return;
+		var pVal;
+		if(mi.getAttribute("type") == "checkbox" && mi.getAttribute("autocheck") != "false")
+			pVal = mi.getAttribute("checked") == "true";
+		else {
+			var curVal = this.getPref(pref);
+			var prefObj = { value: curVal };
+			var ok = this.ps.prompt(
+				window,
+				_localize("Extensions Developer Tools"),
+				_localize("Change “%S” preference:").replace("%S", pref),
+				prefObj,
+				null,
+				{}
+			);
+			if(!ok)
+				return;
+			pVal = prefObj.value;
+			if(typeof curVal == "number")
+				pVal = +pVal;
+		}
+		this.setPref(pref, pVal);
+		this.hlPrefItem(mi, pref);
+		if(mi.hasAttribute("acceltext"))
+			this.showPrefValue(mi, pVal);
 		if(pref == "devtools.chrome.enabled")
 			this.initMenu();
 		this.prefsChanged = true;
+	},
+	showPrefValue: function(mi, pVal) {
+		var pStr = String(pVal);
+		var pType = typeof pVal;
+		if(pType != "boolean") {
+			if(pType == "number")
+				mi.setAttribute("checked", pVal != 0);
+			pStr = pStr.substr(0, 16);
+			// Simple trick to align "1" and "false"
+			var pad = Math.round((5 - pStr.length)*1.6);
+			while(pad-- > 0)
+				pStr += " ";
+		}
+		mi.setAttribute("acceltext", pStr);
 	},
 	hlPrefItem: function(node, pref) {
 		node.style.fontWeight = this.prefHasUserValue(pref) ? "bold" : "";
@@ -1306,8 +1444,8 @@ var mp = cmds.popup = this.appendChild(parseXULFromString('\
 			label="' + _localize("Options") + '"\
 			accesskey="' + _localize("O", "optionsKey") + '">\
 			<menupopup\
-				onpopupshowing="this.parentNode.parentNode.parentNode.commands.initPrefsMenu(this);"\
-				onpopuphidden="this.parentNode.parentNode.parentNode.commands.savePrefFile();"\
+				onpopupshowing="if(event.target == this) this.parentNode.parentNode.parentNode.commands.initPrefsMenu(this);"\
+				onpopuphidden="if(event.target == this) this.parentNode.parentNode.parentNode.commands.savePrefFile();"\
 				oncommand="this.parentNode.parentNode.parentNode.commands.doPrefsMenuCommand(event.target);"\
 				onclick="if(event.button == 1) closeMenus(this);">\
 				<menuitem cb_pref="javascript.options.showInConsole"\
@@ -1362,6 +1500,17 @@ var mp = cmds.popup = this.appendChild(parseXULFromString('\
 					type="checkbox"\
 					label="' + _localize("Enable E4X for content") + '"\
 					hidden="' + !this.commands.canDisableE4X + '" />\
+				<menuseparator cb_id="debugPrefsSeparator" hidden="true" />\
+				<menu cb_id="debugPrefsExtMenu" hidden="true"\
+					label="' + _localize("Debug extensions") + '"\
+					accesskey="' + _localize("e", "debugExtKey") + '">\
+					<menupopup cb_id="debugPrefsExtPopup" />\
+				</menu>\
+				<menu cb_id="debugPrefsAppMenu" hidden="true"\
+					label="' + _localize("Debug application") + '"\
+					accesskey="' + _localize("a", "debugAppKey") + '">\
+					<menupopup cb_id="debugPrefsAppPopup" />\
+				</menu>\
 			</menupopup>\
 		</menu>\
 	</menupopup>'
