@@ -4,14 +4,14 @@
 // Edit Custom Button in Tab button for Custom Buttons
 // (code for "initialization" section)
 
-// (c) Infocatcher 2012-2013
-// version 0.1.8.1 - 2013-11-16
+// (c) Infocatcher 2012-2014
+// version 0.1.8.2 - 2014-01-12
 
 // Note:
 // In Firefox 3.6 and older:
 // - "Save size and position of editor windows separately for each custom button" option should be enabled
 // - tab with editor can't be closed sometimes using OK/Cancel buttons
-// And in new Firefox/SeaMonkey versins reload command closes tab.
+// And in new Firefox/SeaMonkey versions reload command closes tab.
 
 var editInTabLabel = (function() {
 	var locale = (function() {
