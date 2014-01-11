@@ -86,9 +86,12 @@ window.editCustomButtonInTab = function(btn, newTab) { // Should be global to wo
 	var cbService = Components.classes["@xsms.nm.ru/custombuttons/cbservice;1"]
 		.getService(Components.interfaces.cbICustomButtonsService);
 	var param = cbService.getButtonParameters(link);
-	var editorUri = editorBaseUri;
-	if(cbService.mode & 64 /*CB_MODE_SAVE_EDITOR_SIZE_SEPARATELY*/)
-		editorUri += "?window=" + cbService.getWindowId(document.documentURI) + "&id=" + btn.id;
+	var editorUriFull = editorBaseUri
+		+ "?window=" + cbService.getWindowId(document.documentURI)
+		+ "&id=" + btn.id;
+	var editorUri = cbService.mode & 64 /*CB_MODE_SAVE_EDITOR_SIZE_SEPARATELY*/
+		? editorUriFull
+		: editorBaseUri;
 
 	// Search for already opened tab
 	var rawParam = unwrap(param);
@@ -110,9 +113,10 @@ window.editCustomButtonInTab = function(btn, newTab) { // Should be global to wo
 			if(!browser)
 				continue;
 			let win = browser.contentWindow;
-			if(win.location.href != editorUri)
+			let loc = win.location.href;
+			if(loc.substr(0, editorBaseUri.length) != editorBaseUri)
 				continue;
-			let isSameEditor = cbService.mode & 64 /*CB_MODE_SAVE_EDITOR_SIZE_SEPARATELY*/;
+			let isSameEditor = loc == editorUriFull;
 			if(!isSameEditor) {
 				let rawWin = unwrap(win);
 				let winParam = "arguments" in rawWin && rawWin.arguments.length
