@@ -11,7 +11,6 @@
 // In Firefox 3.6 and older:
 // - "Save size and position of editor windows separately for each custom button" option should be enabled
 // - tab with editor can't be closed sometimes using OK/Cancel buttons
-// And in new Firefox/SeaMonkey versions reload command closes tab.
 
 var editInTabLabel = (function() {
 	var locale = (function() {
@@ -164,7 +163,12 @@ window.editCustomButtonInTab = function(btn, newTab) { // Should be global to wo
 		function checkUnsaved(e) {
 			if(alreadyAsked)
 				return;
-			if(!unwrap(doc).documentElement.cancelDialog())
+			var dlg = unwrap(doc).documentElement;
+			if(
+				"_fireButtonEvent" in dlg
+					? !dlg._fireButtonEvent("cancel")
+					: !dlg.cancelDialog()
+			)
 				e.preventDefault();
 		}
 		function onDialogCancel(e) {
