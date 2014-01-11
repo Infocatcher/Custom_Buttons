@@ -114,7 +114,7 @@ window.editCustomButtonInTab = function(btn, newTab) { // Should be global to wo
 				continue;
 			let win = browser.contentWindow;
 			let loc = win.location.href;
-			if(loc.substr(0, editorBaseUri.length) != editorBaseUri)
+			if(loc.substr(0, editorBaseUriLength) != editorBaseUri)
 				continue;
 			let isSameEditor = loc == editorUriFull;
 			if(!isSameEditor) {
@@ -216,10 +216,11 @@ function checkTab(tab) {
 	if(btn)
 		editCustomButtonInTab(btn, tab);
 }
+const editorBaseUriLength = editorBaseUri.length;
 // We can't use only SSTabRestoring: user can reload tab with editor
 addEventListener("DOMContentLoaded", function(e) {
 	var doc = e.target;
-	if(doc.location.href.substr(0, editorBaseUri.length) != editorBaseUri)
+	if(doc.location.href.substr(0, editorBaseUriLength) != editorBaseUri)
 		return;
 	var tabs = gBrowser.tabs || gBrowser.tabContainer.childNodes;
 	for(var i = 0, l = tabs.length; i < l; ++i) {
