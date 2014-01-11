@@ -87,7 +87,7 @@ window.editCustomButtonInTab = function(btn, newTab) { // Should be global to wo
 		.getService(Components.interfaces.cbICustomButtonsService);
 	var param = cbService.getButtonParameters(link);
 	var editorUri = editorBaseUri;
-	if(cbService.mode & 64)
+	if(cbService.mode & 64 /*CB_MODE_SAVE_EDITOR_SIZE_SEPARATELY*/)
 		editorUri += "?window=" + cbService.getWindowId(document.documentURI) + "&id=" + btn.id;
 
 	// Search for already opened tab
@@ -104,17 +104,23 @@ window.editCustomButtonInTab = function(btn, newTab) { // Should be global to wo
 		let tabs = gBrowser.tabs || gBrowser.tabContainer.childNodes;
 		for(let i = 0, l = tabs.length; i < l; ++i) {
 			let tab = tabs[i];
+			if(tab == newTab)
+				continue;
 			let browser = tab.linkedBrowser;
 			if(!browser)
 				continue;
 			let win = browser.contentWindow;
-			if(win.location != editorUri)
+			if(win.location.href != editorUri)
 				continue;
-			let rawWin = unwrap(win);
-			let winParam = "arguments" in rawWin && rawWin.arguments.length
-				? unwrap(rawWin.arguments[0])
-				: rawWin.editor.param;
-			if(winParam.buttonLink == link) {
+			let isSameEditor = cbService.mode & 64 /*CB_MODE_SAVE_EDITOR_SIZE_SEPARATELY*/;
+			if(!isSameEditor) {
+				let rawWin = unwrap(win);
+				let winParam = "arguments" in rawWin && rawWin.arguments.length
+					? unwrap(rawWin.arguments[0])
+					: rawWin.editor.param;
+				isSameEditor = winParam.buttonLink == link;
+			}
+			if(isSameEditor) {
 				gBrowser.selectedTab = tab;
 				win.focus();
 				newTab && setTimeout(function() {
