@@ -117,8 +117,8 @@ window.editCustomButtonInTab = function(btn, newTab) { // Should be global to wo
 				let rawWin = unwrap(win);
 				let winParam = "arguments" in rawWin && rawWin.arguments.length
 					? unwrap(rawWin.arguments[0])
-					: rawWin.editor.param;
-				isSameEditor = winParam.buttonLink == link;
+					: rawWin.editor && rawWin.editor.param;
+				isSameEditor = winParam && winParam.buttonLink == link;
 			}
 			if(isSameEditor) {
 				gBrowser.selectedTab = tab;
