@@ -9,7 +9,8 @@
 
 // Note:
 // In Firefox 3.6 and older:
-// - "Save size and position of editor windows separately for each custom button" option should be enabled
+// - Force enables "Save size and position of editor windows separately for each custom button"
+//   option for editor in tab (because doesn't work without this)
 // - tab with editor can't be closed sometimes using OK/Cancel buttons
 
 var editInTabLabel = (function() {
@@ -90,6 +91,7 @@ window.editCustomButtonInTab = function(btn, newTab) { // Should be global to wo
 		+ "?window=" + cbService.getWindowId(document.documentURI)
 		+ "&id=" + btn.id;
 	var editorUri = cbService.mode & 64 /*CB_MODE_SAVE_EDITOR_SIZE_SEPARATELY*/
+		|| !Object.create // Firefox 3.6 and older
 		? editorUriFull
 		: editorBaseUri;
 
