@@ -581,8 +581,7 @@ this.permissions = {
 				}
 				if(!host)
 					continue;
-				if(this.options.useBaseDomain.preserveCurrentSitesCookies)
-					host = this.getBaseDomain(host);
+				host = this.getHost(this.options.useBaseDomain.preserveCurrentSitesCookies, host);
 				tmp[host] = true;
 			}
 		}
@@ -597,7 +596,12 @@ this.permissions = {
 			.getService(Components.interfaces.nsIXULAppInfo)
 			.name == "SeaMonkey";
 	},
-	getHost: function(useBaseDomain) {
+	getHost: function(useBaseDomain, host) {
+		if(host) {
+			return useBaseDomain
+				? this.getBaseDomain(host)
+				: host;
+		}
 		return useBaseDomain
 			? this.currentBaseDomain
 			: this.currentHost;
