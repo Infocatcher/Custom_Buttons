@@ -20,9 +20,12 @@ var options = {
 	showTempPermissions: true, // Show items about temporary permissions (only Gecko 2.0+)
 	tempExpire: -1, // Type of temporary permissions
 	// -1 - session, otherwise - expire after given time (in milliseconds)
-	useBaseDomain: { // If set to true, will use short domain like google.com instead of www.google.com
-		addPermission: false, // Add (and toggle) permission action
-		openPermissions: false,  // Filter in "Show Exceptions" window
+	useBaseDomain: {
+		// 0 - use full domain name: addons.mozilla.org, www.google.com
+		// 1 - strip "www." prefix from full domain name: addons.mozilla.org, google.com
+		// 2 - use top-level domains (TLDs): mozilla.org, google.com
+		addPermission: 1, // Add (and toggle) permission action
+		openPermissions: 0,  // Filter in "Show Exceptions" window
 	},
 	showDefaultPolicy: true, // Show default policy
 	toggleMode: Components.interfaces.nsIPermissionManager.ALLOW_ACTION,
@@ -507,18 +510,18 @@ this.permissions = {
 		return this.isSeaMonkey = this.appInfo.name == "SeaMonkey";
 	},
 	getHost: function(useBaseDomain, host) {
-		if(host) {
-			return useBaseDomain
-				? this.getBaseDomain(host)
-				: host;
+		if(host === undefined)
+			host = this.currentHost;
+		switch(useBaseDomain) {
+			case 1: return this.stripWww(host);
+			case 2: return this.getBaseDomain(host);
 		}
-		return useBaseDomain
-			? this.currentBaseDomain
-			: this.currentHost;
+		return host;
 	},
 	getURI: function(host) {
 		if(host.indexOf(":") != -1 && /^[:\da-f.]+$/.test(host)) // IPv6
 			host = "[" + host + "]";
+		host = host.replace(/^\./, "");
 		try {
 			return this.io.newURI("http://" + host, null, null);
 		}
@@ -526,6 +529,9 @@ this.permissions = {
 			Components.utils.reportError(this.errPrefix + "Invalid host: \"" + host + "\"");
 			throw e;
 		}
+	},
+	stripWww: function(host) {
+		return host && host.replace(/^www\./i, "");
 	},
 	getBaseDomain: function(host) {
 		if(host) try {
@@ -616,13 +622,11 @@ this.permissions = {
 	},
 
 	openPermissions: function() {
-		var host = this.getHost(this.options.useBaseDomain.openPermissions);
-
 		if(this.isSeaMonkey) {
-			this.openPermissionsSM(host);
+			this.openPermissionsSM();
 			return;
 		}
-
+		var host = this.getHost(this.options.useBaseDomain.openPermissions);
 		// chrome://browser/content/preferences/privacy.js
 		// Like gPrivacyPane.showCookieExceptions()
 		var params = { blockVisible   : true,
@@ -660,9 +664,8 @@ this.permissions = {
 
 		this.tweakWindow(win);
 	},
-	openPermissionsSM: function(host) {
-		if(!this.options.useBaseDomain.openPermissions)
-			host = this.getBaseDomain(host); // Only base domains are displayed in the list
+	openPermissionsSM: function() {
+		var host = this.getBaseDomain(this.currentHost); // Only TLDs are displayed in the list
 
 		//gBrowser.selectedTab = gBrowser.addTab("about:data");
 		//toDataManager("|permissions");
