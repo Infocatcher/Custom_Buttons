@@ -693,7 +693,8 @@ this.permissions = {
 				}
 			}
 
-			if(parseFloat(_this.appInfo.version) > 2.19) {
+			var smVersion = parseFloat(_this.appInfo.version);
+			if(smVersion >= 2.20 && smVersion <= 2.22) {
 				//LOG("Workaround");
 				var ml = content.document.getElementById("typeSelect");
 				ml.value = "Permissions";
@@ -723,6 +724,7 @@ this.permissions = {
 					return;
 				_this.oSvc.removeObserver(observer, topic);
 				selectDomain();
+				//LOG(topic + " -> selectDomain()");
 			}, "dataman-loaded", false);
 			content.gDataman.loadView("|permissions");
 		});
