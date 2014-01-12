@@ -506,6 +506,16 @@ this.permissions = {
 		delete this.isSeaMonkey;
 		return this.isSeaMonkey = this.appInfo.name == "SeaMonkey";
 	},
+	getHost: function(useBaseDomain, host) {
+		if(host) {
+			return useBaseDomain
+				? this.getBaseDomain(host)
+				: host;
+		}
+		return useBaseDomain
+			? this.currentBaseDomain
+			: this.currentHost;
+	},
 	getURI: function(host) {
 		if(host.indexOf(":") != -1 && /^[:\da-f.]+$/.test(host)) // IPv6
 			host = "[" + host + "]";
@@ -606,9 +616,7 @@ this.permissions = {
 	},
 
 	openPermissions: function() {
-		var host = this.options.useBaseDomain.openPermissions
-			? this.currentBaseDomain
-			: this.currentHost;
+		var host = this.getHost(this.options.useBaseDomain.openPermissions);
 
 		if(this.isSeaMonkey) {
 			this.openPermissionsSM(host);
@@ -764,9 +772,7 @@ this.permissions = {
 		//  this.pm.ALLOW_ACTION
 		//  this.pm.DENY_ACTION
 
-		var host = this.options.useBaseDomain.addPermission
-			? this.currentBaseDomain
-			: this.currentHost;
+		var host = this.getHost(this.options.useBaseDomain.addPermission);
 		if(!host)
 			return;
 
