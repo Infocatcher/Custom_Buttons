@@ -264,7 +264,9 @@ this.permissions = {
 			onStateChange: dummy,
 			onProgressChange: dummy,
 			onLocationChange: function(aWebProgress, aRequest, aLocation) {
-				this.context.updButtonState();
+				setTimeout(function(_this) {
+					_this.context.updButtonState();
+				}, 0, this);
 			},
 			onStatusChange: dummy,
 			onSecurityChange: dummy
