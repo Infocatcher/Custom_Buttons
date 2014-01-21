@@ -338,6 +338,11 @@ var cmds = this.commands = {
 		return this.ps = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
 			.getService(Components.interfaces.nsIPromptService);
 	},
+	get wm() {
+		delete this.wm;
+		return this.wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+			.getService(Components.interfaces.nsIWindowMediator);
+	},
 
 	get defaultActionPref() {
 		delete this.defaultActionPref;
@@ -951,9 +956,7 @@ var cmds = this.commands = {
 			toJavaScriptConsole();
 			return;
 		}
-		var w = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-			.getService(Components.interfaces.nsIWindowMediator)
-			.getMostRecentWindow("global:console");
+		var w = this.wm.getMostRecentWindow("global:console");
 		if(w) {
 			w.focus();
 			return;
@@ -964,14 +967,21 @@ var cmds = this.commands = {
 			: "chrome://global/content/console.xul";
 		window.openDialog(consoleURI, "_blank", "chrome,all,centerscreen,resizable,dialog=0");
 	},
+	// Note: Browser Console isn't supported without opened browser windows
+	get browserWindow() {
+		if(window.location.href == "chrome://browser/content/browser.xul")
+			return window;
+		return this.wm.getMostRecentWindow("navigator:browser");
+	},
 	get canOpenBrowserConsole() {
-		delete this.canOpenBrowserConsole;
-		//return this.canOpenBrowserConsole = "HUDConsoleUI" in window
-		//	&& "toggleBrowserConsole" in HUDConsoleUI;
-		return this.canOpenBrowserConsole = !!document.getElementById("menu_browserConsole");
+		var window = this.browserWindow;
+		return window && !!window.document.getElementById("menu_browserConsole");
 	},
 	openBrowserConsole: function() {
-		var consoleFrame = this.getBrowserConsole();
+		var window = this.browserWindow;
+		if(!window)
+			return;
+		var consoleFrame = this.getBrowserConsole(window);
 		if(consoleFrame) {
 			consoleFrame.focus();
 			return;
@@ -980,20 +990,20 @@ var cmds = this.commands = {
 			window.HUDService.toggleBrowserConsole();
 			return;
 		}
-		if("HUDConsoleUI" in window && "toggleBrowserConsole" in HUDConsoleUI) {
-			HUDConsoleUI.toggleBrowserConsole();
+		if("HUDConsoleUI" in window && "toggleBrowserConsole" in window.HUDConsoleUI) {
+			window.HUDConsoleUI.toggleBrowserConsole();
 			return;
 		}
-		document.getElementById("menu_browserConsole").doCommand();
+		window.document.getElementById("menu_browserConsole").doCommand();
 	},
-	getBrowserConsole: function() {
+	getBrowserConsole: function(window) {
 		if("HUDService" in window && "getBrowserConsole" in window.HUDService) { // Firefox 27.0a1+
 			var hud = window.HUDService.getBrowserConsole();
 			return hud && hud.iframeWindow;
 		}
-		if("HUDConsoleUI" in window && HUDConsoleUI._browserConsoleID) try {
+		if("HUDConsoleUI" in window && window.HUDConsoleUI._browserConsoleID) try {
 			var HUDService = Components.utils["import"]("resource:///modules/HUDService.jsm", {}).HUDService;
-			var hud = HUDService.getHudReferenceById(HUDConsoleUI._browserConsoleID);
+			var hud = HUDService.getHudReferenceById(window.HUDConsoleUI._browserConsoleID);
 			return hud && hud.iframeWindow;
 		}
 		catch(e) {
@@ -1033,9 +1043,7 @@ var cmds = this.commands = {
 			&& this.canOpenBrowserConsole
 		)
 			return !!this.getBrowserConsole();
-		return !!Components.classes["@mozilla.org/appshell/window-mediator;1"]
-			.getService(Components.interfaces.nsIWindowMediator)
-			.getMostRecentWindow("global:console");
+		return !!this.wm.getMostRecentWindow("global:console");
 	},
 	restoreErrorConsole: function() {
 		var restore = this.getPref(this.restoreErrorConsolePref);
