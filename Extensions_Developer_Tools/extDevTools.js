@@ -33,6 +33,10 @@ var options = {
 	// Use icon of default menu item as button icon
 	// (middle-click on menu item to mark it as default,
 	// middle-click on button to execute default action)
+	prefValues: {
+		// https://developer.mozilla.org/en-US/Add-ons/Installing_extensions#Disabling_install_locations
+		"extensions.autoDisableScopes": 14
+	},
 	showDebugPrefs: 3, // Sum of flags: 1 - extensions, 2 - application
 	debugPrefsInclude: /\.(?:debug|dev(?:el(?:opment)?)?Mode)(?:[-.]?\w+)?$/i,
 	debugPrefsExclude: /\.debugger/i,
@@ -214,6 +218,9 @@ function _localize(s, key) {
 		},
 		"Enable developer tools for chrome": {
 			ru: "Включить инструменты разработчика для chrome"
+		},
+		"Silently install extensions from browser profile": {
+			ru: "Молча устанавливать расширения из профиля браузера"
 		},
 		"Enable E4X for chrome": {
 			ru: "Включить E4X для chrome"
@@ -1163,18 +1170,29 @@ var cmds = this.commands = {
 		var closeMenu = this.options.closeOptionsMenu ? "auto" : "none";
 		Array.forEach(
 			popup.getElementsByAttribute("cb_pref", "*"),
-			function(node) {
-				if(node.parentNode != popup) // Ignore debug prefs
+			function(mi) {
+				if(mi.parentNode != popup) // Ignore debug prefs
 					return;
-				var pref = node.getAttribute("cb_pref");
+				var pref = mi.getAttribute("cb_pref");
 				knownPrefs[pref] = true;
-				node.setAttribute("checked", !!this.getPref(pref));
-				node.setAttribute("closemenu", closeMenu);
-				this.hlPrefItem(node, pref);
+				var val = this.getPref(pref);
+				var isSpecial = this.options.prefValues.hasOwnProperty(pref);
+				var checked = isSpecial
+					? this.getCheckedState(pref, val)
+					: !!val;
+				mi.setAttribute("checked", checked);
+				mi.setAttribute("closemenu", closeMenu);
+				mi.setAttribute("tooltiptext", isSpecial ? pref + " = " + val : pref);
+				this.hlPrefItem(mi, pref);
 			},
 			this
 		);
 		this.initDebugPrefsMenus(popup, knownPrefs);
+	},
+	getCheckedState: function(pref, val) {
+		if(pref == "extensions.autoDisableScopes")
+			return !(val & 1);
+		return val == this.options.prefValues[pref];
 	},
 	initDebugPrefsMenus: function(parentPopup, knownPrefs) {
 		var showDebugPrefs = this.options.showDebugPrefs;
@@ -1275,7 +1293,18 @@ var cmds = this.commands = {
 			if(typeof curVal == "number")
 				pVal = +pVal;
 		}
-		this.setPref(pref, pVal);
+		if(this.options.prefValues.hasOwnProperty(pref)) {
+			if(pVal) // Checked
+				this.setPref(pref, this.options.prefValues[pref]);
+			else
+				this.prefSvc.clearUserPref(pref);
+			setTimeout(function(_this) {
+				mi.setAttribute("tooltiptext", pref + " = " + _this.getPref(pref));
+			}, 0, this);
+		}
+		else {
+			this.setPref(pref, pVal);
+		}
 		this.hlPrefItem(mi, pref);
 		if(mi.hasAttribute("acceltext"))
 			this.showPrefValue(mi, pVal);
@@ -1465,54 +1494,48 @@ var mp = cmds.popup = this.appendChild(parseXULFromString('\
 				oncommand="this.parentNode.parentNode.parentNode.commands.doPrefsMenuCommand(event.target);"\
 				onclick="if(event.button == 1) closeMenus(this);">\
 				<menuitem cb_pref="javascript.options.showInConsole"\
-					tooltiptext="javascript.options.showInConsole"\
 					type="checkbox"\
 					label="' + _localize("Show errors in chrome files") + '" />\
 				<menuitem cb_pref="javascript.options.strict"\
-					tooltiptext="javascript.options.strict"\
 					type="checkbox"\
 					label="' + _localize("Show strict warnings") + '" />\
 				<menuitem cb_pref="javascript.options.strict.debug"\
-					tooltiptext="javascript.options.strict.debug"\
 					type="checkbox"\
 					label="' + _localize("Show strict warnings in debug builds") + '"\
 					hidden="' + !this.commands.isDebugBuild + '" />\
 				<menuitem cb_pref="dom.report_all_js_exceptions"\
-					tooltiptext="dom.report_all_js_exceptions"\
 					type="checkbox"\
 					label="' + _localize("Show all exceptions") + '"\
 					hidden="' + (cmds.platformVersion < 1.9) + '" />\
 				<menuitem cb_pref="extensions.logging.enabled"\
-					tooltiptext="extensions.logging.enabled"\
 					type="checkbox"\
 					label="' + _localize("Show information about extensions update") + '" />\
 				<menuseparator />\
 				<menuitem cb_pref="browser.dom.window.dump.enabled"\
-					tooltiptext="browser.dom.window.dump.enabled"\
 					type="checkbox"\
 					label="' + _localize("Enable window.dump()") + '" />\
 				<menuitem cb_pref="nglayout.debug.disable_xul_cache"\
-					tooltiptext="nglayout.debug.disable_xul_cache"\
 					type="checkbox"\
 					label="' + _localize("Disable XUL cache") + '" />\
 				<menuitem cb_pref="dom.allow_XUL_XBL_for_file"\
-					tooltiptext="dom.allow_XUL_XBL_for_file"\
 					type="checkbox"\
 					label="' + _localize("Allow XUL and XBL for file://") + '"\
 					hidden="' + (cmds.platformVersion < 2) + '" />\
 				<menuitem cb_pref="devtools.chrome.enabled"\
-					tooltiptext="devtools.chrome.enabled"\
 					type="checkbox"\
 					label="' + _localize("Enable developer tools for chrome") + '"\
 					hidden="' + (cmds.platformVersion < 4 || !cmds.prefHasDefaultValue("devtools.chrome.enabled")) + '" />\
+				<menuitem cb_pref="extensions.autoDisableScopes"\
+					tooltiptext="extensions.autoDisableScopes"\
+					type="checkbox"\
+					label="' + _localize("Silently install extensions from browser profile") + '"\
+					hidden="' + (cmds.platformVersion < 8 || !cmds.prefHasDefaultValue("extensions.autoDisableScopes")) + '" />\
 				<menuseparator hidden="' + !this.commands.canDisableE4X + '" />\
 				<menuitem cb_pref="javascript.options.xml.chrome"\
-					tooltiptext="javascript.options.xml.chrome"\
 					type="checkbox"\
 					label="' + _localize("Enable E4X for chrome") + '"\
 					hidden="' + !this.commands.canDisableE4X + '" />\
 				<menuitem cb_pref="javascript.options.xml.content"\
-					tooltiptext="javascript.options.xml.content"\
 					type="checkbox"\
 					label="' + _localize("Enable E4X for content") + '"\
 					hidden="' + !this.commands.canDisableE4X + '" />\
