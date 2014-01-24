@@ -86,18 +86,32 @@ function _log(s) {
 }
 
 const _ns = "__attributesInspector";
-var context = _ns in window && window[_ns] || (
-	window[_ns] = {
+
+var context;
+var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+	.getService(Components.interfaces.nsIWindowMediator);
+var ws = wm.getEnumerator(null);
+while(ws.hasMoreElements()) {
+	var w = ws.getNext();
+	if(_ns in w) {
+		context = w[_ns];
+		break;
+	}
+}
+if(!context) {
+	context = window[_ns] = {
 		button: this instanceof XULElement && this.localName != "popupset" && this,
 		checked: false,
+		wm: wm,
 		toggle: function() {
 			toggle.call(context);
 		},
 		stop: function() {
 			this.checked && this.toggle();
 		}
-	}
-);
+	};
+}
+
 function ael(type, func, useCapture, target) {
 	return (target || window).addEventListener(type, func, useCapture);
 }
@@ -225,8 +239,6 @@ function init() {
 			sss.loadAndRegisterSheet(cssURI, sss.USER_SHEET);
 	}
 
-	this.wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-		.getService(Components.interfaces.nsIWindowMediator);
 	this.setAllListeners = function(action) {
 		var ws = this.wm.getEnumerator(null);
 		while(ws.hasMoreElements())
