@@ -696,23 +696,24 @@ function init() {
 		},
 		get fxVersion() {
 			var pv = this.appInfo.platformVersion;
-			var vc = Components.classes["@mozilla.org/xpcom/version-comparator;1"]
-				.getService(Components.interfaces.nsIVersionComparator);
-			var v;
-			if(vc.compare(pv, "5.0a1pre") >= 0)
-				v = parseFloat(pv);
-			else if(vc.compare(pv, "2.0a1pre") >= 0)
-				v = 4.0;
-			else if(vc.compare(pv, "1.9.2a1pre") >= 0)
-				v = 3.6;
-			else if(vc.compare(pv, "1.9.1a1pre") >= 0)
-				v = 3.5;
-			else if(vc.compare(pv, "1.9a1pre") >= 0)
-				v = 3.0;
-			else if(vc.compare(pv, "1.8.1a1pre") >= 0)
-				v = 2.0;
-			else //if(vc.compare(pv, "1.8a1pre") >= 0)
-				v = 1.5;
+			// https://developer.mozilla.org/en-US/docs/Mozilla/Gecko/Versions
+			var v = parseFloat(pv);
+			if(v < 5) {
+				var vc = Components.classes["@mozilla.org/xpcom/version-comparator;1"]
+					.getService(Components.interfaces.nsIVersionComparator);
+				if(vc.compare(pv, "2.0a1pre") >= 0)
+					v = 4.0;
+				else if(vc.compare(pv, "1.9.2a1pre") >= 0)
+					v = 3.6;
+				else if(vc.compare(pv, "1.9.1a1pre") >= 0)
+					v = 3.5;
+				else if(vc.compare(pv, "1.9a1pre") >= 0)
+					v = 3.0;
+				else if(vc.compare(pv, "1.8.1a1pre") >= 0)
+					v = 2.0;
+				else //if(vc.compare(pv, "1.8a1pre") >= 0)
+					v = 1.5;
+			}
 			delete this.fxVersion;
 			return this.fxVersion = v;
 		},
