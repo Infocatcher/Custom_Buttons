@@ -8,7 +8,7 @@
 #### Buttons in alphabetical order
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Add_New_Buttons_After_This_Button/icon.png)&nbsp;[Add New Buttons After This Button](Add_New_Buttons_After_This_Button)
-New custom buttons will automatically placed after this button (button are disabled by default, click to enable)
+New custom buttons will be automatically placed after this button (button is disabled by default, click to enable)
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Attributes_Inspector/icon.png)&nbsp;[Attributes Inspector](Attributes_Inspector)
 Shows tooltip with with all attributes and allow open [DOM Inspector](https://addons.mozilla.org/addon/dom-inspector-6622/) for current node

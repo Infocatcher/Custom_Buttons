@@ -2,7 +2,7 @@
 
 // Add New Buttons After This Button button for Custom Buttons
 // (code for "initialization" section)
-// Note: button are disabled by default, click to enable
+// Note: button is disabled by default, click to enable
 
 // (c) Infocatcher 2012
 // version 0.1.1 - 2012-11-25
