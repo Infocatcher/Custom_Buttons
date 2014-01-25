@@ -7,8 +7,7 @@
 // (c) Infocatcher 2012
 // version 0.1.1 - 2012-11-25
 
-var cbs = Components.classes["@xsms.nm.ru/custombuttons/cbservice;1"]
-	.getService(Components.interfaces.cbICustomButtonsService);
+var cbs = custombuttons.cbService;
 var windowId = cbs.getWindowId(document.documentURI);
 var notificationPrefix = cbs.getNotificationPrefix(windowId);
 
