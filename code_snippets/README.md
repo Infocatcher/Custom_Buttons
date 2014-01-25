@@ -11,3 +11,7 @@ Lazy initialize button using “code” section
 
 ###### <a href="prefNS.js">prefNS.js</a>
 Get unique preferences root for each button
+
+###### <a href="prefs.js">prefs.js</a>
+Simple preferences, that syncs with about:config
+<br>Warning: this is test version, use at your own risk!
