@@ -31,9 +31,10 @@ function makePrefable(btn, options, ns) {
 	parseObject(options, ns);
 	if(btn && btn instanceof XULElement && "init" in btn && "destroy" in btn) {
 		sync.__timer = 0;
-		prefs.addObserver(ns, sync, false);
+		var syncObserver = { observe: sync };
+		prefs.addObserver(ns, syncObserver, false);
 		addDestructor(function() {
-			prefs.removeObserver(ns, sync);
+			prefs.removeObserver(ns, syncObserver);
 		});
 	}
 	function parseObject(o, base) {
