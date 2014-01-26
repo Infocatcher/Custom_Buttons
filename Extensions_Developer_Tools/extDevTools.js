@@ -24,10 +24,10 @@ var options = {
 	forceRestartOnLocaleChange: false,
 	updateLocales: true,
 	closeOptionsMenu: false,
-	restoreErrorConsole: 1, // Only for Gecko 2.0+
+	restoreErrorConsole: 1,
 	// 0 - disable
-	// 1 - restore old Error Console (if available)
-	// 2 - restore new Browser Console
+	// 1 - restore old Error Console
+	// 2 - restore new Browser Console (if available)
 	reopenWindowFlushCaches: true,
 	changeButtonIcon: true,
 	// Use icon of default menu item as button icon
@@ -1024,16 +1024,18 @@ var cmds = this.commands = {
 		return this.restoreErrorConsolePref = "extensions.custombuttons.button" + this.btnNum + ".restoreErrorConsole";
 	},
 	initErrorConsoleRestoring: function() {
-		if(this._restoreErrorConsoleObserver || this.platformVersion < 2)
+		if(this._restoreErrorConsoleObserver/* || this.platformVersion < 2*/)
 			return;
 		this.restoreErrorConsole();
 		var obs = this.obs = Components.classes["@mozilla.org/observer-service;1"]
 			.getService(Components.interfaces.nsIObserverService);
 		var _this = this;
-		var observer = this._restoreErrorConsoleObserver = function() {
-			obs.removeObserver(observer, "quit-application-granted");
-			if(_this.errorConsoleOpened)
-				_this.setPref(_this.restoreErrorConsolePref, _this.options.restoreErrorConsole);
+		var observer = this._restoreErrorConsoleObserver = {
+			observe: function() {
+				obs.removeObserver(observer, "quit-application-granted");
+				if(_this.errorConsoleOpened)
+					_this.setPref(_this.restoreErrorConsolePref, _this.options.restoreErrorConsole);
+			}
 		};
 		obs.addObserver(observer, "quit-application-granted", false);
 	},
