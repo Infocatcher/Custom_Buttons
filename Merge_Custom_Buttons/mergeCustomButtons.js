@@ -9,8 +9,8 @@
 // May not work for buttons with initialization code.
 // Middle-click or left-click with any modifier - temporary split/merge.
 
-// (c) Infocatcher 2011, 2013
-// version 0.1.0a6pre - 2013-02-06
+// (c) Infocatcher 2011, 2013-2014
+// version 0.1.0a6pre2 - 2014-01-27
 
 this.onmouseover = function(e) {
 	if(e.target != this)
