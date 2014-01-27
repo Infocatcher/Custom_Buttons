@@ -52,6 +52,23 @@ this.mergeButtons = {
 		delete this.mp;
 		return this.mp = mp;
 	},
+	initProxy: function() {
+		// Trick: wait for XBL binding tor [type="menu"]
+		LOG("initProxy()");
+		var btn = this.button;
+		if("__initTimer" in btn)
+			clearTimeout(btn.__initTimer);
+		if(btn.type == "menu") {
+			LOG("initProxy(): menu");
+			this.init();
+			return;
+		}
+		// This behavior may be changed (fixed?) later, so will initialize anyway after small delay
+		btn.__initTimer = setTimeout(function(_this) {
+			LOG("initProxy() -> fallback timer");
+			_this.init();
+		}, 500, this);
+	},
 	init: function() {
 		this.merge();
 		setTimeout(function(_this) {
@@ -84,6 +101,7 @@ this.mergeButtons = {
 		if(this.merged)
 			return;
 		this.merged = true;
+		LOG("merge()");
 
 		var nodes = [];
 		var hasSep = false; // Will stop on <toolbarseparator/><toolbarseparator/>
@@ -130,6 +148,7 @@ this.mergeButtons = {
 		if(!this.merged)
 			return;
 		this.merged = false;
+		LOG("split()");
 
 		var btn = this.button;
 		var next1 = btn.nextSibling;
@@ -337,12 +356,13 @@ function closeMenus(node) {
 	}
 }
 
-//LOG("init() " + this.type);
+LOG("Initialize " + this.type);
+this.mergeButtons.initProxy();
 this.type = "menu";
 this.orient = "horizontal";
-this.mergeButtons.init();
 this.onDestroy = function(reason) {
-	//LOG("onDestroy(" + reason + ");");
-	if(reason != "constructor") // For SeaMonkey
-		this.mergeButtons.destroy(reason);
+	LOG("onDestroy(" + reason + ");");
+	if(reason == "constructor")
+		return; // Changed XBL binding, ignore
+	this.mergeButtons.destroy(reason);
 };
