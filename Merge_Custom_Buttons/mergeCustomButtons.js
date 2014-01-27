@@ -182,18 +182,10 @@ this.mergeButtons = {
 		var initCode = btn.getAttribute("cb-init");
 		if(!initCode || initCode == "/*Initialization Code*/")
 			return;
-		setTimeout(function(_this) {
-			//LOG("Reinit " + btn.getAttribute("label"));
-			//var link = custombuttons.makeButtonLink("edit", btn.id);
-			//var cbService = custombuttons.cbService;
-			//var param = cbService.getButtonParameters(link);
-			//cbService.installButton(param);
-			var param = _this.getButtonParameters(btn);
-			var newBtn = btn.ownerDocument.createElement("toolbarbutton");
-			newBtn.id = btn.id;
-			_this.makeButton(newBtn, param.wrappedJSObject || param);
-			btn.parentNode.replaceChild(newBtn, btn);
-		}, 0, this);
+		setTimeout(function() {
+			btn.destroy("update");
+			btn.init();
+		}, 0);
 	},
 	reinitButtons: function(btns) {
 		btns.forEach(this.reinitButton, this);
