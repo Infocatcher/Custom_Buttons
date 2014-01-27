@@ -1388,9 +1388,11 @@ var cmds = this.commands = {
 		var _this = this;
 		var timer = Components.classes["@mozilla.org/timer;1"]
 			.createInstance(Components.interfaces.nsITimer);
-		timer.init(function() {
-			_this.prefSvc.savePrefFile(null);
-			LOG("savePrefFile()");
+		timer.init({
+			observe: function() {
+				_this.prefSvc.savePrefFile(null);
+				LOG("savePrefFile()");
+			}
 		}, 100, timer.TYPE_ONE_SHOT);
 	},
 
