@@ -297,6 +297,7 @@ this.mergeButtons = {
 				display: -moz-box !important;\n\
 				margin-left: 3px !important;\n\
 				margin-right: 3px !important;\n\
+				padding: 0 !important;\n\
 				max-width: 16px;\n\
 				max-height: 16px;\n\
 			}\n\
