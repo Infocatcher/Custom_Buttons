@@ -820,17 +820,23 @@ this.bookmarks = {
 		});
 	},
 	getTabState: function(tab) {
+		this.cleanupTabStateCache(tab);
+		return this.ss.getTabState(tab);
+	},
+	cleanupTabStateCache: function(tab) {
 		// Inspired by code from UnloadTab extension
 		// https://addons.mozilla.org/files/compare/233879...223485/file/chrome/content/unloadtab.js#L928
 		// Try flush cached data for tab to get correct scroll position
 		var scope = this.ssTabCacheScope;
-		if(scope) try {
+		if(scope && "TabStateCache" in scope && "delete" in scope.TabStateCache) try {
 			scope.TabStateCache.delete(tab);
+			return true;
 		}
 		catch(e) {
 			Components.utils.reportError(e);
 		}
-		return this.ss.getTabState(tab);
+		//_log("clearTabStateCache() failed!");
+		return false;
 	},
 	get ssTabCacheScope() {
 		var scope;
