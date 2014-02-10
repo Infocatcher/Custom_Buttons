@@ -57,6 +57,7 @@ var options = {
 
 	undoLimit: 10 // Max length of undo/redo history
 };
+var _debug = false; // Show debug messages in error/browser console
 
 function _localize(s, key) {
 	var strings = {
@@ -442,7 +443,7 @@ this.bookmarks = {
 		this.onBookmarksChanged();
 	},
 	destroy: function(force) {
-		//LOG("destroy, " + (force ? "force" : "not force"));
+		_log("destroy(" + force + ")");
 		if(this.mp) {
 			this.mp.removeEventListener("DOMMenuItemActive",   this, false);
 			this.mp.removeEventListener("DOMMenuItemInactive", this, false);
@@ -837,7 +838,7 @@ this.bookmarks = {
 		catch(e) {
 			Components.utils.reportError(e);
 		}
-		//_log("clearTabStateCache() failed!");
+		_log("clearTabStateCache() failed!");
 		return false;
 	},
 	get ssTabCacheScope() {
@@ -860,7 +861,7 @@ this.bookmarks = {
 	cleanupSessionData: function(data) {
 		if(!data)
 			return;
-		//LOG("cleanupSessionData:\n" + JSON.stringify(data, null, "  "));
+		//_log("cleanupSessionData:\n" + JSON.stringify(data, null, "  "));
 		if(!this.options.saveTabPinnedState)
 			delete data.pinned;
 		if("extData" in data) {
@@ -1764,14 +1765,14 @@ this.bookmarks = {
 			clearTimeout(timer);
 			var tab = e.target;
 			_this.setTabSession(tab, ssData, uri);
-			//LOG(e.type + " => setTabSession()");
+			_log(e.type + " => setTabSession()");
 		}
 		tabs.addEventListener("TabOpen", tabOpen, true);
 		var timer = setTimeout(function() {
 			tabs.removeEventListener("TabOpen", tabOpen, true);
 			if(tab) {
 				_this.setTabSession(tab, ssData, uri, true);
-				//LOG("setTimeout => to TabOpen => setTabSession() for current tab");
+				_log("setTimeout => to TabOpen => setTabSession() for current tab");
 			}
 		}, 0);
 	},
@@ -2064,11 +2065,11 @@ this.bookmarks = {
 	}
 };
 this.bookmarks.initProxy();
-//LOG("init");
+_log("init");
 this.onDestroy = function(reason) {
 	if(reason == "constructor")
 		return; // Changed XBL binding, ignore
-	//LOG("destroy: " + reason);
+	_log("destroy: " + reason);
 	this.bookmarks.destroy(reason == "update" || reason == "delete");
 };
 this.type = "menu";
@@ -2099,8 +2100,7 @@ if(options.hideDropMarker || options.showLabel != undefined) {
 	}, 0);
 }
 
-
-function _log(s) {
+function _info(s) {
 	var id = self.id.match(/\d*$/)[0];
 	var cs = Components.classes["@mozilla.org/consoleservice;1"]
 		.getService(Components.interfaces.nsIConsoleService);
@@ -2109,8 +2109,11 @@ function _log(s) {
 		var ms = d.getMilliseconds();
 		return d.toLocaleFormat("%M:%S:") + "000".substr(String(ms).length) + ms;
 	}
-	_log = function(s) {
+	_info = function(s) {
 		cs.logStringMessage("[Session Bookmarks #" + id + "]: " + ts() + " " + s);
 	};
-	return _log.apply(this, arguments);
+	return _info.apply(this, arguments);
+}
+function _log(s) {
+	_debug && _info(s);
 }
