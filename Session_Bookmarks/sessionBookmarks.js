@@ -764,16 +764,22 @@ this.bookmarks = {
 		this.unsaved && this.save();
 	},
 	getMenuitem: function(label, uri, icon, ssData) {
-		return this.createElement("menuitem", {
+		if(!ssData)
+			ssData = "";
+		var mi = this.createElement("menuitem", {
 			"class": "menuitem-iconic bookmark-item menuitem-with-favicon",
 			closemenu: this.options.leftClickCloseMenu ? "auto" : "none",
 			label: label || "",
 			cb_uri: uri || "",
-			cb_ssData: ssData || "",
+			cb_ssData: ssData,
 			tooltiptext: this.decodeURI(uri || ""),
 			image: icon || "",
 			cb_bookmarkItem: "true"
 		});
+		// Faster way to check for "privateTab-isPrivate" in JSON.parse(ssData).attributes
+		if(ssData.indexOf('"privateTab-isPrivate":"true"') > 0)
+			mi.setAttribute("privateTab-isPrivate", "true");
+		return mi;
 	},
 	decodeURI: function(uri) {
 		try {
