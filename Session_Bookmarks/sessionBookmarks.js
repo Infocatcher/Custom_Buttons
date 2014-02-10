@@ -5,8 +5,8 @@
 // Session Bookmarks button for Custom Buttons
 // (code for "initialization" section)
 
-// (c) Infocatcher 2011-2013
-// version 0.2.2pre - 2013-11-13
+// (c) Infocatcher 2011-2014
+// version 0.2.2pre2 - 2014-02-10
 
 // Usage:
 //   Use middle-click or left+click with any modifier to add current tab
