@@ -34,6 +34,8 @@ var options = {
 	allowToggleBookmark: false, // Remove already added bookmark using middle-click on button
 	deleteAfterOpen: false, // Delete opened bookmarks
 	removeAddedTab: false, // Remove tab after bookmark will be added
+	replaceCurrentTab: false, // Replace current tab with new one (and preserve position)
+	// Workaround, use only in case of problems with "open in current tab" feature
 	itemInPageContextMenu: false, // Show "Session Bookmark This Page" item in page context menu
 	showNotifications: 1, // Show notifications like "Bookmark added"
 	// 0 - don't show
@@ -1143,6 +1145,14 @@ this.bookmarks = {
 				}
 				data.entries = tabHistory.concat(data.entries);
 				data.index += tabHistory.length;
+				if(this.options.replaceCurrentTab && tab == gBrowser.selectedTab) {
+					let blankTab = gBrowser.addTab("about:blank", { skipAnimation: true });
+					blankTab.linkedBrowser.stop();
+					gBrowser.moveTabTo(blankTab, gBrowser.tabContainer.selectedIndex + 1);
+					gBrowser.selectedTab = blankTab;
+					gBrowser.removeTab(tab, { animate: false });
+					tab = blankTab;
+				}
 			}
 			this.cleanupSessionData(data); // Only for already saved unwanted data...
 			ssData = JSON.stringify(data);
