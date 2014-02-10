@@ -43,7 +43,7 @@ var options = {
 	// 2 - always show
 	notificationHideDelay: 1700,
 
-	preloadBookmarks: -1,
+	preloadBookmarks: 100,
 	// 0    - disable preload feature (load bookmarks only after menu opening)
 	// -1   - preload on mouseover
 	// 1..N - preload after this time (in ms)
