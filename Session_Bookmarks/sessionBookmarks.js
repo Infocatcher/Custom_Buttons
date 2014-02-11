@@ -1137,6 +1137,16 @@ this.bookmarks = {
 	setTabSession: function(tab, ssData, uri, mergeHistory, disableForceLoad) {
 		if(ssData && "JSON" in window) try {
 			let data = JSON.parse(ssData);
+			// For better compatibility with Private Tab extension
+			let privateAttr = "privateTab-isPrivate";
+			let isPrivate = "PrivateBrowsingUtils" in window
+				&& PrivateBrowsingUtils.isWindowPrivate(tab.linkedBrowser.contentWindow)
+				|| tab.hasAttribute(privateAttr);
+			if(isPrivate) {
+				if(!data.attributes)
+					data.attributes = {};
+				data.attributes[privateAttr] = "true";
+			}
 			if(mergeHistory) {
 				let oldData = JSON.parse(this.getTabState(gBrowser.selectedTab));
 				let tabHistory = oldData.entries.slice(0, oldData.index);
