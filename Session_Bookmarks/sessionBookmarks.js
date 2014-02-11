@@ -1238,8 +1238,10 @@ this.bookmarks = {
 			var wpl = Components.interfaces.nsIWebProgressListener;
 			if(aFlag & wpl.STATE_START) // Force load to bypass cache
 				aRequest.loadFlags |= aRequest.LOAD_BYPASS_CACHE;
-			else if(aFlag & wpl.STATE_STOP && aFlag & wpl.STATE_IS_NETWORK)
-				aWebProgress.chromeEventHandler.removeProgressListener(this);
+			else if(aFlag & wpl.STATE_STOP && aFlag & wpl.STATE_IS_NETWORK) {
+				let ceh = aWebProgress.chromeEventHandler;
+				ceh.removeProgressListener && ceh.removeProgressListener(this);
+			}
 		},
 		onLocationChange: function(aProgress, aRequest, aURI) {},
 		onProgressChange: function(aWebProgress, aRequest, curSelf, maxSelf, curTot, maxTot) {},
