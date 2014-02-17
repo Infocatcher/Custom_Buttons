@@ -30,6 +30,7 @@ btn.image = imgConnecting;
 btn.tooltipText = "Open about:addons…";
 
 var tab;
+var isPending = false;
 var ws = Services.wm.getEnumerator("navigator:browser");
 windowsLoop:
 while(ws.hasMoreElements()) {
@@ -59,13 +60,17 @@ else if(
 	|| tab.linkedBrowser.contentDocument.readyState == "uninitialized"
 	// || tab.linkedBrowser.__SS_restoreState == 1
 )
-	tab.linkedBrowser.reload();
+	isPending = true;
 
 var browser = tab.linkedBrowser;
-if(browser.webProgress.isLoadingDocument)
+if(isPending || browser.webProgress.isLoadingDocument) {
 	browser.addEventListener("load", processAddonsTab, true);
-else
+	if(isPending)
+		browser.reload();
+}
+else {
 	processAddonsTab();
+}
 
 function processAddonsTab(e) {
 	var doc;
