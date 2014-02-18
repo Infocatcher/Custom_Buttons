@@ -36,7 +36,7 @@ var mp = document.createElement("menupopup");
 mp.setAttribute("oncommand", "this.installExtension(event);");
 mp.setAttribute("onpopupshowing", "this.createMenu();");
 mp.setAttribute("onmousedown", "event.target.setAttribute('closemenu', event.shiftKey ? 'none' : 'auto');");
-mp.setAttribute("onclick", "if(event.button == 1) this.toggleExtension(event.target);");
+mp.setAttribute("onclick", "this.handleClick(event);");
 
 mp.createMenu = function() {
 	mp.setAttribute("onpopupshowing", "this.updateMenu();");
@@ -60,6 +60,16 @@ mp.updateMenu = function() {
 		}
 	);
 };
+mp.handleClick = function(e) {
+	if(e.button == 0 || e.ctrlKey || e.altKey || e.shiftKey || e.metaKey)
+		return;
+	if(e.button == 1)
+		this.toggleExtension(e.target);
+	else if(e.button == 2) {
+		e.preventDefault();
+		this.openExtensionOptions(e.target);
+	}
+};
 mp.toggleExtension = function(mi) {
 	var uid = mi.getAttribute("cb_uid");
 	if(!uid)
@@ -71,6 +81,54 @@ mp.toggleExtension = function(mi) {
 		}
 	});
 };
+mp.openExtensionOptions = function(mi) {
+	var uid = mi.getAttribute("cb_uid");
+	if(!uid)
+		return;
+	AddonManager.getAddonByID(uid, function(addon) {
+		if(addon && openAddonOptions(addon))
+			mi.parentNode.hidePopup();
+	});
+};
+function openAddonOptions(addon) {
+	// Based on code from chrome://mozapps/content/extensions/extensions.js
+	// Firefox 21.0a1 (2013-01-27)
+	Components.utils.import("resource://gre/modules/Services.jsm");
+	var optionsURL = addon.optionsURL;
+	if(!addon.isActive || !optionsURL)
+		return false;
+	if(addon.type == "plugin") // No options for now!
+		return false;
+	if(addon.optionsType == AddonManager.OPTIONS_TYPE_INLINE)
+		openAddonPage(addon, true);
+	else if(addon.optionsType == AddonManager.OPTIONS_TYPE_TAB && "switchToTabHavingURI" in window)
+		switchToTabHavingURI(optionsURL, true);
+	else {
+		let windows = Services.wm.getEnumerator(null);
+		while(windows.hasMoreElements()) {
+			let win = windows.getNext();
+			if(win.document.documentURI == optionsURL) {
+				win.focus();
+				return true;
+			}
+		}
+		// Note: original code checks browser.preferences.instantApply and may open modal windows
+		window.openDialog(optionsURL, "", "chrome,titlebar,toolbar,centerscreen,dialog=no");
+	}
+	return true;
+}
+function openAddonsManager(view) {
+	var openAddonsMgr = window.BrowserOpenAddonsMgr // Firefox
+		|| window.openAddonsMgr // Thunderbird
+		|| window.toEM; // SeaMonkey
+	openAddonsMgr(view);
+}
+function openAddonPage(addon, scrollToPreferences) {
+	scrollToPreferences = scrollToPreferences && parseFloat(Services.appinfo.platformVersion) >= 12
+		? "/preferences"
+		: "";
+	openAddonsManager("addons://detail/" + encodeURIComponent(addon.id) + scrollToPreferences);
+}
 function setStyle(mi, uid, addon) {
 	function getAddonCallback(addon) {
 		var icon = "";
