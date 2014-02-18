@@ -5,8 +5,8 @@
 // For developers, useful to test restartless extensions.
 // Place code to "initialization" section to create a "normal" menu.
 
-// (c) Infocatcher 2013
-// version 0.3.0pre5 - 2013-07-15
+// (c) Infocatcher 2013-2014
+// version 0.3.0pre6 - 2014-02-18
 
 var extensions = {
 	"extensionsId1@example": {
