@@ -267,7 +267,8 @@ else { // Mouse gestures or something other...
 }
 
 function getRestartlessAddons(addonTypes, callback, context) {
-	Components.utils.import("resource://gre/modules/AddonManager.jsm");
+	if(!("AddonManager" in window))
+		Components.utils.import("resource://gre/modules/AddonManager.jsm");
 	AddonManager.getAddonsByTypes(addonTypes, function(addons) {
 		var restartless = addons.filter(function(addon) {
 			var ops = addon.operationsRequiringRestart;

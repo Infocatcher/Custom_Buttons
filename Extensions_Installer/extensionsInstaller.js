@@ -30,7 +30,8 @@ var _makeArgs = [
 	"nodelay"
 ];
 
-Components.utils.import("resource://gre/modules/AddonManager.jsm");
+if(!("AddonManager" in window))
+	Components.utils.import("resource://gre/modules/AddonManager.jsm");
 
 var mp = document.createElement("menupopup");
 mp.setAttribute("oncommand", "this.installExtension(event);");
