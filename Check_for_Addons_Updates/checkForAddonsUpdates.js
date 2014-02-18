@@ -5,8 +5,8 @@
 // Check for Addons Updates button for Custom Buttons
 // (code for "code" section)
 
-// (c) Infocatcher 2012-2013
-// version 0.1.4 - 2013-05-09
+// (c) Infocatcher 2012-2014
+// version 0.1.4.1 - 2014-02-18
 
 // Button just open hidden tab with about:addons and trigger built-in "Check for Updates" function.
 // And show tab, if found updates.
