@@ -85,7 +85,7 @@ function processAddonsTab(e) {
 	}
 
 	btn.image = imgLoading;
-	btn.tooltipText = doc.getElementById("updates-progress").getAttribute("value");
+	btn.tooltipText = $("updates-progress").getAttribute("value");
 
 	var origIcon = tab.image;
 	tab.image = image;
@@ -96,10 +96,10 @@ function processAddonsTab(e) {
 		cbu.setPrefs(updEnabledPref, true);
 
 	//Avoid getting false results from the past update check (May not be required for "noneFound")
-	doc.getElementById("updates-noneFound").hidden = true;
-	doc.getElementById("updates-installed").hidden = true;
+	$("updates-noneFound").hidden = true;
+	$("updates-installed").hidden = true;
 
-	doc.getElementById("cmd_findAllUpdates").doCommand();
+	$("cmd_findAllUpdates").doCommand();
 
 	var wait = setInterval(function() {
 		if(!doc.defaultView || doc.defaultView.closed) {
@@ -107,14 +107,14 @@ function processAddonsTab(e) {
 			notify("Tab with add-ons manager was closed!");
 			return;
 		}
-		var inProgress = doc.getElementById("updates-progress");
+		var inProgress = $("updates-progress");
 		if(!inProgress.hidden)
 			return;
-		var autoUpdate = doc.getElementById("utils-autoUpdateDefault");
+		var autoUpdate = $("utils-autoUpdateDefault");
 		var autoUpdateChecked = autoUpdate.getAttribute("checked") == "true";
-		var updated = doc.getElementById("updates-installed");
-		var found = doc.getElementById("updates-manualUpdatesFound-btn");
-		var notFound = doc.getElementById("updates-noneFound");
+		var updated = $("updates-installed");
+		var found = $("updates-manualUpdatesFound-btn");
+		var notFound = $("updates-noneFound");
 
 		if(
 			autoUpdateChecked
@@ -142,15 +142,18 @@ function processAddonsTab(e) {
 			return;
 		}
 		tab.collapsed = false;
-		doc.getElementById("categories").selectedItem = doc.getElementById("category-availableUpdates");
+		$("categories").selectedItem = $("category-availableUpdates");
 		var tabWin = tab.ownerDocument.defaultView;
 		tabWin.gBrowser.selectedTab = tab;
 		setTimeout(function() {
 			tabWin.focus();
 			doc.defaultView.focus();
-			doc.getElementById("addon-list").focus();
+			$("addon-list").focus();
 		}, 0);
 	}, 50);
+	function $(id) {
+		return doc.getElementById(id);
+	}
 	function stopWait() {
 		clearInterval(wait);
 		btn.image = image;
