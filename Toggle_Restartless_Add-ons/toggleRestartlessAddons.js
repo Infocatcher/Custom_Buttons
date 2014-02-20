@@ -161,6 +161,7 @@ function setNewDisabled(addon) {
 function getNewDisabled(addon) {
 	// disabled -> STATE_ASK_TO_ACTIVATE -> enabled -> ...
 	var curDis = addon.userDisabled;
+	var newDis;
 	if("STATE_ASK_TO_ACTIVATE" in AddonManager && curDis == AddonManager.STATE_ASK_TO_ACTIVATE)
 		newDis = false;
 	else if(!curDis)
