@@ -132,7 +132,8 @@ this.__defineSetter__("pluginDisabled", function(dis) {
 		.replace("%N", options.pluginName)
 		.replace("%S", state);
 });
-Components.utils.import("resource://gre/modules/AddonManager.jsm");
+if(!("AddonManager" in window))
+	Components.utils.import("resource://gre/modules/AddonManager.jsm");
 
 this.initAddonListener = function() {
 	var addonListener = {
