@@ -1,0 +1,1 @@
+Orion Editor was renamed to <a href="https://github.com/Infocatcher/Custom_Buttons/tree/master/CB_Source_Editor">Source Editor</a>.
