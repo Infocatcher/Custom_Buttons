@@ -198,6 +198,32 @@ if(!watcher) {
 								mi.setAttribute("oncommand", "goDoCommand('" + enabledCmdsMap[id] + "');");
 							}
 						}
+						// Workaround: emulate keyboard shortcut
+						var keyCmdsMap = {
+							"menu_find":      { keyCode: KeyboardEvent.DOM_VK_F, charCode: "f".charCodeAt(0), ctrlKey: true },
+							"menu_findAgain": { keyCode: KeyboardEvent.DOM_VK_G, charCode: "g".charCodeAt(0), ctrlKey: true },
+							__proto__: null
+						};
+						var _key = function() {
+							var e = this._keyData;
+							var evt = document.createEvent("KeyboardEvent");
+							evt.initKeyEvent(
+								"keydown", true /*bubbles*/, true /*cancelable*/, window,
+								e.ctrlKey || false, e.altKey || false, e.shiftKey || false, e.metaKey || false,
+								e.keyCode || 0, e.charCode || 0
+							);
+							document.commandDispatcher.focusedElement.dispatchEvent(evt);
+						};
+						for(var id in keyCmdsMap) {
+							var mi = document.getElementById(id);
+							if(mi) {
+								mi.removeAttribute("command");
+								mi.removeAttribute("disabled");
+								mi.setAttribute("oncommand", "this._key();");
+								mi._keyData = keyCmdsMap[id];
+								mi._key = _key;
+							}
+						}
 					},
 					["chrome://global/content/editMenuOverlay.xul", function check(window) {
 						return window.document.getElementById("editMenuCommands").hasChildNodes();
