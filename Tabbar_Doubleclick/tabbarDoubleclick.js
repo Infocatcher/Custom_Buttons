@@ -1,7 +1,9 @@
 // http://infocatcher.ucoz.net/js/cb/tabbarDoubleclick.js
+// https://github.com/Infocatcher/Custom_Buttons/tree/master/Tabbar_Doubleclick
 
-// Tabbar doubleclick action example for Custom Buttons
+// Tabbar double click action example for Custom Buttons
 // (code for "initialization" section)
+// Opens new tab (see "BrowserOpenTab();" in code) after double click on tab bar
 
 // (c) Infocatcher 2012
 // version 0.1.0 - 2012-02-05

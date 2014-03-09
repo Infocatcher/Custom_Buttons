@@ -96,7 +96,7 @@ Show/hide all <a href="https://en.wikipedia.org/wiki/HTML_element#Anchor">anchor
 Convert text, typed in wrong keyboard layout
 
 ##### [Tabbar Doubleclick](Tabbar_Doubleclick)
-Tab bar double click action example
+Makes double click on tab bar open a new tab
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Title_Bar/icon.png)&nbsp;[Title Bar](Title_Bar)
 Show window title (if original title was hidden by some reasons)
