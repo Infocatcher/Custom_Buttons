@@ -5,8 +5,8 @@
 // /* Code */           - code for "Code" section
 // /* Initialization */ - code for "Initialization" section
 
-// (c) Infocatcher 2012
-// version 0.1.1 - 2012-04-08
+// (c) Infocatcher 2012, 2014
+// version 0.1.2 - 2014-03-28
 
 
 /* Code */
