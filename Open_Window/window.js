@@ -16,7 +16,8 @@ this.linkedWindow.toggle([null, 0]); // Special call for Downloads
 
 
 /* Initialization */
-Components.utils.import("resource://gre/modules/Services.jsm");
+if(!("Services" in window))
+	Components.utils.import("resource://gre/modules/Services.jsm");
 
 function Window(uri, type) {
 	this.uri = uri;
