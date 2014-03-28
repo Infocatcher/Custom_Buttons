@@ -40,7 +40,7 @@ Window.prototype = {
 			w.focus();
 			return w;
 		}
-		var args = [this.uri, "_blank", features || "resizable,dialog=no,centerscreen"];
+		var args = [this.uri, "_blank", features || "chrome,all,dialog=0,resizable,centerscreen"];
 		if(params)
 			args.push.apply(args, params);
 		return window.openDialog.apply(window, args);
