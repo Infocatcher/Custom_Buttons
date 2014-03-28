@@ -1,4 +1,5 @@
 // http://infocatcher.ucoz.net/js/cb/window.js
+// https://github.com/Infocatcher/Custom_Buttons/tree/master/Open_Window
 
 // Open Window button for Custom Buttons
 // /* Code */           - code for "Code" section
@@ -9,10 +10,11 @@
 
 
 /* Code */
-//this.linkedWindow.toggle();
-this.linkedWindow.toggle([null, 0]); // Special call for Downloads
+this.linkedWindow.toggle();
 // Or
-//this.linkedWindow.close() || BrowserDownloadsUI();
+//this.linkedWindow.open();
+// Or
+//this.linkedWindow.close() || anySpecialCodeToOpenWindow();
 
 
 /* Initialization */
@@ -91,7 +93,7 @@ Window.prototype = {
 };
 
 //var w = this.linkedWindow = new Window("chrome://passwordmgr/content/passwordManager.xul", "Toolkit:PasswordManager");
-var w = this.linkedWindow = new Window("chrome://mozapps/content/downloads/downloads.xul", "Download:Manager");
+var w = this.linkedWindow = new Window("chrome://browser/content/preferences/preferences.xul", "Browser:Preferences");
 w.setObserver({
 	button: this,
 	onWindowChanged: function(opened) {
