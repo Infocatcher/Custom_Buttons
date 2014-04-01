@@ -410,6 +410,7 @@ function init() {
 			var tt = this.context.tt;
 			this._hasData = true;
 
+			var _this = this;
 			var df = tt.ownerDocument.createDocumentFragment();
 			function flush() {
 				//while(tt.hasChildNodes())
@@ -419,6 +420,7 @@ function init() {
 				tt.removeAttribute("width");
 				tt.removeAttribute("height");
 				tt.appendChild(df);
+				_this.forceRepaint(tt, 50);
 			}
 
 			if(node.nodeType == node.DOCUMENT_NODE) {
@@ -780,6 +782,11 @@ function init() {
 			delete this.flasher;
 			return this.flasher = flasher;
 		},
+		forceRepaint: function(node, delay) {
+			if(this.fxVersion >= 29) this.timer(function() {
+				this.flasher.repaintElement(node);
+			}, this, delay || 0);
+		},
 		hl: function(node) {
 			if(!_highlight)
 				return;
@@ -1054,6 +1061,7 @@ function init() {
 			if(fxVersion != 3.6)
 				y += 22;
 			tt.moveTo(x, y);
+			this.forceRepaint(tt);
 		},
 		mouseoutHandler: function(e) {
 			if(!e.relatedTarget)
@@ -1662,6 +1670,7 @@ function init() {
 			this._popups = [];
 		},
 		popupshowingHandler: function(e) {
+			this.forceRepaint(this.context.tt);
 			if(this._shiftKey)
 				return;
 			var tar = e.originalTarget;
@@ -1671,6 +1680,7 @@ function init() {
 			}
 		},
 		popupshownHandler: function(e) {
+			this.forceRepaint(this.context.tt);
 			var tar = e.originalTarget;
 			if(tar.id == this.context.ttId || /*this._shiftKey && */tar.localName == "tooltip")
 				return;
@@ -1680,6 +1690,7 @@ function init() {
 		makeTooltipTopmost: function(restorePos) {
 			this.context.tt.hidePopup(); // Ugly with show/hide tooltips animation
 			restorePos && this.mousemoveHandler();
+			this.forceRepaint(this.context.tt, 100);
 		},
 		popuphidingHandler: function(e) {
 			if(!this._shiftKey)
