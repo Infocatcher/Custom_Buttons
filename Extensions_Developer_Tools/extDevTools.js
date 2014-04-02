@@ -6,7 +6,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2011-2014
-// version 0.1.2pre6 - 2014-01-23
+// version 0.1.2pre7 - 2014-04-02
 
 // Includes Attributes Inspector
 //   http://infocatcher.ucoz.net/js/cb/attrsInspector.js
@@ -1621,8 +1621,8 @@ this.attrsInspector = function(event) {
 // https://forum.mozilla-russia.org/viewtopic.php?id=56041
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Attributes_Inspector
 
-// (c) Infocatcher 2010-2013
-// version 0.6.3pre2 - 2013-11-11
+// (c) Infocatcher 2010-2014
+// version 0.6.3pre3 - 2014-04-02
 
 //===================
 // Attributes Inspector button for Custom Buttons
@@ -1648,6 +1648,7 @@ this.attrsInspector = function(event) {
 // Icon: http://www.iconsearch.ru/detailed/278/2/
 //===================
 
+(function() {
 var _highlight = true; // Hightlight current node
 var _highlightUsingFlasher = false; // Don't modify DOM, but has some side effects (and slower)
 // Note: inIFlasher works in Firefox 4 and higher only with disabled hardware acceleration!
@@ -3548,6 +3549,7 @@ function destroy() {
 	delete window[_ns];
 	_log("Shutdown finished!");
 }
+}).call(this);
 //=== Attributes Inspector end
 };
 
