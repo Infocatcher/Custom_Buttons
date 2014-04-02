@@ -1404,7 +1404,7 @@ function init() {
 							}
 							if(Date.now() < stopTime)
 								inspWin.setTimeout(selectWindow, 25);
-						}, 0);
+						}, _this.fxVersion == 1.5 ? 50 : 0);
 					}, true);
 					_log("inspectWindow(): select JavaScript Object panel");
 					js.doCommand();
