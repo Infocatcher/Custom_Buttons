@@ -2,8 +2,8 @@
 // https://forum.mozilla-russia.org/viewtopic.php?id=56041
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Attributes_Inspector
 
-// (c) Infocatcher 2010-2013
-// version 0.6.3pre2 - 2013-11-11
+// (c) Infocatcher 2010-2014
+// version 0.6.3pre3 - 2014-04-02
 
 //===================
 // Attributes Inspector button for Custom Buttons
