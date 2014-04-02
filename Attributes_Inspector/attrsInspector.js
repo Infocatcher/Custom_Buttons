@@ -29,6 +29,7 @@
 // Icon: http://www.iconsearch.ru/detailed/278/2/
 //===================
 
+(function() {
 var _highlight = true; // Hightlight current node
 var _highlightUsingFlasher = false; // Don't modify DOM, but has some side effects (and slower)
 // Note: inIFlasher works in Firefox 4 and higher only with disabled hardware acceleration!
@@ -1929,3 +1930,4 @@ function destroy() {
 	delete window[_ns];
 	_log("Shutdown finished!");
 }
+}).call(this);
