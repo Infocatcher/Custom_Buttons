@@ -1135,8 +1135,9 @@ this.bookmarks = {
 			this.deleteAllBookmarks();
 	},
 	setTabSession: function(tab, ssData, uri, mergeHistory, disableForceLoad) {
+		var data;
 		if(ssData && "JSON" in window) try {
-			let data = JSON.parse(ssData);
+			data = JSON.parse(ssData);
 			// For better compatibility with Private Tab extension
 			let privateAttr = "privateTab-isPrivate";
 			let isPrivate = "PrivateBrowsingUtils" in window
@@ -1206,6 +1207,8 @@ this.bookmarks = {
 				return;
 			}
 			try {
+				var entriesCount = data && data.entries && data.entries.length;
+				entriesCount && _this.maxHistoryEntries.ensure(entriesCount + 1);
 				_this.ss.setTabState(tab, ssData);
 				if(
 					!disableForceLoad
@@ -1226,6 +1229,9 @@ this.bookmarks = {
 				Components.utils.reportError(_this.errPrefix + "setTabSession: setTabState() failed");
 				Components.utils.reportError(e);
 				fallback();
+			}
+			finally {
+				entriesCount && _this.maxHistoryEntries.restore();
 			}
 		})();
 	},
@@ -1263,6 +1269,36 @@ this.bookmarks = {
 		onProgressChange: function(aWebProgress, aRequest, curSelf, maxSelf, curTot, maxTot) {},
 		onStatusChange:   function(aWebProgress, aRequest, aStatus, aMessage) {},
 		onSecurityChange: function(aWebProgress, aRequest, aState) {}
+	},
+	get maxHistoryEntries() {
+		var prefName = "browser.sessionhistory.max_entries";
+		var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+			.getService(Components.interfaces.nsIPrefBranch);
+		var orig;
+		delete this.maxHistoryEntries;
+		return this.maxHistoryEntries = {
+			_restoreTimer: 0,
+			ensure: function(n) {
+				var cur = prefs.getIntPref(prefName);
+				if(cur >= n)
+					return;
+				if(orig == undefined)
+					orig = cur;
+				_log("Override: " + prefName + " -> " + n);
+				clearTimeout(this._restoreTimer);
+				prefs.setIntPref(prefName, n);
+			},
+			restore: function() {
+				if(orig == undefined)
+					return;
+				clearTimeout(this._restoreTimer);
+				this._restoreTimer = setTimeout(function() {
+					_log("Restore: " + prefName + " -> " + orig);
+					prefs.setIntPref(prefName, orig);
+					orig = undefined;
+				}, 50);
+			}
+		};
 	},
 	deleteBookmark: function(mi) {
 		this.addUndo({ action: "add", mi: mi, pn: mi.parentNode, ns: mi.nextSibling });
