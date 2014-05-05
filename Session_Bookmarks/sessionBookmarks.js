@@ -1178,45 +1178,59 @@ this.bookmarks = {
 			Components.utils.reportError(this.errPrefix + "setTabSession: can't parse session data");
 			Components.utils.reportError(e);
 		}
-		try {
-			if(!ssData)
-				throw "empty ssData";
-			if(this.options.reloadSessions && !this.ios.offline) try {
-				tab.linkedBrowser.addProgressListener(this.progressListener);
-			}
-			catch(e2) {
-				Components.utils.reportError(this.errPrefix + "setTabSession: can't reload session");
-				Components.utils.reportError(e2);
-				setTimeout(function(_this) {
-					tab.linkedBrowser.addProgressListener(_this.progressListener);
-				}, 0, this);
-			}
-			this.ss.setTabState(tab, ssData);
-
-			if(
-				!disableForceLoad
-				&& tab != gBrowser.selectedTab // Should be loaded automatically in this case
-				&& (
-					tab.getAttribute("pending") == "true" // Gecko >= 9.0
-					|| tab.linkedBrowser.contentDocument.readyState == "uninitialized"
-					// || tab.linkedBrowser.__SS_restoreState == 1
-				)
-			) {
-				tab.linkedBrowser.reload();
-				// Show "Connecting…" instead of "New Tab"
-				// (disable browser.sessionstore.restore_on_demand to see this bug)
-				gBrowser.setTabTitleLoading && gBrowser.setTabTitleLoading(tab);
-			}
-		}
-		catch(e) {
-			if(e != "empty ssData") {
-				Components.utils.reportError(this.errPrefix + "setTabSession: setTabState() failed");
-				Components.utils.reportError(e);
-			}
+		function fallback() {
 			uri && tab.linkedBrowser.loadURI(uri);
 		}
+		if(!ssData) {
+			fallback();
+			return;
+		}
+		// Note: we always use progress listener to test <xul:browser>
+		var progressListener = this.progressListener;
+		progressListener.enabled = this.options.reloadSessions && !this.ios.offline;
+		var stopTime = Date.now() + 1e3;
+		var _this = this;
+		(function trySetSession() {
+			try {
+				tab.linkedBrowser.addProgressListener(progressListener);
+			}
+			catch(e) {
+				_info("setTabSession: addProgressListener() failed, error:\n" + e);
+				if(Date.now() < stopTime)
+					setTimeout(trySetSession, 5);
+				else {
+					Components.utils.reportError(_this.errPrefix + "setTabSession: addProgressListener() failed");
+					Components.utils.reportError(e);
+					fallback();
+				}
+				return;
+			}
+			try {
+				_this.ss.setTabState(tab, ssData);
+				if(
+					!disableForceLoad
+					&& tab != gBrowser.selectedTab // Should be loaded automatically in this case
+					&& (
+						tab.getAttribute("pending") == "true" // Gecko >= 9.0
+						|| tab.linkedBrowser.contentDocument.readyState == "uninitialized"
+						// || tab.linkedBrowser.__SS_restoreState == 1
+					)
+				) {
+					tab.linkedBrowser.reload();
+					// Show "Connecting…" instead of "New Tab"
+					// (disable browser.sessionstore.restore_on_demand to see this bug)
+					gBrowser.setTabTitleLoading && gBrowser.setTabTitleLoading(tab);
+				}
+			}
+			catch(e) {
+				Components.utils.reportError(_this.errPrefix + "setTabSession: setTabState() failed");
+				Components.utils.reportError(e);
+				fallback();
+			}
+		})();
 	},
 	progressListener: { // Based on code of Session Manager 0.7.5
+		enabled: true,
 		QueryInterface: function(aIID) {
 			if(
 				aIID.equals(Components.interfaces.nsIWebProgressListener)
@@ -1227,6 +1241,8 @@ this.bookmarks = {
 			throw Components.results.NS_NOINTERFACE;
 		},
 		onStateChange: function(aWebProgress, aRequest, aFlag, aStatus) {
+			if(!this.enabled)
+				return;
 			try {
 				if(aRequest.name == "about:blank")
 					return;
