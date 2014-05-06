@@ -207,6 +207,8 @@ this.onmouseover = function(e) {
 		&& this.bookmarks.mp.hasAttribute("onpopupshowing")
 	)
 		this.bookmarks.delayedLoad();
+	if(this.disabled)
+		return;
 	Array.some(
 		this.parentNode.getElementsByTagName("*"),
 		function(node) {
