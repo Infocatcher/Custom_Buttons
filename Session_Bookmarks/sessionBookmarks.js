@@ -1214,7 +1214,7 @@ this.bookmarks = {
 						.QueryInterface(Components.interfaces.nsISHistory);
 					var maxLength = sh.maxLength;
 					if(entriesCount > maxLength) {
-						_log("Restore nsISHistory.maxLength: " + maxLength + " -> " + entriesCount);
+						_log("Override nsISHistory.maxLength: " + maxLength + " -> " + entriesCount);
 						sh.maxLength = entriesCount;
 					}
 				}
