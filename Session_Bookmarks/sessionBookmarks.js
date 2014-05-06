@@ -206,7 +206,7 @@ this.onmouseover = function(e) {
 		&& this.bookmarks.mp
 		&& this.bookmarks.mp.hasAttribute("onpopupshowing")
 	)
-		this.bookmarks.delayedLoad();
+		this.bookmarks.load();
 	if(this.disabled)
 		return;
 	Array.some(
@@ -352,7 +352,7 @@ this.bookmarks = {
 			context:        this.cmId,
 			oncommand:      "this.parentNode.bookmarks.openBookmark(event);",
 			onclick:        "this.parentNode.bookmarks.openBookmark(event);",
-			onpopupshowing: "this.parentNode.bookmarks.delayedLoad();",
+			onpopupshowing: "this.parentNode.bookmarks.load();",
 			onpopuphidden:  "this.parentNode.bookmarks.checkUnsaved();"
 		});
 		mp.addEventListener("DOMMenuItemActive",   this, false);
@@ -366,14 +366,14 @@ this.bookmarks = {
 		var preload = this.options.preloadBookmarks;
 		if(preload > 0) setTimeout(function(_this) {
 			if(_this.mp.hasAttribute("onpopupshowing"))
-				_this.delayedLoad();
+				_this.load();
 		}, preload, this);
 
 		if(this.noBookmarks())
 			this.button.disabled = true;
 	},
-	delayedLoad: function(callback) {
-		_log("delayedLoad()");
+	load: function(callback) {
+		_log("load()");
 		var mp = this.mp;
 		if(mp.hasAttribute("onpopupshowing")) {
 			// Already called listener can't be removed without this
@@ -383,19 +383,19 @@ this.bookmarks = {
 		var file = this.file;
 		if(file.exists()) {
 			this.readFromFileAsync(file, function(data) {
-				this.load(data);
+				this.loadData(data);
 				callback && callback();
 			}, this);
 		}
 		else {
-			this.load("");
+			this.loadData("");
 			callback && callback();
 		}
 	},
 	ensureLoaded: function(callback, context, args) {
 		if(this._loaded)
 			return callback.apply(context, args);
-		return this.delayedLoad(function() {
+		return this.load(function() {
 			callback.apply(context, args);
 		});
 	},
@@ -407,7 +407,7 @@ this.bookmarks = {
 	_sep:     "separator",
 
 	_loaded: false,
-	load: function(data) {
+	loadData: function(data) {
 		this._loaded = true;
 		this.addContextMenu();
 
@@ -697,7 +697,7 @@ this.bookmarks = {
 		if(data == undefined)
 			this.init();
 		else
-			this.load(data);
+			this.loadData(data);
 	},
 	unsaved: false,
 	_saveInProgress: false,
