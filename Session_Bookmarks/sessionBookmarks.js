@@ -43,7 +43,7 @@ var options = {
 	// 2 - always show
 	notificationHideDelay: 1700,
 
-	preloadBookmarks: 100,
+	preloadBookmarks: -1,
 	// 0    - disable preload feature (load bookmarks only after menu opening)
 	// -1   - preload on mouseover
 	// 1..N - preload after this time (in ms)
@@ -368,6 +368,9 @@ this.bookmarks = {
 			if(_this.mp.hasAttribute("onpopupshowing"))
 				_this.delayedLoad();
 		}, preload, this);
+
+		if(this.noBookmarks())
+			this.button.disabled = true;
 	},
 	delayedLoad: function(callback) {
 		_log("delayedLoad()");
@@ -1553,6 +1556,25 @@ this.bookmarks = {
 			this.$(this.sortId).disabled = !hasBookmarks;
 		if(!hasBookmarks)
 			this.mp.hidePopup();
+		this.noBookmarks(!hasBookmarks);
+	},
+	noBookmarks: function(isEmpty) {
+		var btn = this.button;
+		var key = "_cbSessionBookmarks#" + this.btnNum + "_noBookmarks";
+		var attr = "cb_sessionBookmarks_noBookmarks";
+		if(isEmpty === undefined)
+			return key in window || btn.hasAttribute(attr);
+		_log("noBookmarks(" + isEmpty + ")");
+		if(isEmpty) {
+			window[key] = true;
+			btn.setAttribute(attr, "true");
+		}
+		else {
+			delete window[key];
+			btn.removeAttribute(attr);
+		}
+		document.persist(btn.id, attr);
+		return isEmpty;
 	},
 	initContextMenu: function(mi) {
 		var isBtn = mi == this.button;
@@ -2125,6 +2147,8 @@ this.onDestroy = function(reason) {
 		return; // Changed XBL binding, ignore
 	_log("destroy: " + reason);
 	this.bookmarks.destroy(reason == "update" || reason == "delete");
+	if(reason == "delete")
+		this.bookmarks.noBookmarks(false);
 };
 this.type = "menu";
 this.orient = "horizontal";
