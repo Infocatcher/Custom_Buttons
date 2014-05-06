@@ -1567,8 +1567,10 @@ this.bookmarks = {
 		var btn = this.button;
 		var key = "_cbSessionBookmarks#" + this.btnNum + "_noBookmarks";
 		var attr = "cb_sessionBookmarks_noBookmarks";
+		// Note: we use global window[key] to save state, if button was edited
+		// Also persist() may save empty attribute, so we can't use hasAttribute() check
 		if(isEmpty === undefined)
-			return key in window || btn.hasAttribute(attr);
+			return key in window || btn.getAttribute(attr) == "true";
 		_log("noBookmarks(" + isEmpty + ")");
 		if(isEmpty) {
 			window[key] = true;
