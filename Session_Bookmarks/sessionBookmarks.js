@@ -1207,19 +1207,28 @@ this.bookmarks = {
 				return;
 			}
 			try {
+				var browser = tab.linkedBrowser;
 				var entriesCount = data && data.entries && data.entries.length;
-				entriesCount && _this.maxHistoryEntries.ensure(entriesCount + 1);
+				if(entriesCount) {
+					var sh = browser.sessionHistory
+						.QueryInterface(Components.interfaces.nsISHistory);
+					var maxLength = sh.maxLength;
+					if(entriesCount > maxLength) {
+						_log("Restore nsISHistory.maxLength: " + maxLength + " -> " + entriesCount);
+						sh.maxLength = entriesCount;
+					}
+				}
 				_this.ss.setTabState(tab, ssData);
 				if(
 					!disableForceLoad
 					&& tab != gBrowser.selectedTab // Should be loaded automatically in this case
 					&& (
 						tab.getAttribute("pending") == "true" // Gecko >= 9.0
-						|| tab.linkedBrowser.contentDocument.readyState == "uninitialized"
-						// || tab.linkedBrowser.__SS_restoreState == 1
+						|| browser.contentDocument.readyState == "uninitialized"
+						// || browser.__SS_restoreState == 1
 					)
 				) {
-					tab.linkedBrowser.reload();
+					browser.reload();
 					// Show "Connecting…" instead of "New Tab"
 					// (disable browser.sessionstore.restore_on_demand to see this bug)
 					gBrowser.setTabTitleLoading && gBrowser.setTabTitleLoading(tab);
@@ -1231,7 +1240,10 @@ this.bookmarks = {
 				fallback();
 			}
 			finally {
-				entriesCount && _this.maxHistoryEntries.restore();
+				if(entriesCount && sh.maxLength != maxLength) setTimeout(function() {
+					_log("Restore nsISHistory.maxLength: " + sh.maxLength + " -> " + maxLength);
+					sh.maxLength = maxLength;
+				}, 100);
 			}
 		})();
 	},
@@ -1269,36 +1281,6 @@ this.bookmarks = {
 		onProgressChange: function(aWebProgress, aRequest, curSelf, maxSelf, curTot, maxTot) {},
 		onStatusChange:   function(aWebProgress, aRequest, aStatus, aMessage) {},
 		onSecurityChange: function(aWebProgress, aRequest, aState) {}
-	},
-	get maxHistoryEntries() {
-		var prefName = "browser.sessionhistory.max_entries";
-		var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-			.getService(Components.interfaces.nsIPrefBranch);
-		var orig;
-		delete this.maxHistoryEntries;
-		return this.maxHistoryEntries = {
-			_restoreTimer: 0,
-			ensure: function(n) {
-				var cur = prefs.getIntPref(prefName);
-				if(cur >= n)
-					return;
-				if(orig == undefined)
-					orig = cur;
-				_log("Override: " + prefName + " -> " + n);
-				clearTimeout(this._restoreTimer);
-				prefs.setIntPref(prefName, n);
-			},
-			restore: function() {
-				if(orig == undefined)
-					return;
-				clearTimeout(this._restoreTimer);
-				this._restoreTimer = setTimeout(function() {
-					_log("Restore: " + prefName + " -> " + orig);
-					prefs.setIntPref(prefName, orig);
-					orig = undefined;
-				}, 50);
-			}
-		};
 	},
 	deleteBookmark: function(mi) {
 		this.addUndo({ action: "add", mi: mi, pn: mi.parentNode, ns: mi.nextSibling });
