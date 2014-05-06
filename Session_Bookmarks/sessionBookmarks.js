@@ -206,7 +206,7 @@ this.onmouseover = function(e) {
 		&& this.bookmarks.mp
 		&& this.bookmarks.mp.hasAttribute("onpopupshowing")
 	)
-		this.bookmarks.load();
+		this.bookmarks.loadDelayed();
 	if(this.disabled)
 		return;
 	Array.some(
@@ -371,6 +371,11 @@ this.bookmarks = {
 
 		if(this.noBookmarks())
 			this.button.disabled = true;
+	},
+	loadDelayed: function(callback) {
+		setTimeout(function(_this) {
+			_this.load(callback);
+		}, 0, this);
 	},
 	load: function(callback) {
 		_log("load()");
