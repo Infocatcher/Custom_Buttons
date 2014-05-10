@@ -332,7 +332,8 @@ this.bookmarks = {
 		// This behavior may be changed (fixed?) later, so will initialize anyway after small delay
 		btn.__initTimer = setTimeout(function(_this) {
 			_log("initProxy() -> fallback timer");
-			_this.init();
+			if(btn.type == "menu")
+				_this.init();
 		}, 500, this);
 	},
 	init: function() {
