@@ -418,6 +418,10 @@ this.bookmarks = {
 		this.addContextMenu();
 
 		var mp = this.mp;
+		if(mp.hasChildNodes()) {
+			_log("loadData(): menupopup isn't empty!");
+			mp.textContent = "";
+		}
 		var typeOffset = this._label.length;
 		data.split("\n\n").forEach(function(section, i) {
 			if(!section)
