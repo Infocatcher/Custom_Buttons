@@ -110,6 +110,9 @@ Disable or enable GIF animation on current page
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Toggle_Restartless_Add-ons/icon.png)&nbsp;[Toggle Restartless Add-ons](Toggle_Restartless_Add-ons)
 Drop-down menu to toggle restartless add-ons
 
+##### [Toolbar Flexible Space](Toolbar_Flexible_Space)
+Just looks like toolbar flexible space, may be useful in Firefox 29+ (Australis)
+
 ##### [Toolbar Separator](Toolbar_Separator)
 Just looks like toolbar separator, may be useful in Firefox 29+ (Australis)
 
