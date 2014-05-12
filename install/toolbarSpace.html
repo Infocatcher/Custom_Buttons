@@ -1,0 +1,35 @@
+<!DOCTYPE HTML>
+<meta charset="utf-8"/>
+<title>Toolbar Space [0.1.0 - 2014-05-12]</title>
+<body>
+<a href="custombutton://%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%0D%0A%3Ccustombutton%20xmlns%3Acb%3D%22http%3A//xsms.nm.ru/custombuttons/%22%3E%0A%20%20%3Cname%3EToolbar%20Space%3C/name%3E%0A%20%20%3Cimage%3E%3C%21%5BCDATA%5Bcustombuttons-stdicon-1%5D%5D%3E%3C/image%3E%0A%20%20%3Cmode%3E0%3C/mode%3E%0A%20%20%3Cinitcode%3E%3C%21%5BCDATA%5B//%20https%3A//github.com/Infocatcher/Custom_Buttons/tree/master/Toolbar_Space%0A%0A//%20Toolbar%20Space%20button%20for%20Custom%20Buttons%0A//%20%28code%20for%20%22initialization%22%20section%29%0A%0A//%20%28c%29%20Infocatcher%202014%0A//%20version%200.1.0%20-%202014-05-12%0A%0Athis.tooltipText%20%3D%20%22%22%3B%20//%20Remove%20tooltip%0Athis.style.cssText%20%3D%20%27%5C%0A%09/*%20styles%20for%20toolbarspacer%20from%20chrome%3A//global/skin/toolbar.css%20*/%5Cn%5C%0A%09width%3A%2015px%3B%5Cn%5C%0A%09/*%20Remove%20button%20styles%20*/%5Cn%5C%0A%09-moz-appearance%3A%20listitem%20%21important%3B%20/*%20Hack%2C%20try%20use%20%22none%22%20in%20case%20of%20wrong%20appearance%20*/%5Cn%5C%0A%09list-style-image%3A%20none%20%21important%3B%5Cn%5C%0A%09margin%3A%200%20%21important%3B%5Cn%5C%0A%09padding%3A%200%20%21important%3B%5Cn%5C%0A%27%3B%0AsetTimeout%28function%28%29%20%7B%20//%20Force%20hide%20icon%0A%09var%20icon%20%3D%20self.ownerDocument.getAnonymousElementByAttribute%28self%2C%20%22class%22%2C%20%22toolbarbutton-icon%22%29%3B%0A%09icon.style.display%20%3D%20%22none%22%3B%0A%7D%2C%2050%29%3B%5D%5D%3E%3C/initcode%3E%0A%20%20%3Ccode%3E%3C%21%5BCDATA%5B/*CODE*/%5D%5D%3E%3C/code%3E%0A%20%20%3Caccelkey%3E%3C%21%5BCDATA%5B%5D%5D%3E%3C/accelkey%3E%0A%20%20%3Chelp%3E%3C%21%5BCDATA%5B%5D%5D%3E%3C/help%3E%0A%20%20%3Cattributes/%3E%0A%3C/custombutton%3E"
+>Install</a>
+| <a href="https://github.com/Infocatcher/Custom_Buttons/tree/master/Toolbar_Space">Source</a>
+| <a href="https://github.com/Infocatcher/Custom_Buttons#usage">Instructions</a>
+<script type="text/javascript">
+var a = document.getElementsByTagName("a")[0];
+a.title = document.title;
+if(/%3Cimage%3E%3C%21%5BCDATA%5B(data%3A\S+)%5D%5D%3E%3C\/image%3E/.test(a.href)) {
+	var icon = decodeURIComponent(RegExp.$1);
+
+	var img = document.createElement("img");
+	img.src = icon;
+	img.alt = "";
+	img.style.verticalAlign = "middle";
+	img.style.marginRight = "4px";
+	img.style.border = "none";
+	a.insertBefore(img, a.firstChild);
+
+	var link = document.createElement("link");
+	link.rel = "shortcut icon";
+	link.href = icon;
+	document.documentElement.insertBefore(link, document.documentElement.firstChild);
+}
+</script>
+<script type="text/javascript" src="http://infocatcher.github.io/Custom_Buttons/viewCustomButton.js"></script>
+<script type="text/javascript">
+if("viewCustomButtonCode" in window) setTimeout(function() {
+	viewCustomButtonCode(a.href);
+}, 0);
+</script>
+</body>
