@@ -113,6 +113,9 @@ Drop-down menu to toggle restartless add-ons
 ##### [Toolbar Separator](Toolbar_Separator)
 Just looks like toolbar separator, may be useful in Firefox 29+ (Australis)
 
+##### [Toolbar Space](Toolbar_Space)
+Just looks like toolbar space, may be useful in Firefox 29+ (Australis)
+
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Undo_Close_Tabs/icons/icon.png)&nbsp;[Undo Close Tabs](Undo_Close_Tabs)
 Allows restore recently closed tabs and windows
 

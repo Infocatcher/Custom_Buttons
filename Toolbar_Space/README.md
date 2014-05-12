@@ -1,0 +1,2 @@
+<a href="http://infocatcher.github.io/Custom_Buttons/install/toolbarSpace.html"><strong>Toolbar Space</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+<br>Just looks like toolbar space, may be useful in Firefox 29+ (Australis)
