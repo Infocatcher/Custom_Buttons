@@ -1,5 +1,8 @@
 This is some code snippets related to <a href="https://addons.mozilla.org/addon/custom-buttons/">Custom Buttons</a>.
 
+###### <a href="autoOpenCloseMenu.js">autoOpenCloseMenu.js</a>
+Automatically open menu on mouse over (and hide it on mouse out)
+
 ###### <a href="menuWithDelayedInitialization.js">menuWithDelayedInitialization.js</a>
 Example menu with delayed initialization, <a href="http://infocatcher.github.io/Custom_Buttons/install/menuWithDelayedInitialization.html">install page</a>
 
