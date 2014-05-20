@@ -4,7 +4,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2010, 2012, 2014
-// version 0.2.3 - 2014-01-06
+// version 0.2.3.1 - 2014-05-20
 
 var flexibleWidth = true;
 
