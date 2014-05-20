@@ -155,6 +155,8 @@ this.ondblclick = function(e) {
 		window.maximize();
 };
 
+var s = document.documentElement.style;
+var boxShadowPrefix = "boxShadow" in s ? "" : "-moz-";
 var cssStr = ('\
 	@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");\n\
 	@-moz-document url("' + window.location.href + '") {\n\
@@ -169,7 +171,7 @@ var cssStr = ('\
 			-moz-box-pack: center !important;\n\
 			-moz-box-orient: horizontal !important;\n\
 			background: transparent !important;\n\
-			-moz-box-shadow: none !important;\n\
+			' + boxShadowPrefix + 'box-shadow: none !important;\n\
 			-moz-appearance: none !important;\n\
 			border: none !important;\n\
 		}\n\
