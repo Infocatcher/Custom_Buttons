@@ -161,8 +161,6 @@ var cssStr = ('\
 	@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");\n\
 	@-moz-document url("' + window.location.href + '") {\n\
 		%button% {\n\
-			color: windowText !important;\n\
-			text-shadow: window 2px -2px 4px, window -2px 2px 4px, window -2px -4px 4px, window 2px 4px 4px !important;\n\
 			width: ' + titleWidth + ' !important;\n\
 			min-width: ' + titleWidthMin + ' !important;\n\
 			max-width: ' + titleWidthMax + ' !important;\n\
@@ -170,10 +168,15 @@ var cssStr = ('\
 			padding: 1px 3px !important;\n\
 			-moz-box-pack: center !important;\n\
 			-moz-box-orient: horizontal !important;\n\
-			background: transparent !important;\n\
-			' + boxShadowPrefix + 'box-shadow: none !important;\n\
 			-moz-appearance: none !important;\n\
+		}\n\
+		%button%,\n\
+		%button% > .toolbarbutton-text {\n\
+			color: windowText !important;\n\
+			text-shadow: window 2px -2px 4px, window -2px 2px 4px, window -2px -4px 4px, window 2px 4px 4px !important;\n\
+			background: transparent !important;\n\
 			border: none !important;\n\
+			' + boxShadowPrefix + 'box-shadow: none !important;\n\
 		}\n\
 		%button% > .toolbarbutton-icon {\n\
 			display: none !important;\n\
