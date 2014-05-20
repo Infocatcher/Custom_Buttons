@@ -164,7 +164,15 @@ this.bookmarks = {
 		if(options.useFolderTitle)
 			this.setButtonTitle(btn._placesView._resultNode && btn._placesView._resultNode.title);
 		// Add "Open All in Tabs" menuitem
-		PlacesViewBase.prototype._mayAddCommandsItems(btn.firstChild);
+		try {
+			btn._placesView._mayAddCommandsItems.call({
+				_rootElt: null,
+				__proto__: btn._placesView
+			}, btn.firstChild);
+		}
+		catch(e) {
+			PlacesViewBase.prototype._mayAddCommandsItems(btn.firstChild);
+		}
 	},
 	destroy: function() {
 		var btn = this.button;
