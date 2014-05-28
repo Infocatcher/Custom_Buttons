@@ -243,6 +243,8 @@ if(!watcher) {
 						mode: SourceEditor.modes.js,
 						value: code,
 						lineNumbers: true,
+						enableCodeFolding: true,
+						showTrailingSpace: true,
 						contextMenu: "sourceEditorContext"
 					})
 					: new SourceEditor();
