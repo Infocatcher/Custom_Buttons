@@ -455,6 +455,10 @@ if(!watcher) {
 				window.setTimeout(function() { window.editor.removeObservers(); }, 0);
 				window.setTimeout(function() { window.editor.addObservers();    }, 0);
 			}, false);
+			// Fix for Ctrl+S hotkey (catched by CodeMirror)
+			window.addEventListener("keydown",  this.handleKeyEvent, true);
+			window.addEventListener("keypress", this.handleKeyEvent, true);
+			window.addEventListener("keyup",    this.handleKeyEvent, true);
 		},
 		destroyWindow: function(window, reason, isFrame) {
 			if(reason == this.REASON_WINDOW_CLOSED)
@@ -539,6 +543,9 @@ if(!watcher) {
 				});
 				delete window.SourceEditor;
 			}
+			window.removeEventListener("keydown",  this.handleKeyEvent, true);
+			window.removeEventListener("keypress", this.handleKeyEvent, true);
+			window.removeEventListener("keyup",    this.handleKeyEvent, true);
 			//~ todo: we have one not removed controller!
 			//LOG("getControllerCount(): " + window.controllers.getControllerCount());
 		},
@@ -586,6 +593,19 @@ if(!watcher) {
 					var window = e.target.defaultView;
 					window.removeEventListener(e.type, this, false);
 					this.destroyWindow(window, this.REASON_WINDOW_CLOSED, true);
+			}
+		},
+		handleKeyEvent: function(e) {
+			if(
+				(e.keyCode == e.DOM_VK_S || String.fromCharCode(e.charCode).toUpperCase() == "S")
+				&& e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey
+			) {
+				e.preventDefault();
+				e.stopPropagation();
+				if(e.type == "keydown") {
+					var window = e.currentTarget;
+					window.editor.updateButton();
+				}
 			}
 		},
 		loadOverlays: function() {
