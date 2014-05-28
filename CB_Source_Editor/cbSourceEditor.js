@@ -7,6 +7,17 @@
 // (c) Infocatcher 2012-2014
 // version 0.1.0a4 - 2014-02-24
 
+var options = {
+	codeMirror: {
+		lineNumbers: true,
+		enableCodeFolding: true,
+		showTrailingSpace: true
+	},
+	orion: {
+		lineNumbers: true
+	}
+};
+
 const watcherId = "customButtonsSourceEditor_" + this.id;
 var {Application, Components} = window; // Prevent garbage collection in Firefox 3.6 and older
 var watcher = Application.storage.get(watcherId, null);
@@ -238,16 +249,23 @@ if(!watcher) {
 				if("__sourceEditor" in cbEditor)
 					return;
 				var code = cbEditor.value;
-				var se = isCodeMirror
-					? new SourceEditor({
+				if(isCodeMirror) {
+					var opts = {
 						mode: SourceEditor.modes.js,
 						value: code,
 						lineNumbers: true,
 						enableCodeFolding: true,
 						showTrailingSpace: true,
 						contextMenu: "sourceEditorContext"
-					})
-					: new SourceEditor();
+					};
+					var optsOvr = options.codeMirror;
+					for(var opt in optsOvr) if(optsOvr.hasOwnProperty(opt))
+						opts[opt] = optsOvr[opt];
+					var se = new SourceEditor(opts);
+				}
+				else {
+					var se = new SourceEditor();
+				}
 				se.__isCodeMirror = isCodeMirror;
 				var seElt = document.createElement("hbox");
 				seElt.className = "sourceEditor";
@@ -376,15 +394,19 @@ if(!watcher) {
 					});
 				}
 				else {
+					var opts = {
+						mode: SourceEditor.MODES.JAVASCRIPT,
+						showLineNumbers: true,
+						initialText: code,
+						placeholderText: code, // For backward compatibility
+						contextMenu: "sourceEditorContext"
+					};
+					var optsOvr = options.orion;
+					for(var opt in optsOvr) if(optsOvr.hasOwnProperty(opt))
+						opts[opt] = optsOvr[opt];
 					se.init(
 						seElt,
-						{
-							mode: SourceEditor.MODES.JAVASCRIPT,
-							showLineNumbers: true,
-							initialText: code,
-							placeholderText: code, // For backward compatibility
-							contextMenu: "sourceEditorContext"
-						},
+						opts,
 						function callback() {
 							done();
 							isLoaded && se.resetUndo && se.resetUndo();
