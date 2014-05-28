@@ -404,26 +404,22 @@ if(!watcher) {
 					var optsOvr = options.orion;
 					for(var opt in optsOvr) if(optsOvr.hasOwnProperty(opt))
 						opts[opt] = optsOvr[opt];
-					se.init(
-						seElt,
-						opts,
-						function callback() {
-							done();
-							isLoaded && se.resetUndo && se.resetUndo();
-							se.addEventListener(SourceEditor.EVENTS.TEXT_CHANGED, onTextChanged);
+					se.init(seElt, opts, function callback() {
+						done();
+						isLoaded && se.resetUndo && se.resetUndo();
+						se.addEventListener(SourceEditor.EVENTS.TEXT_CHANGED, onTextChanged);
 
-							// Hack to use selected editor
-							var controller = se.ui._controller;
-							var tabs = document.getElementById("custombuttons-editbutton-tabbox");
-							controller.__defineGetter__("_editor", function() {
-								var seElt = tabs.selectedPanel;
-								var se = seElt && seElt.__sourceEditor
-									|| document.getElementsByTagName("cbeditor")[0].__sourceEditor;
-								return se;
-							});
-							controller.__defineSetter__("_editor", function() {});
-						}
-					);
+						// Hack to use selected editor
+						var controller = se.ui._controller;
+						var tabs = document.getElementById("custombuttons-editbutton-tabbox");
+						controller.__defineGetter__("_editor", function() {
+							var seElt = tabs.selectedPanel;
+							var se = seElt && seElt.__sourceEditor
+								|| document.getElementsByTagName("cbeditor")[0].__sourceEditor;
+							return se;
+						});
+						controller.__defineSetter__("_editor", function() {});
+					});
 				}
 			}, this);
 
