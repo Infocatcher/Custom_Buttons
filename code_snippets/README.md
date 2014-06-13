@@ -9,6 +9,9 @@ Example menu with delayed initialization, <a href="http://infocatcher.github.io/
 ###### <a href="mergeInitialization.js">mergeInitialization.js</a>
 Example for safely use only one button for initialization of many “buttons” without UI
 
+###### <a href="multilinePrompt.js">multilinePrompt.js</a>
+Multiline prompt example: opens custom dialog like built-in prompt() function
+
 ###### <a href="oneTimeCommand.js">oneTimeCommand.js</a>
 Lazy initialize button using “code” section
 
