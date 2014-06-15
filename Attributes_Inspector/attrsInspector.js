@@ -789,8 +789,19 @@ function init() {
 			return this.flasher = flasher;
 		},
 		forceRepaint: function(node, delay) {
-			if(this.fxVersion >= 29 && this.flasher) this.timer(function() {
-				this.flasher.repaintElement(node);
+			if(this.fxVersion >= 29) this.timer(function() {
+				if(this.fxVersion < 33 && this.flasher) {
+					this.flasher.repaintElement(node);
+					return;
+				}
+				var s = node.style;
+				s.width = s.height = "";
+				var rc = node.getBoundingClientRect();
+				s.width = rc.width + "px";
+				s.height = rc.height + "px";
+				this.timer(function() {
+					s.width = s.height = "";
+				}, this, 0);
 			}, this, delay || 0);
 		},
 		hl: function(node) {
