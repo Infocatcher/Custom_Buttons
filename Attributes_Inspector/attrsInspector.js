@@ -425,6 +425,10 @@ function init() {
 				// Firefox sometimes sets width/height to limit very huge tooltip
 				tt.removeAttribute("width");
 				tt.removeAttribute("height");
+				if(_forceRepaintTooltip) { // Clear our force repaint hack
+					var s = tt.style;
+					s.width = s.height = "";
+				}
 				tt.appendChild(df);
 				_this.forceRepaint(tt, 50);
 			}
@@ -801,12 +805,14 @@ function init() {
 				}
 				var s = node.style;
 				s.width = s.height = "";
+				node.removeAttribute("width");
+				node.removeAttribute("height");
 				var rc = node.getBoundingClientRect();
 				s.width = rc.width + "px";
 				s.height = rc.height + "px";
-				this.timer(function() {
-					s.width = s.height = "";
-				}, this, 0);
+				//this.timer(function() {
+				//	s.width = s.height = "";
+				//}, this, 0);
 			}, this, delay || 0);
 		},
 		hl: function(node) {
