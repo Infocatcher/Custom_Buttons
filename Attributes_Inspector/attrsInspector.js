@@ -44,6 +44,11 @@ var _addedColor = "-moz-hyperlinktext";
 var _removedColor = "grayText";
 var _changedColor = "-moz-visitedhyperlinktext";
 
+var _forceRepaintTooltip = false;
+// See https://github.com/Infocatcher/Custom_Buttons/issues/25
+// Force repaint tooltip, may solve display glitches in Gecko 29+
+// (disabled by default for better performance)
+
 var _excludeChildTextNodes = 1;
 // 0 - don't exclude
 // 1 - exclude, if found element node
@@ -789,7 +794,7 @@ function init() {
 			return this.flasher = flasher;
 		},
 		forceRepaint: function(node, delay) {
-			if(this.fxVersion >= 29) this.timer(function() {
+			if(_forceRepaintTooltip && this.fxVersion >= 29) this.timer(function() {
 				if(this.fxVersion < 33 && this.flasher) {
 					this.flasher.repaintElement(node);
 					return;
