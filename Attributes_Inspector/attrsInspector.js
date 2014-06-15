@@ -774,17 +774,22 @@ function init() {
 			this._timersCounter = 0;
 		},
 		get flasher() {
-			var flasher = Components.classes["@mozilla.org/inspector/flasher;1"]
-				.getService(Components.interfaces.inIFlasher);
-			flasher.color = _borderColor;
-			flasher.thickness = _borderWidth;
-			flasher.invert = false;
-
+			try { // Will be removed in Gecko 33+, see https://bugzilla.mozilla.org/show_bug.cgi?id=1018324
+				var flasher = Components.classes["@mozilla.org/inspector/flasher;1"]
+					.getService(Components.interfaces.inIFlasher);
+				flasher.color = _borderColor;
+				flasher.thickness = _borderWidth;
+				flasher.invert = false;
+			}
+			catch(e) {
+				_log("inIFlasher isn't available");
+				Components.utils.reportError(e);
+			}
 			delete this.flasher;
 			return this.flasher = flasher;
 		},
 		forceRepaint: function(node, delay) {
-			if(this.fxVersion >= 29) this.timer(function() {
+			if(this.fxVersion >= 29 && this.flasher) this.timer(function() {
 				this.flasher.repaintElement(node);
 			}, this, delay || 0);
 		},
