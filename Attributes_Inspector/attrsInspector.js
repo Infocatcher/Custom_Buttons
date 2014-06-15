@@ -1701,7 +1701,7 @@ function init() {
 			var tar = e.originalTarget;
 			if(tar.id == this.context.ttId)
 				return;
-			this.forceRepaint(this.context.tt);
+			this.forceRepaint(this.context.tt, 150);
 			if(this._shiftKey)
 				return;
 			if(tar.localName == "tooltip") {
