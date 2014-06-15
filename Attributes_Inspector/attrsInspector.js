@@ -1698,19 +1698,23 @@ function init() {
 			this._popups = [];
 		},
 		popupshowingHandler: function(e) {
+			var tar = e.originalTarget;
+			if(tar.id == this.context.ttId)
+				return;
 			this.forceRepaint(this.context.tt);
 			if(this._shiftKey)
 				return;
-			var tar = e.originalTarget;
-			if(tar.localName == "tooltip" && tar.id != this.context.ttId) {
+			if(tar.localName == "tooltip") {
 				this.stopEvent(e);
 				_log("Forbid tooltip showing: " + this._getPopupInfo(tar));
 			}
 		},
 		popupshownHandler: function(e) {
-			this.forceRepaint(this.context.tt);
 			var tar = e.originalTarget;
-			if(tar.id == this.context.ttId || /*this._shiftKey && */tar.localName == "tooltip")
+			if(tar.id == this.context.ttId)
+				return;
+			this.forceRepaint(this.context.tt);
+			if(/*this._shiftKey && */tar.localName == "tooltip")
 				return;
 			this.makeTooltipTopmost(true);
 			_log(e.type + " => make tooltip topmost");
