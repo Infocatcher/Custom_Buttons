@@ -49,6 +49,8 @@ var _forceRepaintTooltip = false;
 // Force repaint tooltip, may solve display glitches in Gecko 29+
 // (disabled by default for better performance)
 
+var _maxTooltipWidth = 600; // Max width in px, 0 to not force limits
+
 var _excludeChildTextNodes = 1;
 // 0 - don't exclude
 // 1 - exclude, if found element node
@@ -196,6 +198,10 @@ function init() {
 	var tt = this.tt = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "tooltip");
 	tt.id = ttId;
 	tt.setAttribute("orient", "vertical");
+	if(_maxTooltipWidth > 0) {
+		_maxTooltipWidth = Math.min(_maxTooltipWidth, (screen.availWidth || screen.width) - 20) + "px";
+		tt.style.maxWidth = _maxTooltipWidth;
+	}
 	//if("pointerEvents" in tt.style)
 	//	tt.style.pointerEvents = "none";
 	tt.setAttribute("mousethrough", "always");
@@ -366,6 +372,9 @@ function init() {
 			var item = this.e("div");
 			item.style.lineHeight = "1.25";
 			item.style.maxHeight = "12.5em";
+			// Note: max-width for tooltip itself may not work with classic windows theme
+			if(_maxTooltipWidth)
+				item.style.maxWidth = _maxTooltipWidth;
 			item.className = "attrsInspector-item";
 
 			overflowBox.appendChild(item);
