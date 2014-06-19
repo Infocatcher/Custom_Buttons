@@ -1622,7 +1622,7 @@ this.attrsInspector = function(event) {
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Attributes_Inspector
 
 // (c) Infocatcher 2010-2014
-// version 0.6.3pre3 - 2014-04-02
+// version 0.6.3 - 2014-06-19
 
 //===================
 // Attributes Inspector button for Custom Buttons
@@ -1651,8 +1651,9 @@ this.attrsInspector = function(event) {
 (function() {
 var _highlight = true; // Hightlight current node
 var _highlightUsingFlasher = false; // Don't modify DOM, but has some side effects (and slower)
-// Note: inIFlasher works in Firefox 4 and higher only with disabled hardware acceleration!
+// Note: inIFlasher works in Firefox 4+ only with disabled hardware acceleration!
 // See https://bugzilla.mozilla.org/show_bug.cgi?id=368608 and https://bugzilla.mozilla.org/show_bug.cgi?id=594299
+// Also inIFlasher isn't available in Firefox 33+, see https://bugzilla.mozilla.org/show_bug.cgi?id=1018324
 var _borderColor = "red"; // Any valid CSS color
 var _borderWidth = 1; // Border width in pixels
 var _borderStyle = "solid"; // border-style property in CSS
@@ -1662,6 +1663,13 @@ var _borderStyle = "solid"; // border-style property in CSS
 var _addedColor = "-moz-hyperlinktext";
 var _removedColor = "grayText";
 var _changedColor = "-moz-visitedhyperlinktext";
+
+var _forceRepaintTooltip = false;
+// See https://github.com/Infocatcher/Custom_Buttons/issues/25
+// Force repaint tooltip, may solve display glitches in Gecko 29+
+// (disabled by default for better performance)
+
+var _maxTooltipWidth = 600; // Max width in px, 0 to not force limits
 
 var _excludeChildTextNodes = 1;
 // 0 - don't exclude
@@ -1810,6 +1818,10 @@ function init() {
 	var tt = this.tt = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "tooltip");
 	tt.id = ttId;
 	tt.setAttribute("orient", "vertical");
+	if(_maxTooltipWidth > 0) {
+		_maxTooltipWidth = Math.min(_maxTooltipWidth, (screen.availWidth || screen.width) - 20) + "px";
+		tt.style.maxWidth = _maxTooltipWidth;
+	}
 	//if("pointerEvents" in tt.style)
 	//	tt.style.pointerEvents = "none";
 	tt.setAttribute("mousethrough", "always");
@@ -1980,6 +1992,9 @@ function init() {
 			var item = this.e("div");
 			item.style.lineHeight = "1.25";
 			item.style.maxHeight = "12.5em";
+			// Note: max-width for tooltip itself may not work with classic windows theme
+			if(_maxTooltipWidth)
+				item.style.maxWidth = _maxTooltipWidth;
 			item.className = "attrsInspector-item";
 
 			overflowBox.appendChild(item);
@@ -2039,6 +2054,10 @@ function init() {
 				// Firefox sometimes sets width/height to limit very huge tooltip
 				tt.removeAttribute("width");
 				tt.removeAttribute("height");
+				if(_forceRepaintTooltip) { // Clear our force repaint hack
+					var s = tt.style;
+					s.width = s.height = "";
+				}
 				tt.appendChild(df);
 				_this.forceRepaint(tt, 50);
 			}
@@ -2393,18 +2412,36 @@ function init() {
 			this._timersCounter = 0;
 		},
 		get flasher() {
-			var flasher = Components.classes["@mozilla.org/inspector/flasher;1"]
-				.getService(Components.interfaces.inIFlasher);
-			flasher.color = _borderColor;
-			flasher.thickness = _borderWidth;
-			flasher.invert = false;
-
+			try { // Will be removed in Gecko 33+, see https://bugzilla.mozilla.org/show_bug.cgi?id=1018324
+				var flasher = Components.classes["@mozilla.org/inspector/flasher;1"]
+					.getService(Components.interfaces.inIFlasher);
+				flasher.color = _borderColor;
+				flasher.thickness = _borderWidth;
+				flasher.invert = false;
+			}
+			catch(e) {
+				_log("inIFlasher isn't available");
+				Components.utils.reportError(e);
+			}
 			delete this.flasher;
 			return this.flasher = flasher;
 		},
 		forceRepaint: function(node, delay) {
-			if(this.fxVersion >= 29) this.timer(function() {
-				this.flasher.repaintElement(node);
+			if(_forceRepaintTooltip && this.fxVersion >= 29) this.timer(function() {
+				if(this.fxVersion < 33 && this.flasher) {
+					this.flasher.repaintElement(node);
+					return;
+				}
+				var s = node.style;
+				s.width = s.height = "";
+				node.removeAttribute("width");
+				node.removeAttribute("height");
+				var rc = node.getBoundingClientRect();
+				s.width = rc.width + "px";
+				s.height = rc.height + "px";
+				//this.timer(function() {
+				//	s.width = s.height = "";
+				//}, this, 0);
 			}, this, delay || 0);
 		},
 		hl: function(node) {
@@ -3290,19 +3327,23 @@ function init() {
 			this._popups = [];
 		},
 		popupshowingHandler: function(e) {
-			this.forceRepaint(this.context.tt);
+			var tar = e.originalTarget;
+			if(tar.id == this.context.ttId)
+				return;
+			this.forceRepaint(this.context.tt, 150);
 			if(this._shiftKey)
 				return;
-			var tar = e.originalTarget;
-			if(tar.localName == "tooltip" && tar.id != this.context.ttId) {
+			if(tar.localName == "tooltip") {
 				this.stopEvent(e);
 				_log("Forbid tooltip showing: " + this._getPopupInfo(tar));
 			}
 		},
 		popupshownHandler: function(e) {
-			this.forceRepaint(this.context.tt);
 			var tar = e.originalTarget;
-			if(tar.id == this.context.ttId || /*this._shiftKey && */tar.localName == "tooltip")
+			if(tar.id == this.context.ttId)
+				return;
+			this.forceRepaint(this.context.tt);
+			if(/*this._shiftKey && */tar.localName == "tooltip")
 				return;
 			this.makeTooltipTopmost(true);
 			_log(e.type + " => make tooltip topmost");
