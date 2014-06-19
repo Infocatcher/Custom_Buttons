@@ -32,8 +32,9 @@
 (function() {
 var _highlight = true; // Hightlight current node
 var _highlightUsingFlasher = false; // Don't modify DOM, but has some side effects (and slower)
-// Note: inIFlasher works in Firefox 4 and higher only with disabled hardware acceleration!
+// Note: inIFlasher works in Firefox 4+ only with disabled hardware acceleration!
 // See https://bugzilla.mozilla.org/show_bug.cgi?id=368608 and https://bugzilla.mozilla.org/show_bug.cgi?id=594299
+// Also inIFlasher isn't available in Firefox 33+, see https://bugzilla.mozilla.org/show_bug.cgi?id=1018324
 var _borderColor = "red"; // Any valid CSS color
 var _borderWidth = 1; // Border width in pixels
 var _borderStyle = "solid"; // border-style property in CSS
