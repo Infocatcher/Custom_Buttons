@@ -13,6 +13,10 @@ var maxAttempts = 4;
 
 var logPrefix = "reloadImage(): ";
 debug && Components.utils.import("resource://gre/modules/Services.jsm");
+var activeAttempts = 0;
+var totalImages = 0;
+var successImages = 0;
+var failedImages = 0;
 function reloadImage(img) {
 	// Based on code from chrome://browser/content/nsContextMenu.js (Firefox 21.0a1)
 	if(!(img instanceof Components.interfaces.nsIImageLoadingContent) || !img.currentURI)
@@ -65,6 +69,11 @@ function reloadImage(img) {
 			resetSrc();
 		}
 		else {
+			if(error)
+				++failedImages;
+			else
+				++successImages;
+			feedback("Reloading: " + successImages + "/" + totalImages);
 			destroy();
 		}
 		debug && Services.console.logStringMessage(logPrefix + src + "\n=> " + e.type + (error ? "#" + errors : ""));
@@ -79,11 +88,19 @@ function reloadImage(img) {
 		clearTimeout(stopWaitTimer);
 		img.removeEventListener("load", check, true);
 		img.removeEventListener("error", check, true);
+		if(!--activeAttempts)
+			feedback("Done [count: " + totalImages + (failedImages ? ", failed: " + failedImages + "" : "") + "]");
 	}
 	img.addEventListener("load", check, true);
 	img.addEventListener("error", check, true);
 	var stopWaitTimer = setTimeout(destroy, 8*60e3);
+	++activeAttempts;
+	++totalImages;
 	img.forceReload();
+}
+function feedback(s) {
+	if("XULBrowserWindow" in window)
+		XULBrowserWindow.setOverLink("Reload Broken Images: " + s, null);
 }
 function parseWin(win) {
 	Array.forEach(win.frames, parseWin);
@@ -102,3 +119,4 @@ function parseWin(win) {
 	}
 }
 parseWin(content);
+feedback("Start reloading: " + totalImages);
