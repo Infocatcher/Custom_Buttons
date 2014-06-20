@@ -1,4 +1,4 @@
-// http://infocatcher.ucoz.net/js/cb/reloadBrokenImages.js
+﻿// http://infocatcher.ucoz.net/js/cb/reloadBrokenImages.js
 // https://forum.mozilla-russia.org/viewtopic.php?id=57978
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Reload_Broken_Images
 
@@ -10,6 +10,47 @@
 
 var debug = false;
 var maxAttempts = 4;
+
+function _localize(s) {
+	var strings = {
+		"%label%: ": {
+			ru: "%label%: "
+		},
+		"Reloading: $1/$2": {
+			ru: "Обновление: $1/$2"
+		},
+		"Done [count: $1, failed: $2]": {
+			ru: "Готово [всего: $1, неудачно: $2]"
+		},
+		"Done [count: $1]": {
+			ru: "Готово [всего: $1]"
+		},
+		"Start reloading: $1": {
+			ru: "Запуск обновления: $1"
+		}
+	};
+	var locale = (function() {
+		//var prefs = Services.prefs;
+		var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+			.getService(Components.interfaces.nsIPrefBranch);
+		if(!prefs.getBoolPref("intl.locale.matchOS")) {
+			var locale = prefs.getCharPref("general.useragent.locale");
+			if(locale.substr(0, 9) != "chrome://")
+				return locale;
+		}
+		return Components.classes["@mozilla.org/chrome/chrome-registry;1"]
+			.getService(Components.interfaces.nsIXULChromeRegistry)
+			.getSelectedLocale("global");
+	})().match(/^[a-z]*/)[0];
+	_localize = !locale || locale == "en"
+		? function(s) {
+			return s;
+		}
+		: function(s) {
+			return strings[s] && strings[s][locale] || s;
+		};
+	return _localize.apply(this, arguments);
+}
 
 var logPrefix = "reloadImage(): ";
 debug && Components.utils.import("resource://gre/modules/Services.jsm");
@@ -106,10 +147,11 @@ function reloadImage(img) {
 }
 function feedback(s, replacements) {
 	if("XULBrowserWindow" in window) {
+		s = _localize(s);
 		if(replacements) replacements.forEach(function(replacement, i) {
 			s = s.replace("$" + ++i, replacement);
 		});
-		XULBrowserWindow.setOverLink("Reload Broken Images: " + s, null);
+		XULBrowserWindow.setOverLink(feedbackPrefix + s, null);
 	}
 }
 function parseWin(win) {
@@ -128,5 +170,11 @@ function parseWin(win) {
 		);
 	}
 }
+var feedbackPrefix = _localize("%label%: ")
+	.replace(
+		"%label%",
+		this instanceof XULElement && this.label
+			|| "Reload Broken Images"
+	);
 parseWin(content);
 feedback("Start reloading: $1", [totalImages]);
