@@ -19,10 +19,10 @@ function _localize(s) {
 		"Reloading: $1/$2": {
 			ru: "Обновление: $1/$2"
 		},
-		"Done [count: $1, failed: $2]": {
+		"Done [total: $1, failed: $2]": {
 			ru: "Готово [всего: $1, неудачно: $2]"
 		},
-		"Done [count: $1]": {
+		"Done [total: $1]": {
 			ru: "Готово [всего: $1]"
 		},
 		"Start reloading: $1": {
@@ -135,8 +135,8 @@ function reloadImage(img) {
 		if(!--activeAttempts) {
 			feedback(
 				failedImages
-					? "Done [count: $1, failed: $2]"
-					: "Done [count: $1]",
+					? "Done [total: $1, failed: $2]"
+					: "Done [total: $1]",
 				[totalImages, failedImages],
 				true
 			);
