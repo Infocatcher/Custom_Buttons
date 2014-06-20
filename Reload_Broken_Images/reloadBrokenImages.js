@@ -27,6 +27,9 @@ function _localize(s) {
 		},
 		"Start reloading: $1": {
 			ru: "Запуск обновления: $1"
+		},
+		"Nothing to reload": {
+			ru: "Обновлять нечего"
 		}
 	};
 	var locale = (function() {
@@ -178,4 +181,4 @@ var feedbackPrefix = _localize("%label%: ")
 			|| "Reload Broken Images"
 	);
 parseWin(content);
-feedback("Start reloading: $1", [totalImages]);
+feedback(totalImages ? "Start reloading: $1" : "Nothing to reload", [totalImages]);
