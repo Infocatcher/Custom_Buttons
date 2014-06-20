@@ -114,7 +114,7 @@ function reloadImage(img) {
 				++failedImages;
 			else
 				++successImages;
-			feedback("Reloading: $1/$2", [successImages, totalImages]);
+			feedback("Reloading: $1/$2", [failedImages + successImages, totalImages]);
 			destroy();
 		}
 		debug && Services.console.logStringMessage(logPrefix + src + "\n=> " + e.type + (error ? "#" + errors : ""));
@@ -151,6 +151,7 @@ function feedback(s, replacements) {
 		if(replacements) replacements.forEach(function(replacement, i) {
 			s = s.replace("$" + ++i, replacement);
 		});
+		debug && Services.console.logStringMessage(logPrefix + "feedback():\n" + s);
 		XULBrowserWindow.setOverLink(feedbackPrefix + s, null);
 	}
 }
