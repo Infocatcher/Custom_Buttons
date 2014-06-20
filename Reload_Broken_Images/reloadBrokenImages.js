@@ -22,11 +22,17 @@ function reloadImage(img) {
 		return;
 	var uri = img.currentURI;
 	var src = uri.spec;
-	urlSecurityCheck(
-		src,
-		img.ownerDocument.nodePrincipal,
-		Components.interfaces.nsIScriptSecurityManager.DISALLOW_SCRIPT
-	);
+	try {
+		urlSecurityCheck(
+			src,
+			img.ownerDocument.nodePrincipal,
+			Components.interfaces.nsIScriptSecurityManager.DISALLOW_SCRIPT
+		);
+	}
+	catch(e) {
+		Components.utils.reportError(e);
+		return;
+	}
 	debug && Services.console.logStringMessage(logPrefix + src);
 	var errors = 0;
 	function check(e) {
