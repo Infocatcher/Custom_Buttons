@@ -30,10 +30,8 @@ function reloadImage(img) {
 	debug && Services.console.logStringMessage(logPrefix + src);
 	var errors = 0;
 	function check(e) {
-		if(e.type == "error")
-			++errors;
-		debug && Services.console.logStringMessage(logPrefix + src + " => " + e.type + (errors ? "#" + errors : ""));
-		if(errors && errors < maxAttempts) {
+		var error = e.type == "error";
+		if(error && ++errors < maxAttempts) {
 			try {
 				var tools = Components.classes["@mozilla.org/image/tools;1"]
 					.getService(Components.interfaces.imgITools);
@@ -63,6 +61,7 @@ function reloadImage(img) {
 		else {
 			destroy();
 		}
+		debug && Services.console.logStringMessage(logPrefix + src + " => " + e.type + (error ? "#" + errors : ""));
 	}
 	function resetSrc() {
 		img.src = "about:blank";
