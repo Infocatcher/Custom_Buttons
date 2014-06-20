@@ -137,7 +137,8 @@ function reloadImage(img) {
 				failedImages
 					? "Done [count: $1, failed: $2]"
 					: "Done [count: $1]",
-				[totalImages, failedImages]
+				[totalImages, failedImages],
+				true
 			);
 		}
 	}
@@ -148,7 +149,7 @@ function reloadImage(img) {
 	++totalImages;
 	img.forceReload();
 }
-function feedback(s, replacements) {
+function feedback(s, replacements, isLast) {
 	if("XULBrowserWindow" in window) {
 		s = _localize(s);
 		if(replacements) replacements.forEach(function(replacement, i) {
@@ -156,6 +157,9 @@ function feedback(s, replacements) {
 		});
 		debug && Services.console.logStringMessage(logPrefix + "feedback():\n" + s);
 		XULBrowserWindow.setOverLink(feedbackPrefix + s, null);
+		if(isLast) setTimeout(function() {
+			XULBrowserWindow.setOverLink("", null);
+		}, 1500);
 	}
 }
 function parseWin(win) {
@@ -181,4 +185,4 @@ var feedbackPrefix = _localize("%label%: ")
 			|| "Reload Broken Images"
 	);
 parseWin(content);
-feedback(totalImages ? "Start reloading: $1" : "Nothing to reload", [totalImages]);
+feedback(totalImages ? "Start reloading: $1" : "Nothing to reload", [totalImages], !totalImages);
