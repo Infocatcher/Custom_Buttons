@@ -41,11 +41,11 @@ function reloadImage(img) {
 						.getService(Components.interfaces.imgICache);
 				if(cache.findEntryProperties(uri)) {
 					cache.removeEntry(uri);
-					debug && Services.console.logStringMessage(logPrefix + src + " => remove this URI from cache");
+					debug && Services.console.logStringMessage(logPrefix + src + "\n=> remove this URI from cache");
 				}
 			}
 			catch(e) {
-				debug && Services.console.logStringMessage(logPrefix + src + " => cache.removeEntry() failed");
+				debug && Services.console.logStringMessage(logPrefix + src + "\n=> cache.removeEntry() failed");
 				Components.utils.reportError(e);
 			}
 
@@ -61,7 +61,7 @@ function reloadImage(img) {
 		else {
 			destroy();
 		}
-		debug && Services.console.logStringMessage(logPrefix + src + " => " + e.type + (error ? "#" + errors : ""));
+		debug && Services.console.logStringMessage(logPrefix + src + "\n=> " + e.type + (error ? "#" + errors : ""));
 	}
 	function resetSrc() {
 		img.src = "about:blank";
