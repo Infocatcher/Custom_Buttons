@@ -6,7 +6,7 @@
 // (code for "code" section)
 
 // (c) Infocatcher 2012-2014
-// version 0.3.0 - 2014-06-20
+// version 0.3.0.1 - 2014-06-20
 
 var debug = false;
 var maxAttempts = 4;
