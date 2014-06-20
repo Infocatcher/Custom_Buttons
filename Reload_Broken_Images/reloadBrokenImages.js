@@ -73,7 +73,7 @@ function reloadImage(img) {
 				++failedImages;
 			else
 				++successImages;
-			feedback("Reloading: " + successImages + "/" + totalImages);
+			feedback("Reloading: $1/$2", [successImages, totalImages]);
 			destroy();
 		}
 		debug && Services.console.logStringMessage(logPrefix + src + "\n=> " + e.type + (error ? "#" + errors : ""));
@@ -88,8 +88,14 @@ function reloadImage(img) {
 		clearTimeout(stopWaitTimer);
 		img.removeEventListener("load", check, true);
 		img.removeEventListener("error", check, true);
-		if(!--activeAttempts)
-			feedback("Done [count: " + totalImages + (failedImages ? ", failed: " + failedImages + "" : "") + "]");
+		if(!--activeAttempts) {
+			feedback(
+				failedImages
+					? "Done [count: $1, failed: $2]"
+					: "Done [count: $1]",
+				[totalImages, failedImages]
+			);
+		}
 	}
 	img.addEventListener("load", check, true);
 	img.addEventListener("error", check, true);
@@ -98,9 +104,13 @@ function reloadImage(img) {
 	++totalImages;
 	img.forceReload();
 }
-function feedback(s) {
-	if("XULBrowserWindow" in window)
+function feedback(s, replacements) {
+	if("XULBrowserWindow" in window) {
+		if(replacements) replacements.forEach(function(replacement, i) {
+			s = s.replace("$" + ++i, replacement);
+		});
 		XULBrowserWindow.setOverLink("Reload Broken Images: " + s, null);
+	}
 }
 function parseWin(win) {
 	Array.forEach(win.frames, parseWin);
@@ -119,4 +129,4 @@ function parseWin(win) {
 	}
 }
 parseWin(content);
-feedback("Start reloading: " + totalImages);
+feedback("Start reloading: $1", [totalImages]);
