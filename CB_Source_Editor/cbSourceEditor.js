@@ -11,7 +11,8 @@ var options = {
 	codeMirror: {
 		lineNumbers: true,
 		enableCodeFolding: true,
-		showTrailingSpace: true
+		showTrailingSpace: true,
+		autocomplete: true
 	},
 	orion: {
 		lineNumbers: true
@@ -257,6 +258,7 @@ if(!watcher) {
 						lineNumbers: true,
 						enableCodeFolding: true,
 						showTrailingSpace: true,
+						autocomplete: true,
 						contextMenu: "sourceEditorContext"
 					};
 					var optsOvr = options.codeMirror;
@@ -353,6 +355,12 @@ if(!watcher) {
 				}
 				if(isCodeMirror) {
 					se.appendTo(seElt).then(function() {
+						try {
+							se.setupAutoCompletion();
+						}
+						catch(e) {
+							Components.utils.reportError(e);
+						}
 						window.setTimeout(function() {
 							se.on("change", onTextChanged);
 							if(isLoaded) {
