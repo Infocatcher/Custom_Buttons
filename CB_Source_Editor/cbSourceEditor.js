@@ -17,6 +17,7 @@ var options = {
 		lineNumbers: true
 	}
 };
+// Also see devtools.editor.* preferences in about:config
 
 const watcherId = "customButtonsSourceEditor_" + this.id;
 var {Application, Components} = window; // Prevent garbage collection in Firefox 3.6 and older
