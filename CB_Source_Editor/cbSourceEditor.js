@@ -5,7 +5,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2012-2014
-// version 0.1.0a4 - 2014-02-24
+// version 0.1.0a5 - 2014-06-21
 
 var options = {
 	codeMirror: {
