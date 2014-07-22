@@ -11,7 +11,14 @@
 // Button just open hidden tab with about:addons and trigger built-in "Check for Updates" function.
 // And show tab, if found updates.
 
-var btn = this;
+(function() {
+var btn = this instanceof XULElement
+	? this
+	: { // Launched not from custom button
+		image: "", // Base64-encoded icon (if empty, will be used "imgLoading")
+		label: "Check for Addons Updates",
+		tooltipText: ""
+	};
 if("_cb_disabled" in btn)
 	return;
 btn._cb_disabled = true;
@@ -30,7 +37,7 @@ else if(app == "Thunderbird") {
 	imgLoading = "chrome://messenger/skin/icons/loading.png";
 }
 
-var image = btn.image;
+var image = btn.image || imgLoading;
 var tip = btn.tooltipText;
 btn.image = imgConnecting;
 btn.tooltipText = "Open " + ADDONS_URL + "…";
@@ -155,9 +162,9 @@ function processAddonsTab(e) {
 	tab.image = image;
 
 	var updEnabledPref = "extensions.update.enabled";
-	var updEnabled = cbu.getPrefs(updEnabledPref);
+	var updEnabled = Services.prefs.getBoolPref(updEnabledPref);
 	if(!updEnabled)
-		cbu.setPrefs(updEnabledPref, true);
+		Services.prefs.setBoolPref(updEnabledPref, true);
 
 	var notFound = $("updates-noneFound");
 	var updated = $("updates-installed");
@@ -219,7 +226,7 @@ function processAddonsTab(e) {
 		}
 
 		if(!updEnabled)
-			cbu.setPrefs(updEnabledPref, false);
+			Services.prefs.setBoolPref(updEnabledPref, false);
 
 		if(!notFound.hidden) {
 			removeTab();
@@ -300,3 +307,4 @@ function dontSelectHiddenTab(e) {
 		if(done(t))
 			return;
 }
+}).call(this);
