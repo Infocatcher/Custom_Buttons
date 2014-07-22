@@ -272,7 +272,8 @@ function processAddonsTab(e) {
 function dontSelectHiddenTab(e) {
 	// <tab /><tab collapsed="true" />
 	// Close first tab: collapsed tab becomes selected
-	if(e.target != tab)
+	var trgTab = e.originalTarget || e.target;
+	if(trgTab != tab)
 		return;
 
 	if(/\n(?:BrowserOpenAddonsMgr|toEM)@chrome:\/\//.test(new Error().stack)) {
