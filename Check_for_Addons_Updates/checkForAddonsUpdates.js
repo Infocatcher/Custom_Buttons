@@ -34,7 +34,7 @@ var tip = btn.tooltipText;
 btn.image = imgConnecting;
 btn.tooltipText = "Open about:addons…";
 
-var tab;
+var tab, browser;
 var tbTabInfo, tbTab;
 var tabmail = document.getElementById("tabmail");
 
@@ -75,8 +75,8 @@ if(tabmail) { // Thunderbird
 	}
 }
 else {
-	var isPending = false;
-	var ws = Services.wm.getEnumerator("navigator:browser");
+	let isPending = false;
+	let ws = Services.wm.getEnumerator("navigator:browser");
 	windowsLoop:
 	while(ws.hasMoreElements()) {
 		let w = ws.getNext();
@@ -107,7 +107,7 @@ else {
 	)
 		isPending = true;
 
-	var browser = tab.linkedBrowser;
+	browser = tab.linkedBrowser;
 	if(isPending || browser.webProgress.isLoadingDocument) {
 		browser.addEventListener("load", processAddonsTab, true);
 		if(isPending)
