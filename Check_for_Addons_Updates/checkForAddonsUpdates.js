@@ -20,6 +20,7 @@ if(!("Services" in window))
 	Components.utils.import("resource://gre/modules/Services.jsm");
 var app = Services.appinfo.name;
 
+var ADDONS_URL = "about:addons";
 var imgConnecting = "chrome://browser/skin/tabbrowser/connecting.png";
 var imgLoading = "chrome://browser/skin/tabbrowser/loading.png";
 if(app == "SeaMonkey")
@@ -32,7 +33,7 @@ else if(app == "Thunderbird") {
 var image = btn.image;
 var tip = btn.tooltipText;
 btn.image = imgConnecting;
-btn.tooltipText = "Open about:addons…";
+btn.tooltipText = "Open " + ADDONS_URL + "…";
 
 var tab, browser;
 var tbTabInfo, tbTab;
@@ -65,7 +66,7 @@ if(tabmail) { // Thunderbird
 		}, "EM-loaded", false);
 		// See openAddonsMgr() -> openContentTab()
 		tbTabInfo = tabmail.openTab("contentTab", {
-			contentPage: "about:addons",
+			contentPage: ADDONS_URL,
 			clickHandler: "specialTabs.siteClickHandler(event, /addons\.mozilla\.org/);",
 			background: true
 		});
@@ -86,7 +87,7 @@ else {
 			if(
 				!t.closing
 				&& t.linkedBrowser
-				&& t.linkedBrowser.currentURI.spec == "about:addons"
+				&& t.linkedBrowser.currentURI.spec == ADDONS_URL
 			) {
 				tab = t;
 				break windowsLoop;
@@ -95,7 +96,7 @@ else {
 	}
 
 	if(!tab) {
-		tab = gBrowser.addTab("about:addons");
+		tab = gBrowser.addTab(ADDONS_URL);
 		tab.collapsed = true;
 		tab.closing = true; // See "visibleTabs" getter in chrome://browser/content/tabbrowser.xml
 		window.addEventListener("TabSelect", dontSelectHiddenTab, false);
@@ -125,7 +126,7 @@ function processAddonsTab(e) {
 	}
 	else if(e) {
 		doc = e.target;
-		if(doc.location != "about:addons")
+		if(doc.location != ADDONS_URL)
 			return;
 		browser.removeEventListener(e.type, processAddonsTab, true);
 	}
@@ -192,7 +193,7 @@ function processAddonsTab(e) {
 					for(let i = 0, l = closedTabs.length; i < l; ++i) {
 						let closedTab = closedTabs[i];
 						let state = closedTab.state;
-						if(state.entries[state.index - 1].url == "about:addons") {
+						if(state.entries[state.index - 1].url == ADDONS_URL) {
 							ss.forgetClosedTab(window, i);
 							return;
 						}
