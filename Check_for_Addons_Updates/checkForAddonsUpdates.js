@@ -18,13 +18,13 @@ btn._cb_disabled = true;
 
 if(!("Services" in window))
 	Components.utils.import("resource://gre/modules/Services.jsm");
-var appName = Services.appinfo.name;
+var app = Services.appinfo.name;
 
 var imgConnecting = "chrome://browser/skin/tabbrowser/connecting.png";
 var imgLoading = "chrome://browser/skin/tabbrowser/loading.png";
-if(appName == "SeaMonkey")
+if(app == "SeaMonkey")
 	imgConnecting = imgLoading = "chrome://communicator/skin/icons/loading.gif";
-else if(appName == "Thunderbird") {
+else if(app == "Thunderbird") {
 	imgConnecting = "chrome://messenger/skin/icons/connecting.png";
 	imgLoading = "chrome://messenger/skin/icons/loading.png";
 }
@@ -151,7 +151,7 @@ function processAddonsTab(e) {
 
 	$("cmd_findAllUpdates").doCommand();
 
-	var wait = setInterval(function() {
+	var waitTimer = setInterval(function() {
 		if(!doc.defaultView || doc.defaultView.closed) {
 			stopWait();
 			notify("Tab with add-ons manager was closed!");
@@ -215,7 +215,7 @@ function processAddonsTab(e) {
 		return doc.getElementById(id);
 	}
 	function stopWait() {
-		clearInterval(wait);
+		clearInterval(waitTimer);
 		btn.image = image;
 		btn.tooltipText = tip;
 		if(tab.image == image)
