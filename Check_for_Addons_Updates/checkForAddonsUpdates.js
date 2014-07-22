@@ -16,7 +16,8 @@ if("_cb_disabled" in btn)
 	return;
 btn._cb_disabled = true;
 
-Components.utils.import("resource://gre/modules/Services.jsm");
+if(!("Services" in window))
+	Components.utils.import("resource://gre/modules/Services.jsm");
 var appName = Services.appinfo.name;
 
 var imgConnecting = "chrome://browser/skin/tabbrowser/connecting.png";
