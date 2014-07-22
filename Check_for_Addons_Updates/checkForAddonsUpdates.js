@@ -144,9 +144,10 @@ function processAddonsTab(e) {
 	if(!updEnabled)
 		cbu.setPrefs(updEnabledPref, true);
 
-	//Avoid getting false results from the past update check (May not be required for "noneFound")
-	$("updates-noneFound").hidden = true;
-	$("updates-installed").hidden = true;
+	var notFound = $("updates-noneFound");
+	var updated = $("updates-installed");
+	// Avoid getting false results from the past update check (may not be required for "noneFound")
+	notFound.hidden = updated.hidden = true;
 
 	$("cmd_findAllUpdates").doCommand();
 
@@ -161,14 +162,12 @@ function processAddonsTab(e) {
 			return;
 		var autoUpdate = $("utils-autoUpdateDefault");
 		var autoUpdateChecked = autoUpdate.getAttribute("checked") == "true";
-		var updated = $("updates-installed");
-		var found = $("updates-manualUpdatesFound-btn");
-		var notFound = $("updates-noneFound");
 
+		var found = $("updates-manualUpdatesFound-btn");
 		if(
 			autoUpdateChecked
-				? updated.hidden && notFound.hidden
-				: found.hidden && notFound.hidden
+				? notFound.hidden && updated.hidden
+				: notFound.hidden && found.hidden
 		) // Too early?
 			return;
 
