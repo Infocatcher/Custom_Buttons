@@ -24,6 +24,10 @@ var imgConnecting = "chrome://browser/skin/tabbrowser/connecting.png";
 var imgLoading = "chrome://browser/skin/tabbrowser/loading.png";
 if(appName == "SeaMonkey")
 	imgConnecting = imgLoading = "chrome://communicator/skin/icons/loading.gif";
+else if(appName == "Thunderbird") {
+	imgConnecting = "chrome://messenger/skin/icons/connecting.png";
+	imgLoading = "chrome://messenger/skin/icons/loading.png";
+}
 
 var image = btn.image;
 var tip = btn.tooltipText;
@@ -31,51 +35,95 @@ btn.image = imgConnecting;
 btn.tooltipText = "Open about:addons…";
 
 var tab;
-var isPending = false;
-var ws = Services.wm.getEnumerator("navigator:browser");
-windowsLoop:
-while(ws.hasMoreElements()) {
-	let w = ws.getNext();
-	let tabs = w.gBrowser.tabs;
-	for(let i = 0, l = tabs.length; i < l; ++i) {
-		let t = tabs[i];
-		if(
-			!t.closing
-			&& t.linkedBrowser
-			&& t.linkedBrowser.currentURI.spec == "about:addons"
-		) {
-			tab = t;
-			break windowsLoop;
-		}
+var tbTabInfo, tbTab;
+var tabmail = document.getElementById("tabmail");
+
+if(tabmail) { // Thunderbird
+	let addonsWin;
+	let receivePong = function(subject, topic, data) {
+		addonsWin = subject;
+	};
+	Services.obs.addObserver(receivePong, "EM-pong", false);
+	Services.obs.notifyObservers(null, "EM-ping", "");
+	Services.obs.removeObserver(receivePong, "EM-pong");
+	if(addonsWin) {
+		tbTabInfo = tabmail.getBrowserForDocument(addonsWin);
+		tbTab = tab = tbTabInfo.tabNode;
+		processAddonsTab(addonsWin);
+	}
+	else {
+		Services.obs.addObserver(function observer(subject, topic, data) {
+			Services.obs.removeObserver(observer, topic);
+			if(subject.document.readyState == "complete")
+				processAddonsTab(subject);
+			else {
+				subject.addEventListener("load", function onLoad(e) {
+					subject.removeEventListener(e.type, onLoad, false);
+					processAddonsTab(subject);
+				}, false);
+			}
+		}, "EM-loaded", false);
+		// See openAddonsMgr() -> openContentTab()
+		tbTabInfo = tabmail.openTab("contentTab", {
+			contentPage: "about:addons",
+			clickHandler: "specialTabs.siteClickHandler(event, /addons\.mozilla\.org/);",
+			background: true
+		});
+		tbTab = tab = tbTabInfo.tabNode;
+		tbTab.collapsed = true;
+		// Note: dontSelectHiddenTab() not implemented
 	}
 }
-
-if(!tab) {
-	tab = gBrowser.addTab("about:addons");
-	tab.collapsed = true;
-	tab.closing = true; // See "visibleTabs" getter in chrome://browser/content/tabbrowser.xml
-	window.addEventListener("TabSelect", dontSelectHiddenTab, false);
-}
-else if(
-	tab.getAttribute("pending") == "true" // Gecko >= 9.0
-	|| tab.linkedBrowser.contentDocument.readyState == "uninitialized"
-	// || tab.linkedBrowser.__SS_restoreState == 1
-)
-	isPending = true;
-
-var browser = tab.linkedBrowser;
-if(isPending || browser.webProgress.isLoadingDocument) {
-	browser.addEventListener("load", processAddonsTab, true);
-	if(isPending)
-		browser.reload();
-}
 else {
-	processAddonsTab();
+	var isPending = false;
+	var ws = Services.wm.getEnumerator("navigator:browser");
+	windowsLoop:
+	while(ws.hasMoreElements()) {
+		let w = ws.getNext();
+		let tabs = w.gBrowser.tabs;
+		for(let i = 0, l = tabs.length; i < l; ++i) {
+			let t = tabs[i];
+			if(
+				!t.closing
+				&& t.linkedBrowser
+				&& t.linkedBrowser.currentURI.spec == "about:addons"
+			) {
+				tab = t;
+				break windowsLoop;
+			}
+		}
+	}
+
+	if(!tab) {
+		tab = gBrowser.addTab("about:addons");
+		tab.collapsed = true;
+		tab.closing = true; // See "visibleTabs" getter in chrome://browser/content/tabbrowser.xml
+		window.addEventListener("TabSelect", dontSelectHiddenTab, false);
+	}
+	else if(
+		tab.getAttribute("pending") == "true" // Gecko >= 9.0
+		|| tab.linkedBrowser.contentDocument.readyState == "uninitialized"
+		// || tab.linkedBrowser.__SS_restoreState == 1
+	)
+		isPending = true;
+
+	var browser = tab.linkedBrowser;
+	if(isPending || browser.webProgress.isLoadingDocument) {
+		browser.addEventListener("load", processAddonsTab, true);
+		if(isPending)
+			browser.reload();
+	}
+	else {
+		processAddonsTab();
+	}
 }
 
 function processAddonsTab(e) {
 	var doc;
-	if(e) {
+	if(e && e instanceof Components.interfaces.nsIDOMWindow) {
+		doc = e.document;
+	}
+	else if(e) {
 		doc = e.target;
 		if(doc.location != "about:addons")
 			return;
@@ -125,32 +173,44 @@ function processAddonsTab(e) {
 			return;
 
 		stopWait();
-		tab.closing = false;
+		if(!tbTab)
+			tab.closing = false;
+		function removeTab() {
+			if(!tab.collapsed)
+				return;
+			if(tbTab)
+				tabmail.closeTab(tbTabInfo);
+			else
+				gBrowser.removeTab(tab);
+		}
 
 		if(!updEnabled)
 			cbu.setPrefs(updEnabledPref, false);
 
 		if(!notFound.hidden) {
-			if(tab.collapsed)
-				gBrowser.removeTab(tab);
+			removeTab();
 			notify(notFound.getAttribute("value"));
 			return;
 		}
 		if(autoUpdateChecked) {
-			if(tab.collapsed)
-				gBrowser.removeTab(tab);
+			removeTab();
 			notify(updated.getAttribute("value"));
 			return;
 		}
+
 		tab.collapsed = false;
 		$("categories").selectedItem = $("category-availableUpdates");
-		var tabWin = tab.ownerDocument.defaultView;
-		tabWin.gBrowser.selectedTab = tab;
-		setTimeout(function() {
-			tabWin.focus();
-			doc.defaultView.focus();
-			$("addon-list").focus();
-		}, 0);
+		if(tbTab)
+			tabmail.switchToTab(tbTabInfo);
+		else {
+			var tabWin = tab.ownerDocument.defaultView;
+			tabWin.gBrowser.selectedTab = tab;
+			setTimeout(function() {
+				tabWin.focus();
+				doc.defaultView.focus();
+				$("addon-list").focus();
+			}, 0);
+		}
 	}, 50);
 	function $(id) {
 		return doc.getElementById(id);
