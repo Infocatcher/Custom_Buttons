@@ -178,7 +178,7 @@ function processAddonsTab(e) {
 			if(!tab.collapsed)
 				return;
 			if(tbTab)
-				tabmail.closeTab(tbTabInfo);
+				tabmail.closeTab(tbTabInfo, true /*aNoUndo*/);
 			else
 				gBrowser.removeTab(tab);
 		}
