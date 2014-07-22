@@ -35,9 +35,14 @@ var tip = btn.tooltipText;
 btn.image = imgConnecting;
 btn.tooltipText = "Open " + ADDONS_URL + "…";
 
-var tab, browser;
+var tab, browser, gBrowser;
 var tbTabInfo, tbTab;
-var tabmail = document.getElementById("tabmail");
+
+var trgWindow = Services.wm.getMostRecentWindow("navigator:browser")
+	|| Services.wm.getMostRecentWindow("mail:3pane")
+	|| window;
+var trgDocument = trgWindow.document;
+var tabmail = trgDocument.getElementById("tabmail");
 
 if(tabmail) { // Thunderbird
 	let addonsWin;
@@ -48,6 +53,14 @@ if(tabmail) { // Thunderbird
 	Services.obs.notifyObservers(null, "EM-ping", "");
 	Services.obs.removeObserver(receivePong, "EM-pong");
 	if(addonsWin) {
+		var rootWindow = addonsWin
+			.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+			.getInterface(Components.interfaces.nsIWebNavigation)
+			.QueryInterface(Components.interfaces.nsIDocShellTreeItem)
+			.rootTreeItem
+			.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+			.getInterface(Components.interfaces.nsIDOMWindow);
+		tabmail = rootWindow.document.getElementById("tabmail");
 		tbTabInfo = tabmail.getBrowserForDocument(addonsWin);
 		tbTab = tab = tbTabInfo.tabNode;
 		processAddonsTab(addonsWin);
@@ -95,11 +108,12 @@ else {
 		}
 	}
 
+	gBrowser = trgWindow.gBrowser;
 	if(!tab) {
 		tab = gBrowser.addTab(ADDONS_URL);
 		tab.collapsed = true;
 		tab.closing = true; // See "visibleTabs" getter in chrome://browser/content/tabbrowser.xml
-		window.addEventListener("TabSelect", dontSelectHiddenTab, false);
+		trgWindow.addEventListener("TabSelect", dontSelectHiddenTab, false);
 	}
 	else if(
 		tab.getAttribute("pending") == "true" // Gecko >= 9.0
@@ -220,17 +234,16 @@ function processAddonsTab(e) {
 
 		tab.collapsed = false;
 		$("categories").selectedItem = $("category-availableUpdates");
+		var tabWin = tab.ownerDocument.defaultView;
 		if(tbTab)
 			tabmail.switchToTab(tbTabInfo);
-		else {
-			var tabWin = tab.ownerDocument.defaultView;
+		else
 			tabWin.gBrowser.selectedTab = tab;
-			setTimeout(function() {
-				tabWin.focus();
-				doc.defaultView.focus();
-				$("addon-list").focus();
-			}, 0);
-		}
+		setTimeout(function() {
+			tabWin.focus();
+			doc.defaultView.focus();
+			$("addon-list").focus();
+		}, 0);
 	}, 50);
 	function $(id) {
 		return doc.getElementById(id);
@@ -241,7 +254,7 @@ function processAddonsTab(e) {
 		btn.tooltipText = tip;
 		if(tab.image == image)
 			tab.image = origIcon;
-		window.removeEventListener("TabSelect", dontSelectHiddenTab, false);
+		trgWindow.removeEventListener("TabSelect", dontSelectHiddenTab, false);
 		setTimeout(function() {
 			delete btn._cb_disabled;
 		}, 500);
@@ -264,7 +277,7 @@ function dontSelectHiddenTab(e) {
 
 	if(/\n(?:BrowserOpenAddonsMgr|toEM)@chrome:\/\//.test(new Error().stack)) {
 		// User open Add-ons Manager, show tab
-		window.removeEventListener("TabSelect", dontSelectHiddenTab, false);
+		trgWindow.removeEventListener("TabSelect", dontSelectHiddenTab, false);
 		setTimeout(function() { // Hidden tab can't be selected, so select it manually...
 			tab.collapsed = tab.closing = false;
 			gBrowser.selectedTab = tab;
