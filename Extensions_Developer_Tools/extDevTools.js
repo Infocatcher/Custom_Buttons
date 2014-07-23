@@ -798,21 +798,8 @@ var cmds = this.commands = {
 				return;
 			}
 
-			var imgConnecting = "chrome://browser/skin/tabbrowser/connecting.png";
-			var imgLoading = "chrome://browser/skin/tabbrowser/loading.png";
-			var appName = _this.appInfo.name;
-			if(appName == "SeaMonkey")
-				imgConnecting = imgLoading = "chrome://communicator/skin/icons/loading.gif";
-			else if(appName == "Thunderbird") {
-				imgConnecting = "chrome://messenger/skin/icons/connecting.png";
-				imgLoading = "chrome://messenger/skin/icons/loading.png";
-			}
-
 			var btn = _this.button;
-			var icon = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon");
-			var origIcon = icon.src;
-			icon.src = imgConnecting;
-
+			var progressIcon = new ProgressIcon(btn);
 			AddonManager.getInstallForURL(
 				installURL,
 				function(install) {
@@ -831,7 +818,7 @@ var cmds = this.commands = {
 							this._done(false);
 						},
 						_done: function(ok) {
-							icon.src = origIcon;
+							progressIcon.restore();
 							install.removeListener(this);
 							this._progress();
 							if(!ok) {
@@ -871,7 +858,7 @@ var cmds = this.commands = {
 								XULBrowserWindow.setOverLink(state || "", null);
 						}
 					});
-					icon.src = imgLoading;
+					progressIcon.loading();
 					install.install();
 				},
 				"application/x-xpinstall"
@@ -1407,6 +1394,61 @@ var cmds = this.commands = {
 		}
 	}
 };
+function ProgressIcon(btn) {
+	var app = Services.appinfo.name;
+	if(app == "SeaMonkey")
+		this.imgConnecting = this.imgLoading = "chrome://communicator/skin/icons/loading.gif";
+	else if(app == "Thunderbird") {
+		this.imgConnecting = "chrome://messenger/skin/icons/connecting.png";
+		this.imgLoading = "chrome://messenger/skin/icons/loading.png";
+	}
+	else {
+		this.imgConnecting = "chrome://browser/skin/tabbrowser/connecting.png";
+		this.imgLoading = "chrome://browser/skin/tabbrowser/loading.png";
+	}
+	if(!(btn instanceof XULElement)) {
+		this.loading = this.restore = function() {};
+		return this;
+	}
+	var useAnimation = app == "Firefox" && parseFloat(Services.appinfo.platformVersion) >= 32;
+	var btnIcon = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon");
+	var origIcon = btnIcon.src;
+	btnIcon.src = this.imgConnecting;
+	if(useAnimation) {
+		let cs = btnIcon.ownerDocument.defaultView.getComputedStyle(btnIcon, null);
+		let s = btnIcon.style;
+		s.margin = [cs.marginTop, cs.marginRight, cs.marginBottom, cs.marginLeft].join(" ");
+		s.padding = [cs.paddingTop, cs.paddingRight, cs.paddingBottom, cs.paddingLeft].join(" ");
+		s.width = cs.width;
+		s.height = cs.height;
+		s.boxShadow = "none";
+		s.borderColor = s.background = "transparent";
+		btnIcon.setAttribute("fadein", "true");
+		btnIcon.setAttribute("busy", "true");
+		btnIcon.classList.add("tab-throbber");
+		btnIcon._restore = function() {
+			delete btnIcon._restore;
+			btnIcon.removeAttribute("busy");
+			btnIcon.removeAttribute("progress");
+			setTimeout(function() {
+				btnIcon.classList.remove("tab-throbber");
+				btnIcon.removeAttribute("style");
+				btnIcon.removeAttribute("fadein");
+			}, 0);
+		};
+	}
+	this.loading = function() {
+		btnIcon.src = this.imgLoading;
+		if(useAnimation)
+			btnIcon.setAttribute("progress", "true");
+	};
+	this.restore = function() {
+		btnIcon.src = origIcon;
+		if(useAnimation)
+			btnIcon._restore();
+	};
+	return this;
+}
 
 var mp = cmds.popup = this.appendChild(parseXULFromString('\
 	<menupopup xmlns="' + XULNS + '"\
