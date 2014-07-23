@@ -239,7 +239,8 @@ mp.installExtension = function(e) {
 				onInstallEnded: function(install, addon) {
 					install.removeListener(this);
 					restore();
-					notify("Ok!", "Successfully installed:\n" + xpi.match(/[^\\\/]*$/)[0]);
+					var icon = addon.iconURL || addon.icon64URL;
+					notify("Ok!", "Successfully installed:\n" + xpi.match(/[^\\\/]*$/)[0], icon);
 					if(addon.pendingOperations)
 						Application.restart();
 				},
@@ -324,19 +325,17 @@ else { // Mouse gestures or something other...
 	mp.openPopupAtScreen(e.screenX, e.screenY);
 }
 
-function notify(title, text, isError) {
+function notify(title, text, icon) {
 	Components.classes["@mozilla.org/alerts-service;1"]
 		.getService(Components.interfaces.nsIAlertsService)
 		.showAlertNotification(
-			isError
-				? "chrome://global/skin/icons/Warning.png"
-				: /*btn && btn.image || */"chrome://mozapps/skin/extensions/extensionGeneric.png",
+			icon || "chrome://mozapps/skin/extensions/extensionGeneric.png",
 			"Extensions Installer: " + title,
 			text
 		);
 }
 function error(title, text) {
-	notify(title, text, true);
+	notify(title, text, "chrome://global/skin/icons/Warning.png");
 }
 function expandVariables(str) {
 	var props = Components.classes["@mozilla.org/file/directory_service;1"]
