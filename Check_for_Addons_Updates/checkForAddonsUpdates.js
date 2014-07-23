@@ -46,12 +46,12 @@ var tab, browser, gBrowser;
 var tbTabInfo, tbTab;
 
 var trgWindow = Services.wm.getMostRecentWindow("navigator:browser")
-	|| Services.wm.getMostRecentWindow("mail:3pane")
+	|| app == "Thunderbird" && Services.wm.getMostRecentWindow("mail:3pane")
 	|| window;
 var trgDocument = trgWindow.document;
 var tabmail = trgDocument.getElementById("tabmail");
 
-if(tabmail) { // Thunderbird
+if(tabmail && app == "Thunderbird") { // Note: SeaMonkey doesn't support content tabs in mail window
 	let addonsWin;
 	let receivePong = function(subject, topic, data) {
 		addonsWin = subject;
