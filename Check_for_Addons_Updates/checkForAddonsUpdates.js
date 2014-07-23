@@ -28,18 +28,10 @@ if(!("Services" in window))
 var app = Services.appinfo.name;
 
 var ADDONS_URL = "about:addons";
-var imgConnecting = "chrome://browser/skin/tabbrowser/connecting.png";
-var imgLoading = "chrome://browser/skin/tabbrowser/loading.png";
-if(app == "SeaMonkey")
-	imgConnecting = imgLoading = "chrome://communicator/skin/icons/loading.gif";
-else if(app == "Thunderbird") {
-	imgConnecting = "chrome://messenger/skin/icons/connecting.png";
-	imgLoading = "chrome://messenger/skin/icons/loading.png";
-}
 
-var image = btn.image || imgLoading;
+var progressIcon = new ProgressIcon(btn);
+var image = btn.image || progressIcon.imgLoading;
 var tip = btn.tooltipText;
-btn.image = imgConnecting;
 btn.tooltipText = "Open " + ADDONS_URL + "…";
 
 var tab, browser, gBrowser;
@@ -140,7 +132,7 @@ else if("gBrowser" in trgWindow && trgWindow.gBrowser.tabs) {
 	}
 }
 else {
-	btn.image = image;
+	progressIcon.restore();
 	btn.tooltipText = tip;
 	delete btn._cb_disabled;
 	Services.prompt.alert(window, btn.label, "Error: Can't find supported window!");
@@ -162,7 +154,7 @@ function processAddonsTab(e) {
 		doc = browser.contentDocument;
 	}
 
-	btn.image = imgLoading;
+	progressIcon.loading();
 	btn.tooltipText = $("updates-progress").getAttribute("value");
 
 	var origIcon = tab.image;
@@ -264,7 +256,7 @@ function processAddonsTab(e) {
 	}
 	function stopWait() {
 		clearInterval(waitTimer);
-		btn.image = image;
+		progressIcon.restore();
 		btn.tooltipText = tip;
 		if(tab.image == image)
 			tab.image = origIcon;
@@ -313,5 +305,60 @@ function dontSelectHiddenTab(e) {
 	for(var t = tab.previousSibling; t; t = t.previousSibling)
 		if(done(t))
 			return;
+}
+function ProgressIcon(btn) {
+	var app = Services.appinfo.name;
+	if(app == "SeaMonkey")
+		this.imgConnecting = this.imgLoading = "chrome://communicator/skin/icons/loading.gif";
+	else if(app == "Thunderbird") {
+		this.imgConnecting = "chrome://messenger/skin/icons/connecting.png";
+		this.imgLoading = "chrome://messenger/skin/icons/loading.png";
+	}
+	else {
+		this.imgConnecting = "chrome://browser/skin/tabbrowser/connecting.png";
+		this.imgLoading = "chrome://browser/skin/tabbrowser/loading.png";
+	}
+	if(!(btn instanceof XULElement)) {
+		this.loading = this.restore = function() {};
+		return this;
+	}
+	var useAnimation = app == "Firefox" && parseFloat(Services.appinfo.platformVersion) >= 32;
+	var btnIcon = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon");
+	var origIcon = btnIcon.src;
+	btnIcon.src = this.imgConnecting;
+	if(useAnimation) {
+		let cs = btnIcon.ownerDocument.defaultView.getComputedStyle(btnIcon, null);
+		let s = btnIcon.style;
+		s.margin = [cs.marginTop, cs.marginRight, cs.marginBottom, cs.marginLeft].join(" ");
+		s.padding = [cs.paddingTop, cs.paddingRight, cs.paddingBottom, cs.paddingLeft].join(" ");
+		s.width = cs.width;
+		s.height = cs.height;
+		s.boxShadow = "none";
+		s.borderColor = s.background = "transparent";
+		btnIcon.setAttribute("fadein", "true");
+		btnIcon.setAttribute("busy", "true");
+		btnIcon.classList.add("tab-throbber");
+		btnIcon._restore = function() {
+			delete btnIcon._restore;
+			btnIcon.removeAttribute("busy");
+			btnIcon.removeAttribute("progress");
+			setTimeout(function() {
+				btnIcon.classList.remove("tab-throbber");
+				btnIcon.removeAttribute("style");
+				btnIcon.removeAttribute("fadein");
+			}, 0);
+		};
+	}
+	this.loading = function() {
+		btnIcon.src = this.imgLoading;
+		if(useAnimation)
+			btnIcon.setAttribute("progress", "true");
+	};
+	this.restore = function() {
+		btnIcon.src = origIcon;
+		if(useAnimation)
+			btnIcon._restore();
+	};
+	return this;
 }
 }).call(this);
