@@ -94,7 +94,8 @@ mp.openExtensionOptions = function(mi) {
 function openAddonOptions(addon) {
 	// Based on code from chrome://mozapps/content/extensions/extensions.js
 	// Firefox 21.0a1 (2013-01-27)
-	Components.utils.import("resource://gre/modules/Services.jsm");
+	if(!("Services" in window))
+		Components.utils.import("resource://gre/modules/Services.jsm");
 	var optionsURL = addon.optionsURL;
 	if(!addon.isActive || !optionsURL)
 		return false;
@@ -187,7 +188,8 @@ mp.installExtension = function(e) {
 		}, 300);
 	}
 
-	Components.utils.import("resource://gre/modules/Services.jsm");
+	if(!("Services" in window))
+		Components.utils.import("resource://gre/modules/Services.jsm");
 	if(isCb) {
 		var progressIcon = new ProgressIcon(btn);
 		var restore = function() {
