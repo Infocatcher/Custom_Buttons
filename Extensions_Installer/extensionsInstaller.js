@@ -189,20 +189,10 @@ mp.installExtension = function(e) {
 
 	Components.utils.import("resource://gre/modules/Services.jsm");
 	if(isCb) {
-		if(!btn._extInstallerInProgress++)
-			btn._extInstallerOrigImage = btn.image;
-		var imgConnecting = "chrome://browser/skin/tabbrowser/connecting.png";
-		var imgLoading = "chrome://browser/skin/tabbrowser/loading.png";
-		if(Services.appinfo.name == "SeaMonkey")
-			imgConnecting = imgLoading = "chrome://communicator/skin/icons/loading.gif";
-		var origImg = "_extInstallerOrigImage" in btn ? btn._extInstallerOrigImage : btn.image;
-		btn.image = imgConnecting;
+		var progressIcon = new ProgressIcon(btn);
 		var restore = function() {
-			if(!--btn._extInstallerInProgress) {
-				btn.image = origImg;
-				delete btn._extInstallerOrigImage;
-			}
 			unlock();
+			progressIcon.restore();
 		};
 	}
 	else {
@@ -241,8 +231,8 @@ mp.installExtension = function(e) {
 	AddonManager.getInstallForFile(
 		xpiFile,
 		function(install) {
-			if(isCb)
-				btn.image = imgLoading;
+			if(progressIcon)
+				progressIcon.loading();
 			install.addListener({
 				onInstallEnded: function(install, addon) {
 					install.removeListener(this);
@@ -270,10 +260,7 @@ var isCbInit = isCb
 	&& typeof event == "object"
 	&& !("type" in event)
 	&& typeof _phase == "string" && _phase == "init";
-if(isCb) {
-	var btn = this;
-	btn._extInstallerInProgress = 0;
-}
+var btn = isCb && this;
 if(isCbInit) {
 	this.type = "menu";
 	this.orient = "horizontal";
@@ -370,4 +357,59 @@ function file(path) {
 		.createInstance(Components.interfaces.nsILocalFile || Components.interfaces.nsIFile);
 	file.initWithPath(path);
 	return file;
+}
+function ProgressIcon(btn) {
+	var app = Services.appinfo.name;
+	if(app == "SeaMonkey")
+		this.imgConnecting = this.imgLoading = "chrome://communicator/skin/icons/loading.gif";
+	else if(app == "Thunderbird") {
+		this.imgConnecting = "chrome://messenger/skin/icons/connecting.png";
+		this.imgLoading = "chrome://messenger/skin/icons/loading.png";
+	}
+	else {
+		this.imgConnecting = "chrome://browser/skin/tabbrowser/connecting.png";
+		this.imgLoading = "chrome://browser/skin/tabbrowser/loading.png";
+	}
+	if(!(btn instanceof XULElement)) {
+		this.loading = this.restore = function() {};
+		return this;
+	}
+	var useAnimation = app == "Firefox" && parseFloat(Services.appinfo.platformVersion) >= 32;
+	var btnIcon = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon");
+	var origIcon = btnIcon.src;
+	btnIcon.src = this.imgConnecting;
+	if(useAnimation) {
+		let cs = btnIcon.ownerDocument.defaultView.getComputedStyle(btnIcon, null);
+		let s = btnIcon.style;
+		s.margin = [cs.marginTop, cs.marginRight, cs.marginBottom, cs.marginLeft].join(" ");
+		s.padding = [cs.paddingTop, cs.paddingRight, cs.paddingBottom, cs.paddingLeft].join(" ");
+		s.width = cs.width;
+		s.height = cs.height;
+		s.boxShadow = "none";
+		s.borderColor = s.background = "transparent";
+		btnIcon.setAttribute("fadein", "true");
+		btnIcon.setAttribute("busy", "true");
+		btnIcon.classList.add("tab-throbber");
+		btnIcon._restore = function() {
+			delete btnIcon._restore;
+			btnIcon.removeAttribute("busy");
+			btnIcon.removeAttribute("progress");
+			setTimeout(function() {
+				btnIcon.classList.remove("tab-throbber");
+				btnIcon.removeAttribute("style");
+				btnIcon.removeAttribute("fadein");
+			}, 0);
+		};
+	}
+	this.loading = function() {
+		btnIcon.src = this.imgLoading;
+		if(useAnimation)
+			btnIcon.setAttribute("progress", "true");
+	};
+	this.restore = function() {
+		btnIcon.src = origIcon;
+		if(useAnimation)
+			btnIcon._restore();
+	};
+	return this;
 }
