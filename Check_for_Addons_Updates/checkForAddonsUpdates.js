@@ -95,7 +95,7 @@ if(tabmail && app == "Thunderbird") { // Note: SeaMonkey doesn't support content
 		// Note: dontSelectHiddenTab() not implemented
 	}
 }
-else {
+else if("gBrowser" in trgWindow && trgWindow.gBrowser.tabs) {
 	let isPending = false;
 	let ws = Services.wm.getEnumerator("navigator:browser");
 	windowsLoop:
@@ -138,6 +138,13 @@ else {
 	else {
 		processAddonsTab();
 	}
+}
+else {
+	btn.image = image;
+	btn.tooltipText = tip;
+	delete btn._cb_disabled;
+	Services.prompt.alert(window, btn.label, "Error: Can't find supported window!");
+	return;
 }
 
 function processAddonsTab(e) {
