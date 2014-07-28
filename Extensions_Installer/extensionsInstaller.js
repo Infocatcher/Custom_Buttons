@@ -240,7 +240,7 @@ mp.installExtension = function(e) {
 					install.removeListener(this);
 					restore();
 					var icon = addon.iconURL || addon.icon64URL;
-					notify("Ok!", "Successfully installed:\n" + xpi.match(/[^\\\/]*$/)[0], icon);
+					notify("Ok!", "Successfully installed:\n" + addon.name + " " + addon.version, icon);
 					if(addon.pendingOperations)
 						Application.restart();
 				},
