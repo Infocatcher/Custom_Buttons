@@ -19,20 +19,25 @@ if(!allTabsBtn) {
 }
 
 var btn = this;
+var isBtn = btn instanceof XULElement;
 var popup = allTabsBtn.getElementsByTagName("menupopup")[0];
-if(btn._allTabsPopup) {
+if(isBtn && btn._allTabsPopup) {
 	btn._allTabsPopup.hidePopup();
 	btn._allTabsPopup = null;
 }
 else if(popup) {
-	btn._allTabsPopup = popup;
-	btn.setAttribute("open", true);
+	if(isBtn) {
+		btn._allTabsPopup = popup;
+		btn.setAttribute("open", true);
+	}
 	document.documentElement.appendChild(popup);
 	popup.addEventListener("popuphidden", function restorePopup(e) {
 		popup.removeEventListener(e.type, restorePopup, true);
-		btn.removeAttribute("open");
+		if(isBtn) {
+			btn.removeAttribute("open");
+			btn._allTabsPopup = null;
+		}
 		allTabsBtn.appendChild(popup);
-		btn._allTabsPopup = null;
 	}, true);
 
 	var e = getEvent();
@@ -61,24 +66,26 @@ else { // SeaMonkey or old Firefox?
 					popup.moveTo(evt.screenX, evt.screenY);
 				}, false);
 			}
-			btn._allTabsPopup = popup;
-			btn.setAttribute("open", true);
-			var markAsClosedTimer = 0;
-			var markAsClosed = function(e) {
-				if(e.type == "popuphidden") {
-					popup.removeEventListener("popuphidden", markAsClosed, true);
-					markAsClosedTimer = setTimeout(function() {
-						btn.removeAttribute("open");
-						btn._allTabsPopup = null;
-					}, 0);
-				}
-				else {
-					btn.removeEventListener("mousedown", markAsClosed, true);
-					clearTimeout(markAsClosedTimer);
-				}
-			};
-			popup.addEventListener("popuphidden", markAsClosed, true);
-			btn.addEventListener("mousedown", markAsClosed, true);
+			if(isBtn) {
+				btn._allTabsPopup = popup;
+				btn.setAttribute("open", true);
+				var markAsClosedTimer = 0;
+				var markAsClosed = function(e) {
+					if(e.type == "popuphidden") {
+						popup.removeEventListener("popuphidden", markAsClosed, true);
+						markAsClosedTimer = setTimeout(function() {
+							btn.removeAttribute("open");
+							btn._allTabsPopup = null;
+						}, 0);
+					}
+					else {
+						btn.removeEventListener("mousedown", markAsClosed, true);
+						clearTimeout(markAsClosedTimer);
+					}
+				};
+				popup.addEventListener("popuphidden", markAsClosed, true);
+				btn.addEventListener("mousedown", markAsClosed, true);
+			}
 		}
 	}
 	allTabsBtn.open = open;
