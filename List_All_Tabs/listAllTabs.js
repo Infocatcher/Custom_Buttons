@@ -41,18 +41,10 @@ else if(popup) {
 	}, true);
 
 	var e = getEvent();
-	if(e) {
-		if("openPopupAtScreen" in popup)
-			popup.openPopupAtScreen(e.screenX, e.screenY);
-		else
-			popup.showPopup(document.documentElement, e.screenX, e.screenY, "popup", null, null);
-	}
-	else {
-		if("openPopup" in popup)
-			popup.openPopup();
-		else
-			popup.showPopup();
-	}
+	if(e)
+		popup.openPopupAtScreen(e.screenX, e.screenY);
+	else
+		popup.openPopup();
 }
 else { // SeaMonkey or old Firefox?
 	var open = !allTabsBtn.open;
