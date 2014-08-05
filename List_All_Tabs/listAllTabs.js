@@ -3,8 +3,8 @@
 // List All Tabs button for Custom Buttons
 // (code for "code" section)
 
-// (c) Infocatcher 2013
-// version 0.1.0.1 - 2013-11-23
+// (c) Infocatcher 2013-2014
+// version 0.1.0.2 - 2014-08-05
 
 var allTabsBtn = document.getElementById("alltabs-button");
 if(!allTabsBtn && "gNavToolbox" in window && gNavToolbox.palette) // Firefox + button in palette
