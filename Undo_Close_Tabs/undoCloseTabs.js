@@ -677,7 +677,7 @@ this.undoCloseTabsList = {
 				accesskey: key,
 				class: "menuitem-iconic bookmark-item menuitem-with-favicon",
 				oncommand: "this.parentNode.parentNode.undoCloseTabsList.undoCloseTab(" + i + ");",
-				tooltiptext: this.convertURI(state.entries[state.index - 1].url),
+				tooltiptext: state && state.entries && this.convertURI(state.entries[state.index - 1].url) || "",
 				cb_index: i,
 				cb_type: "tab"
 			});
