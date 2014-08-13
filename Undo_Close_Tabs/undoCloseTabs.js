@@ -669,6 +669,7 @@ this.undoCloseTabsList = {
 
 		var keys = this.options.accesskeys.closedTabs;
 		this._undoTabItems.forEach(function(undoItem, i) {
+			var state = undoItem.state;
 			var key = keys && keys.charAt(i % keys.length);
 			var keyPrefix = keys && (key + this.options.accesskeyPostfix);
 			var mi = this.createElement("menuitem", {
@@ -676,20 +677,20 @@ this.undoCloseTabsList = {
 				accesskey: key,
 				class: "menuitem-iconic bookmark-item menuitem-with-favicon",
 				oncommand: "this.parentNode.parentNode.undoCloseTabsList.undoCloseTab(" + i + ");",
-				tooltiptext: this.convertURI(undoItem.state.entries[undoItem.state.index - 1].url),
+				tooltiptext: this.convertURI(state.entries[state.index - 1].url),
 				cb_index: i,
 				cb_type: "tab"
 			});
 			if(
-				undoItem.state
-				&& "attributes" in undoItem.state
-				&& "privateTab-isPrivate" in undoItem.state.attributes
+				state
+				&& "attributes" in state
+				&& "privateTab-isPrivate" in state.attributes
 			) // https://addons.mozilla.org/addon/private-tab/
 				mi.setAttribute("privateTab-isPrivate", "true");
 			if(this.cm)
 				mi.setAttribute("context", this.cmId);
 			var image = undoItem.image // Firefox
-				|| undoItem.state && undoItem.state.attributes && undoItem.state.attributes.image; // SeaMonkey
+				|| state && state.attributes && state.attributes.image; // SeaMonkey
 			if(image)
 				mi.setAttribute("image", this.cachedIcon(image));
 			if(i == 0)
