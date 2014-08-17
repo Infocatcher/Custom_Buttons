@@ -691,7 +691,10 @@ this.undoCloseTabsList = {
 			if(this.cm)
 				mi.setAttribute("context", this.cmId);
 			var image = undoItem.image // Firefox
-				|| state && state.attributes && state.attributes.image; // SeaMonkey
+				|| state && state.attributes && state.attributes.image // SeaMonkey
+				|| state && state.xultab
+					&& /(?:^| )image=(\S+)/.test(state.xultab)
+					&& decodeURI(RegExp.$1); // Only Firefox 2.0 ?
 			if(image)
 				mi.setAttribute("image", this.cachedIcon(image));
 			if(i == 0)
@@ -738,7 +741,7 @@ this.undoCloseTabsList = {
 		return this.crop(uri, crop);
 	},
 	cachedIcon: function(src) {
-		src = src.replace(/[&#]-moz-resolution=\d+,\d+$/, ""); // Firefox 22.0a1
+		src = src.replace(/[&#]-moz-resolution=\d+,\d+$/, ""); // Firefox 22+
 		if(
 			!/^https?:/.test(src)
 			// IDN, see https://bugzilla.mozilla.org/show_bug.cgi?id=311045
