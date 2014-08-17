@@ -728,7 +728,9 @@ this.undoCloseTabsList = {
 	},
 	convertURI: function(uri, crop) {
 		try {
-			uri = losslessDecodeURI({ spec: uri });
+			uri = "losslessDecodeURI" in window
+				? losslessDecodeURI({ spec: uri })
+				: decodeURI(uri);
 		}
 		catch(e) {
 			Components.utils.reportError(e);
