@@ -629,8 +629,7 @@ this.undoCloseTabsList = {
 		var keys = this.options.accesskeys.closedWindows;
 		this._undoWindowItems.forEach(function(undoItem, i) {
 			var tabs = undoItem.tabs;
-			var key = keys && keys.charAt(i % keys.length);
-			var keyPrefix = keys && (key + this.options.accesskeyPostfix);
+			var [key, keyPrefix] = this.getKey(keys, i);
 			var mi = this.createElement("menuitem", {
 				label: keyPrefix + "(%count) %title"
 					.replace("%title", undoItem.title)
@@ -670,8 +669,7 @@ this.undoCloseTabsList = {
 		var keys = this.options.accesskeys.closedTabs;
 		this._undoTabItems.forEach(function(undoItem, i) {
 			var state = undoItem.state;
-			var key = keys && keys.charAt(i % keys.length);
-			var keyPrefix = keys && (key + this.options.accesskeyPostfix);
+			var [key, keyPrefix] = this.getKey(keys, i);
 			var mi = this.createElement("menuitem", {
 				label: keyPrefix + undoItem.title,
 				accesskey: key,
@@ -697,6 +695,11 @@ this.undoCloseTabsList = {
 				mi.setAttribute("key", "key_undoCloseTab");
 			undoPopup.appendChild(mi);
 		}, this);
+	},
+	getKey: function(keys, i) {
+		var key = keys && keys.charAt(i % keys.length);
+		var keyPrefix = keys && (key + this.options.accesskeyPostfix);
+		return [key, keyPrefix];
 	},
 	checkForMiddleClick: function(e, upd) {
 		var mi = e.target;
