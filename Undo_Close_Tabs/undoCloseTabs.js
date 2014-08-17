@@ -220,7 +220,10 @@ this.undoCloseTabsList = {
 	cmId: this.id + "-contextSub",
 	errPrefix: "[Custom Buttons :: Undo Close Tabs List]: ",
 	get mp() {
-		var mp = this.createElement("menupopup", {
+		var mp = this.button.getElementsByTagName("menupopup");
+		mp = mp.length && mp[0];
+		mp && mp.parentNode.removeChild(mp);
+		mp = this.createElement("menupopup", {
 			id: this.mpId,
 			onclick: "this.parentNode.undoCloseTabsList.checkForMiddleClick(event);",
 			onpopupshowing: "if(event.target == this) document.popupNode = this.parentNode;",
