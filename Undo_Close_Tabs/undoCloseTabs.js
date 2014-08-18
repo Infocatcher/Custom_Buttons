@@ -35,6 +35,7 @@ var options = {
 		"clearClosedTabs"
 	],
 	*/
+	windowItemTemplate: "(%count) %title",
 	itemTip: ["title", "url", "closedAt"],
 	hideRestoreAllForSingleEntry: false,
 	allowDeleteEntries: true,
@@ -651,7 +652,7 @@ this.undoCloseTabsList = {
 			}, this);
 			var url = urls.join(" \n");
 			var mi = this.createElement("menuitem", {
-				label: keyPrefix + "(%count) %title"
+				label: keyPrefix + this.options.windowItemTemplate
 					.replace("%title", title)
 					.replace("%count", tabs.length),
 				accesskey: key,
