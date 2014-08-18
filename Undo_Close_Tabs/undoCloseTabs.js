@@ -35,6 +35,7 @@ var options = {
 		"clearClosedTabs"
 	],
 	*/
+	itemTip: ["title", "url", "closedAt"],
 	hideRestoreAllForSingleEntry: false,
 	allowDeleteEntries: true,
 	accesskeys: { // Empty string ("") to disable or string with possible values ("0123...", "abcd...")
@@ -74,7 +75,10 @@ function _localize(sid) {
 			buttonMenuAccesskey: "m",
 
 			tabContextMenu: "Recently Closed Tabs",
-			tabContextMenuAccesskey: "y"
+			tabContextMenuAccesskey: "y",
+
+			itemTip: "%ago ago, %date",
+			day: "d"
 		},
 		ru: {
 			restoreTab: "Восстановить последнюю закрытую вкладку",
@@ -101,7 +105,10 @@ function _localize(sid) {
 			buttonMenuAccesskey: "М",
 
 			tabContextMenu: "Недавно закрытые вкладки",
-			tabContextMenuAccesskey: "о"
+			tabContextMenuAccesskey: "о",
+
+			itemTip: "%ago назад, %date",
+			day: "д"
 		}
 	};
 	var locale = (function() {
@@ -633,33 +640,32 @@ this.undoCloseTabsList = {
 		this._undoWindowItems.forEach(function(undoItem, i) {
 			var tabs = undoItem.tabs;
 			var [key, keyPrefix] = this.getKey(keys, i);
+			var title = undoItem.title;
+			var selectedTab = tabs[undoItem.selected - 1];
+			var urls = [];
+			tabs.forEach(function(tab) {
+				if(!tab.entries || !tab.entries.length) // Can be [] for about:blank
+					return;
+				var url = this.convertURI(tab.entries[tab.index - 1].url, 120);
+				urls.push((tab == selectedTab && tabs.length > 1 ? "*" : "") + url);
+			}, this);
+			var url = urls.join(" \n");
 			var mi = this.createElement("menuitem", {
 				label: keyPrefix + "(%count) %title"
-					.replace("%title", undoItem.title)
+					.replace("%title", title)
 					.replace("%count", tabs.length),
 				accesskey: key,
 				"class": "menuitem-iconic bookmark-item menuitem-with-favicon",
 				oncommand: "undoCloseWindow(" + i + ");",
+				tooltiptext: this.getTip(undoItem, title, url),
 				cb_index: i,
 				cb_type: "window"
 			});
 			if(this.cm)
 				mi.setAttribute("context", this.cmId);
-			var selectedTab = tabs[undoItem.selected - 1];
 			var icon = selectedTab.image || selectedTab.attributes && selectedTab.attributes.image;
 			if(icon)
 				mi.setAttribute("image", this.cachedIcon(icon));
-			//if(selectedTab.entries && selectedTab.entries.length) // Can be [] for about:blank
-			//	mi.setAttribute("tooltiptext", selectedTab.entries[selectedTab.index - 1].url);
-			var uris = [];
-			tabs.forEach(function(tab) {
-				if(!tab.entries || !tab.entries.length) // Can be [] for about:blank
-					return;
-				var url = this.convertURI(tab.entries[tab.index - 1].url, 120);
-				uris.push((tab == selectedTab && tabs.length > 1 ? "*" : "") + url);
-			}, this);
-			if(uris.length)
-				mi.setAttribute("tooltiptext", uris.join(" \n"));
 			if(i == 0)
 				mi.setAttribute("key", "key_undoCloseWindow");
 			undoPopup.appendChild(mi);
@@ -673,12 +679,14 @@ this.undoCloseTabsList = {
 		this._undoTabItems.forEach(function(undoItem, i) {
 			var state = undoItem.state;
 			var [key, keyPrefix] = this.getKey(keys, i);
+			var title = undoItem.title;
+			var url = state && state.entries && state.entries[state.index - 1].url || "";
 			var mi = this.createElement("menuitem", {
-				label: keyPrefix + undoItem.title,
+				label: keyPrefix + title,
 				accesskey: key,
 				class: "menuitem-iconic bookmark-item menuitem-with-favicon",
 				oncommand: "this.parentNode.parentNode.undoCloseTabsList.undoCloseTab(" + i + ");",
-				tooltiptext: state && state.entries && this.convertURI(state.entries[state.index - 1].url) || "",
+				tooltiptext: this.getTip(undoItem, title, url),
 				cb_index: i,
 				cb_type: "tab"
 			});
@@ -706,6 +714,38 @@ this.undoCloseTabsList = {
 		var key = keys && keys.charAt(i % keys.length);
 		var keyPrefix = keys && (key + this.options.accesskeyPostfix);
 		return [key, keyPrefix];
+	},
+	getTip: function(undoItem, title, url) {
+		var tipData = [];
+		this.options.itemTip.forEach(function(key) {
+			var v;
+			switch(key) {
+				case "title":
+					if(title != url)
+						v = title;
+				break;
+				case "url":
+					v = url.indexOf("\n") == -1 ? this.convertURI(url) : url;
+				break;
+				case "closedAt":
+					if(!("closedAt" in undoItem))
+						break;
+					var closedAt = undoItem.closedAt;
+					var dt = Math.round(Math.max(0, Date.now() - closedAt)/1000);
+					var d = Math.floor(dt/24/3600);
+					dt -= d*24*3600;
+					var ts = new Date((dt + new Date(dt).getTimezoneOffset()*60)*1000).toLocaleFormat("%H:%M:%S");
+					if(d)
+						ts = d + _localize("day") + " " + ts.replace(/^0/, "");
+					else
+						ts = ts.replace(/^0(?:0:)?/, "");
+					v = _localize("itemTip")
+						.replace("%ago", ts)
+						.replace("%date", new Date(closedAt).toLocaleString());
+			}
+			v && tipData.push(v);
+		}, this);
+		return tipData.join(" \n");
 	},
 	checkForMiddleClick: function(e, upd) {
 		var mi = e.target;
