@@ -36,7 +36,7 @@ var options = {
 	],
 	*/
 	windowItemTemplate: "(%count) %title",
-	itemTip: ["title", "url", "closedAt"],
+	itemTipTemplate: ["title", "url", "closedAt"],
 	hideRestoreAllForSingleEntry: false,
 	allowDeleteEntries: true,
 	accesskeys: { // Empty string ("") to disable or string with possible values ("0123...", "abcd...")
@@ -417,7 +417,7 @@ this.undoCloseTabsList = {
 					break;
 				XULBrowserWindow.setOverLink(
 					e.type == "DOMMenuItemActive"
-						? (e.target.getAttribute("tooltiptext") || "")
+						? (e.target.getAttribute("cb_url") || "")
 							.replace(/ \n/g, ", ")
 						: "",
 					null
@@ -659,6 +659,7 @@ this.undoCloseTabsList = {
 				"class": "menuitem-iconic bookmark-item menuitem-with-favicon",
 				oncommand: "undoCloseWindow(" + i + ");",
 				tooltiptext: this.getTip(title, url, undoItem.closedAt || 0),
+				cb_url: this.convertURI(url),
 				cb_index: i,
 				cb_type: "window"
 			});
@@ -688,6 +689,7 @@ this.undoCloseTabsList = {
 				class: "menuitem-iconic bookmark-item menuitem-with-favicon",
 				oncommand: "this.parentNode.parentNode.undoCloseTabsList.undoCloseTab(" + i + ");",
 				tooltiptext: this.getTip(title, url, undoItem.closedAt || 0),
+				cb_url: this.convertURI(url),
 				cb_index: i,
 				cb_type: "tab"
 			});
@@ -718,7 +720,7 @@ this.undoCloseTabsList = {
 	},
 	getTip: function(title, url, closedAt) {
 		var tipData = [];
-		this.options.itemTip.forEach(function(key) {
+		this.options.itemTipTemplate.forEach(function(key) {
 			var v;
 			switch(key) {
 				case "title":
@@ -726,7 +728,7 @@ this.undoCloseTabsList = {
 						v = title;
 				break;
 				case "url":
-					v = url.indexOf("\n") == -1 ? this.convertURI(url) : url;
+					v = this.convertURI(url);
 				break;
 				case "closedAt":
 					if(!closedAt)
@@ -770,6 +772,8 @@ this.undoCloseTabsList = {
 		return s.substr(0, start) + "…" + s.substr(start - crop);
 	},
 	convertURI: function(uri, crop) {
+		if(uri.indexOf("\n") != -1)
+			return uri;
 		try {
 			uri = "losslessDecodeURI" in window
 				? losslessDecodeURI({ spec: uri })
