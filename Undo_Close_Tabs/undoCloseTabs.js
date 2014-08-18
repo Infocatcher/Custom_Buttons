@@ -657,7 +657,7 @@ this.undoCloseTabsList = {
 				accesskey: key,
 				"class": "menuitem-iconic bookmark-item menuitem-with-favicon",
 				oncommand: "undoCloseWindow(" + i + ");",
-				tooltiptext: this.getTip(undoItem, title, url),
+				tooltiptext: this.getTip(title, url, undoItem.closedAt || 0),
 				cb_index: i,
 				cb_type: "window"
 			});
@@ -686,7 +686,7 @@ this.undoCloseTabsList = {
 				accesskey: key,
 				class: "menuitem-iconic bookmark-item menuitem-with-favicon",
 				oncommand: "this.parentNode.parentNode.undoCloseTabsList.undoCloseTab(" + i + ");",
-				tooltiptext: this.getTip(undoItem, title, url),
+				tooltiptext: this.getTip(title, url, undoItem.closedAt || 0),
 				cb_index: i,
 				cb_type: "tab"
 			});
@@ -715,7 +715,7 @@ this.undoCloseTabsList = {
 		var keyPrefix = keys && (key + this.options.accesskeyPostfix);
 		return [key, keyPrefix];
 	},
-	getTip: function(undoItem, title, url) {
+	getTip: function(title, url, closedAt) {
 		var tipData = [];
 		this.options.itemTip.forEach(function(key) {
 			var v;
@@ -728,9 +728,8 @@ this.undoCloseTabsList = {
 					v = url.indexOf("\n") == -1 ? this.convertURI(url) : url;
 				break;
 				case "closedAt":
-					if(!("closedAt" in undoItem))
+					if(!closedAt)
 						break;
-					var closedAt = undoItem.closedAt;
 					var dt = Math.round(Math.max(0, Date.now() - closedAt)/1000);
 					var d = Math.floor(dt/24/3600);
 					dt -= d*24*3600;
