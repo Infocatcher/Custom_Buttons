@@ -410,6 +410,7 @@ this.undoCloseTabsList = {
 			id: this.tipId,
 			orient: "vertical",
 			onpopupshowing: "return this.parentNode.undoCloseTabsList.updTooltip(this, document.tooltipNode);",
+			style: "padding: 0;"
 		});
 		var btn = this.button;
 		btn.removeAttribute("tooltiptext");
