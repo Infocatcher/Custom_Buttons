@@ -410,8 +410,23 @@ this.undoCloseTabsList = {
 			id: this.tipId,
 			orient: "vertical",
 			onpopupshowing: "return this.parentNode.undoCloseTabsList.updTooltip(this, document.tooltipNode);",
+			onpopuphiding: "this.cancelUpdateTimer();",
 			style: "padding: 0;"
 		});
+		tip._updateTimer = 0;
+		tip.initUpdateTimer = function(fn, context) {
+			if(this._updateTimer)
+				clearInterval(this._updateTimer);
+			this._updateTimer = setInterval(function() {
+				fn.call(context);
+			}, 1000);
+		};
+		tip.cancelUpdateTimer = function() {
+			if(this._updateTimer) {
+				clearInterval(this._updateTimer);
+				this._updateTimer = 0;
+			}
+		};
 		var btn = this.button;
 		btn.removeAttribute("tooltiptext");
 		btn.setAttribute("tooltip", this.tipId);
@@ -829,12 +844,20 @@ this.undoCloseTabsList = {
 		else {
 			return false;
 		}
+
 		var tipData = this.getTooltipData(template, header, title, url, closedAt);
-		if(!tipData.hasChildNodes())
-			return false;
 		tip.textContent = "";
 		tip.appendChild(tipData);
-		return true;
+		if(closedAt && template.indexOf("closedAt") != -1) {
+			tip.initUpdateTimer(function() {
+				var tipData = this.getTooltipData(template, header, title, url, closedAt);
+				if(tipData.textContent != tip.textContent) {
+					tip.textContent = "";
+					tip.appendChild(tipData);
+				}
+			}, this);
+		}
+		return tip.hasChildNodes();
 	},
 	getTooltipData: function(template, header, title, url, closedAt) {
 		var df = document.createDocumentFragment();
