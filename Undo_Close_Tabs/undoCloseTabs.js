@@ -944,11 +944,16 @@ setTimeout(function(_this) {
 // Used icons from Undo Closed Tabs Button extension
 
 // Styles can't override hardcoded icon
-var icon = this.ownerDocument.getAnonymousElementByAttribute(this, "class", "toolbarbutton-icon");
-if(icon)
-	icon.src = "";
-else
-	this.image = "";
+if( // Remove icon only if nsIStyleSheetService works on-the-fly (Firefox 3.0+)
+	!Components.ID("{41d979dc-ea03-4235-86ff-1e3c090c5630}")
+		.equals(Components.interfaces.nsIStyleSheetService)
+) {
+	var icon = this.ownerDocument.getAnonymousElementByAttribute(this, "class", "toolbarbutton-icon");
+	if(icon)
+		icon.src = "";
+	else
+		this.image = "";
+}
 
 var cssStr = '\
 	@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");\n\
