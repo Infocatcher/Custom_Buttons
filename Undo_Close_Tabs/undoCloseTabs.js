@@ -730,47 +730,6 @@ this.undoCloseTabsList = {
 		var keyPrefix = keys && (key + this.options.accesskeyPostfix);
 		return [key, keyPrefix];
 	},
-	getTooltipData: function(header, title, url, closedAt) {
-		var df = document.createDocumentFragment();
-		function item(cn, val) {
-			var lbl = document.createElement("label");
-			lbl.className = "cb-" + cn;
-			//lbl.setAttribute("value", val);
-			lbl.textContent = val;
-			lbl.setAttribute("maxwidth", "450"); // Trick to restore right border for long lines
-			return df.appendChild(lbl);
-		}
-		if(header)
-			item("header", header);
-		this.options.itemTipTemplate.forEach(function(key) {
-			switch(key) {
-				case "title":
-					if(title && title != url)
-						item(key, title);
-				break;
-				case "url":
-					if(url)
-						item(key, this.convertURI(url));
-				break;
-				case "closedAt":
-					if(!closedAt)
-						break;
-					var dt = Math.round(Math.max(0, Date.now() - closedAt)/1000);
-					var d = Math.floor(dt/24/3600);
-					dt -= d*24*3600;
-					var ts = new Date((dt + new Date(dt).getTimezoneOffset()*60)*1000).toLocaleFormat("%H:%M:%S");
-					if(d)
-						ts = d + _localize("day") + " " + ts.replace(/^0/, "");
-					else
-						ts = ts.replace(/^0(?:0:)?/, "");
-					var tsTip = _localize("itemTip")
-						.replace("%ago", ts)
-						.replace("%date", new Date(closedAt).toLocaleString());
-					item(key, tsTip);
-			}
-		}, this);
-		return df;
-	},
 	checkForMiddleClick: function(e, upd) {
 		var mi = e.target;
 		if(
@@ -857,6 +816,47 @@ this.undoCloseTabsList = {
 		tip.textContent = "";
 		tip.appendChild(tipData);
 		return true;
+	},
+	getTooltipData: function(header, title, url, closedAt) {
+		var df = document.createDocumentFragment();
+		function item(cn, val) {
+			var lbl = document.createElement("label");
+			lbl.className = "cb-" + cn;
+			//lbl.setAttribute("value", val);
+			lbl.textContent = val;
+			lbl.setAttribute("maxwidth", "450"); // Trick to restore right border for long lines
+			return df.appendChild(lbl);
+		}
+		if(header)
+			item("header", header);
+		this.options.itemTipTemplate.forEach(function(key) {
+			switch(key) {
+				case "title":
+					if(title && title != url)
+						item(key, title);
+				break;
+				case "url":
+					if(url)
+						item(key, this.convertURI(url));
+				break;
+				case "closedAt":
+					if(!closedAt)
+						break;
+					var dt = Math.round(Math.max(0, Date.now() - closedAt)/1000);
+					var d = Math.floor(dt/24/3600);
+					dt -= d*24*3600;
+					var ts = new Date((dt + new Date(dt).getTimezoneOffset()*60)*1000).toLocaleFormat("%H:%M:%S");
+					if(d)
+						ts = d + _localize("day") + " " + ts.replace(/^0/, "");
+					else
+						ts = ts.replace(/^0(?:0:)?/, "");
+					var tsTip = _localize("itemTip")
+						.replace("%ago", ts)
+						.replace("%date", new Date(closedAt).toLocaleString());
+					item(key, tsTip);
+			}
+		}, this);
+		return df;
 	},
 	get wm() {
 		delete this.wm;
