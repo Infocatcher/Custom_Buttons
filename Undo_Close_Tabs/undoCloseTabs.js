@@ -868,7 +868,7 @@ this.undoCloseTabsList = {
 			//lbl.setAttribute("value", val);
 			lbl.textContent = val;
 			lbl.setAttribute("maxwidth", "450"); // Trick to restore right border for long lines
-			if(hasHeader && key != "header")
+			if(key == "closedAt" || hasHeader && key != "header")
 				lbl.style.color = "grayText";
 			return df.appendChild(lbl);
 		}
