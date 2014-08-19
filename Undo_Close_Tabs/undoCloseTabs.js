@@ -227,6 +227,7 @@ this.undoCloseTabsList = {
 	options: options,
 	mpId: this.id + "-context",
 	cmId: this.id + "-contextSub",
+	tipId: this.id + "-tooltip",
 	errPrefix: "[Custom Buttons :: Undo Close Tabs List]: ",
 	get mp() {
 		var mp = this.button.getElementsByTagName("menupopup");
@@ -341,7 +342,9 @@ this.undoCloseTabsList = {
 		menu = this.createElement("menu", {
 			id: menuId,
 			label: _localize("tabContextMenu"),
-			accesskey: _localize("tabContextMenuAccesskey")
+			accesskey: _localize("tabContextMenuAccesskey"),
+			tooltip: this.tipId,
+			popupsinherittooltip: "true"
 		});
 		menu.undoCloseTabsList = this;
 		var origMp = this.mp;
@@ -391,16 +394,16 @@ this.undoCloseTabsList = {
 		origMi.setAttribute("hidden", "true");
 	},
 	initTooltip: function() {
-		var btn = this.button;
-		var tip = btn.getElementsByTagName("tooltip");
-		tip = tip.length && tip[0];
+		var tip = document.getElementById(this.tipId);
 		tip && tip.parentNode.removeChild(tip);
-		tip = this.createElement("tooltip", {
+		tip = this.tip = this.createElement("tooltip", {
+			id: this.tipId,
 			orient: "vertical",
 			onpopupshowing: "return this.parentNode.undoCloseTabsList.updTooltip(this, document.tooltipNode);",
 		});
+		var btn = this.button;
 		btn.removeAttribute("tooltiptext");
-		btn.setAttribute("tooltip", "_child");
+		btn.setAttribute("tooltip", this.tipId);
 		btn.setAttribute("popupsinherittooltip", "true");
 		btn.appendChild(tip);
 	},
@@ -417,6 +420,8 @@ this.undoCloseTabsList = {
 			menu.parentNode.removeChild(menu);
 			this.tabContextUndoClose.removeAttribute("hidden");
 		}
+		var tip = this.tip;
+		tip && tip.parentNode.removeChild(tip);
 	},
 	handleEvent: function(e) {
 		switch(e.type) {
