@@ -347,6 +347,16 @@ this.undoCloseTabsList = {
 			popupsinherittooltip: "true"
 		});
 		menu.undoCloseTabsList = this;
+		menu.onclick = function(e) {
+			if(e.target != this)
+				return;
+			if(e.button == 1 || e.button == 0 && (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey)) {
+				if(this.undoCloseTabsList.closedTabCount) {
+					this.undoCloseTabsList.undoCloseTab();
+					closeMenus(this);
+				}
+			}
+		};
 		var origMp = this.mp;
 		var mp = origMp.cloneNode(true);
 		mp.id = this.button.id + "-tabContext";
