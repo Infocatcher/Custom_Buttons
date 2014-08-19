@@ -822,12 +822,15 @@ this.undoCloseTabsList = {
 	},
 	getTooltipData: function(template, header, title, url, closedAt) {
 		var df = document.createDocumentFragment();
-		function item(cn, val) {
+		var hasHeader = header && template.indexOf("header") != -1;
+		function item(key, val) {
 			var lbl = document.createElement("label");
-			lbl.className = "cb-" + cn;
+			lbl.className = "cb-" + key;
 			//lbl.setAttribute("value", val);
 			lbl.textContent = val;
 			lbl.setAttribute("maxwidth", "450"); // Trick to restore right border for long lines
+			if(hasHeader && key != "header")
+				lbl.style.color = "grayText";
 			return df.appendChild(lbl);
 		}
 		template.forEach(function(key) {
