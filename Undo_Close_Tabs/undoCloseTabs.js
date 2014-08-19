@@ -278,8 +278,7 @@ this.undoCloseTabsList = {
 		});
 		var menu = this.createElement("menu", {
 			label: _localize("buttonMenu"),
-			accesskey: _localize("buttonMenuAccesskey"),
-			tooltiptext: ""
+			accesskey: _localize("buttonMenuAccesskey")
 		});
 		menu.appendChild(cbPopup);
 		cbPopup.setAttribute(
@@ -321,6 +320,9 @@ this.undoCloseTabsList = {
 			window.addEventListener("TabOpen", this, false);
 		this.mp.addEventListener("DOMMenuItemActive",   this, false);
 		this.mp.addEventListener("DOMMenuItemInactive", this, false);
+		setTimeout(function(_this) {
+			_this.initTooltip();
+		}, 50, this);
 		this.updUIGlobal();
 		if(this.options.showInTabContextMenu) setTimeout(function(_this) {
 			_this.initTabContext();
@@ -387,6 +389,20 @@ this.undoCloseTabsList = {
 		origMi.parentNode.insertBefore(menu, origMi.nextSibling);
 		origMi.setAttribute("hidden", "true");
 	},
+	initTooltip: function() {
+		var btn = this.button;
+		var tip = btn.getElementsByTagName("tooltip");
+		tip = tip.length && tip[0];
+		tip && tip.parentNode.removeChild(tip);
+		tip = this.createElement("tooltip", {
+			orient: "vertical",
+			onpopupshowing: "return this.parentNode.undoCloseTabsList.updTooltip(this, document.tooltipNode);",
+		});
+		btn.removeAttribute("tooltiptext");
+		btn.setAttribute("tooltip", "_child");
+		btn.setAttribute("popupsinherittooltip", "true");
+		btn.appendChild(tip);
+	},
 	destroy: function() {
 		window.removeEventListener("TabClose",       this, false);
 		window.removeEventListener("SSTabRestoring", this, false);
@@ -417,7 +433,7 @@ this.undoCloseTabsList = {
 					break;
 				XULBrowserWindow.setOverLink(
 					e.type == "DOMMenuItemActive"
-						? (e.target.getAttribute("cb_url") || "")
+						? (e.target.getAttribute("cb_urlDecoded") || "")
 							.replace(/ \n/g, ", ")
 						: "",
 					null
@@ -554,7 +570,6 @@ this.undoCloseTabsList = {
 					&& df.appendChild(this.createElement("menuitem", {
 						label: _localize("restoreAllWindows"),
 						accesskey: _localize("restoreAllWindowsAccesskey"),
-						tooltiptext: "",
 						oncommand: "for(var i = 0; i < " + this._undoWindowItems.length + "; ++i) undoCloseWindow();"
 					}));
 				break;
@@ -562,7 +577,6 @@ this.undoCloseTabsList = {
 					wc && df.appendChild(this.createElement("menuitem", {
 						label: _localize("clearWindowsHistory"),
 						accesskey: _localize("clearWindowsHistoryAccesskey"),
-						tooltiptext: "",
 						oncommand: "this.parentNode.parentNode.undoCloseTabsList.clearUndoWindowsList();"
 					}));
 				break;
@@ -574,7 +588,6 @@ this.undoCloseTabsList = {
 					&& df.appendChild(this.createElement("menuitem", {
 						label: _localize("restoreAllTabs"),
 						accesskey: _localize("restoreAllTabsAccesskey"),
-						tooltiptext: "",
 						oncommand: "for(var i = 0; i < " + this._undoTabItems.length + "; ++i) this.parentNode.parentNode.undoCloseTabsList.undoCloseTab();"
 					}));
 				break;
@@ -582,7 +595,6 @@ this.undoCloseTabsList = {
 					tc && df.appendChild(this.createElement("menuitem", {
 						label: _localize("clearTabsHistory"),
 						accesskey: _localize("clearTabsHistoryAccesskey"),
-						tooltiptext: "",
 						oncommand: "this.parentNode.parentNode.undoCloseTabsList.clearUndoTabsList();"
 					}));
 				break;
@@ -595,7 +607,6 @@ this.undoCloseTabsList = {
 					&& df.appendChild(this.createElement("menuitem", {
 						label: _localize("clearAllHistory"),
 						accesskey: _localize("clearAllHistoryAccesskey"),
-						tooltiptext: "",
 						oncommand: "this.parentNode.parentNode.undoCloseTabsList.clearAllLists();"
 					}));
 				break;
@@ -603,7 +614,6 @@ this.undoCloseTabsList = {
 					canRestoreLastSession && df.appendChild(this.createElement("menuitem", {
 						label: _localize("restoreLastSession"),
 						accesskey: _localize("restoreLastSessionAccesskey"),
-						tooltiptext: "",
 						oncommand: "this.parentNode.parentNode.undoCloseTabsList.ss.restoreLastSession();"
 					}));
 				break;
@@ -658,8 +668,9 @@ this.undoCloseTabsList = {
 				accesskey: key,
 				"class": "menuitem-iconic bookmark-item menuitem-with-favicon",
 				oncommand: "undoCloseWindow(" + i + ");",
-				tooltiptext: this.getTip(title, url, undoItem.closedAt || 0),
-				cb_url: this.convertURI(url),
+				cb_url: url,
+				cb_urlDecoded: this.convertURI(url),
+				cb_closedAt: undoItem.closedAt || 0,
 				cb_index: i,
 				cb_type: "window"
 			});
@@ -688,8 +699,9 @@ this.undoCloseTabsList = {
 				accesskey: key,
 				class: "menuitem-iconic bookmark-item menuitem-with-favicon",
 				oncommand: "this.parentNode.parentNode.undoCloseTabsList.undoCloseTab(" + i + ");",
-				tooltiptext: this.getTip(title, url, undoItem.closedAt || 0),
-				cb_url: this.convertURI(url),
+				cb_url: url,
+				cb_urlDecoded: this.convertURI(url),
+				cb_closedAt: undoItem.closedAt || 0,
 				cb_index: i,
 				cb_type: "tab"
 			});
@@ -718,17 +730,27 @@ this.undoCloseTabsList = {
 		var keyPrefix = keys && (key + this.options.accesskeyPostfix);
 		return [key, keyPrefix];
 	},
-	getTip: function(title, url, closedAt) {
-		var tipData = [];
+	getTooltipData: function(header, title, url, closedAt) {
+		var df = document.createDocumentFragment();
+		function item(cn, val) {
+			var lbl = document.createElement("label");
+			lbl.className = "cb-" + cn;
+			//lbl.setAttribute("value", val);
+			lbl.textContent = val;
+			lbl.setAttribute("maxwidth", "450"); // Trick to restore right border for long lines
+			return df.appendChild(lbl);
+		}
+		if(header)
+			item("header", header);
 		this.options.itemTipTemplate.forEach(function(key) {
-			var v;
 			switch(key) {
 				case "title":
-					if(title != url)
-						v = title;
+					if(title && title != url)
+						item(key, title);
 				break;
 				case "url":
-					v = this.convertURI(url);
+					if(url)
+						item(key, this.convertURI(url));
 				break;
 				case "closedAt":
 					if(!closedAt)
@@ -741,13 +763,13 @@ this.undoCloseTabsList = {
 						ts = d + _localize("day") + " " + ts.replace(/^0/, "");
 					else
 						ts = ts.replace(/^0(?:0:)?/, "");
-					v = _localize("itemTip")
+					var tsTip = _localize("itemTip")
 						.replace("%ago", ts)
 						.replace("%date", new Date(closedAt).toLocaleString());
+					item(key, tsTip);
 			}
-			v && tipData.push(v);
 		}, this);
-		return tipData.join(" \n");
+		return df;
 	},
 	checkForMiddleClick: function(e, upd) {
 		var mi = e.target;
@@ -807,21 +829,34 @@ this.undoCloseTabsList = {
 		)
 			dis = false;
 		this.button.disabled = dis;
-		setTimeout(function(_this) {
-			_this.updTooltip();
-		}, 0, this);
 	},
-	updTooltip: function() {
-		var lastTabTip = "";
-		if(this.closedTabCount) {
-			//~ todo: try optimize JSON.parse() usage (can we use cached this._undoTabItems here?)
-			// Or update tooltipText only on mouseover
+	updTooltip: function(tip, tn) {
+		var header, title, url, closedAt;
+		if(tn == this.button) {
+			header = _localize("restoreTab");
 			let undoTabItems = JSON.parse(this.ss.getClosedTabData(window));
-			let lastItem = undoTabItems[0];
-			lastTabTip = " \n" + this.crop(lastItem.title)
-				+ " \n" + this.convertURI(lastItem.state.entries[lastItem.state.index - 1].url);
+			if(undoTabItems.length) {
+				let lastItem = undoTabItems[0];
+				title = lastItem.title;
+				url = lastItem.state && lastItem.state.entries
+					&& lastItem.state.entries[lastItem.state.index - 1].url;
+				closedAt = lastItem.closedAt || 0;
+			}
 		}
-		this.button.tooltipText = _localize("restoreTab") + lastTabTip;
+		else if(tn.hasAttribute("cb_index")) {
+			title = tn.getAttribute("label");
+			url = tn.getAttribute("cb_url");
+			closedAt = +tn.getAttribute("cb_closedAt");
+		}
+		else {
+			return false;
+		}
+		var tipData = this.getTooltipData(header, title, url, closedAt);
+		if(!tipData.hasChildNodes())
+			return false;
+		tip.textContent = "";
+		tip.appendChild(tipData);
+		return true;
 	},
 	get wm() {
 		delete this.wm;
