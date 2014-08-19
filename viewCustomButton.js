@@ -98,7 +98,7 @@ function loadHihglighterStyles() {
 	var codeSelector = ".cbCodeView-section-value";
 	var isDarkTheme = false;
 	if(window.getComputedStyle) { // No autodetection in IE, sorry
-		var s = window.getComputedStyle(document.body);
+		var s = window.getComputedStyle(document.body, null);
 		var bg = s.backgroundColor || "";
 		if(bg.toLowerCase() == "transparent") {
 			document.body.style.background = "-moz-default-background-color";
