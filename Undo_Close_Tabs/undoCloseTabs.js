@@ -869,11 +869,11 @@ this.undoCloseTabsList = {
 					var dt = Math.round(Math.max(0, Date.now() - closedAt)/1000);
 					var d = Math.floor(dt/24/3600);
 					dt -= d*24*3600;
-					var ts = new Date((dt + new Date(dt).getTimezoneOffset()*60)*1000).toLocaleFormat("%H:%M:%S");
+					var ts = new Date((dt + new Date(dt).getTimezoneOffset()*60)*1000)
+						.toLocaleFormat("%H:%M")
+						.replace(/^0/, "");
 					if(d)
-						ts = d + _localize("day") + " " + ts.replace(/^0/, "");
-					else
-						ts = ts.replace(/^0(?:0:)?/, "");
+						ts = d + _localize("day") + " " + ts;
 					var tsTip = _localize("itemTip")
 						.replace("%ago", ts)
 						.replace("%date", new Date(closedAt).toLocaleString());
