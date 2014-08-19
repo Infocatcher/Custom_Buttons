@@ -36,6 +36,7 @@ var options = {
 	],
 	*/
 	windowItemTemplate: "(%count) %title",
+	buttonTipTemplate: ["header", "title", "url", "closedAt"],
 	itemTipTemplate: ["title", "url", "closedAt"],
 	hideRestoreAllForSingleEntry: false,
 	allowDeleteEntries: true,
@@ -790,8 +791,9 @@ this.undoCloseTabsList = {
 		this.button.disabled = dis;
 	},
 	updTooltip: function(tip, tn) {
-		var header, title, url, closedAt;
+		var template, header, title, url, closedAt;
 		if(tn == this.button) {
+			template = this.options.buttonTipTemplate;
 			header = _localize("restoreTab");
 			let undoTabItems = JSON.parse(this.ss.getClosedTabData(window));
 			if(undoTabItems.length) {
@@ -803,6 +805,7 @@ this.undoCloseTabsList = {
 			}
 		}
 		else if(tn.hasAttribute("cb_index")) {
+			template = this.options.itemTipTemplate;
 			title = tn.getAttribute("label");
 			url = tn.getAttribute("cb_url");
 			closedAt = +tn.getAttribute("cb_closedAt");
@@ -810,14 +813,14 @@ this.undoCloseTabsList = {
 		else {
 			return false;
 		}
-		var tipData = this.getTooltipData(header, title, url, closedAt);
+		var tipData = this.getTooltipData(template, header, title, url, closedAt);
 		if(!tipData.hasChildNodes())
 			return false;
 		tip.textContent = "";
 		tip.appendChild(tipData);
 		return true;
 	},
-	getTooltipData: function(header, title, url, closedAt) {
+	getTooltipData: function(template, header, title, url, closedAt) {
 		var df = document.createDocumentFragment();
 		function item(cn, val) {
 			var lbl = document.createElement("label");
@@ -827,10 +830,12 @@ this.undoCloseTabsList = {
 			lbl.setAttribute("maxwidth", "450"); // Trick to restore right border for long lines
 			return df.appendChild(lbl);
 		}
-		if(header)
-			item("header", header);
-		this.options.itemTipTemplate.forEach(function(key) {
+		template.forEach(function(key) {
 			switch(key) {
+				case "header":
+					if(header)
+						item(key, header);
+				break;
 				case "title":
 					if(title && title != url)
 						item(key, title);
