@@ -227,6 +227,7 @@ this.undoCloseTabsList = {
 	options: options,
 	mpId: this.id + "-context",
 	cmId: this.id + "-contextSub",
+	tcmId: this.id + "-tabContextMenu",
 	tipId: this.id + "-tooltip",
 	errPrefix: "[Custom Buttons :: Undo Close Tabs List]: ",
 	get mp() {
@@ -336,11 +337,10 @@ this.undoCloseTabsList = {
 			LOG("Can't find \"Undo Close Tab\" item in tab context menu");
 			return;
 		}
-		var menuId = this.button.id + "-tabContextMenu";
-		var menu = document.getElementById(menuId);
+		var menu = document.getElementById(this.tcmId);
 		menu && menu.parentNode.removeChild(menu); // For SeaMonkey
 		menu = this.createElement("menu", {
-			id: menuId,
+			id: this.tcmId,
 			label: _localize("tabContextMenu"),
 			accesskey: _localize("tabContextMenuAccesskey"),
 			tooltip: this.tipId,
@@ -415,7 +415,7 @@ this.undoCloseTabsList = {
 			window.removeEventListener("TabOpen", this, false);
 		this.mp.removeEventListener("DOMMenuItemActive",   this, false);
 		this.mp.removeEventListener("DOMMenuItemInactive", this, false);
-		var menu = document.getElementById(this.button.id + "-tabContextMenu");
+		var menu = document.getElementById(this.tcmId);
 		if(menu) {
 			menu.parentNode.removeChild(menu);
 			this.tabContextUndoClose.removeAttribute("hidden");
