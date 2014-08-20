@@ -889,15 +889,15 @@ this.undoCloseTabsList = {
 				case "closedAt":
 					if(!closedAt)
 						break;
-					var dt = Math.round(Math.max(0, Date.now() - closedAt)/1000);
-					var d = Math.floor(dt/24/3600);
+					let dt = Math.round(Math.max(0, Date.now() - closedAt)/1000);
+					let d = Math.floor(dt/24/3600);
 					dt -= d*24*3600;
-					var ts = new Date((dt + new Date(dt).getTimezoneOffset()*60)*1000)
+					let ts = new Date((dt + new Date(dt).getTimezoneOffset()*60)*1000)
 						.toLocaleFormat("%H:%M")
 						.replace(/^0/, "");
 					if(d)
 						ts = d + _localize("day") + " " + ts;
-					var tsTip = _localize("itemTip")
+					let tsTip = _localize("itemTip")
 						.replace("%ago", ts)
 						.replace("%date", new Date(closedAt).toLocaleString());
 					item(key, tsTip);
@@ -987,7 +987,7 @@ if( // Remove icon only if nsIStyleSheetService works on-the-fly (Firefox 3.0+)
 	!Components.ID("{41d979dc-ea03-4235-86ff-1e3c090c5630}")
 		.equals(Components.interfaces.nsIStyleSheetService)
 ) {
-	var icon = this.ownerDocument.getAnonymousElementByAttribute(this, "class", "toolbarbutton-icon");
+	let icon = this.ownerDocument.getAnonymousElementByAttribute(this, "class", "toolbarbutton-icon");
 	if(icon)
 		icon.src = "";
 	else
