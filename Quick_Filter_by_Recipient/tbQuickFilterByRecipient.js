@@ -16,9 +16,9 @@ function _localize(s, key) {
 		}
 	};
 	var locale = (function() {
-		//var prefs = Services.prefs;
-		var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-			.getService(Components.interfaces.nsIPrefBranch);
+		var prefs = "Services" in window && Services.prefs
+			|| Components.classes["@mozilla.org/preferences-service;1"]
+				.getService(Components.interfaces.nsIPrefBranch);
 		if(!prefs.getBoolPref("intl.locale.matchOS")) {
 			var locale = prefs.getCharPref("general.useragent.locale");
 			if(locale.substr(0, 9) != "chrome://")
