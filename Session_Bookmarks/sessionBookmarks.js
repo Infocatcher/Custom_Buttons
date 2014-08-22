@@ -2152,8 +2152,8 @@ this.bookmarks = {
 			.replace(/"/g, "&quot;");
 	}
 };
-this.bookmarks.initProxy();
 _log("init");
+this.bookmarks.initProxy();
 this.onDestroy = function(reason) {
 	if(reason == "constructor")
 		return; // Changed XBL binding, ignore
