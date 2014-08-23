@@ -36,6 +36,7 @@ var options = {
 	],
 	*/
 	windowItemTemplate: "(%count) %title",
+	windowSelectedTabPrefix: "*",
 	buttonTipTemplate: ["header", "title", "url", "closedAt"],
 	itemTipTemplate: ["title", "url", "closedAt"],
 	hideRestoreAllForSingleEntry: false,
@@ -690,7 +691,10 @@ this.undoCloseTabsList = {
 				if(!tab.entries || !tab.entries.length) // Can be [] for about:blank
 					return;
 				var url = this.convertURI(tab.entries[tab.index - 1].url, 120);
-				urls.push((tab == selectedTab && tabs.length > 1 ? "*" : "") + url);
+				var selectedPrefix = tab == selectedTab && tabs.length > 1
+					? this.options.windowSelectedTabPrefix
+					: "";
+				urls.push(selectedPrefix + url);
 			}, this);
 			var url = urls.join(" \n");
 			var mi = this.createElement("menuitem", {
