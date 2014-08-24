@@ -448,7 +448,7 @@ this.undoCloseTabsList = {
 			this.tabContextUndoClose.removeAttribute("hidden");
 		}
 		var tip = this.tip;
-		tip && tip.parentNode.removeChild(tip);
+		tip && tip.parentNode && tip.parentNode.removeChild(tip);
 	},
 	handleEvent: function(e) {
 		switch(e.type) {
