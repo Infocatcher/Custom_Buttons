@@ -578,15 +578,13 @@ this.undoCloseTabsList = {
 	},
 	drawUndoList: function() {
 		var mp = this.mp;
-		//while(mp.hasChildNodes())
-		//	mp.removeChild(mp.lastChild);
-		mp.textContent = "";
 
 		var wc = this.closedWindowCount;
 		var tc = this.closedTabCount;
 		var ss = this.ss;
 		var canRestoreLastSession = "restoreLastSession" in ss && ss.canRestoreLastSession
 		if(!wc && !tc && !canRestoreLastSession) {
+			mp.textContent = "";
 			mp.hidePopup();
 			return false;
 		}
@@ -671,12 +669,13 @@ this.undoCloseTabsList = {
 
 		this._undoWindowItems = this._undoTabItems = null;
 
-		var show = df.hasChildNodes();
-		if(show)
-			mp.appendChild(df);
-		else
+		mp.textContent = "";
+		if(!df.hasChildNodes()) {
 			mp.hidePopup();
-		return show;
+			return false;
+		}
+		mp.appendChild(df);
+		return true;
 	},
 	addUndoWindowsList: function(undoPopup) {
 		// Based on code from chrome://browser/content/browser.js
