@@ -246,12 +246,14 @@ this.undoCloseTabsList = {
 		delete this.mp;
 		return this.mp = this.button.appendChild(mp);
 	},
+	get useCentextMenu() {
+		delete this.useCentextMenu;
+		return this.useCentextMenu = this.options.allowDeleteEntries
+			&& ("forgetClosedTab" in this.ss || "forgetClosedWindow" in this.ss);
+	},
 	get cm() {
 		delete this.cm;
-		if(
-			!this.options.allowDeleteEntries
-			|| !("forgetClosedTab" in this.ss || "forgetClosedWindow" in this.ss)
-		)
+		if(!this.useCentextMenu)
 			return this.cm = null;
 		var cm = document.getElementById(this.cmId);
 		cm && cm.parentNode.removeChild(cm);
@@ -958,7 +960,7 @@ this.undoCloseTabsList = {
 	}
 };
 
-if(!this.undoCloseTabsList.options.useMenu && this.undoCloseTabsList.cm) {
+if(!this.undoCloseTabsList.options.useMenu && this.undoCloseTabsList.useCentextMenu) {
 	this.oncontextmenu = function(e) {
 		if(
 			e.target != this
