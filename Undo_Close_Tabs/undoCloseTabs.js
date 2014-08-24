@@ -322,9 +322,9 @@ this.undoCloseTabsList = {
 		window.addEventListener("unload",         this, false);
 		if(this.appName == "SeaMonkey") // No SSTab* events in SeaMonkey
 			window.addEventListener("TabOpen", this, false);
-		this.mp.addEventListener("DOMMenuItemActive",   this, false);
-		this.mp.addEventListener("DOMMenuItemInactive", this, false);
 		setTimeout(function(_this) {
+			_this.mp.addEventListener("DOMMenuItemActive",   _this, false);
+			_this.mp.addEventListener("DOMMenuItemInactive", _this, false);
 			_this.initTooltip();
 		}, 50, this);
 		this.updUIGlobal();
