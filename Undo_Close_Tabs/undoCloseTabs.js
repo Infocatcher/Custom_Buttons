@@ -329,6 +329,7 @@ this.undoCloseTabsList = {
 			_this.mp.addEventListener("DOMMenuItemInactive", _this, false);
 			_this.initTooltip();
 		}, 50, this);
+		this.addPbExitObserver(true);
 		this.updUIGlobal();
 		if(this.options.showInTabContextMenu) setTimeout(function(_this) {
 			_this.initTabContext();
@@ -436,6 +437,16 @@ this.undoCloseTabsList = {
 		btn.setAttribute("popupsinherittooltip", "true");
 		btn.appendChild(tip);
 	},
+	_hasPbExitObserver: false,
+	addPbExitObserver: function(add) {
+		if(add == this._hasPbExitObserver || !("Services" in window))
+			return;
+		this._hasPbExitObserver = add;
+		if(add)
+			Services.obs.addObserver(this, "last-pb-context-exited", false);
+		else
+			Services.obs.removeObserver(this, "last-pb-context-exited");
+	},
 	destroy: function() {
 		window.removeEventListener("TabClose",       this, false);
 		window.removeEventListener("SSTabRestoring", this, false);
@@ -444,6 +455,7 @@ this.undoCloseTabsList = {
 			window.removeEventListener("TabOpen", this, false);
 		this.mp.removeEventListener("DOMMenuItemActive",   this, false);
 		this.mp.removeEventListener("DOMMenuItemInactive", this, false);
+		this.addPbExitObserver(false);
 		var menu = document.getElementById(this.tcmId);
 		if(menu) {
 			menu.parentNode.removeChild(menu);
@@ -476,6 +488,13 @@ this.undoCloseTabsList = {
 			case "unload":
 				this.updUIGlobal();
 				this.destroy();
+		}
+	},
+	observe: function(subject, topic, data) {
+		if(topic == "last-pb-context-exited") {
+			setTimeout(function(_this) {
+				_this.updUI();
+			}, 25, this);
 		}
 	},
 
