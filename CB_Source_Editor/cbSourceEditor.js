@@ -247,6 +247,7 @@ if(!watcher) {
 				);
 			}.bind(this), 500); // We should wait to not break other extensions with document.loadOverlay()
 
+			var tabs = document.getElementById("custombuttons-editbutton-tabbox");
 			Array.slice(document.getElementsByTagName("cbeditor")).forEach(function(cbEditor) {
 				if("__sourceEditor" in cbEditor)
 					return;
@@ -380,7 +381,6 @@ if(!watcher) {
 						// doc.defaultView.controllers.insertControllerAt(0, controller(this, doc.defaultView));
 						var controllers = window.controllers; // nsIControllers
 						var controller = se.__cmdController = controllers.getControllerAt(0);
-						var tabs = document.getElementById("custombuttons-editbutton-tabbox");
 						if("__cmdControllers" in tabs)
 							tabs.__cmdControllers.push(controller);
 						else {
@@ -425,7 +425,6 @@ if(!watcher) {
 
 						// Hack to use selected editor
 						var controller = se.ui._controller;
-						var tabs = document.getElementById("custombuttons-editbutton-tabbox");
 						controller.__defineGetter__("_editor", function() {
 							var seElt = tabs.selectedPanel;
 							var se = seElt && seElt.__sourceEditor
@@ -443,7 +442,6 @@ if(!watcher) {
 				var cdFake = {
 					__proto__: cd,
 					get focusedElement() {
-						var tabs = document.getElementById("custombuttons-editbutton-tabbox");
 						var selectedTab = tabs.selectedTab;
 						if(selectedTab && selectedTab.id == "code-tab")
 							return document.getElementById("code").textbox.inputField;
