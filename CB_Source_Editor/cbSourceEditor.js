@@ -364,9 +364,14 @@ if(!watcher) {
 						window.setTimeout(function() {
 							se.on("change", onTextChanged);
 							if(isLoaded) {
-								var seGlobal = Components.utils.getGlobalForObject(SourceEditor.prototype);
-								var cm = seGlobal.editors.get(se);
-								cm.clearHistory();
+								if("clearHistory" in se)
+									se.clearHistory();
+								else {
+									var seGlobal = Components.utils.getGlobalForObject(SourceEditor.prototype);
+									// Note: this is resource://app/modules/devtools/gDevTools.jsm scope in Firefox 34+
+									var cm = seGlobal.editors.get(se);
+									cm.clearHistory();
+								}
 							}
 						}, isFrame ? 50 : 15); // Oh, magic delays...
 						done();
