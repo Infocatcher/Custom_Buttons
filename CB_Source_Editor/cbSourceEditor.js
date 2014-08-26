@@ -248,6 +248,7 @@ if(!watcher) {
 			}.bind(this), 500); // We should wait to not break other extensions with document.loadOverlay()
 
 			var tabs = document.getElementById("custombuttons-editbutton-tabbox");
+			var selectedPanel = tabs.selectedPanel;
 			Array.slice(document.getElementsByTagName("cbeditor")).forEach(function(cbEditor) {
 				if("__sourceEditor" in cbEditor)
 					return;
@@ -435,6 +436,8 @@ if(!watcher) {
 					});
 				}
 			}, this);
+			// Force select correct panel (prevent bugs, if selected "Button settings" tab)
+			tabs.selectedPanel = selectedPanel.__sourceEditorElt || selectedPanel;
 
 			var origExecCmd = window.editor.execute_oncommand_code;
 			window.editor.execute_oncommand_code = function() {
