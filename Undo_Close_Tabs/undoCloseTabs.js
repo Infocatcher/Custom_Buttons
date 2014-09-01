@@ -435,7 +435,7 @@ this.undoCloseTabsList = {
 		btn.removeAttribute("tooltiptext");
 		btn.setAttribute("tooltip", this.tipId);
 		btn.setAttribute("popupsinherittooltip", "true");
-		btn.appendChild(tip);
+		document.getElementById("mainPopupSet").appendChild(tip);
 	},
 	_hasPbExitObserver: false,
 	addPbExitObserver: function(add) {
