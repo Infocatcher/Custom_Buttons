@@ -413,10 +413,11 @@ this.undoCloseTabsList = {
 		tip = this.tip = this.createElement("tooltip", {
 			id: this.tipId,
 			orient: "vertical",
-			onpopupshowing: "return this.parentNode.undoCloseTabsList.updTooltip(this, document.tooltipNode);",
+			onpopupshowing: "return this.undoCloseTabsList.updTooltip(this, document.tooltipNode);",
 			onpopuphiding: "this.cancelUpdateTimer();",
 			style: "padding: 0;"
 		});
+		tip.undoCloseTabsList = this;
 		tip._updateTimer = 0;
 		tip.initUpdateTimer = function(fn, context) {
 			if(this._updateTimer)
