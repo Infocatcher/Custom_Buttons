@@ -507,7 +507,8 @@ this.undoCloseTabsList = {
 	},
 	get tabContextUndoClose() {
 		return document.getElementById("context_undoCloseTab")
-			|| document.getAnonymousElementByAttribute(gBrowser, "tbattr", "tabbrowser-undoclosetab");
+			|| document.getElementById("tabContextUndoCloseTab") // Firefox 2.0
+			|| document.getAnonymousElementByAttribute(gBrowser, "tbattr", "tabbrowser-undoclosetab"); // SeaMonkey
 	},
 	get closedWindowCount() {
 		if(!("getClosedWindowCount" in this.ss)) {
