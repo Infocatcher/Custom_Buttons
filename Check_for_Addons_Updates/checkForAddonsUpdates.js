@@ -6,7 +6,7 @@
 // (code for "code" section)
 
 // (c) Infocatcher 2012-2014
-// version 0.1.5pre2 - 2014-07-23
+// version 0.1.5 - 2014-10-13
 
 // Button just open hidden tab with about:addons and trigger built-in "Check for Updates" function.
 // And show tab, if found updates.
