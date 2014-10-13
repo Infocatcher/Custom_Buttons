@@ -52,7 +52,7 @@ if(tabmail && app == "Thunderbird") { // Note: SeaMonkey doesn't support content
 	Services.obs.notifyObservers(null, "EM-ping", "");
 	Services.obs.removeObserver(receivePong, "EM-pong");
 	if(addonsWin) {
-		var rootWindow = addonsWin
+		let rootWindow = addonsWin
 			.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
 			.getInterface(Components.interfaces.nsIWebNavigation)
 			.QueryInterface(Components.interfaces.nsIDocShellTreeItem)
