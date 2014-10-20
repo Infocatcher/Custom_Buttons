@@ -4,8 +4,8 @@
 // Switch Keyboard Layout button for Custom Buttons
 // (code for "code" section)
 
-// (c) Infocatcher 2009, 2013
-// version 0.2.0pre2 - 2013-02-13
+// (c) Infocatcher 2009, 2013-2014
+// version 0.2.0 - 2014-10-20
 
 // Convert text, typed in wrong keyboard layout.
 // Configured for Russian <-> English.
