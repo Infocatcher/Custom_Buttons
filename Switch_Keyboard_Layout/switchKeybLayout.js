@@ -215,7 +215,7 @@ var keybUtils = {
 				}
 			}
 			else {
-				tmpNode = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
+				tmpNode = doc.createElementNS("http://www.w3.org/1999/xhtml", "div");
 				tmpNode.appendChild(rng.cloneContents());
 			}
 
