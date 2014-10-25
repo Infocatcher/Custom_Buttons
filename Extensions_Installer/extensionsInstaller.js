@@ -279,7 +279,9 @@ if(isCbInit) {
 					node != this
 					&& node.namespaceURI == xulns
 					&& node.boxObject
-					&& node.boxObject instanceof Components.interfaces.nsIMenuBoxObject
+					// See https://github.com/Infocatcher/Custom_Buttons/issues/28
+					//&& node.boxObject instanceof Components.interfaces.nsIMenuBoxObject
+					&& "open" in node
 					&& node.open
 				) {
 					node.open = false;
