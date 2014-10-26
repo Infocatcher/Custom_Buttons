@@ -145,16 +145,18 @@ function setNewDisabled(addon) {
 	var realDis = addon.userDisabled;
 	if(realDis != newDis) { // We can't enable vulnerable plugins
 		var err = "Can't set addon.userDisabled to " + newDis + ", real value: " + realDis;
-		if(newDis)
-			Components.utils.reportError(err);
+		if(newDis) {
+			LOG(err + "\nSTATE_ASK_TO_ACTIVATE not supported?");
+			newDis = false;
+		}
 		else {
 			LOG(err + "\nVulnerable plugin?");
 			if(oldDis == AddonManager.STATE_ASK_TO_ACTIVATE)
 				newDis = true;
 			else
 				newDis = AddonManager.STATE_ASK_TO_ACTIVATE;
-			addon.userDisabled = newDis;
 		}
+		addon.userDisabled = newDis;
 	}
 	return addon.userDisabled;
 }
