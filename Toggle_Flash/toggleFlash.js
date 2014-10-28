@@ -121,8 +121,13 @@ this.__defineSetter__("pluginDisabled", function(dis) {
 		if(icon) {
 			if(style.hasOwnProperty("iconStyle"))
 				icon.style.cssText = style.iconStyle;
-			if(style.hasOwnProperty("iconGrayscale"))
-				icon.style.filter = style.iconGrayscale ? 'url("chrome://mozapps/skin/extensions/extensions.svg#greyscale")' : "";
+			if(style.hasOwnProperty("iconGrayscale")) {
+				icon.style.filter = style.iconGrayscale
+					? parseFloat(Services.appinfo.platformVersion) >= 36
+						? "grayscale(1)"
+						: 'url("chrome://mozapps/skin/extensions/extensions.svg#greyscale")'
+					: "";
+			}
 			if(style.hasOwnProperty("iconOpacity"))
 				icon.style.opacity = style.iconOpacity;
 		}
