@@ -125,6 +125,12 @@ function ael(type, func, useCapture, target) {
 	return (target || window).addEventListener(type, func, useCapture);
 }
 function rel(type, func, useCapture, target) {
+	// Trick for Firefox 36.0a1
+	if("EventTarget" in window && EventTarget.prototype && EventTarget.prototype.removeEventListener) try {
+		EventTarget.prototype.removeEventListener.call(target || window, type, func, useCapture);
+	}
+	catch(e) {
+	}
 	return (target || window).removeEventListener(type, func, useCapture);
 }
 function defineGetter(o, p, g) {
