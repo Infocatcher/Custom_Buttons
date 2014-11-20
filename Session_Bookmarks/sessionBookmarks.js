@@ -220,6 +220,7 @@ this.onmouseover = function(e) {
 				//&& node.boxObject instanceof Components.interfaces.nsIMenuBoxObject
 				&& "open" in node
 				&& node.open
+				&& node.getElementsByTagName("menupopup").length
 			) {
 				node.open = false;
 				this.open = true;
