@@ -213,11 +213,12 @@ function init() {
 	tt.setAttribute("mousethrough", "always");
 	top.document.documentElement.appendChild(tt);
 
-	// Resolve -moz-* and system colors (for copy tooltip contents feature)
 	var tts = tt.style;
-	var ttcs = top.getComputedStyle(tt, null);
 	// Trick to force repaint tooltip, see https://github.com/Infocatcher/Custom_Buttons/issues/25
 	tts.opacity = "0.99";
+
+	// Resolve -moz-* and system colors (for copy tooltip contents feature)
+	var ttcs = top.getComputedStyle(tt, null);
 	tts.color = _addedColor;
 	_addedColor = ttcs.color;
 	tts.color = _removedColor;
