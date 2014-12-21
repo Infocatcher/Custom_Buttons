@@ -1709,7 +1709,6 @@ var _addedColor = "-moz-hyperlinktext";
 var _removedColor = "grayText";
 var _changedColor = "-moz-visitedhyperlinktext";
 
-var _forceRepaintTooltip = false;
 // See https://github.com/Infocatcher/Custom_Buttons/issues/25
 // Force repaint tooltip, may solve display glitches in Gecko 29+
 // (disabled by default for better performance)
@@ -1878,8 +1877,11 @@ function init() {
 	tt.setAttribute("mousethrough", "always");
 	top.document.documentElement.appendChild(tt);
 
-	// Resolve -moz-* and system colors (for copy tooltip contents feature)
 	var tts = tt.style;
+	// Trick to force repaint tooltip, see https://github.com/Infocatcher/Custom_Buttons/issues/25
+	tts.opacity = "0.99";
+
+	// Resolve -moz-* and system colors (for copy tooltip contents feature)
 	var ttcs = top.getComputedStyle(tt, null);
 	tts.color = _addedColor;
 	_addedColor = ttcs.color;
@@ -2105,12 +2107,7 @@ function init() {
 				// Firefox sometimes sets width/height to limit very huge tooltip
 				tt.removeAttribute("width");
 				tt.removeAttribute("height");
-				if(_forceRepaintTooltip) { // Clear our force repaint hack
-					var s = tt.style;
-					s.width = s.height = "";
-				}
 				tt.appendChild(df);
-				_this.forceRepaint(tt, 50);
 			}
 
 			if(node.nodeType == node.DOCUMENT_NODE) {
@@ -2477,24 +2474,6 @@ function init() {
 			delete this.flasher;
 			return this.flasher = flasher;
 		},
-		forceRepaint: function(node, delay) {
-			if(_forceRepaintTooltip && this.fxVersion >= 29) this.timer(function() {
-				if(this.fxVersion < 33 && this.flasher) {
-					this.flasher.repaintElement(node);
-					return;
-				}
-				var s = node.style;
-				s.width = s.height = "";
-				node.removeAttribute("width");
-				node.removeAttribute("height");
-				var rc = node.getBoundingClientRect();
-				s.width = rc.width + "px";
-				s.height = rc.height + "px";
-				//this.timer(function() {
-				//	s.width = s.height = "";
-				//}, this, 0);
-			}, this, delay || 0);
-		},
 		hl: function(node) {
 			if(!_highlight)
 				return;
@@ -2769,7 +2748,6 @@ function init() {
 			if(fxVersion != 3.6)
 				y += 22;
 			tt.moveTo(x, y);
-			this.forceRepaint(tt);
 		},
 		mouseoutHandler: function(e) {
 			if(!e.relatedTarget)
@@ -3381,7 +3359,6 @@ function init() {
 			var tar = e.originalTarget;
 			if(tar.id == this.context.ttId)
 				return;
-			this.forceRepaint(this.context.tt, 150);
 			if(this._shiftKey)
 				return;
 			if(tar.localName == "tooltip") {
@@ -3393,7 +3370,6 @@ function init() {
 			var tar = e.originalTarget;
 			if(tar.id == this.context.ttId)
 				return;
-			this.forceRepaint(this.context.tt);
 			if(/*this._shiftKey && */tar.localName == "tooltip")
 				return;
 			this.makeTooltipTopmost(true);
@@ -3402,7 +3378,6 @@ function init() {
 		makeTooltipTopmost: function(restorePos) {
 			this.context.tt.hidePopup(); // Ugly with show/hide tooltips animation
 			restorePos && this.mousemoveHandler();
-			this.forceRepaint(this.context.tt, 100);
 		},
 		popuphidingHandler: function(e) {
 			if(!this._shiftKey)
