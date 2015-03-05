@@ -12,6 +12,7 @@ var options = {
 		lineNumbers: true,
 		enableCodeFolding: true,
 		showTrailingSpace: true,
+		lineWrapping: false,
 		autocomplete: true
 	},
 	orion: {
