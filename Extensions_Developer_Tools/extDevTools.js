@@ -1604,6 +1604,13 @@ var mp = cmds.popup = this.appendChild(parseXULFromString('\
 	</menupopup>'
 ));
 
+var tb = this.parentNode;
+if(tb.getAttribute("orient") == "vertical") {
+	// https://addons.mozilla.org/firefox/addon/vertical-toolbar/
+	var isRight = tb.parentNode.getAttribute("placement") == "right";
+	mp.setAttribute("position", isRight ? "start_before" : "end_before");
+}
+
 if(!cmds.onlyPopup)
 	mp.addEventListener("command", cmds, true);
 

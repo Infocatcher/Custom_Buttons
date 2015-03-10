@@ -39,6 +39,13 @@ mp.setAttribute("onpopupshowing", "this.createMenu();");
 mp.setAttribute("onmousedown", "event.target.setAttribute('closemenu', event.shiftKey ? 'none' : 'auto');");
 mp.setAttribute("onclick", "this.handleClick(event);");
 
+var tb = this.parentNode;
+if(tb.getAttribute("orient") == "vertical") {
+	// https://addons.mozilla.org/firefox/addon/vertical-toolbar/
+	var isRight = tb.parentNode.getAttribute("placement") == "right";
+	mp.setAttribute("position", isRight ? "start_before" : "end_before");
+}
+
 mp.createMenu = function() {
 	mp.setAttribute("onpopupshowing", "this.updateMenu();");
 

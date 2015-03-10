@@ -235,7 +235,8 @@ this.undoCloseTabsList = {
 	tipId: this.id + "-tooltip",
 	errPrefix: "[Custom Buttons :: Undo Close Tabs List]: ",
 	get mp() {
-		var mp = this.button.getElementsByTagName("menupopup");
+		var btn = this.button;
+		var mp = btn.getElementsByTagName("menupopup");
 		mp = mp.length && mp[0];
 		mp && mp.parentNode.removeChild(mp);
 		mp = this.createElement("menupopup", {
@@ -246,8 +247,17 @@ this.undoCloseTabsList = {
 		});
 		if(this.cm)
 			mp.setAttribute("context", this.cmId);
+		var tb = btn.parentNode;
+		if(
+			this.options.useMenu
+			&& tb.getAttribute("orient") == "vertical"
+		) {
+			// https://addons.mozilla.org/firefox/addon/vertical-toolbar/
+			var isRight = tb.parentNode.getAttribute("placement") == "right";
+			mp.setAttribute("position", isRight ? "start_before" : "end_before");
+		}
 		delete this.mp;
-		return this.mp = this.button.appendChild(mp);
+		return this.mp = btn.appendChild(mp);
 	},
 	get useCentextMenu() {
 		delete this.useCentextMenu;

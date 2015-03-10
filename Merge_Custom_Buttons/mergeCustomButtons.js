@@ -52,6 +52,12 @@ this.mergeButtons = {
 		mp.__defineGetter__("nodeName", function() {
 			return "toolbar";
 		});
+		var tb = this.button.parentNode;
+		if(tb.getAttribute("orient") == "vertical") {
+			// https://addons.mozilla.org/firefox/addon/vertical-toolbar/
+			var isRight = tb.parentNode.getAttribute("placement") == "right";
+			mp.setAttribute("position", isRight ? "start_before" : "end_before");
+		}
 		delete this.mp;
 		return this.mp = mp;
 	},

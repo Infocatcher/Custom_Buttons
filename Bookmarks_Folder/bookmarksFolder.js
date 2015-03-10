@@ -152,6 +152,12 @@ this.bookmarks = {
 		mp.setAttribute("onclick", "BookmarksEventHandler.onClick(event, this.parentNode._placesView);");
 		mp.setAttribute("tooltip", "bhTooltip");
 		mp.setAttribute("popupsinherittooltip", "true");
+		var tb = btn.parentNode;
+		if(tb.getAttribute("orient") == "vertical") {
+			// https://addons.mozilla.org/firefox/addon/vertical-toolbar/
+			var isRight = tb.parentNode.getAttribute("placement") == "right";
+			mp.setAttribute("position", isRight ? "start_before" : "end_before");
+		}
 		btn.appendChild(mp);
 		options.useFolderTitle && setTimeout(function(_this) {
 			_this.setButtonTitle();

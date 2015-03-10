@@ -350,7 +350,8 @@ this.bookmarks = {
 		_log("delayedInit()");
 		this.initIds();
 
-		var mps = this.button.getElementsByTagName("menupopup");
+		var btn = this.button;
+		var mps = btn.getElementsByTagName("menupopup");
 		mps.length && mps[0].parentNode.removeChild(mps[0]); // Hack for SeaMonkey
 		var mp = this.mp = this.createElement("menupopup", {
 			context:        this.cmId,
@@ -361,7 +362,13 @@ this.bookmarks = {
 		});
 		mp.addEventListener("DOMMenuItemActive",   this, false);
 		mp.addEventListener("DOMMenuItemInactive", this, false);
-		this.button.appendChild(mp);
+		var tb = btn.parentNode;
+		if(tb.getAttribute("orient") == "vertical") {
+			// https://addons.mozilla.org/firefox/addon/vertical-toolbar/
+			var isRight = tb.parentNode.getAttribute("placement") == "right";
+			mp.setAttribute("position", isRight ? "start_before" : "end_before");
+		}
+		btn.appendChild(mp);
 
 		if(this.options.itemInPageContextMenu) setTimeout(function(_this) {
 			_this.initPageContextMenu();
@@ -374,7 +381,7 @@ this.bookmarks = {
 		}, preload, this);
 
 		if(this.noBookmarks())
-			this.button.disabled = true;
+			btn.disabled = true;
 	},
 	loadDelayed: function(callback) {
 		setTimeout(function(_this) {
