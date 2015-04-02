@@ -66,7 +66,11 @@ function reloadImage(img) {
 	if(!(img instanceof Components.interfaces.nsIImageLoadingContent) || !img.currentURI)
 		return;
 	var request = img.getRequest(Components.interfaces.nsIImageLoadingContent.CURRENT_REQUEST);
-	if(request && (request.imageStatus & request.STATUS_LOAD_COMPLETE))
+	if(
+		request
+		&& request.imageStatus & request.STATUS_LOAD_COMPLETE
+		&& !(request.imageStatus & request.STATUS_ERROR) // We may have both flags!
+	)
 		return;
 	var uri = img.currentURI;
 	var src = uri.spec;
