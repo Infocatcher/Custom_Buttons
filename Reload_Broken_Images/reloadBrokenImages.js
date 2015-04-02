@@ -5,8 +5,8 @@
 // Reload Broken Images button for Custom Buttons
 // (code for "code" section)
 
-// (c) Infocatcher 2012-2014
-// version 0.3.0.1 - 2014-06-20
+// (c) Infocatcher 2012-2015
+// version 0.3.1 - 2015-04-02
 
 var debug = false;
 var maxAttempts = 4;
