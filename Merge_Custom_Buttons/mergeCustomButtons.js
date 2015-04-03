@@ -144,10 +144,20 @@ this.mergeButtons = {
 				_this.reinitButtons(nodes);
 				return;
 			}
+			function stopEvent(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				e.stopImmediatePropagation && e.stopImmediatePropagation();
+			}
 			mp.collapsed = true;
+			// Prevent event bubbling for restart in full screen mode
+			mp.addEventListener("popupshowing", stopEvent, true);
+			mp.addEventListener("popupshown", stopEvent, true);
 			mp.openPopup(); // Force call XBL destructors/constructors
 			setTimeout(function() {
 				mp.hidePopup();
+				mp.removeEventListener("popupshowing", stopEvent, true);
+				mp.removeEventListener("popupshown", stopEvent, true);
 				mp.collapsed = false;
 				_this.reinitButtons(nodes);
 			}, 0);
