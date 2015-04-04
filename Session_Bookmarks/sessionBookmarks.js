@@ -967,7 +967,7 @@ this.bookmarks = {
 	addBookmark: function() {
 		return this.ensureLoaded(this._addBookmark, this, arguments);
 	},
-	_addBookmark: function(insPoint, tab) {
+	_addBookmark: function(insPoint, tab, undoBuffer) {
 		var canToggle = this.options.allowToggleBookmark
 			&& (!insPoint || insPoint == this.button);
 		var td = this.getTabData(tab);
@@ -990,11 +990,16 @@ this.bookmarks = {
 		}
 		var mi = this.getMenuitem(td.label, td.uri, td.icon, td.ssData);
 		this.mp.insertBefore(mi, this.correctInsPoint(insPoint));
-		this.addUndo({ action: "remove", mi: mi, pn: mi.parentNode, ns: mi.nextSibling });
-		this.onBookmarksChanged(true);
-		this.blink();
-		this.notify(_localize("Bookmark added"));
-		this.scheduleSave();
+		var undo = { action: "remove", mi: mi, pn: mi.parentNode, ns: mi.nextSibling };
+		if(undoBuffer)
+			undoBuffer.push(undo);
+		else {
+			this.addUndo(undo);
+			this.onBookmarksChanged(true);
+			this.blink();
+			this.notify(_localize("Bookmark added"));
+			this.scheduleSave();
+		}
 		if(this.options.removeAddedTab) setTimeout(function() {
 			var tab = td.tab;
 			if(!tab.parentNode) // Already closed?
@@ -1018,12 +1023,20 @@ this.bookmarks = {
 		return this.ensureLoaded(this._bookmarkAllTabs, this, arguments);
 	},
 	_bookmarkAllTabs: function(insPoint) {
+		var undo = [];
 		var tabs = gBrowser.visibleTabs || gBrowser.tabs || gBrowser.tabContainer.childNodes;
 		Array.forEach(tabs, function(tab) {
-			var mi = this._addBookmark(insPoint, tab);
+			var mi = this._addBookmark(insPoint, tab, undo);
 			if(mi)
 				insPoint = mi.nextSibling || mi;
 		}, this);
+		if(!undo.length)
+			return;
+		this.addUndo({ action: "removes", actions: undo.reverse() });
+		this.onBookmarksChanged(true);
+		this.blink();
+		this.notify(_localize("Bookmark added"));
+		this.scheduleSave();
 	},
 	correctInsPoint: function(insPoint) {
 		if(!insPoint || insPoint.parentNode != this.mp)
@@ -1417,7 +1430,11 @@ this.bookmarks = {
 			}
 			else if(action == "move")
 				o.mi.parentNode.insertBefore(o.mi, invert ? o.newPos : o.oldPos);
-			else if(action == "adds" || action == "moves") {
+			else if(
+				action == "adds"
+				|| action == "moves"
+				|| action == "removes"
+			) {
 				let actions = o.actions;
 				if(invert)
 					actions = o.actions.slice().reverse();
