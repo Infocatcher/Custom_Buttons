@@ -1031,7 +1031,7 @@ this.bookmarks = {
 		Array.forEach(tabs, function(tab) {
 			var mi = this._addBookmark(insPoint, tab, undo);
 			if(mi)
-				insPoint = mi.nextSibling || mi;
+				insPoint = mi.nextSibling;
 		}, this);
 		if(!undo.length)
 			return;
