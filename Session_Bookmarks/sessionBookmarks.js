@@ -507,6 +507,9 @@ this.bookmarks = {
 		this.addBookmarkId = btnId + "-addBookmark";
 		this.addSepId      = btnId + "-addSeparator";
 
+		this.bmAllSepId    = btnId + "-separator-bookmarkAllTabs";
+		this.bmAllId       = btnId + "-bookmarkAllTabs";
+
 		this.updateSepId   = btnId + "-separator-update";
 		this.updateId      = btnId + "-update";
 		this.updateURIId   = btnId + "-updateURI";
@@ -552,6 +555,13 @@ this.bookmarks = {
 					oncommand="this.parentNode.bookmarks.addSeparator(this.parentNode.triggerNode || document.popupNode);"\
 					label="' + this.getLabel("placesContext_new:separator", "New Separator") + '"\
 					accesskey="' + this.getAccesskey("placesContext_new:separator", "S") + '" />\
+				\
+				<menuseparator id="' + this.bmAllSepId + '" />\
+				<menuitem id="' + this.bmAllId + '"\
+					closemenu="single"\
+					oncommand="this.parentNode.bookmarks.bookmarkAllTabs(this.parentNode.triggerNode || document.popupNode);"\
+					label="' + this.getLabel("context_bookmarkAllTabs", "Bookmark All Tabs…") + '"\
+					accesskey="' + this.getAccesskey("context_bookmarkAllTabs", "T") + '" />\
 				\
 				<menuseparator id="' + this.updateSepId + '" />\
 				<menuitem id="' + this.updateId + '"\
@@ -1003,6 +1013,17 @@ this.bookmarks = {
 		this.addUndo({ action: "remove", mi: sep, pn: sep.parentNode, ns: sep.nextSibling });
 		this.scheduleSave();
 		return sep;
+	},
+	bookmarkAllTabs: function() {
+		return this.ensureLoaded(this._bookmarkAllTabs, this, arguments);
+	},
+	_bookmarkAllTabs: function(insPoint) {
+		var tabs = gBrowser.visibleTabs || gBrowser.tabs || gBrowser.tabContainer.childNodes;
+		Array.forEach(tabs, function(tab) {
+			var mi = this._addBookmark(insPoint, tab);
+			if(mi)
+				insPoint = mi.nextSibling || mi;
+		}, this);
 	},
 	correctInsPoint: function(insPoint) {
 		if(!insPoint || insPoint.parentNode != this.mp)
