@@ -61,6 +61,13 @@ var _debug = false; // Show debug messages in error/browser console
 
 function _localize(s, key) {
 	var strings = {
+		"Bookmark All Tabs": {
+			ru: "Добавить все вкладки в закладки"
+		},
+		bookmarkAllTabsKey: {
+			ru: "л"
+		},
+
 		"Update": {
 			ru: "Обновить"
 		},
@@ -563,8 +570,8 @@ this.bookmarks = {
 				<menuitem id="' + this.bmAllId + '"\
 					closemenu="single"\
 					oncommand="this.parentNode.bookmarks.bookmarkAllTabs(this.parentNode.triggerNode || document.popupNode);"\
-					label="' + this.getLabel("context_bookmarkAllTabs", "Bookmark All Tabs…") + '"\
-					accesskey="' + this.getAccesskey("context_bookmarkAllTabs", "T") + '" />\
+					label="' + _localize("Bookmark All Tabs") + '"\
+					accesskey="' + _localize("T", "bookmarkAllTabsKey") + '" />\
 				\
 				<menuseparator id="' + this.updateSepId + '" />\
 				<menuitem id="' + this.updateId + '"\
