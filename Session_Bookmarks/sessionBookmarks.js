@@ -143,6 +143,9 @@ function _localize(s, key) {
 		"Bookmark added": {
 			ru: "Закладка добавлена"
 		},
+		"Bookmarks added: %S": {
+			ru: "Закладки добавлены: %S"
+		},
 		"Bookmark already exists": {
 			ru: "Закладка уже существует"
 		},
@@ -1035,7 +1038,7 @@ this.bookmarks = {
 		this.addUndo({ action: "removes", actions: undo.reverse() });
 		this.onBookmarksChanged(true);
 		this.blink();
-		this.notify(_localize("Bookmark added"));
+		this.notify(_localize("Bookmarks added: %S").replace("%S", undo.length));
 		this.scheduleSave();
 	},
 	correctInsPoint: function(insPoint) {
