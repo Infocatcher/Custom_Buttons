@@ -134,7 +134,7 @@ this.historyManager = {
 			Components.classes["@mozilla.org/browser/sessionstore;1"]
 			|| Components.classes["@mozilla.org/suite/sessionstore;1"]
 		).getService(Components.interfaces.nsISessionStore);
-		ss.setWindowValue(window, key, Date.now());
+		ss.setWindowValue(window, key, "" + Date.now());
 		clearTimeout(this._forceSaveSessionTimer);
 		this._forceSaveSessionTimer = setTimeout(function() {
 			ss.deleteWindowValue(window, key);
