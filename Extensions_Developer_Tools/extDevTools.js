@@ -80,7 +80,9 @@ var images = {
 	// nuove by Alexander Moore, http://www.iconsearch.ru/detailed/278/1/
 	attrsInspector: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACW0lEQVQ4jW2TQUsbQRiG3/l2ui4hPaSbCBZPsR6kMXrwYP9AK+JJKOJZKPgD1KMXf0ELPffsoRDpxUv2aLUHKamHikJxi1gQktXNzrqbna+HJJPE9oNhGJh55n3f+UYwM7a2tuzNzc13RETMTADAzOjN/bVGr7Isw+rq6vuzszMtAWB8fDxXKBQ+EBHSNIXWGpZlGYgQAkIIEBGEENBaw3XdjwASCQCO41Cr1YLv+8jlchBCIAxDFItFlEolc5CZDaxarUoDsG3nme//xuLiK3NDlmmcn/9EEAQoFAp4XBMTExIACAB8/2ppbm4OzAytu1YtizA19QI3Nzf/HBZCoFgsSgCQXdrz6bSjIZIEJGhkY5p2Rtb9yufztlHQaDR81hpRO0a7raDUA1T8gLCtcHd3Z3wPB+o4DhnA/X3wpV73kKYdPCQJokihHUb40WjAdV0T4jDEtu2BhbW1tbhUKuHgoIby1DSeSImLi3Ocnn7DwsICZmcrBtCHSCkHCpgZlUoF6+tv8TRvQ4gUKytL2N7eRr1eR61WGwH0eoKMAgDUk4X5+Xkws2mi3d1d7O3twXEcLC8v97pTQAgxUNAHDHskIhARJicnsbOzA8/z4HketGZkWpvnpu6bW3I4qMejXC5jY2MDx8fHODr6CtYZkiQZAIiIhrz9FzIz8xKv3yzh6uoXpLRwcnISoh/g4eFhNY5jVkqxUoqjKBoZYdjmZjPgZrPFSim+vLz87rquw8zdEJVSrevr60+9L6uZWQshNDNrZuhMs+50Eu2MjSVBEPzZ39//fHt7GwPAX9zKMQVPs/QoAAAAAElFTkSuQmCC",
 	// FatCow icons, http://www.iconfinder.com/icondetails/36398/16/code_script_icon
-	scratchpad: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAArBJREFUeNqMU11IFFEU/vbO7Iyuums/GvmXhISBiOWWGFgGiyaC0UMkWRT11FNPQbEl9iNb0mtgUEQW+xjUQ5RrlClZ5IbaQ0bpw+paSGLGbrs7O3emc2d/kKjowBnm3HvnO9/5vju2Tb4ARJiUOjcQ1fhizUZnkVORsBzXMT7/HZLNZp0RT8ZssEuUjEGVWZWMdJimibhuXO4/UFvUWVeKf0Xg0yJcOXa03359i2UWDQKIackTmY91qkXyVWmmz/qezyBBbCvX5TXLGfpUo7mquETUEY1bgKtD0JeIvsMu4cXsNxz2R6DIDHJGAOqQX6CmyjjnEN/bfqPuYJIFrPLY5Ly346RYyzLQE/Hq7SUu66CWNFJd0+KZaTYFioxgeAV2mKH1vYPBfFVCWgOa0eB76stcpHwSmmFAQMiktkjxLpJUR2glBtlIzArsn9QoxYAaGJxXr8lVECHruGHSrEDxhccWfLinLcXozEM4cmTkJmITWVuzNkpKQ32pC1GuW1039DzB6OlWSCQaSUoacTCJYfiUB2ZRxR3RRAzGLAeIQmFeTrkAUumCVF4ZxMCR3bg0HLaU13UDMaJr0GjnhkLoP9gIjXNT1CxJUHT7zKhuFO68MYKqa8/g62jEgw/LePP5I3ZVroV/cgGin9m3HyPT0/BPLcHbskOMasoJQl+52Ja1ip19hIWoBofKLG2ut29Fp/8duraVIvwjBiGe2AtHEpYIjGnRt30vZxCizTnKJRLs7qsp5NOdONRQi703x9Dt2QInWbj56hC6GutQoNpxb+w9vpzf57Y5Pcc9SlNngEaxRJFpZoVEFN4fbarDwMhkyiXaFYofo7X7oxP42t3mrvAFgsIJlbLmTz9NWe/TcRvxnPO2uEVd3js4LrSY97a66S8O4j+iPp1/q/FLgAEAGto2bg8Nx1UAAAAASUVORK5CYII="
+	scratchpad: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAArBJREFUeNqMU11IFFEU/vbO7Iyuums/GvmXhISBiOWWGFgGiyaC0UMkWRT11FNPQbEl9iNb0mtgUEQW+xjUQ5RrlClZ5IbaQ0bpw+paSGLGbrs7O3emc2d/kKjowBnm3HvnO9/5vju2Tb4ARJiUOjcQ1fhizUZnkVORsBzXMT7/HZLNZp0RT8ZssEuUjEGVWZWMdJimibhuXO4/UFvUWVeKf0Xg0yJcOXa03359i2UWDQKIackTmY91qkXyVWmmz/qezyBBbCvX5TXLGfpUo7mquETUEY1bgKtD0JeIvsMu4cXsNxz2R6DIDHJGAOqQX6CmyjjnEN/bfqPuYJIFrPLY5Ly346RYyzLQE/Hq7SUu66CWNFJd0+KZaTYFioxgeAV2mKH1vYPBfFVCWgOa0eB76stcpHwSmmFAQMiktkjxLpJUR2glBtlIzArsn9QoxYAaGJxXr8lVECHruGHSrEDxhccWfLinLcXozEM4cmTkJmITWVuzNkpKQ32pC1GuW1039DzB6OlWSCQaSUoacTCJYfiUB2ZRxR3RRAzGLAeIQmFeTrkAUumCVF4ZxMCR3bg0HLaU13UDMaJr0GjnhkLoP9gIjXNT1CxJUHT7zKhuFO68MYKqa8/g62jEgw/LePP5I3ZVroV/cgGin9m3HyPT0/BPLcHbskOMasoJQl+52Ja1ip19hIWoBofKLG2ut29Fp/8duraVIvwjBiGe2AtHEpYIjGnRt30vZxCizTnKJRLs7qsp5NOdONRQi703x9Dt2QInWbj56hC6GutQoNpxb+w9vpzf57Y5Pcc9SlNngEaxRJFpZoVEFN4fbarDwMhkyiXaFYofo7X7oxP42t3mrvAFgsIJlbLmTz9NWe/TcRvxnPO2uEVd3js4LrSY97a66S8O4j+iPp1/q/FLgAEAGto2bg8Nx1UAAAAASUVORK5CYII=",
+	// Fugue Icons by Yusuke Kamiyamane, https://www.iconfinder.com/icons/84569/eyedropper_icon
+	eyedropper: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAeRJREFUeNpi/P//PwMlgIWRkRHOsQKyi4C0JZKCv1AMAkCr7H4yMBR/ZWBg/czA0PP7//99LLg0ogOYZtX+fr9PT58yHOnu5v7NwLCPZQ1QsyUBZyJrfrp/P8MfdnaGDwwMbH9AXsCj2QaI84Ga9wI1eyJrPrpq1YlvDAwN/0AG3MIRiEDRCY4rVhjfjYxkwaF5JzgQn7i6gjUwMTExIAfov3//JuyIiChwnTw54OmePVg1gw145uICYbCwMDAzM8M0q3z48IHrR1zP+m8xegz6ISHG+1atOg2Mjc3/kTSDLUZ3OlSzU25xVaGhgoDFySWX1h9fs+ZsaFiYKdDmoP8Q78ExCy7Ney6/uiPEw/Zye2f06xcCAhO+r1pVAFRSg6z+NrIBf/78Uf706ZNjQVktXHNRtPNJoNj+v3//3gHatgRZ4zYgvgUy4Pz582D/s7Oz23b0TS2Cac4Ktj7y9evXw8DAvYtNIwwwCwsLM3z58kWJk19Um0XaWAikOd7D4ABQ7AjQVfeALmA4/+0bwxag4hNA/BY90Dg5ORmkpaVjX3/8cd3S3jWXh4cnloODQxHkKmIAKOLlgM43B+ZKPqBf7wLxO1CQoOHfaPQfWD4DGcAPxFxQw0Ax8w8P/ovEBqsFCDAAxpr/WSMLDJQAAAAASUVORK5CYII="
 };
 
 function _localize(s, key) {
@@ -174,6 +176,12 @@ function _localize(s, key) {
 		},
 		scratchpadKey: {
 			ru: "р"
+		},
+		"Grab a color from the page": {
+			ru: "Захватить цвет со страницы"
+		},
+		eyedropperKey: {
+			ru: "ц"
 		},
 
 		"Reopen window?": {
@@ -1111,6 +1119,13 @@ var cmds = this.commands = {
 			})();
 		}, false);
 	},
+	get hasEyedropper() {
+		delete this.hasEyedropper;
+		return this.hasEyedropper = "openEyedropper" in window;
+	},
+	openEyedropper: function() {
+		openEyedropper();
+	},
 
 	get isDebugBuild() { //~ todo: find another way
 		delete this.isDebugBuild;
@@ -1533,6 +1548,13 @@ var mp = cmds.popup = this.appendChild(parseXULFromString('\
 			class="menuitem-iconic"\
 			image="' + images.scratchpad + '"\
 			hidden="' + !cmds.hasScratchpad + '" />\
+		<menuitem cb_id="openEyedropper"\
+			oncommand="this.parentNode.parentNode.commands.openEyedropper();"\
+			label="' + _localize("Grab a color from the page") + '"\
+			accesskey="' + _localize("G", "eyedropperKey") + '"\
+			class="menuitem-iconic"\
+			image="' + images.eyedropper + '"\
+			hidden="' + !cmds.hasEyedropper + '" />\
 		<menuseparator />\
 		<menu\
 			label="' + _localize("Options") + '"\
