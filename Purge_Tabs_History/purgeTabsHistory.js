@@ -2,8 +2,8 @@
 // http://infocatcher.ucoz.net/js/cb/purgeTabsHistory.js
 
 // Purge Tab(s) History
-// (c) Infocatcher 2009, 2011-2013
-// version 0.3.0.1 - 2013-09-29
+// (c) Infocatcher 2009, 2011-2013, 2015
+// version 0.3.0.2 - 2015-04-06
 
 this.onclick = function(e) {
 	if(e.button == 1 || e.button == 0 && (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey))
