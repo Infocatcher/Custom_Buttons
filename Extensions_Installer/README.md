@@ -1,4 +1,4 @@
-![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Extensions_Installer/icon.png)&nbsp;<a href="http://infocatcher.github.io/Custom_Buttons/install/extensionsInstaller.html"><strong>Extensions Installer</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Extensions_Installer/icon.png)&nbsp;<a href="https://infocatcher.github.io/Custom_Buttons/install/extensionsInstaller.html"><strong>Extensions Installer</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
 <br>For extensions developers: installs extension from given link, useful to test restartless extensions
 <br>
 <br>In example configuration used <a href="make.bat">make.bat</a> script and <a href="http://www.manhunter.ru/releases/80_delayed_start_1_3.html">Delayed Start</a> utility to hide console window.

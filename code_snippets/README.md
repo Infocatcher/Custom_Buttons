@@ -4,7 +4,7 @@ This is some code snippets related to <a href="https://addons.mozilla.org/addon/
 Automatically open menu on mouse over (and hide it on mouse out)
 
 ###### <a href="menuWithDelayedInitialization.js">menuWithDelayedInitialization.js</a>
-Example menu with delayed initialization, <a href="http://infocatcher.github.io/Custom_Buttons/install/menuWithDelayedInitialization.html">install page</a>
+Example menu with delayed initialization, <a href="https://infocatcher.github.io/Custom_Buttons/install/menuWithDelayedInitialization.html">install page</a>
 
 ###### <a href="mergeInitialization.js">mergeInitialization.js</a>
 Example for safely use only one button for initialization of many “buttons” without UI

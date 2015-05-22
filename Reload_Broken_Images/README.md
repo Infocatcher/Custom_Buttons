@@ -1,3 +1,3 @@
-![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Reload_Broken_Images/icon.png)&nbsp;<a href="http://infocatcher.github.io/Custom_Buttons/install/reloadBrokenImages.html"><strong>Reload Broken Images</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Reload_Broken_Images/icon.png)&nbsp;<a href="https://infocatcher.github.io/Custom_Buttons/install/reloadBrokenImages.html"><strong>Reload Broken Images</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
 <br>Reload broken or not loaded images.
 <br>This is the same as “Reload Image” from context menu, but for all images on the page.

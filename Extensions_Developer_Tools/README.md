@@ -1,4 +1,4 @@
-![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Extensions_Developer_Tools/icon.png)&nbsp;<a href="http://infocatcher.github.io/Custom_Buttons/install/extDevTools.html"><strong>Extensions Developer Tools</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Extensions_Developer_Tools/icon.png)&nbsp;<a href="https://infocatcher.github.io/Custom_Buttons/install/extDevTools.html"><strong>Extensions Developer Tools</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
 <br>Some tools for extensions or custom buttons developers (includes [Attributes Inspector](../Attributes_Inspector)).
 <br>Use middle-click on any main menu item to set it as default and call with middle-click on the button (you also can use left-click with any modifier since v.0.1.2pre2).
 <br>Also with [extDevToolsMouseGesturesLauncher.js](extDevToolsMouseGesturesLauncher.js) the code can be used in mouse gestures or in hotkeys.

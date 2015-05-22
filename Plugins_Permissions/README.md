@@ -1,4 +1,4 @@
-![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Plugins_Permissions/icons/icon.png)&nbsp;<a href="http://infocatcher.github.io/Custom_Buttons/install/pluginsPermissions.html"><strong>Plugins Permissions</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Plugins_Permissions/icons/icon.png)&nbsp;<a href="https://infocatcher.github.io/Custom_Buttons/install/pluginsPermissions.html"><strong>Plugins Permissions</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
 <br>Menage plugins permissions: block or allow.
 <br>Note: *plugins.click_to_play* in about:config (“Block plugins” checkbox in button's context menu) should be enabled.
 <br>

@@ -1,2 +1,2 @@
-<a href="http://infocatcher.github.io/Custom_Buttons/install/toolbarFlexibleSpace.html"><strong>Toolbar Flexible Space</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
+<a href="https://infocatcher.github.io/Custom_Buttons/install/toolbarFlexibleSpace.html"><strong>Toolbar Flexible Space</strong></a> button for [Custom Buttons](https://addons.mozilla.org/addon/custom-buttons/)
 <br>Just looks like toolbar flexible space, may be useful in Firefox 29+ (Australis)
