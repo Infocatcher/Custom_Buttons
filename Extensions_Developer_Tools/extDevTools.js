@@ -1436,8 +1436,8 @@ function ProgressIcon(btn) {
 	var origIcon = btnIcon.src;
 	btnIcon.src = this.imgConnecting;
 	if(useAnimation) {
-		let cs = btnIcon.ownerDocument.defaultView.getComputedStyle(btnIcon, null);
-		let s = btnIcon.style;
+		var cs = btnIcon.ownerDocument.defaultView.getComputedStyle(btnIcon, null);
+		var s = btnIcon.style;
 		s.margin = [cs.marginTop, cs.marginRight, cs.marginBottom, cs.marginLeft].join(" ");
 		s.padding = [cs.paddingTop, cs.paddingRight, cs.paddingBottom, cs.paddingLeft].join(" ");
 		s.width = cs.width;
