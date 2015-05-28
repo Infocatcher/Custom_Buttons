@@ -636,15 +636,7 @@ var cmds = this.commands = {
 		var woc = this.getPref(pId);
 		if(woc != undefined)
 			this.setPref(pId, false);
-		if("Application" in window && "restart" in Application)
-			Application.restart();
-		else {
-			var appStartup = Components.interfaces.nsIAppStartup;
-			if(canQuitApplication())
-				Components.classes["@mozilla.org/toolkit/app-startup;1"]
-					.getService(appStartup)
-					.quit(appStartup.eAttemptQuit | appStartup.eRestart);
-		}
+		this.appRestart();
 		if(woc != undefined)
 			this.setPref(pId, woc);
 	},
@@ -686,11 +678,35 @@ var cmds = this.commands = {
 		}
 		this._restart();
 	},
+
 	get obs() {
 		delete this.obs;
 		return this.obs = Components.classes["@mozilla.org/observer-service;1"]
 			.getService(Components.interfaces.nsIObserverService);
 	},
+	// Based on code from resource:///components/fuelApplication.js in Firefox 38
+	appQuit: function() {
+		return this._quitWithFlags(Components.interfaces.nsIAppStartup.eAttemptQuit);
+	},
+	appRestart: function() {
+		return this._quitWithFlags(
+			Components.interfaces.nsIAppStartup.eAttemptQuit
+			| Components.interfaces.nsIAppStartup.eRestart
+		);
+	},
+	_quitWithFlags: function(flags) {
+		var cancelQuit = Components.classes["@mozilla.org/supports-PRBool;1"]
+			.createInstance(Components.interfaces.nsISupportsPRBool);
+		var quitType = flags & Components.interfaces.nsIAppStartup.eRestart ? "restart" : null;
+		this.obs.notifyObservers(cancelQuit, "quit-application-requested", quitType);
+		if(cancelQuit.data)
+			return false; // somebody canceled our quit request
+		var appStartup = Components.classes["@mozilla.org/toolkit/app-startup;1"]
+			.getService(Components.interfaces.nsIAppStartup);
+		appStartup.quit(flags);
+		return true;
+	},
+
 	flushCaches: function() {
 		// See resource://gre/modules/XPIProvider.jsm
 		var obs = this.obs;
@@ -944,7 +960,7 @@ var cmds = this.commands = {
 			if(
 				"goQuitApplication" in window
 					? goQuitApplication()
-					: "Application" in window && "quit" in Application && Application.quit()
+					: this.appQuit()
 			)
 				this.setPref("browser.sessionstore.resume_session_once", true);
 		}
