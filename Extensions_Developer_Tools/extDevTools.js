@@ -686,10 +686,14 @@ var cmds = this.commands = {
 		}
 		this._restart();
 	},
+	get obs() {
+		delete this.obs;
+		return this.obs = Components.classes["@mozilla.org/observer-service;1"]
+			.getService(Components.interfaces.nsIObserverService);
+	},
 	flushCaches: function() {
 		// See resource://gre/modules/XPIProvider.jsm
-		var obs = Components.classes["@mozilla.org/observer-service;1"]
-			.getService(Components.interfaces.nsIObserverService);
+		var obs = this.obs;
 		obs.notifyObservers(null, "startupcache-invalidate", null);
 		obs.notifyObservers(null, "chrome-flush-skin-caches", null);
 		obs.notifyObservers(null, "chrome-flush-caches", null);
@@ -1025,8 +1029,7 @@ var cmds = this.commands = {
 		if(this._restoreErrorConsoleObserver/* || this.platformVersion < 2*/)
 			return;
 		this.restoreErrorConsole();
-		var obs = this.obs = Components.classes["@mozilla.org/observer-service;1"]
-			.getService(Components.interfaces.nsIObserverService);
+		var obs = this.obs;
 		var _this = this;
 		var observer = this._restoreErrorConsoleObserver = {
 			observe: function() {
