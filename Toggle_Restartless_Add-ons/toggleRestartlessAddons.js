@@ -143,7 +143,7 @@ mp.destroyMenu = function() {
 function isAskToActivateAddon(addon) {
 	return addon.type == "plugin"
 		&& "STATE_ASK_TO_ACTIVATE" in AddonManager
-		&& Application.prefs.getValue("plugins.click_to_play", false);
+		&& Services.prefs.getBoolPref("plugins.click_to_play");
 }
 function setNewDisabled(addon) {
 	var newDis = getNewDisabled(addon);
