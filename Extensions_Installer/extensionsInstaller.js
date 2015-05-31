@@ -249,7 +249,7 @@ mp.installExtension = function(e) {
 					var icon = addon.iconURL || addon.icon64URL;
 					notify("Ok!", "Successfully installed:\n" + addon.name + " " + addon.version, icon);
 					if(addon.pendingOperations)
-						Application.restart();
+						appRestart();
 				},
 				onInstallFailed: function(install) {
 					install.removeListener(this);
@@ -264,6 +264,27 @@ mp.installExtension = function(e) {
 		"application/x-xpinstall"
 	);
 };
+// Based on code from resource:///components/fuelApplication.js in Firefox 38
+function appRestart() {
+	return _quitWithFlags(
+		Components.interfaces.nsIAppStartup.eAttemptQuit
+		| Components.interfaces.nsIAppStartup.eRestart
+	);
+}
+function _quitWithFlags(flags) {
+	if(!("Services" in window))
+		Components.utils.import("resource://gre/modules/Services.jsm");
+	var cancelQuit = Components.classes["@mozilla.org/supports-PRBool;1"]
+		.createInstance(Components.interfaces.nsISupportsPRBool);
+	var quitType = flags & Components.interfaces.nsIAppStartup.eRestart ? "restart" : null;
+	Services.obs.notifyObservers(cancelQuit, "quit-application-requested", quitType);
+	if(cancelQuit.data)
+		return false; // somebody canceled our quit request
+	var appStartup = Components.classes["@mozilla.org/toolkit/app-startup;1"]
+		.getService(Components.interfaces.nsIAppStartup);
+	appStartup.quit(flags);
+	return true;
+}
 
 var isCb = this instanceof XULElement; // Custom Buttons
 var isCbInit = isCb
