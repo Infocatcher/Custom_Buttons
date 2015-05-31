@@ -8,15 +8,18 @@
 // (c) Infocatcher 2013-2014
 // version 0.3.0pre6 - 2014-02-18
 
+var rootDir = "d:\\extensions\\";
+if(!file(rootDir).exists())
+	rootDir = "z:\\dev\\extensions\\";
 var extensions = {
 	"extensionsId1@example": {
 		name: "Extension 1",
-		dir: "d:\\extensions\\my_extension",
+		dir: rootDir + "my_extension",
 		xpi: "%d\\my_extension-latest.xpi"
 	},
 	"extensionsId2@example": {
 		name: "Extension 2",
-		dir: "d:\\extensions\\my_extension_2",
+		dir: rootDir + "my_extension_2",
 		xpi: "%d\\my_extension2-latest.xpi",
 		makeExe: "d:\\someMaker.exe",
 		makeArgs: ["some", "args", "here"]
