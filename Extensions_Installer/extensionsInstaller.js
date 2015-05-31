@@ -5,8 +5,8 @@
 // For developers, useful to test restartless extensions.
 // Place code to "initialization" section to create a "normal" menu.
 
-// (c) Infocatcher 2013-2014
-// version 0.3.0pre6 - 2014-02-18
+// (c) Infocatcher 2013-2015
+// version 0.3.0pre7 - 2015-05-31
 
 var rootDir = "d:\\extensions\\";
 if(!file(rootDir).exists())
