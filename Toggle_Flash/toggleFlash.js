@@ -4,8 +4,8 @@
 // Toggle Flash button for Custom Buttons
 // (code for "initialization" section)
 
-// (c) Infocatcher 2012-2014
-// version 0.1.4.1 - 2014-02-21
+// (c) Infocatcher 2012-2015
+// version 0.1.4.2 - 2015-05-31
 
 var options = {
 	pluginName: "Shockwave Flash", // Or name of any other plugin
