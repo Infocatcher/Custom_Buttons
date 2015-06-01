@@ -224,7 +224,7 @@ this.bookmarks = {
 		}
 		// https://developer.mozilla.org/en/Displaying_Places_information_using_views
 		var rootFolder = PlacesUIUtils.allBookmarksFolderId;
-		var placesOverlay = Application.name == "SeaMonkey"
+		var placesOverlay = Services.appinfo.name == "SeaMonkey"
 			? '\n\
 			<?xml-stylesheet href="chrome://communicator/skin/bookmarks/bookmarks.css"?>\n\
 			<?xml-stylesheet href="chrome://communicator/content/places/places.css"?>\n\
