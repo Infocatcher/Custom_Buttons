@@ -115,11 +115,6 @@ this.bookmarks = {
 	set folderTitle(val) {
 		this.setStringPref(this.titlePref, val);
 	},
-	get wm() {
-		delete this.wm;
-		return this.wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-			.getService(Components.interfaces.nsIWindowMediator);
-	},
 	initialized: false,
 	init: function() {
 		var folder = this.folder;
@@ -217,7 +212,7 @@ this.bookmarks = {
 	},
 	selectFolder: function() {
 		var winType = this.button.id + ":dialog";
-		var win = this.wm.getMostRecentWindow(winType);
+		var win = Services.wm.getMostRecentWindow(winType);
 		if(win) {
 			win.focus();
 			return null;
@@ -371,7 +366,7 @@ this.bookmarks = {
 			return;
 		this.initWithFolder(folder);
 
-		var ws = this.wm.getEnumerator("navigator:browser");
+		var ws = Services.wm.getEnumerator("navigator:browser");
 		while(ws.hasMoreElements()) {
 			let w = ws.getNext();
 			if(w == window)
