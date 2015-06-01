@@ -372,7 +372,12 @@ this.bookmarks = {
 			if(w == window)
 				continue;
 			let btn = w.document.getElementById(this.button.id);
-			btn && btn.bookmarks.initWithFolder(folder);
+			if(btn) {
+				btn.bookmarks.initWithFolder(folder);
+				setTimeout(function(btn, _this) {
+					btn.tooltipText = _this.button.tooltipText;
+				}, 110, btn, this); // Will be updatetd after 100ms in selectFolder()
+			}
 		}
 	},
 	getFolderId: function(folder) {
