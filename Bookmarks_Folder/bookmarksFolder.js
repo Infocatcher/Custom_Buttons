@@ -100,20 +100,20 @@ this.bookmarks = {
 		return this.pref = "extensions.custombuttons.button" + this.button.id.match(/\d*$/)[0] + ".bookmarkFolder";
 	},
 	get folder() {
-		return Application.prefs.getValue(this.pref, "");
+		return this.getStringPref(this.pref, "");
 	},
 	set folder(val) {
-		Application.prefs.setValue(this.pref, String(val));
+		this.setStringPref(this.pref, "" + val);
 	},
 	get titlePref() {
 		delete this.titlePref;
 		return this.titlePref = "extensions.custombuttons.button" + this.button.id.match(/\d*$/)[0] + ".bookmarkFolderTitle";
 	},
 	get folderTitle() {
-		return Application.prefs.getValue(this.titlePref, "");
+		return this.getStringPref(this.titlePref, "");
 	},
 	set folderTitle(val) {
-		Application.prefs.setValue(this.titlePref, val);
+		this.setStringPref(this.titlePref, val);
 	},
 	get wm() {
 		delete this.wm;
@@ -414,6 +414,21 @@ this.bookmarks = {
 			this.placesDrop(e, folderId);
 		else
 			PlacesMenuDNDHandler.onDrop(e);
+	},
+	getStringPref: function(name, defaultVal) {
+		try {
+			return Services.prefs.getComplexValue(name, Components.interfaces.nsISupportsString).data;
+		}
+		catch(e) {
+		}
+		return defaultVal;
+	},
+	setStringPref: function(name, val) {
+		var ss = Components.interfaces.nsISupportsString;
+		var str = Components.classes["@mozilla.org/supports-string;1"]
+			.createInstance(ss);
+		str.data = val;
+		Services.prefs.setComplexValue(name, ss, str);
 	}
 };
 
