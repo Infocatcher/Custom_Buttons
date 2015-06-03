@@ -8,7 +8,7 @@
 // (c) Infocatcher 2010-2014
 // version 0.2.1pre2 - 2014-01-12
 
-var {Application, Components} = window; // Prevent garbage collection in Firefox 3.6 and older
+var {Components} = window; // Prevent garbage collection in Firefox 3.6 and older
 
 var cp = Components.interfaces.nsICookiePermission;
 var options = {
@@ -484,7 +484,7 @@ this.permissions = {
 		if(interval <= 0)
 			return;
 		var timerId = this.timerId;
-		var timer = this.timer = Application.storage.get(timerId, null);
+		var timer = this.timer = this.storage.get(timerId, null);
 		if(timer)
 			return;
 		timer = this.timer = {
@@ -504,7 +504,7 @@ this.permissions = {
 			destroy: function() {
 				this.permissions.oSvc.removeObserver(this, "quit-application-granted");
 				this.timer.cancel();
-				Application.storage.set(this.timerId, null);
+				this.permissions.storage.set(this.timerId, null);
 				this.permissions = null;
 			},
 			handleEvent: function(e) {
@@ -521,7 +521,7 @@ this.permissions = {
 					this.permissions.removeUnprotectedCookies();
 			}
 		};
-		Application.storage.set(timerId, timer);
+		this.storage.set(timerId, timer);
 		timer.init();
 	},
 	moveToStatusBar: function() {
@@ -1134,6 +1134,32 @@ this.permissions = {
 	parseXULFromString: function(xul) {
 		xul = xul.replace(/>\s+</g, "><");
 		return new DOMParser().parseFromString(xul, "application/xml").documentElement;
+	},
+
+	get storage() {
+		delete this.storage;
+		if(!("Services" in window)) // Firefox 3.6 and older
+			return this.storage = Application.storage;
+		// Simple replacement for Application.storage
+		// See https://bugzilla.mozilla.org/show_bug.cgi?id=1090880
+		//var global = Components.utils.getGlobalForObject(Services);
+		// Ensure, that we have global object (because window.Services may be overwriten)
+		var global = Components.utils.import("resource://gre/modules/Services.jsm", {});
+		var ns = "_cbCookiesPermissionsStorage";
+		var storage = global[ns] || (global[ns] = global.Object.create(null));
+		return this.storage = {
+			get: function(key, defaultVal) {
+				if(key in storage)
+					return storage[key];
+				return defaultVal;
+			},
+			set: function(key, val) {
+				if(key === null)
+					delete storage[key];
+				else
+					storage[key] = val;
+			}
+		};
 	}
 };
 
