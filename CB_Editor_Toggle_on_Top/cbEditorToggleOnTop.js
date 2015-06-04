@@ -11,8 +11,32 @@
 // Hotkey: Ctrl+T
 
 const watcherId = "customButtonsToggleOnTop_" + this.id;
-var {Application, Components} = window; // Prevent garbage collection in Firefox 3.6 and older
-var watcher = Application.storage.get(watcherId, null);
+var {Components} = window; // Prevent garbage collection in Firefox 3.6 and older
+var storage = (function() {
+	if(!("Services" in window)) // Firefox 3.6 and older
+		return Application.storage;
+	// Simple replacement for Application.storage
+	// See https://bugzilla.mozilla.org/show_bug.cgi?id=1090880
+	//var global = Components.utils.getGlobalForObject(Services);
+	// Ensure, that we have global object (because window.Services may be overwriten)
+	var global = Components.utils.import("resource://gre/modules/Services.jsm", {});
+	var ns = "_cbEditorToggleOnTopStorage";
+	var storage = global[ns] || (global[ns] = global.Object.create(null));
+	return {
+		get: function(key, defaultVal) {
+			if(key in storage)
+				return storage[key];
+			return defaultVal;
+		},
+		set: function(key, val) {
+			if(key === null)
+				delete storage[key];
+			else
+				storage[key] = val;
+		}
+	};
+})();
+var watcher = storage.get(watcherId, null);
 if(!watcher) {
 	watcher = {
 		btnPos: 0, // 0 - at top right window corner, 1 - at end of tabs, 2 - before dialog buttons spacer
@@ -320,13 +344,13 @@ if(!watcher) {
 			this.btnChecked && btn.setAttribute("checked", onTop);
 		}
 	};
-	Application.storage.set(watcherId, watcher);
+	storage.set(watcherId, watcher);
 	watcher.init(watcher.REASON_STARTUP);
 }
 function destructor(reason) {
 	if(reason == "update" || reason == "delete") {
 		watcher.destroy(watcher.REASON_SHUTDOWN);
-		Application.storage.set(watcherId, null);
+		storage.set(watcherId, null);
 	}
 }
 if(
