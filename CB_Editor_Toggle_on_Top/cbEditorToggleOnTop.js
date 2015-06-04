@@ -5,8 +5,8 @@
 // Custom Buttons Editor: Toggle on Top button for Custom Buttons
 // (code for "initialization" section)
 
-// (c) Infocatcher 2012-2013
-// version 0.1.10 - 2013-02-09
+// (c) Infocatcher 2012-2015
+// version 0.1.11 - 2015-06-04
 
 // Hotkey: Ctrl+T
 
