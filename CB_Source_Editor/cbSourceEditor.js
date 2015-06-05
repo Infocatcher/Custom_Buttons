@@ -4,8 +4,8 @@
 // Source Editor (formerly Orion Editor) button for Custom Buttons
 // (code for "initialization" section)
 
-// (c) Infocatcher 2012-2014
-// version 0.1.0a5 - 2014-06-21
+// (c) Infocatcher 2012-2015
+// version 0.1.0a6 - 2015-06-05
 
 var options = {
 	codeMirror: {
