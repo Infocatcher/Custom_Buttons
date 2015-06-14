@@ -623,14 +623,14 @@ if(!watcher) {
 			switch(e.type) {
 				case "DOMContentLoaded":
 					//var window = e.currentTarget;
-					var window = e.target.defaultView;
+					var window = e.target.defaultView || e.target;
 					window.removeEventListener(e.type, this, false);
 					var isFrame = window != e.currentTarget;
 					this.initWindow(window, this.REASON_WINDOW_LOADED, isFrame);
 				break;
 				case "unload":
 					//var window = e.currentTarget;
-					var window = e.target.defaultView;
+					var window = e.target.defaultView || e.target;
 					window.removeEventListener(e.type, this, false);
 					this.destroyWindow(window, this.REASON_WINDOW_CLOSED, true);
 			}
