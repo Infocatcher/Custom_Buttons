@@ -8,6 +8,7 @@
 // version 0.1.0a6 - 2015-06-05
 
 var options = {
+	cssInHelp: true,
 	codeMirror: {
 		lineNumbers: true,
 		enableCodeFolding: true,
@@ -278,9 +279,12 @@ if(!watcher) {
 				if("__sourceEditor" in cbEditor)
 					return;
 				var code = cbEditor.value;
+				var isCSS = options.cssInHelp && cbEditor.id == "help";
 				if(isCodeMirror) {
 					var opts = {
-						mode: SourceEditor.modes.js,
+						mode: isCSS
+							? SourceEditor.modes.css
+							: SourceEditor.modes.js,
 						value: code,
 						lineNumbers: true,
 						enableCodeFolding: true,
@@ -435,7 +439,9 @@ if(!watcher) {
 				}
 				else {
 					var opts = {
-						mode: SourceEditor.MODES.JAVASCRIPT,
+						mode: isCSS
+							? SourceEditor.MODES.CSS
+							: SourceEditor.MODES.JAVASCRIPT,
 						showLineNumbers: true,
 						initialText: code,
 						placeholderText: code, // For backward compatibility
