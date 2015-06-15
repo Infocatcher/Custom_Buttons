@@ -931,12 +931,12 @@ this.permissions = {
 				.QueryInterface(Components.interfaces.nsIPermission);
 			if(permission.type != this.permissionType)
 				continue;
-			var permissionHost = permission.host;
+			let permissionHost = permission.host;
 			if(permissionHost == host)
 				return permission;
 			if(dontGetInherited)
 				continue;
-			var hostLen = permissionHost.length;
+			let hostLen = permissionHost.length;
 			if(
 				hostLen > maxHostLen
 				&& host.substr(-hostLen - 1) == "." + permissionHost // ~= checkCookieHost()
