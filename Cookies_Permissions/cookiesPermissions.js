@@ -751,6 +751,8 @@ this.permissions = {
 	openPermissionsSM: function(host) {
 		var win = this.wm.getMostRecentWindow("mozilla:cookieviewer");
 		var _this = this;
+		if(!host)
+			host = "";
 		var setFilter = function setFilter(e) {
 			e && win.removeEventListener("load", setFilter, false);
 			var doc = win.document;
@@ -759,11 +761,11 @@ this.permissions = {
 		};
 		if(win) {
 			win.focus();
-			host && setFilter();
+			setFilter();
 		}
 		else {
 			win = window.openDialog("chrome://communicator/content/permissions/cookieViewer.xul", "_blank", "");
-			host && win.addEventListener("load", setFilter, false);
+			win.addEventListener("load", setFilter, false);
 		}
 	},
 	tweakWindow: function(win) {
