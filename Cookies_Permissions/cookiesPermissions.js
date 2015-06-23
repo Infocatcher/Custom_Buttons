@@ -552,7 +552,7 @@ this.permissions = {
 
 	get currentHost() {
 		var loc = content.location;
-		if(["view-source:", "about:", "chrome:", "resource:", "javascript:", "data:"].indexOf(loc.protocol) == -1) try {
+		if(!this.noHost(loc.protocol)) try {
 			return loc.hostname;
 		}
 		catch(e) {
@@ -574,7 +574,7 @@ this.permissions = {
 				let host;
 				try {
 					let uri = browser.currentURI;
-					if(["view-source", "about", "chrome", "resource", "javascript", "data"].indexOf(uri.scheme) != -1)
+					if(this.noHost(uri.scheme))
 						continue;
 					host = uri.host;
 				}
@@ -591,6 +591,10 @@ this.permissions = {
 		for(var host in tmp)
 			hosts.push(host);
 		return hosts;
+	},
+	noHost: function(protocol) {
+		protocol = String.replace(protocol, /:$/, "");
+		return ["view-source", "about", "chrome", "resource", "javascript", "data"].indexOf(protocol) != -1;
 	},
 	get isSeaMonkey() {
 		delete this.isSeaMonkey;
