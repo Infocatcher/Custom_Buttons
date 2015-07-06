@@ -823,11 +823,11 @@ this.undoCloseTabsList = {
 		return s.substr(0, start) + "…" + s.substr(start - crop);
 	},
 	convertURI: function(uri, crop) {
-		if(uri.indexOf("\n") != -1)
+		if(!uri || uri.indexOf("\n") != -1)
 			return uri;
 		try {
 			uri = "losslessDecodeURI" in window
-				? losslessDecodeURI({ spec: uri })
+				? losslessDecodeURI(makeURI(uri))
 				: decodeURI(uri);
 		}
 		catch(e) {

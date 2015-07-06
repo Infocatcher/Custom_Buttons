@@ -827,8 +827,8 @@ this.bookmarks = {
 		return mi;
 	},
 	decodeURI: function(uri) {
-		try {
-			return losslessDecodeURI({ spec: uri });
+		if(uri) try {
+			return losslessDecodeURI(makeURI(uri));
 		}
 		catch(e) {
 			Components.utils.reportError(e);
