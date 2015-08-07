@@ -152,6 +152,8 @@ function setStyle(mi, uid, addon) {
 				|| "chrome://mozapps/skin/extensions/extensionGeneric-16.png";
 			if(addon.isActive)
 				color = iconOpacity = "";
+			else if(addon.appDisabled)
+				color = "red";
 		}
 		mi.setAttribute("image", icon);
 		mi.style.color = color;
