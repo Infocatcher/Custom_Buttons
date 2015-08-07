@@ -262,6 +262,13 @@ mp.installExtension = function(e) {
 					Components.utils.reportError(err);
 					restore();
 					error("Error", err);
+				},
+				onDownloadFailed: function(install) {
+					install.removeListener(this);
+					var err = "Downloading failed\n" + xpi;
+					Components.utils.reportError(err);
+					restore();
+					error("Error", err);
 				}
 			});
 			install.install();
