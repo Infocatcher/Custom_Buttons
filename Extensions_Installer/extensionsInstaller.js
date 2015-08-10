@@ -154,6 +154,9 @@ function setStyle(mi, uid, addon) {
 				color = iconOpacity = "";
 			else if(addon.appDisabled)
 				color = "red";
+			var tt = (mi.tooltipText || "").replace(/ \n[\s\S]*$/, "");
+			mi.tooltipText = tt + " \nVersion: " + addon.version
+				+ (addon.updateDate ? " \nUpdated: " + new Date(addon.updateDate).toLocaleString() : "");
 		}
 		mi.setAttribute("image", icon);
 		mi.style.color = color;
