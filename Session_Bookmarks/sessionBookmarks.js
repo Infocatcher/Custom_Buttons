@@ -1206,7 +1206,6 @@ this.bookmarks = {
 	setTabSession: function(tab, ssData, uri, mergeHistory, disableForceLoad, _isPrivate) {
 		var data;
 		if(ssData && "JSON" in window) try {
-			data = JSON.parse(ssData);
 			// For better compatibility with Private Tab extension
 			let privateAttr = "privateTab-isPrivate";
 			let isPrivate = _isPrivate || false;
@@ -1233,6 +1232,7 @@ this.bookmarks = {
 				mm.loadFrameScript("data:application/javascript," + encodeURIComponent(data), false);
 				return;
 			}
+			data = JSON.parse(ssData);
 			if(isPrivate) {
 				if(!data.attributes)
 					data.attributes = {};
