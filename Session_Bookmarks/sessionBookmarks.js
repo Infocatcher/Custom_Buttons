@@ -1203,15 +1203,36 @@ this.bookmarks = {
 		if(this.options.deleteAfterOpen)
 			this.deleteAllBookmarks();
 	},
-	setTabSession: function(tab, ssData, uri, mergeHistory, disableForceLoad) {
+	setTabSession: function(tab, ssData, uri, mergeHistory, disableForceLoad, _isPrivate) {
 		var data;
 		if(ssData && "JSON" in window) try {
 			data = JSON.parse(ssData);
 			// For better compatibility with Private Tab extension
 			let privateAttr = "privateTab-isPrivate";
-			let isPrivate = "PrivateBrowsingUtils" in window
-				&& PrivateBrowsingUtils.isWindowPrivate(tab.linkedBrowser.contentWindow)
-				|| tab.hasAttribute(privateAttr);
+			let isPrivate = _isPrivate || false;
+			if(_isPrivate === undefined) try {
+				isPrivate = "PrivateBrowsingUtils" in window
+					&& PrivateBrowsingUtils.isWindowPrivate(tab.linkedBrowser.contentWindow)
+					|| tab.hasAttribute(privateAttr);
+			}
+			catch(e2) {
+				// Looks like e10s, will wait for remote frame initialization
+				// Note: we can't unload frame script due to https://bugzilla.mozilla.org/show_bug.cgi?id=1051238
+				let data = '\
+					var privacyContext = docShell.QueryInterface(Components.interfaces.nsILoadContext);\n\
+					var isPrivate = !privacyContext.usePrivateBrowsing;\n\
+					privacyContext.usePrivateBrowsing = isPrivate;\n\
+					sendAsyncMessage("CB:SessionBookmarks:FrameReady", { isPrivate: isPrivate });';
+				let feedback = function(msg) {
+					mm.removeMessageListener("CB:SessionBookmarks:FrameReady", feedback);
+					var isPrivate = msg.data.isPrivate;
+					this.setTabSession(tab, ssData, uri, mergeHistory, disableForceLoad, isPrivate);
+				}.bind(this);
+				let mm = tab.linkedBrowser.messageManager;
+				mm.addMessageListener("CB:SessionBookmarks:FrameReady", feedback);
+				mm.loadFrameScript("data:application/javascript," + encodeURIComponent(data), false);
+				return;
+			}
 			if(isPrivate) {
 				if(!data.attributes)
 					data.attributes = {};
