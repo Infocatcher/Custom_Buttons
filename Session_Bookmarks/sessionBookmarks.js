@@ -1211,8 +1211,9 @@ this.bookmarks = {
 			let privateAttr = "privateTab-isPrivate";
 			let isPrivate = _isPrivate || false;
 			if(_isPrivate === undefined) try {
+				let contentWindow = browser.contentWindow || browser.contentWindowAsCPOW;
 				isPrivate = "PrivateBrowsingUtils" in window
-					&& PrivateBrowsingUtils.isWindowPrivate(browser.contentWindow)
+					&& PrivateBrowsingUtils.isWindowPrivate(contentWindow)
 					|| tab.hasAttribute(privateAttr);
 			}
 			catch(e2) {
@@ -1314,7 +1315,7 @@ this.bookmarks = {
 					&& tab != gBrowser.selectedTab // Should be loaded automatically in this case
 					&& (
 						tab.getAttribute("pending") == "true" // Gecko >= 9.0
-						|| browser.contentDocument.readyState == "uninitialized"
+						|| (browser.contentDocument || browser.contentDocumentAsCPOW).readyState == "uninitialized"
 						// || browser.__SS_restoreState == 1
 					)
 				) {
