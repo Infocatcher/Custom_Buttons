@@ -1205,13 +1205,14 @@ this.bookmarks = {
 	},
 	setTabSession: function(tab, ssData, uri, mergeHistory, disableForceLoad, _isPrivate) {
 		var data;
+		var browser = tab.linkedBrowser;
 		if(ssData && "JSON" in window) try {
 			// For better compatibility with Private Tab extension
 			let privateAttr = "privateTab-isPrivate";
 			let isPrivate = _isPrivate || false;
 			if(_isPrivate === undefined) try {
 				isPrivate = "PrivateBrowsingUtils" in window
-					&& PrivateBrowsingUtils.isWindowPrivate(tab.linkedBrowser.contentWindow)
+					&& PrivateBrowsingUtils.isWindowPrivate(browser.contentWindow)
 					|| tab.hasAttribute(privateAttr);
 			}
 			catch(e2) {
@@ -1227,7 +1228,7 @@ this.bookmarks = {
 					var isPrivate = msg.data.isPrivate;
 					this.setTabSession(tab, ssData, uri, mergeHistory, disableForceLoad, isPrivate);
 				}.bind(this);
-				let mm = tab.linkedBrowser.messageManager;
+				let mm = browser.messageManager;
 				mm.addMessageListener("CB:SessionBookmarks:FrameReady", feedback);
 				mm.loadFrameScript("data:application/javascript," + encodeURIComponent(data), false);
 				return;
@@ -1270,7 +1271,7 @@ this.bookmarks = {
 			Components.utils.reportError(e);
 		}
 		function fallback() {
-			uri && tab.linkedBrowser.loadURI(uri);
+			uri && browser.loadURI(uri);
 		}
 		if(!ssData) {
 			fallback();
@@ -1283,7 +1284,7 @@ this.bookmarks = {
 		var _this = this;
 		(function trySetSession() {
 			try {
-				tab.linkedBrowser.addProgressListener(progressListener);
+				browser.addProgressListener(progressListener);
 			}
 			catch(e) {
 				_info("setTabSession: addProgressListener() failed, error:\n" + e);
@@ -1297,7 +1298,6 @@ this.bookmarks = {
 				return;
 			}
 			try {
-				var browser = tab.linkedBrowser;
 				var entriesCount = data && data.entries && data.entries.length;
 				if(entriesCount) {
 					var sh = browser.sessionHistory
