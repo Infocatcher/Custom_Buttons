@@ -1211,12 +1211,15 @@ this.bookmarks = {
 			let privateAttr = "privateTab-isPrivate";
 			let isPrivate = _isPrivate || false;
 			if(_isPrivate === undefined) try {
-				let contentWindow = browser.contentWindow || browser.contentWindowAsCPOW;
+				let contentWindow = (browser.contentWindow || browser.contentWindowAsCPOW)
+					.QueryInterface(Components.interfaces.nsIDOMWindow); // Ensure initialized
 				isPrivate = "PrivateBrowsingUtils" in window
 					&& PrivateBrowsingUtils.isWindowPrivate(contentWindow)
 					|| tab.hasAttribute(privateAttr);
 			}
 			catch(e2) {
+				if(String.indexOf(e2, ".QueryInterface is not a function") == -1)
+					Components.utils.reportError(e2);
 				// Looks like e10s, will wait for remote frame initialization
 				// Note: we can't unload frame script due to https://bugzilla.mozilla.org/show_bug.cgi?id=1051238
 				let data = '\
