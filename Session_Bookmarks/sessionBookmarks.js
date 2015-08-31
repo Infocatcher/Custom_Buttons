@@ -1224,8 +1224,7 @@ this.bookmarks = {
 				// Note: we can't unload frame script due to https://bugzilla.mozilla.org/show_bug.cgi?id=1051238
 				let data = '\
 					var privacyContext = docShell.QueryInterface(Components.interfaces.nsILoadContext);\n\
-					var isPrivate = !privacyContext.usePrivateBrowsing;\n\
-					privacyContext.usePrivateBrowsing = isPrivate;\n\
+					var isPrivate = privacyContext.usePrivateBrowsing || false;\n\
 					sendAsyncMessage("CB:SessionBookmarks:FrameReady", { isPrivate: isPrivate });';
 				let feedback = function(msg) {
 					mm.removeMessageListener("CB:SessionBookmarks:FrameReady", feedback);
