@@ -291,7 +291,7 @@ this.permissions = {
 						let pm = win.gPermissionManager;
 						let perms = pm._permissions;
 						for(let i = 0, l = perms.length; i < l; ++i) {
-							if(perms[i].host == permission.host) {
+							if(this.context.getPermissionHost(perms[i]) == this.context.getPermissionHost(permission)) {
 								perms.splice(i, 1);
 								--pm._view._rowCount;
 								pm._tree.treeBoxObject.rowCountChanged(i, -1);
@@ -905,7 +905,7 @@ this.permissions = {
 					out.push(permission);
 				else {
 					out = true;
-					this.removePermissionForHost(permission.host);
+					this.removePermissionForHost(this.getPermissionHost(permission));
 				}
 			}
 		}
@@ -933,7 +933,7 @@ this.permissions = {
 				.QueryInterface(Components.interfaces.nsIPermission);
 			if(permission.type != this.permissionType)
 				continue;
-			let permissionHost = permission.host;
+			let permissionHost = this.getPermissionHost(permission);
 			if(permissionHost == host)
 				return permission;
 			if(dontGetInherited)
@@ -965,6 +965,12 @@ this.permissions = {
 			}
 			Components.utils.reportError(e);
 		}
+	},
+	getPermissionHost: function(permission) {
+		if("host" in permission)
+			return permission.host;
+		// See https://bugzilla.mozilla.org/show_bug.cgi?id=1173523
+		return permission.principal.URI.host; // Firefox 42+
 	},
 	get defaultPermission() {
 		// http://kb.mozillazine.org/Network.cookie.cookieBehavior
