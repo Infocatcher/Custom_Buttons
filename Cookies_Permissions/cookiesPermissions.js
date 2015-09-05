@@ -831,14 +831,10 @@ this.permissions = {
 			temporary = false;
 		this.updButtonState(capability); // Faster than ProgressListener (70-80 ms for me)
 
-		var pm = this.pm;
-		if(this.hasTempPermissions) try { // Can't change expireType...
-			pm.remove(host, this.permissionType);
-		}
-		catch(e) {
-			Components.utils.reportError(e);
-		}
+		if(this.hasTempPermissions)
+			this.removePermissionForHost(host);
 
+		var pm = this.pm;
 		var args = [this.getURI(host), this.permissionType, capability];
 		if(temporary) {
 			let expire = this.options.tempExpire;
@@ -859,13 +855,13 @@ this.permissions = {
 		var pm = this.pm;
 		var uri = this.getURI(host);
 		var permission = pm.testPermission(uri, this.permissionType);
-		pm.remove(host, this.permissionType);
+		this.removePermissionForHost(host);
 		while(pm.testPermission(uri, this.permissionType) == permission) {
 			let parentHost = host.replace(/^[^.]*\./, "");
 			if(parentHost == host)
 				break;
 			host = parentHost;
-			pm.remove(host, this.permissionType);
+			this.removePermissionForHost(host);
 		}
 	},
 	togglePermission: function(capabilities) {
@@ -909,7 +905,7 @@ this.permissions = {
 					out.push(permission);
 				else {
 					out = true;
-					pm.remove(permission.host, this.permissionType);
+					this.removePermissionForHost(permission.host);
 				}
 			}
 		}
@@ -952,6 +948,23 @@ this.permissions = {
 			}
 		}
 		return matchedPermission;
+	},
+	removePermissionForHost: function(host) {
+		try {
+			this.pm.remove(host, this.permissionType);
+		}
+		catch(e) {
+			// See https://bugzilla.mozilla.org/show_bug.cgi?id=1170200
+			if("Services" in window) try { // Firefox 42+
+				var uri = Services.io.newURI("http://" + host, null, null);
+				this.pm.remove(uri, this.permissionType);
+				return;
+			}
+			catch(e2) {
+				Components.utils.reportError(e2);
+			}
+			Components.utils.reportError(e);
+		}
 	},
 	get defaultPermission() {
 		// http://kb.mozillazine.org/Network.cookie.cookieBehavior
