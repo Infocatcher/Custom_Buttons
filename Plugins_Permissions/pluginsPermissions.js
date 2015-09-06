@@ -600,8 +600,8 @@ this.permissions = {
 					case pm.ALLOW_ACTION: action = "allowLabel"; break;
 					case pm.DENY_ACTION:  action = "denyLabel";
 				}
-				return permission.host + ": " + _localize(action).toLowerCase();
-			}).join(", \n");
+				return this.getPermissionHost(permission) + ": " + _localize(action).toLowerCase();
+			}, this).join(", \n");
 		}
 
 		this.updToggleBlockItem();

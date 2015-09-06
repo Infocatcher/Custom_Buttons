@@ -692,8 +692,8 @@ this.permissions = {
 					case cp.ACCESS_DENY:    action = "denyLabel";         break;
 					case cp.ACCESS_SESSION: action = "allowSessionLabel";
 				}
-				return permission.host + ": " + _localize(action).toLowerCase();
-			}).join(", \n");
+				return this.getPermissionHost(permission) + ": " + _localize(action).toLowerCase();
+			}, this).join(", \n");
 		}
 
 		var mi = this.mp.getElementsByAttribute("cb_id", "removeCurrentSiteCookies")[0];
