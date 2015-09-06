@@ -790,6 +790,7 @@ this.permissions = {
 		if(this.hasTempPermissions)
 			this.removePermissionForHost(host);
 
+		var pm = this.pm;
 		var args = [this.getURI(host), this.permissionType, capability];
 		if(temporary) {
 			let expire = this.options.tempExpire;
