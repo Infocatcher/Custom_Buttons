@@ -33,6 +33,46 @@ var _makeArgs = [
 	"nodelay"
 ];
 
+function _localize(s, key) {
+	var strings = {
+		"Version: %S": {
+			ru: "Версия: %S"
+		},
+		"Updated: %S": {
+			ru: "Обновлено: %S"
+		},
+		"Ok!": {
+			ru: "ОК!"
+		},
+		"Successfully installed:\n%N %V": {
+			ru: "Успешно установлено:\n%N %V"
+		}
+	};
+	var locale = (function() {
+		var prefs = "Services" in window && Services.prefs
+			|| Components.classes["@mozilla.org/preferences-service;1"]
+				.getService(Components.interfaces.nsIPrefBranch);
+		if(!prefs.getBoolPref("intl.locale.matchOS")) {
+			var locale = prefs.getCharPref("general.useragent.locale");
+			if(locale.substr(0, 9) != "chrome://")
+				return locale;
+		}
+		return Components.classes["@mozilla.org/chrome/chrome-registry;1"]
+			.getService(Components.interfaces.nsIXULChromeRegistry)
+			.getSelectedLocale("global");
+	})().match(/^[a-z]*/)[0];
+	_localize = !locale || locale == "en"
+		? function(s) {
+			return s;
+		}
+		: function(s, key) {
+			if(!key)
+				key = s;
+			return strings[key] && strings[key][locale] || s;
+		};
+	return _localize.apply(this, arguments);
+}
+
 if(!("AddonManager" in window))
 	Components.utils.import("resource://gre/modules/AddonManager.jsm");
 
@@ -156,8 +196,8 @@ function setStyle(mi, uid, addon) {
 				color = "red";
 			var tt = (mi.tooltipText || "").replace(/ \n[\s\S]*$/, "");
 			mi.tooltipText = tt
-				+ " \nVersion: " + addon.version
-				+ " \nUpdated: " + (addon.updateDate ? new Date(addon.updateDate).toLocaleString() : "???");
+				+ " \n" + _localize("Version: %S").replace("%S", addon.version)
+				+ " \n" + _localize("Updated: %S").replace("%S", addon.updateDate ? new Date(addon.updateDate).toLocaleString() : "???");
 		}
 		mi.setAttribute("image", icon);
 		mi.style.color = color;
@@ -256,7 +296,13 @@ mp.installExtension = function(e) {
 					install.removeListener(this);
 					restore();
 					var icon = addon.iconURL || addon.icon64URL;
-					notify("Ok!", "Successfully installed:\n" + addon.name + " " + addon.version, icon);
+					notify(
+						_localize("Ok!"),
+						_localize("Successfully installed:\n%N %V")
+							.replace("%N", addon.name)
+							.replace("%V", addon.version),
+						icon
+					);
 					if(addon.pendingOperations)
 						appRestart();
 				},
