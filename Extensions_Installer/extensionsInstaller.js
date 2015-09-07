@@ -155,8 +155,9 @@ function setStyle(mi, uid, addon) {
 			else if(addon.appDisabled)
 				color = "red";
 			var tt = (mi.tooltipText || "").replace(/ \n[\s\S]*$/, "");
-			mi.tooltipText = tt + " \nVersion: " + addon.version
-				+ (addon.updateDate ? " \nUpdated: " + new Date(addon.updateDate).toLocaleString() : "");
+			mi.tooltipText = tt
+				+ " \nVersion: " + addon.version
+				+ " \nUpdated: " + (addon.updateDate ? new Date(addon.updateDate).toLocaleString() : "???");
 		}
 		mi.setAttribute("image", icon);
 		mi.style.color = color;
