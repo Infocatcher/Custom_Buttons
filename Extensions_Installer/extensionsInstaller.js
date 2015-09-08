@@ -6,7 +6,7 @@
 // Place code to "initialization" section to create a "normal" menu.
 
 // (c) Infocatcher 2013-2015
-// version 0.3.0pre7 - 2015-05-31
+// version 0.3.0 - 2015-09-08
 
 var rootDir = "d:\\extensions\\";
 if(!file(rootDir).exists())
