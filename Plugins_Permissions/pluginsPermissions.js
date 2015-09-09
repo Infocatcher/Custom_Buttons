@@ -502,6 +502,12 @@ this.permissions = {
 	get currentBaseDomain() {
 		return this.getBaseDomain(this.currentHost);
 	},
+	get currentProtocol() {
+		var scheme = gBrowser.currentURI.scheme;
+		if(scheme == "https")
+			return scheme;
+		return "http";
+	},
 	get appInfo() {
 		delete this.appInfo;
 		return this.appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
@@ -525,7 +531,7 @@ this.permissions = {
 			host = "[" + host + "]";
 		host = host.replace(/^\./, "");
 		try {
-			return this.io.newURI("http://" + host, null, null);
+			return this.io.newURI(this.currentProtocol + "://" + host, null, null);
 		}
 		catch(e) {
 			Components.utils.reportError(this.errPrefix + "Invalid host: \"" + host + "\"");

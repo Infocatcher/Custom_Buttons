@@ -596,6 +596,12 @@ this.permissions = {
 		protocol = String.replace(protocol, /:$/, "");
 		return ["view-source", "about", "chrome", "resource", "javascript", "data"].indexOf(protocol) != -1;
 	},
+	get currentProtocol() {
+		var scheme = gBrowser.currentURI.scheme;
+		if(scheme == "https")
+			return scheme;
+		return "http";
+	},
 	get isSeaMonkey() {
 		delete this.isSeaMonkey;
 		return this.isSeaMonkey = Components.classes["@mozilla.org/xre/app-info;1"]
@@ -616,7 +622,7 @@ this.permissions = {
 			host = "[" + host + "]";
 		host = host.replace(/^\./, "");
 		try {
-			return this.io.newURI("http://" + host, null, null);
+			return this.io.newURI(this.currentProtocol + "://" + host, null, null);
 		}
 		catch(e) {
 			Components.utils.reportError(this.errPrefix + "Invalid host: \"" + host + "\"");
