@@ -871,12 +871,15 @@ this.permissions = {
 			return this.PERMISSIONS_NOT_SUPPORTED;
 		var pm = this.pm;
 		var matchedPermission = pm.UNKNOWN_ACTION;
+		var protocol = this.currentProtocol;
 		var maxHostLen = -1;
 		var enumerator = pm.enumerator;
 		while(enumerator.hasMoreElements()) {
 			let permission = enumerator.getNext()
 				.QueryInterface(Components.interfaces.nsIPermission);
 			if(permission.type != this.permissionType)
+				continue;
+			if("principal" in permission && permission.principal.URI.scheme != protocol) // Firefox 42+
 				continue;
 			var permissionHost = this.getPermissionHost(permission);
 			if(permissionHost == host)
