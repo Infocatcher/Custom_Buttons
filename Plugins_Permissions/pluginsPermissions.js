@@ -899,7 +899,7 @@ this.permissions = {
 		catch(e) {
 			// See https://bugzilla.mozilla.org/show_bug.cgi?id=1170200
 			if("Services" in window) try { // Firefox 42+
-				var uri = Services.io.newURI("http://" + host, null, null);
+				var uri = Services.io.newURI(this.currentProtocol + "://" + host, null, null);
 				this.pm.remove(uri, this.permissionType);
 				return;
 			}
