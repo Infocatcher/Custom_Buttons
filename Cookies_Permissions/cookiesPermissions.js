@@ -712,6 +712,8 @@ this.permissions = {
 
 	openPermissions: function() {
 		var host = this.getHost(this.options.useBaseDomain.openPermissions);
+		if(host && "Services" in window && parseFloat(Services.appinfo.platformVersion) >= 42)
+			host = this.currentProtocol + "://" + host;
 
 		if(this.isSeaMonkey) {
 			this.openPermissionsSM(host);

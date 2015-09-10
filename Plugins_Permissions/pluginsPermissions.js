@@ -635,6 +635,8 @@ this.permissions = {
 			return;
 		}
 		var host = this.getHost(this.options.useBaseDomain.openPermissions);
+		if(host && "Services" in window && parseFloat(Services.appinfo.platformVersion) >= 42)
+			host = this.currentProtocol + "://" + host;
 		// chrome://browser/content/preferences/privacy.js
 		// Like gPrivacyPane.showCookieExceptions()
 		var params = { blockVisible   : true,
