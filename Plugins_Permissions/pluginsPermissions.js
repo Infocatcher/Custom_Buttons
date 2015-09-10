@@ -82,7 +82,7 @@ function _localize(sid) {
 			buttonMenu: "Button Menu",
 			buttonMenuAccesskey: "M",
 
-			exceptionsTitle: "Exceptions — %p",
+			exceptionsTitle: "Exceptions - %p",
 			exceptionsDesc: "You can specify which websites are always or never allowed to \
 				play plugins. Type the exact address of the site you want to manage and \
 				then click Block or Allow."
