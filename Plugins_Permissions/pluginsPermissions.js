@@ -491,9 +491,11 @@ this.permissions = {
 	},
 
 	get currentHost() {
-		var loc = content.location;
-		if(["view-source:", "about:", "chrome:", "resource:", "javascript:", "data:"].indexOf(loc.protocol) == -1) try {
-			return loc.hostname;
+		return this.getHostFromBrowser(gBrowser);
+	},
+	getHostFromBrowser: function(browser) {
+		try {
+			return browser.currentURI.host;
 		}
 		catch(e) {
 		}
