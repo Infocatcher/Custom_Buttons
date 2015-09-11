@@ -551,13 +551,7 @@ this.permissions = {
 	},
 
 	get currentHost() {
-		var loc = content.location;
-		if(!this.noHost(loc.protocol)) try {
-			return loc.hostname;
-		}
-		catch(e) {
-		}
-		return "";
+		return this.getHostFromBrowser(gBrowser);
 	},
 	get currentHosts() { // returns hosts from all visible tabs in all windows
 		var tmp = { __proto__: null };
@@ -571,16 +565,7 @@ this.permissions = {
 				let browser = tab.linkedBrowser;
 				if(!browser)
 					continue;
-				let host;
-				try {
-					let uri = browser.currentURI;
-					if(this.noHost(uri.scheme))
-						continue;
-					host = uri.host;
-				}
-				catch(e) {
-					continue;
-				}
+				let host = this.getHostFromBrowser(browser);
 				if(!host)
 					continue;
 				host = this.getHost(this.options.useBaseDomain.preserveCurrentSitesCookies, host);
@@ -591,6 +576,17 @@ this.permissions = {
 		for(var host in tmp)
 			hosts.push(host);
 		return hosts;
+	},
+	getHostFromBrowser: function(browser) {
+		try {
+			let uri = browser.currentURI;
+			if(!this.noHost(uri.scheme))
+				return uri.host;
+		}
+		catch(e) {
+			Components.utils.reportError(e);
+		}
+		return "";
 	},
 	noHost: function(protocol) {
 		protocol = String.replace(protocol, /:$/, "");
