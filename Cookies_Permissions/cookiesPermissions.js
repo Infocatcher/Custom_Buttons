@@ -579,18 +579,11 @@ this.permissions = {
 	},
 	getHostFromBrowser: function(browser) {
 		try {
-			let uri = browser.currentURI;
-			if(!this.noHost(uri.scheme))
-				return uri.host;
+			return browser.currentURI.host;
 		}
 		catch(e) {
-			Components.utils.reportError(e);
 		}
 		return "";
-	},
-	noHost: function(protocol) {
-		protocol = String.replace(protocol, /:$/, "");
-		return ["view-source", "about", "chrome", "resource", "javascript", "data"].indexOf(protocol) != -1;
 	},
 	get currentProtocol() {
 		var scheme = gBrowser.currentURI.scheme;
