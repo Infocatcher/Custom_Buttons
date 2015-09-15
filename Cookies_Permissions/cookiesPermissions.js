@@ -579,7 +579,10 @@ this.permissions = {
 	},
 	getHostFromBrowser: function(browser) {
 		try {
-			return browser.currentURI.host;
+			var uri = browser.currentURI;
+			if(["chrome", "resource"].indexOf(uri.scheme) != -1)
+				return "";
+			return uri.host;
 		}
 		catch(e) {
 		}
