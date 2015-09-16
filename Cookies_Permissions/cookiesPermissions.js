@@ -690,7 +690,8 @@ this.permissions = {
 					case cp.ACCESS_DENY:    action = "denyLabel";         break;
 					case cp.ACCESS_SESSION: action = "allowSessionLabel";
 				}
-				return this.getPermissionHost(permission) + ": " + _localize(action).toLowerCase();
+				return (permission.host || permission.principal.URI.spec.replace(/\/$/, ""))
+					+ ": " + _localize(action).toLowerCase();
 			}, this).join(", \n");
 		}
 

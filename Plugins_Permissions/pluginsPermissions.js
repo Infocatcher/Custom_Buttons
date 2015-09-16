@@ -611,7 +611,8 @@ this.permissions = {
 					case pm.ALLOW_ACTION: action = "allowLabel"; break;
 					case pm.DENY_ACTION:  action = "denyLabel";
 				}
-				return this.getPermissionHost(permission) + ": " + _localize(action).toLowerCase();
+				return (permission.host || permission.principal.URI.spec.replace(/\/$/, ""))
+					+ ": " + _localize(action).toLowerCase();
 			}, this).join(", \n");
 		}
 
