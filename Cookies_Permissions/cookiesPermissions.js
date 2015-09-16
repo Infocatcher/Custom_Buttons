@@ -906,7 +906,7 @@ this.permissions = {
 					out.push(permission);
 				else {
 					out = true;
-					this.removePermissionForHost(this.getPermissionHost(permission));
+					this.removeRawPermission(permission);
 				}
 			}
 		}
@@ -969,6 +969,12 @@ this.permissions = {
 			}
 			Components.utils.reportError(e);
 		}
+	},
+	removeRawPermission: function(permission) {
+		if("principal" in permission) // Firefox 42+
+			this.pm.remove(permission.principal.URI, this.permissionType);
+		else
+			this.removePermissionForHost(permission.host);
 	},
 	getPermissionHost: function(permission) {
 		if("host" in permission)
