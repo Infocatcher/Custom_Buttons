@@ -676,7 +676,7 @@ this.permissions = {
 		if(this.hasTempPermissions) {
 			let maxItems = 10;
 			let removeItem = this.mp.getElementsByAttribute("cb_id", "removeTempPermissions")[0];
-			let tempPermissions = this.removeTempPermissions(true);
+			let tempPermissions = this.tempPermissions;
 			removeItem.disabled = !tempPermissions.length;
 			if(tempPermissions.length > maxItems)
 				tempPermissions.splice(maxItems - 2, tempPermissions.length - maxItems + 1, "…");
@@ -889,8 +889,8 @@ this.permissions = {
 		else
 			this.addPermission(capability);
 	},
-	removeTempPermissions: function(onlyGet) {
-		var out = onlyGet ? [] : false;
+	get tempPermissions() {
+		var out = [];
 		if(!this.hasTempPermissions)
 			return out;
 		var pm = this.pm;
@@ -901,16 +901,13 @@ this.permissions = {
 			if(
 				permission.type == this.permissionType
 				&& permission.expireType != pm.EXPIRE_NEVER
-			) {
-				if(onlyGet)
-					out.push(permission);
-				else {
-					out = true;
-					this.removeRawPermission(permission);
-				}
-			}
+			)
+				out.push(permission);
 		}
 		return out;
+	},
+	removeTempPermissions: function() {
+		this.tempPermissions.forEach(this.removeRawPermission, this);
 	},
 	getPermission: function() {
 		var host = this.currentHost;
