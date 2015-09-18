@@ -866,23 +866,12 @@ this.permissions = {
 		}
 	},
 	togglePermission: function(capabilities) {
-		//var cp = this.cp;
-		//function cpName(n) {
-		//	for(var p in cp)
-		//		if(cp[p] == n)
-		//			return p;
-		//	return n;
-		//}
-
-		//var permission = this.getPermission();
 		var permission = this.getPermissionEx(this.getHost(this.options.useBaseDomain.addPermission), true);
 		if(permission instanceof Components.interfaces.nsIPermission)
 			permission = permission.capability;
-		//LOG("Current: " + cpName(permission));
 		if(permission == this.PERMISSIONS_NOT_SUPPORTED)
 			return;
 		var capability = capabilities[(capabilities.indexOf(permission) + 1) % capabilities.length];
-		//LOG("=> " + cpName(capability));
 
 		if(capability == this.cp.ACCESS_DEFAULT)
 			this.removePermission();
@@ -1109,19 +1098,11 @@ this.permissions = {
 			let cookie = cookies.getNext()
 				.QueryInterface(Components.interfaces.nsICookie);
 			let cookieHost = cookie.host;
-			if(checkHost && !checkHost.call(this, cookieHost)) {
-				//LOG("Don't remove: " + cookieHost);
+			if(checkHost && !checkHost.call(this, cookieHost))
 				continue;
-			}
 			let uri = this.getURI(cookieHost);
-			//LOG(
-			//	"!!! Host: " + cookieHost
-			//	+ ", uri " + uri.spec
-			//	+ ", testPermission: " + pm.testPermission(uri, this.permissionType)
-			//);
 			if(types && types.indexOf(pm.testPermission(uri, this.permissionType)) == -1)
 				continue;
-			//LOG("!!! Remove: " + cookieHost);
 			cm.remove(cookieHost, cookie.name, cookie.path, false);
 		}
 	},

@@ -709,7 +709,6 @@ this.permissions = {
 
 			var smVersion = parseFloat(_this.appInfo.version);
 			if(smVersion >= 2.20 && smVersion <= 2.22) {
-				//LOG("Workaround");
 				var ml = content.document.getElementById("typeSelect");
 				ml.value = "Permissions";
 				ml.doCommand();
@@ -719,7 +718,6 @@ this.permissions = {
 				var stopWait = Date.now() + 5e3;
 				var waitTimer = setTimeout(function wait() {
 					var newDomainsCount = gDomains.displayedDomains.length;
-					//LOG(oldDomainsCount + " -> " + newDomainsCount);
 					if(
 						newDomainsCount > 1 && newDomainsCount == oldDomainsCount
 						|| Date.now() > stopWait
@@ -738,7 +736,6 @@ this.permissions = {
 					return;
 				_this.oSvc.removeObserver(observer, topic);
 				selectDomain();
-				//LOG(topic + " -> selectDomain()");
 			}, "dataman-loaded", false);
 			content.gDataman.loadView("|permissions");
 		});
