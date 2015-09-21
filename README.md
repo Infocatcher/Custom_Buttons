@@ -101,6 +101,9 @@ Makes double click on tab bar open a new tab
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Title_Bar/icon.png)&nbsp;[Title Bar](Title_Bar)
 Show window title (if original title was hidden by some reasons)
 
+##### [Toggle Find](Toggle_Find)
+Toggle find bar and prefill it with selected text
+
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Toggle_Flash/icon.png)&nbsp;[Toggle Flash](Toggle_Flash)
 Toggle Shockwave Flash plugin (also may be easily configured to toggle any other add-on)
 
