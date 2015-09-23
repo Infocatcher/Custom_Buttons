@@ -113,7 +113,12 @@ if(!watcher) {
 			}
 			catch(e) {
 				var require = Components.utils.import("resource://gre/modules/devtools/Loader.jsm", {}).devtools.require;
-				var SourceEditor = window.SourceEditor = require("devtools/sourceeditor/editor");
+				try {
+					var SourceEditor = window.SourceEditor = require("devtools/sourceeditor/editor");
+				}
+				catch(e2) {
+					var SourceEditor = window.SourceEditor = require("devtools/client/sourceeditor/editor");
+				}
 				isCodeMirror = true;
 			}
 
