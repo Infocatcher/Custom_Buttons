@@ -398,6 +398,7 @@ if(!watcher) {
 							Components.utils.reportError(e);
 						}
 						window.setTimeout(function() {
+							window.editor.changed = false; // Strange...
 							se.on("change", onTextChanged);
 							if(isLoaded) {
 								if("clearHistory" in se)
