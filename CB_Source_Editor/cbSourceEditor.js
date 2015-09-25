@@ -510,9 +510,10 @@ if(!watcher) {
 				window.setTimeout(function() { window.editor.addObservers();    }, 0);
 			}, false);
 			// Fix for Ctrl+S hotkey (catched by CodeMirror)
-			window.addEventListener("keydown",  this.handleKeyEvent, true);
-			window.addEventListener("keypress", this.handleKeyEvent, true);
-			window.addEventListener("keyup",    this.handleKeyEvent, true);
+			var hke = this.handleKeyEvent;
+			window.addEventListener("keydown",  hke, true);
+			window.addEventListener("keypress", hke, true);
+			window.addEventListener("keyup",    hke, true);
 		},
 		destroyWindow: function(window, reason, isFrame) {
 			if(reason == this.REASON_WINDOW_CLOSED)
@@ -597,9 +598,10 @@ if(!watcher) {
 				});
 				delete window.SourceEditor;
 			}
-			window.removeEventListener("keydown",  this.handleKeyEvent, true);
-			window.removeEventListener("keypress", this.handleKeyEvent, true);
-			window.removeEventListener("keyup",    this.handleKeyEvent, true);
+			var hke = this.handleKeyEvent;
+			window.removeEventListener("keydown",  hke, true);
+			window.removeEventListener("keypress", hke, true);
+			window.removeEventListener("keyup",    hke, true);
 			//~ todo: we have one not removed controller!
 			//LOG("getControllerCount(): " + window.controllers.getControllerCount());
 		},
