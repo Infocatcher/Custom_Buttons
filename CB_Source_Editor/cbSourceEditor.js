@@ -307,6 +307,8 @@ if(!watcher) {
 				}
 				se.__isCodeMirror = isCodeMirror;
 				var seElt = document.createElement("hbox");
+				if(cbEditor.id)
+					seElt.id = "sourceEditor-" + cbEditor.id;
 				seElt.className = "sourceEditor";
 				seElt.setAttribute("flex", 1);
 				seElt.__sourceEditor = se;
