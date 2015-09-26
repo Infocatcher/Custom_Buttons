@@ -109,18 +109,18 @@ if(!watcher) {
 			var isCodeMirror = false;
 			try { // See chrome://browser/content/devtools/scratchpad.js
 				Components.utils.import("resource:///modules/source-editor.jsm", window);
-				var SourceEditor = window.SourceEditor;
 			}
 			catch(e) {
 				var require = Components.utils.import("resource://gre/modules/devtools/Loader.jsm", {}).devtools.require;
 				try {
-					var SourceEditor = window.SourceEditor = require("devtools/sourceeditor/editor");
+					window.SourceEditor = require("devtools/sourceeditor/editor");
 				}
 				catch(e2) {
-					var SourceEditor = window.SourceEditor = require("devtools/client/sourceeditor/editor");
+					window.SourceEditor = require("devtools/client/sourceeditor/editor");
 				}
 				isCodeMirror = true;
 			}
+			var SourceEditor = window.SourceEditor;
 
 			// See view-source:chrome://browser/content/devtools/scratchpad.xul
 			// + view-source:chrome://browser/content/devtools/source-editor-overlay.xul
