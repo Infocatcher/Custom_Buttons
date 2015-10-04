@@ -725,13 +725,19 @@ this.permissions = {
 					   permissionType : this.permissionType,
 					   windowTitle    : bundle.GetStringFromName("cookiepermissionstitle"),
 					   introText      : bundle.GetStringFromName("cookiepermissionstext") };
-		var win = this.wm.getMostRecentWindow("Browser:Permissions");
-		if(
-			win
-			&& !this.options.reusePermissionsWindow
-			&& "gPermissionManager" in win && win.gPermissionManager._type != this.permissionType
-		)
+
+		var win;
+		var ws = this.wm.getEnumerator("Browser:Permissions");
+		while(ws.hasMoreElements()) {
+			win = ws.getNext();
+			if(
+				this.options.reusePermissionsWindow
+				|| "gPermissionManager" in win && win.gPermissionManager._type == this.permissionType
+			)
+				break;
 			win = null;
+		}
+
 		var _this = this;
 		var setFilter = function setFilter(e) {
 			e && win.removeEventListener("load", setFilter, false);
