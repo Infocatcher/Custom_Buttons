@@ -19,7 +19,7 @@
 //   Ctrl+Up, Ctrl+Down    - navigate to parent/child node
 //   Ctrl+Left, Ctrl+Right - navigate to previous/next sibling node
 //   Ctrl+Shift+C          - copy tooltip's contents
-//   Ctrl+W                - inspect node's window object in DOM Inspector
+//   Ctrl+Shift+W          - inspect node's window object in DOM Inspector
 
 // For more developer tools see Extensions Developer Tools button:
 //   http://infocatcher.ucoz.net/js/cb/extDevTools.js
@@ -1187,8 +1187,8 @@ function init() {
 				var nodes = this._nodes;
 				nodes.length && this.inspect(nodes[0], top, e.shiftKey);
 			}
-			else if( // Ctrl+W, Ctrl+Shift+W
-				ctrlOrCtrlShift && (
+			else if( // Ctrl+Shift+W
+				ctrlShift && (
 					e.keyCode == e.DOM_VK_W // keydown || keyup
 					|| e.keyCode == 0 && String.fromCharCode(e.charCode).toUpperCase() == "W" // keypress
 				)
