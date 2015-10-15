@@ -50,7 +50,7 @@ mp.setAttribute("oncontextmenu", "return false;");
 mp.setAttribute("onpopuphidden", "this.destroyMenu();");
 
 var tb = this.parentNode;
-if(tb.getAttribute("orient") == "vertical") {
+if(tb && tb.getAttribute("orient") == "vertical") {
 	// https://addons.mozilla.org/firefox/addon/vertical-toolbar/
 	var isRight = tb.parentNode.getAttribute("placement") == "right";
 	mp.setAttribute("position", isRight ? "start_before" : "end_before");
