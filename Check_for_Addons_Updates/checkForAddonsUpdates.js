@@ -155,7 +155,8 @@ function processAddonsTab(e) {
 	}
 
 	progressIcon.loading();
-	btn.tooltipText = $("updates-progress").getAttribute("value");
+	var inProgress = $("updates-progress");
+	btn.tooltipText = inProgress.getAttribute("value");
 
 	var origIcon = tab.image;
 	tab.image = image;
@@ -178,7 +179,6 @@ function processAddonsTab(e) {
 			notify("Tab with add-ons manager was closed!");
 			return;
 		}
-		var inProgress = $("updates-progress");
 		if(!inProgress.hidden)
 			return;
 		var autoUpdate = $("utils-autoUpdateDefault");
