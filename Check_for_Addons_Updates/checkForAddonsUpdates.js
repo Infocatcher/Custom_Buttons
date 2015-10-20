@@ -124,8 +124,14 @@ else if("gBrowser" in trgWindow && trgWindow.gBrowser.tabs) {
 	browser = tab.linkedBrowser;
 	if(isPending || browser.webProgress.isLoadingDocument) {
 		browser.addEventListener("load", processAddonsTab, true);
-		if(isPending)
-			browser.reload();
+		if(isPending) {
+			//browser.reload();
+			// Workaround to correctly restore pending tab
+			// See https://github.com/Infocatcher/Custom_Buttons/issues/39
+			var selTab = gBrowser.selectedTab;
+			gBrowser.selectedTab = tab;
+			gBrowser.selectedTab = selTab;
+		}
 	}
 	else {
 		processAddonsTab();
