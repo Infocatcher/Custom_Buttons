@@ -1321,7 +1321,16 @@ this.bookmarks = {
 						// || browser.__SS_restoreState == 1
 					)
 				) {
-					browser.reload();
+					if(_this.platformVersion >= 41) {
+						// Workaround to correctly restore pending tab
+						// See https://github.com/Infocatcher/Custom_Buttons/issues/39
+						let selTab = gBrowser.selectedTab;
+						gBrowser.selectedTab = tab;
+						gBrowser.selectedTab = selTab;
+					}
+					else {
+						browser.reload();
+					}
 					// Show "Connecting…" instead of "New Tab"
 					// (disable browser.sessionstore.restore_on_demand to see this bug)
 					gBrowser.setTabTitleLoading && gBrowser.setTabTitleLoading(tab);
