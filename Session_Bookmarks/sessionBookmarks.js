@@ -1314,7 +1314,7 @@ this.bookmarks = {
 				_this.ss.setTabState(tab, ssData);
 				if(
 					!disableForceLoad
-					&& tab != gBrowser.selectedTab // Should be loaded automatically in this case
+					&& !tab.selected // Selected tab will be loaded automatically
 					&& (
 						tab.getAttribute("pending") == "true" // Gecko >= 9.0
 						|| (browser.contentDocument || browser.contentDocumentAsCPOW).readyState == "uninitialized"
