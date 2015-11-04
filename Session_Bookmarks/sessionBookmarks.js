@@ -1264,6 +1264,7 @@ this.bookmarks = {
 					gBrowser.selectedTab = blankTab;
 					gBrowser.removeTab(tab, { animate: false });
 					tab = blankTab;
+					browser = tab.linkedBrowser;
 				}
 			}
 			this.cleanupSessionData(data); // Only for already saved unwanted data...
