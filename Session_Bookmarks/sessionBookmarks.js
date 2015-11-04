@@ -1257,7 +1257,7 @@ this.bookmarks = {
 				}
 				data.entries = tabHistory.concat(data.entries);
 				data.index += tabHistory.length;
-				if(this.options.replaceCurrentTab && tab == gBrowser.selectedTab) {
+				if(this.options.replaceCurrentTab && tab.selected) {
 					let blankTab = gBrowser.addTab("about:blank", { skipAnimation: true });
 					blankTab.linkedBrowser.stop();
 					gBrowser.moveTabTo(blankTab, gBrowser.tabContainer.selectedIndex + 1);
