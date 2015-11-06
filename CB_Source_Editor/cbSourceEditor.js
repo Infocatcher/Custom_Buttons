@@ -5,7 +5,7 @@
 // (code for "initialization" section)
 
 // (c) Infocatcher 2012-2015
-// version 0.1.0a6 - 2015-06-05
+// version 0.1.0a7 - 2015-11-06
 
 var options = {
 	cssInHelp: true,
