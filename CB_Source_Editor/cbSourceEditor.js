@@ -71,8 +71,12 @@ if(!watcher) {
 			return this.wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
 				.getService(Components.interfaces.nsIWindowMediator);
 		},
+		get platformVersion() {
+			delete this.platformVersion;
+			return this.platformVersion = "Services" in window ? parseFloat(Services.appinfo.platformVersion) : 0;
+		},
 		init: function(reason) {
-			if("Services" in window && parseFloat(Services.appinfo.platformVersion) < 27) {
+			if(this.platformVersion < 27) {
 				this.isBrowserWindow = function() {
 					return false; // CodeMirror is available only since Firefox 27.0a1 (2013-09-24)
 				};
@@ -126,7 +130,11 @@ if(!watcher) {
 			// + view-source:chrome://browser/content/devtools/source-editor-overlay.xul
 			var psXUL = (isCodeMirror
 			? '<!DOCTYPE popupset [\
-				<!ENTITY % sourceEditorStrings SYSTEM "chrome://browser/locale/devtools/sourceeditor.dtd">\
+				<!ENTITY % sourceEditorStrings SYSTEM "' + (
+					this.platformVersion >= 45
+						? "chrome://devtools/locale/sourceeditor.dtd"
+						: "chrome://browser/locale/devtools/sourceeditor.dtd"
+				) + '">\
 				%sourceEditorStrings;\
 			]>\
 			<popupset id="sourceEditorPopupset"\
