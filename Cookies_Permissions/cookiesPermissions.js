@@ -609,12 +609,12 @@ this.permissions = {
 		}
 		return host;
 	},
-	getURI: function(host) {
+	getURI: function(host, protocol) {
 		if(host.indexOf(":") != -1 && /^[:\da-f.]+$/.test(host)) // IPv6
 			host = "[" + host + "]";
 		host = host.replace(/^\./, "");
 		try {
-			return this.io.newURI(this.currentProtocol + "://" + host, null, null);
+			return this.io.newURI((protocol || this.currentProtocol) + "://" + host, null, null);
 		}
 		catch(e) {
 			Components.utils.reportError(this.errPrefix + "Invalid host: \"" + host + "\"");
@@ -1106,9 +1106,13 @@ this.permissions = {
 			let cookieHost = cookie.host;
 			if(checkHost && !checkHost.call(this, cookieHost))
 				continue;
-			let uri = this.getURI(cookieHost);
-			if(types && types.indexOf(pm.testPermission(uri, this.permissionType)) == -1)
-				continue;
+			if(types) {
+				// Trick for Firefox 42+, assumed pm.UNKNOWN_ACTION == 0
+				let permission = pm.testPermission(this.getURI(cookieHost, "http"), this.permissionType)
+					|| pm.testPermission(this.getURI(cookieHost, "https"), this.permissionType);
+				if(types.indexOf(permission) == -1)
+					continue;
+			}
 			cm.remove(cookieHost, cookie.name, cookie.path, false);
 		}
 	},
