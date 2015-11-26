@@ -1066,10 +1066,11 @@ this.permissions = {
 		if(removeAll == undefined)
 			removeAll = this.options.removeAllUnprotectedCookies;
 		var cp = this.cp;
+		var checkCookieHosts;
 		if(!removeAll) {
 			let hosts = this.currentHosts;
 			let checkCookieHost = this.checkCookieHost;
-			var checkCookieHosts = function(cookieHost) {
+			checkCookieHosts = function(cookieHost) {
 				return !hosts.some(function(host) {
 					return checkCookieHost(cookieHost, host);
 				});
