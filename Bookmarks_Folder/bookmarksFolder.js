@@ -56,16 +56,19 @@ function _localize(s, key) {
 	return _localize.apply(this, arguments);
 }
 
+function hasModifier(e) {
+	return e.ctrlKey || e.shiftKey || e.altKey || e.metaKey;
+}
 this.onclick = function(e) {
 	if(e.target != this)
 		return;
 	if(e.button != 2 && !this.bookmarks.initialized)
 		this.bookmarks.init();
-	else if(e.button == 1 || e.button == 0 && (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey))
+	else if(e.button == 1 || e.button == 0 && hasModifier(e))
 		this.bookmarks.changeFolder();
 };
 this.onmousedown = function(e) {
-	if(e.target == this && e.button == 0 && (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey))
+	if(e.target == this && e.button == 0 && hasModifier(e))
 		e.preventDefault();
 };
 this.onmouseover = function(e) {
