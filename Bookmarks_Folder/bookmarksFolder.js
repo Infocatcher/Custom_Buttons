@@ -5,8 +5,8 @@
 // Bookmarks Folder button for Custom Buttons
 // (code for "initialization" section)
 
-// (c) Infocatcher 2011-2014
-// version 0.1.1 - 2014-05-20
+// (c) Infocatcher 2011-2016
+// version 0.1.2 - 2016-01-04
 
 // Compatibility: Firefox 4.0+, SeaMonkey 2.1+
 
