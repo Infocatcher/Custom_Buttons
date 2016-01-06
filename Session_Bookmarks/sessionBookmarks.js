@@ -2081,7 +2081,7 @@ this.bookmarks = {
 	},
 	writeToFileAsync: function(str, file, callback, context) {
 		var encoder = this.textEncoder;
-		if(encoder) try {
+		if(encoder && this.platformVersion >= 20) try {
 			var {OS} = Components.utils.import("resource://gre/modules/osfile.jsm", {});
 			var onFailure = function(err) {
 				callback && callback.call(context || this, Components.results.NS_ERROR_FAILURE);
@@ -2155,7 +2155,7 @@ this.bookmarks = {
 	},
 	readFromFileAsync: function(file, callback, context) {
 		var decoder = this.textDecoder;
-		if(decoder) try {
+		if(decoder && this.platformVersion >= 20) try {
 			var {OS} = Components.utils.import("resource://gre/modules/osfile.jsm", {});
 			var onFailure = function(err) {
 				callback.call(context || this, "", Components.results.NS_ERROR_FAILURE);
