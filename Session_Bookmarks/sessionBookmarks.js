@@ -2073,7 +2073,42 @@ this.bookmarks = {
 	PERMS_FILE_READ:        parseInt("0444", 8),
 	PERMS_FILE_WRITE:       parseInt("0644", 8),
 	PERMS_FILE_OWNER_WRITE: parseInt("0600", 8),
+	get textEncoder() {
+		delete this.textEncoder;
+		if("TextEncoder" in window) // Firefox 18+
+			return this.textEncoder = new TextEncoder();
+		return this.textEncoder = null;
+	},
 	writeToFileAsync: function(str, file, callback, context) {
+		var encoder = this.textEncoder;
+		if(encoder) try {
+			var {OS} = Components.utils.import("resource://gre/modules/osfile.jsm", {});
+			var onFailure = function(err) {
+				callback && callback.call(context || this, Components.results.NS_ERROR_FAILURE);
+			}.bind(this);
+			try {
+				var arr = encoder.encode(str);
+			}
+			catch(e) {
+				onFailure(e);
+				return;
+			}
+			var options = {
+				tmpPath: file.path + ".tmp"
+			};
+			OS.File.writeAtomic(file.path, arr, options).then(
+				function onSuccess() {
+					callback && callback.call(context || this, Components.results.NS_OK, str);
+				}.bind(this),
+				onFailure
+			).then(null, onFailure);
+			return;
+		}
+		catch(e) {
+			if(OS)
+				Components.utils.reportError(e);
+		}
+
 		try {
 			Components.utils.import("resource://gre/modules/NetUtil.jsm");
 			Components.utils.import("resource://gre/modules/FileUtils.jsm");
