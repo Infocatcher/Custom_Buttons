@@ -2147,7 +2147,33 @@ this.bookmarks = {
 		cos.writeString(str);
 		cos.close(); // this closes fos
 	},
+	get textDecoder() {
+		delete this.textDecoder;
+		if("TextDecoder" in window) // Firefox 18+
+			return this.textDecoder = new TextDecoder();
+		return this.textDecoder = null;
+	},
 	readFromFileAsync: function(file, callback, context) {
+		var decoder = this.textDecoder;
+		if(decoder) try {
+			var {OS} = Components.utils.import("resource://gre/modules/osfile.jsm", {});
+			var onFailure = function(err) {
+				callback.call(context || this, "", Components.results.NS_ERROR_FAILURE);
+			}.bind(this);
+			OS.File.read(file.path).then(
+				function onSuccess(arr) {
+					var data = decoder.decode(arr);
+					callback.call(context || this, data, Components.results.NS_OK);
+				}.bind(this),
+				onFailure
+			).then(null, onFailure);
+			return;
+		}
+		catch(e) {
+			if(OS)
+				Components.utils.reportError(e);
+		}
+
 		try {
 			Components.utils.import("resource://gre/modules/NetUtil.jsm");
 			if(!("newChannel" in NetUtil))
