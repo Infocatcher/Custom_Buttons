@@ -2085,7 +2085,7 @@ this.bookmarks = {
 			var {OS} = Components.utils.import("resource://gre/modules/osfile.jsm", {});
 			var onFailure = function(err) {
 				callback && callback.call(context, Components.results.NS_ERROR_FAILURE);
-			}.bind(this);
+			};
 			try {
 				var arr = encoder.encode(str);
 			}
@@ -2099,7 +2099,7 @@ this.bookmarks = {
 			OS.File.writeAtomic(file.path, arr, options).then(
 				function onSuccess() {
 					callback && callback.call(context, Components.results.NS_OK, str);
-				}.bind(this),
+				},
 				onFailure
 			).then(null, onFailure);
 			return;
@@ -2133,9 +2133,9 @@ this.bookmarks = {
 			.createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
 		suc.charset = "UTF-8";
 		var istream = suc.convertToInputStream(str);
-		NetUtil.asyncCopy(istream, ostream, callback && this.bind(function(status) {
+		NetUtil.asyncCopy(istream, ostream, callback && function(status) {
 			callback.call(context, status, str);
-		}, this));
+		});
 	},
 	writeToFile: function(str, file) {
 		var fos = Components.classes["@mozilla.org/network/file-output-stream;1"]
@@ -2159,12 +2159,12 @@ this.bookmarks = {
 			var {OS} = Components.utils.import("resource://gre/modules/osfile.jsm", {});
 			var onFailure = function(err) {
 				callback.call(context, "", Components.results.NS_ERROR_FAILURE);
-			}.bind(this);
+			};
 			OS.File.read(file.path).then(
 				function onSuccess(arr) {
 					var data = decoder.decode(arr);
 					callback.call(context, data, Components.results.NS_OK);
-				}.bind(this),
+				},
 				onFailure
 			).then(null, onFailure);
 			return;
@@ -2241,11 +2241,11 @@ this.bookmarks = {
 			var {OS} = Components.utils.import("resource://gre/modules/osfile.jsm", {});
 			var onFailure = function(err) {
 				callback.call(context, Components.results.NS_ERROR_FILE_COPY_OR_MOVE_FAILED);
-			}.bind(this);
+			};
 			OS.File.copy(file.path, newFile.path).then(
 				function onSuccess() {
 					callback.call(context, Components.results.NS_OK);
-				}.bind(this),
+				},
 				onFailure
 			).then(null, onFailure);
 			return;
@@ -2283,9 +2283,9 @@ this.bookmarks = {
 				.createInstance(Components.interfaces.nsIFileOutputStream);
 			fos.init(newFile, 0x02 | 0x08 | 0x20, this.PERMS_FILE_WRITE, 0);
 
-			NetUtil.asyncCopy(fis, fos, this.bind(function(status) {
+			NetUtil.asyncCopy(fis, fos, function(status) {
 				callback.call(context, status);
-			}, this));
+			});
 		}
 		catch(e) {
 			Components.utils.reportError(e);
