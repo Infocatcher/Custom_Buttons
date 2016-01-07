@@ -2189,7 +2189,7 @@ this.bookmarks = {
 				catch(e) {
 					Components.utils.reportError(e);
 				}
-				callback.call(context, data, 0);
+				callback.call(context, data, status);
 			};
 			this.readFromFileAsync.apply(this, arguments);
 			return;
