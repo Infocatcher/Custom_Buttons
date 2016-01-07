@@ -2237,6 +2237,24 @@ this.bookmarks = {
 		return str;
 	},
 	copyFileAsync: function(file, newFile, callback, context) {
+		if(this.platformVersion >= 20) try {
+			var {OS} = Components.utils.import("resource://gre/modules/osfile.jsm", {});
+			var onFailure = function(err) {
+				callback.call(context || this, Components.results.NS_ERROR_FILE_COPY_OR_MOVE_FAILED);
+			}.bind(this);
+			OS.File.copy(file.path, newFile.path).then(
+				function onSuccess() {
+					callback.call(context || this, Components.results.NS_OK);
+				}.bind(this),
+				onFailure
+			).then(null, onFailure);
+			return;
+		}
+		catch(e) {
+			if(OS)
+				Components.utils.reportError(e);
+		}
+
 		try {
 			Components.utils.import("resource://gre/modules/NetUtil.jsm");
 		}
