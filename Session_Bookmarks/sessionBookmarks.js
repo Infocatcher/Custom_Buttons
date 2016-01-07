@@ -2084,7 +2084,7 @@ this.bookmarks = {
 		if(encoder && this.platformVersion >= 20) try {
 			var {OS} = Components.utils.import("resource://gre/modules/osfile.jsm", {});
 			var onFailure = function(err) {
-				callback && callback.call(context || this, Components.results.NS_ERROR_FAILURE);
+				callback && callback.call(context, Components.results.NS_ERROR_FAILURE);
 			}.bind(this);
 			try {
 				var arr = encoder.encode(str);
@@ -2098,7 +2098,7 @@ this.bookmarks = {
 			};
 			OS.File.writeAtomic(file.path, arr, options).then(
 				function onSuccess() {
-					callback && callback.call(context || this, Components.results.NS_OK, str);
+					callback && callback.call(context, Components.results.NS_OK, str);
 				}.bind(this),
 				onFailure
 			).then(null, onFailure);
@@ -2123,7 +2123,7 @@ this.bookmarks = {
 				catch(e) {
 					Components.utils.reportError(e);
 				}
-				callback && callback.call(context || this, status, str);
+				callback && callback.call(context, status, str);
 			};
 			this.writeToFileAsync.apply(this, arguments);
 			return;
@@ -2134,7 +2134,7 @@ this.bookmarks = {
 		suc.charset = "UTF-8";
 		var istream = suc.convertToInputStream(str);
 		NetUtil.asyncCopy(istream, ostream, callback && this.bind(function(status) {
-			callback.call(context || this, status, str);
+			callback.call(context, status, str);
 		}, this));
 	},
 	writeToFile: function(str, file) {
@@ -2158,12 +2158,12 @@ this.bookmarks = {
 		if(decoder && this.platformVersion >= 20) try {
 			var {OS} = Components.utils.import("resource://gre/modules/osfile.jsm", {});
 			var onFailure = function(err) {
-				callback.call(context || this, "", Components.results.NS_ERROR_FAILURE);
+				callback.call(context, "", Components.results.NS_ERROR_FAILURE);
 			}.bind(this);
 			OS.File.read(file.path).then(
 				function onSuccess(arr) {
 					var data = decoder.decode(arr);
-					callback.call(context || this, data, Components.results.NS_OK);
+					callback.call(context, data, Components.results.NS_OK);
 				}.bind(this),
 				onFailure
 			).then(null, onFailure);
@@ -2189,7 +2189,7 @@ this.bookmarks = {
 				catch(e) {
 					Components.utils.reportError(e);
 				}
-				callback.call(context || this, data, 0);
+				callback.call(context, data, 0);
 			};
 			this.readFromFileAsync.apply(this, arguments);
 			return;
@@ -2209,7 +2209,7 @@ this.bookmarks = {
 				catch(e) {
 				}
 			}
-			callback.call(context || this, data, status);
+			callback.call(context, data, status);
 		}, this));
 	},
 	readFromFile: function(file) {
@@ -2240,11 +2240,11 @@ this.bookmarks = {
 		if(this.platformVersion >= 20) try {
 			var {OS} = Components.utils.import("resource://gre/modules/osfile.jsm", {});
 			var onFailure = function(err) {
-				callback.call(context || this, Components.results.NS_ERROR_FILE_COPY_OR_MOVE_FAILED);
+				callback.call(context, Components.results.NS_ERROR_FILE_COPY_OR_MOVE_FAILED);
 			}.bind(this);
 			OS.File.copy(file.path, newFile.path).then(
 				function onSuccess() {
-					callback.call(context || this, Components.results.NS_OK);
+					callback.call(context, Components.results.NS_OK);
 				}.bind(this),
 				onFailure
 			).then(null, onFailure);
@@ -2270,7 +2270,7 @@ this.bookmarks = {
 				catch(e) {
 					Components.utils.reportError(e);
 				}
-				callback.call(context || this, status);
+				callback.call(context, status);
 			};
 			this.copyFileAsync.apply(this, arguments);
 			return;
@@ -2284,12 +2284,12 @@ this.bookmarks = {
 			fos.init(newFile, 0x02 | 0x08 | 0x20, this.PERMS_FILE_WRITE, 0);
 
 			NetUtil.asyncCopy(fis, fos, this.bind(function(status) {
-				callback.call(context || this, status);
+				callback.call(context, status);
 			}, this));
 		}
 		catch(e) {
 			Components.utils.reportError(e);
-			callback.call(context || this, Components.results.NS_ERROR_FILE_ACCESS_DENIED);
+			callback.call(context, Components.results.NS_ERROR_FILE_ACCESS_DENIED);
 		}
 	},
 	ensureFilePermissions: function(file, mask) {
