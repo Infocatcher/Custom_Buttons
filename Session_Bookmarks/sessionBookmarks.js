@@ -2105,8 +2105,7 @@ this.bookmarks = {
 			return;
 		}
 		catch(e) {
-			if(OS)
-				Components.utils.reportError(e);
+			OS && Components.utils.reportError(e);
 		}
 
 		try {
@@ -2170,8 +2169,7 @@ this.bookmarks = {
 			return;
 		}
 		catch(e) {
-			if(OS)
-				Components.utils.reportError(e);
+			OS && Components.utils.reportError(e);
 		}
 
 		try {
@@ -2251,8 +2249,7 @@ this.bookmarks = {
 			return;
 		}
 		catch(e) {
-			if(OS)
-				Components.utils.reportError(e);
+			OS && Components.utils.reportError(e);
 		}
 
 		try {
