@@ -409,6 +409,10 @@ if(!watcher) {
 						}
 						window.setTimeout(function() {
 							window.editor.changed = false; // Strange...
+							window.setTimeout(function() { // Workaround for unexpected onTextChanged() calls
+								if(window.editor.changed && cbEditor.value == code)
+									window.editor.changed = false;
+							}, 100);
 							se.on("change", onTextChanged);
 							if(isLoaded) {
 								if("clearHistory" in se)
