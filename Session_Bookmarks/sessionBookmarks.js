@@ -505,40 +505,43 @@ this.bookmarks = {
 
 	initIds: function() {
 		this.initIds = function() {};
+		var shortcuts = {
+			// Bookmarks menu
+			cmId:          "-context",
+			sepId:         "-separator",
+			openAllId:     "-openAll",
 
+			// Bookmarks context menu
+			addBookmarkId: "-addBookmark",
+			addSepId:      "-addSeparator",
+
+			bmAllSepId:    "-separator-bookmarkAllTabs",
+			bmAllId:       "-bookmarkAllTabs",
+
+			updateSepId:   "-separator-update",
+			updateId:      "-update",
+			updateURIId:   "-updateURI",
+
+			deleteSepId:   "-separator-delete",
+			deleteId:      "-delete",
+			deleteAllId:   "-deleteAll",
+
+			sortSepId:     "-separator-sort",
+			sortId:        "-sort",
+
+			undoId:        "-undo",
+			redoId:        "-redo",
+
+			propsSepId:    "-separator-properties",
+			propsId:       "-properties",
+
+			btnMenuSepId:  "-separator-buttonMenu",
+			btnMenuId:     "-buttonMenu",
+			__proto__: null
+		};
 		var btnId = this.button.id;
-
-		// Bookmarks menu
-		this.cmId          = btnId + "-context";
-		this.sepId         = btnId + "-separator";
-		this.openAllId     = btnId + "-openAll";
-
-		// Bookmarks context menu
-		this.addBookmarkId = btnId + "-addBookmark";
-		this.addSepId      = btnId + "-addSeparator";
-
-		this.bmAllSepId    = btnId + "-separator-bookmarkAllTabs";
-		this.bmAllId       = btnId + "-bookmarkAllTabs";
-
-		this.updateSepId   = btnId + "-separator-update";
-		this.updateId      = btnId + "-update";
-		this.updateURIId   = btnId + "-updateURI";
-
-		this.deleteSepId   = btnId + "-separator-delete";
-		this.deleteId      = btnId + "-delete";
-		this.deleteAllId   = btnId + "-deleteAll";
-
-		this.sortSepId     = btnId + "-separator-sort";
-		this.sortId        = btnId + "-sort";
-
-		this.undoId        = btnId + "-undo";
-		this.redoId        = btnId + "-redo";
-
-		this.propsSepId    = btnId + "-separator-properties";
-		this.propsId       = btnId + "-properties";
-
-		this.btnMenuSepId  = btnId + "-separator-buttonMenu";
-		this.btnMenuId     = btnId + "-buttonMenu";
+		for(var p in shortcuts)
+			this[p] = btnId + shortcuts[p];
 	},
 	addContextMenu: function() {
 		_log("addContextMenu()");
