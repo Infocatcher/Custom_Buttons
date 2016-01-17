@@ -1115,10 +1115,11 @@ this.bookmarks = {
 			return;
 		if("_notifyTip" in this)
 			this._notifyTip.hidePopup();
-		var tip = this._notifyTip = document.createElement("tooltip");
-		tip.className = "sessionBookmarks-notifyTip";
-		tip.setAttribute("label", msg);
-		tip.setAttribute("onmouseover", "this.hidePopup();");
+		var tip = this._notifyTip = this.createElement("tooltip", {
+			"class": "sessionBookmarks-notifyTip",
+			label: msg,
+			onmouseover: "this.hidePopup();"
+		});
 		var stl = tip.style;
 		stl.opacity = 0.6;
 		document.documentElement.appendChild(tip);
