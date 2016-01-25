@@ -2132,10 +2132,8 @@ this.bookmarks = {
 			return;
 		}
 		var ostream = FileUtils.openSafeFileOutputStream(file);
-		var suc = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"]
-			.createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
-		suc.charset = "UTF-8";
-		var istream = suc.convertToInputStream(str);
+		var uc = this.unicodeConverter("UTF-8");
+		var istream = uc.convertToInputStream(str);
 		NetUtil.asyncCopy(istream, ostream, callback && function(status) {
 			callback.call(context, status, str);
 		});
@@ -2227,16 +2225,20 @@ this.bookmarks = {
 		return this.convertToUnicode(str);
 	},
 	convertToUnicode: function(str) {
-		var suc = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"]
-			.createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
-		suc.charset = "utf8";
+		var uc = this.unicodeConverter("UTF-8");
 		try {
-			return suc.ConvertToUnicode(str);
+			return uc.ConvertToUnicode(str);
 		}
 		catch(e) {
 			Components.utils.reportError(e);
 		}
 		return str;
+	},
+	unicodeConverter: function(charset) {
+		var uc = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"]
+			.createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
+		uc.charset = charset;
+		return uc;
 	},
 	copyFileAsync: function(file, newFile, callback, context) {
 		if(this.platformVersion >= 20) try {
