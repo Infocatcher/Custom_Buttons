@@ -914,28 +914,28 @@ var cmds = this.commands = {
 		else if(os == "Darwin") platform = "mac";
 		else                    platform = "linux-i686";
 		if(!isRelease) {
-			// ftp://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/latest-mozilla-central-l10n/win32/xpi/
-			// ftp://ftp.mozilla.org/pub/mozilla.org/seamonkey/nightly/latest-comm-central-trunk-l10n/win32/xpi/
-			// ftp://ftp.mozilla.org/pub/mozilla.org/thunderbird/nightly/latest-comm-central-l10n/win32/xpi/
+			// https://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/latest-mozilla-central-l10n/win32/xpi/
+			// https://ftp.mozilla.org/pub/mozilla.org/seamonkey/nightly/latest-comm-central-trunk-l10n/win32/xpi/
+			// https://ftp.mozilla.org/pub/mozilla.org/thunderbird/nightly/latest-comm-central-l10n/win32/xpi/
 			// firefox-25.0a1.fr.langpack.xpi
 			var file = app + "-" + version + "." + locale + ".langpack.xpi";
 			var dir;
 			if(app == "firefox")        dir = "latest-mozilla-central-l10n";
 			else if(app == "seamonkey") dir = "latest-comm-central-trunk-l10n";
 			else                        dir = "latest-comm-central-l10n";
-			return "ftp://ftp.mozilla.org/pub/mozilla.org/" + app + "/nightly/" + dir + "/" + platform + "/xpi/" + file;
+			return "https://ftp.mozilla.org/pub/mozilla.org/" + app + "/nightly/" + dir + "/" + platform + "/xpi/" + file;
 		}
 		if(app == "seamonkey") {
-			// ftp://ftp.mozilla.org/pub/mozilla.org/seamonkey/releases/2.17.1/langpack/seamonkey-2.17.1.ru.langpack.xpi
-			return "ftp://ftp.mozilla.org/pub/mozilla.org/seamonkey/releases/"
+			// https://ftp.mozilla.org/pub/mozilla.org/seamonkey/releases/2.17.1/langpack/seamonkey-2.17.1.ru.langpack.xpi
+			return "https://ftp.mozilla.org/pub/mozilla.org/seamonkey/releases/"
 				+ version + "/langpack/seamonkey-" + version + "." + locale + ".langpack.xpi";
 		}
 		var file = locale + ".xpi";
 		var esr = useESR ? "esr" : "";
-		// ftp://ftp.mozilla.org/pub/mozilla.org/firefox/releases/23.0/win32/xpi/
-		// ftp://ftp.mozilla.org/pub/mozilla.org/firefox/releases/23.0/mac/xpi/
-		// ftp://ftp.mozilla.org/pub/mozilla.org/firefox/releases/23.0/linux-i686/xpi/
-		return "ftp://ftp.mozilla.org/pub/mozilla.org/" + app + "/releases/" + version + esr + "/" + platform + "/xpi/" + file;
+		// https://ftp.mozilla.org/pub/mozilla.org/firefox/releases/23.0/win32/xpi/
+		// https://ftp.mozilla.org/pub/mozilla.org/firefox/releases/23.0/mac/xpi/
+		// https://ftp.mozilla.org/pub/mozilla.org/firefox/releases/23.0/linux-i686/xpi/
+		return "https://ftp.mozilla.org/pub/mozilla.org/" + app + "/releases/" + version + esr + "/" + platform + "/xpi/" + file;
 	},
 	get canSaveSessionAndExit() {
 		delete this.canSaveSessionAndExit;
