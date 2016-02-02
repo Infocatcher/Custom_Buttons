@@ -3,8 +3,8 @@
 // Custom Buttons: Disable Initialization button for Custom Buttons
 // (code for "initialization" section)
 
-// (c) Infocatcher 2012-2013
-// version 0.1.0 - 2013-05-05
+// (c) Infocatcher 2012-2013, 2016
+// version 0.1.1 - 2016-02-02
 
 // Adds "Enable initialization" checkbox to custom button's context menu.
 // Only for test purposes!
