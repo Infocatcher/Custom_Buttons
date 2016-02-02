@@ -8,7 +8,7 @@
 
 // Adds "Enable initialization" checkbox to custom button's context menu.
 // Only for test purposes!
-// "Disabled" mean only "return;" before initealization code.
+// "Disabled" mean only "if(true) return;" before initealization code.
 
 // Note: button itself aren't needed, this is just way to execute code on window startup.
 // So you can place it on hidden toolbar.
@@ -80,7 +80,7 @@ addEventListener("popupshowing", function(e) {
 		return;
 	var btn = getBtn();
 	var initCode = btn && btn.cbInitCode || "";
-	if(/^\n*return(?:;|\s*\n)/.test(initCode))
+	if(/^\s*(?:if\s*\(true\)\s*)?return(?:;|\s*\n)/.test(initCode))
 		toggleEnabled.removeAttribute("checked");
 	else
 		toggleEnabled.setAttribute("checked", "true");
@@ -95,11 +95,12 @@ window.toggleCustomButtonEnabled = function() { // Should be global to work in c
 	if(!btn)
 		return;
 
-	const disablePrefix = "return; // Disabled by Disable Initialization button\n\n";
+	// Trick to prevent "unreachable code after return statement" warning
+	const disablePrefix = "if(true) return; // Disabled by Disable Initialization button\n\n";
 	var initCode = btn.cbInitCode;
 	//if(initCode.substr(0, disablePrefix.length) == disablePrefix)
 	//	initCode = initCode.substr(disablePrefix.length);
-	if(/^\s*return;?(?:\s*\/\/[^\n\r]*)?\n+/.test(initCode))
+	if(/^\s*(?:if\s*\(true\)\s*)?return;?(?:\s*\/\/[^\n\r]*)?\n+/.test(initCode))
 		initCode = RegExp.rightContext;
 	else
 		initCode = disablePrefix + initCode;
@@ -126,7 +127,8 @@ function getBtn() {
 
 var style = '\
 	@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");\n\
-	toolbarbutton[id^="custombuttons-button"][cb-init^="return;"]:not([cb-edit-state]) {\n\
+	toolbarbutton[id^="custombuttons-button"][cb-init^="return;"]:not([cb-edit-state]),\n\
+	toolbarbutton[id^="custombuttons-button"][cb-init^="if(true) return;"]:not([cb-edit-state]) {\n\
 		outline: 1px dotted !important;\n\
 		outline-offset: -1px !important;\n\
 	}';
