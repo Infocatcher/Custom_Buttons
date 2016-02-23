@@ -767,7 +767,7 @@ function init() {
 				"stopImmediatePropagation" in e && e.stopImmediatePropagation();
 			}
 			catch(e) { // e10s: TypeError: 'preventDefault' called on an object that does not implement interface Event.
-				if(("" + e).indexOf("does not implement interface") == -1)
+				if(_debug || ("" + e).indexOf("does not implement interface") == -1)
 					Components.utils.reportError(e);
 			}
 			//_log("stopEvent: " + e.type);
@@ -902,7 +902,7 @@ function init() {
 					});
 				}
 				catch(e) { // e10s: Argument 1 of MutationObserver.observe does not implement interface Node.
-					if(("" + e).indexOf("does not implement interface") == -1)
+					if(_debug || ("" + e).indexOf("does not implement interface") == -1)
 						Components.utils.reportError(e);
 				}
 				return;
@@ -1679,7 +1679,7 @@ function init() {
 					_log('Warning! Default action for "' + e.type + '" event is already cancelled!');
 			}
 			catch(e) { // e10s: TypeError: 'getPreventDefault' called on an object that does not implement interface Event.
-				if(("" + e).indexOf("does not implement interface") == -1)
+				if(_debug || ("" + e).indexOf("does not implement interface") == -1)
 					Components.utils.reportError(e);
 			}
 		},
