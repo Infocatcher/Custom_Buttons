@@ -152,12 +152,11 @@ function convertE4X(s) {
 	// { expressions }
 	s = s.replace(/(=\s*)?\{([^\}]*)\}/g, function(s, eq, code) {
 		//~ todo: don't add ( ... ) for foo, this.foo, this[foo] and foo("something") ?
-		var isAttr = !!RegExp.$1;
-		code = "e4xConv_encodeHTML(" + code + (isAttr ? ", true" : "") + ")";
+		code = "e4xConv_encodeHTML(" + code + (eq ? ", true" : "") + ")";
 		var q = eq ? '"' : "";
 		code = q + "' + " + code + " + '" + q;
 		codes.push(code);
-		return eq + rndExpr;
+		return (eq || "") + rndExpr;
 	});
 
 	// Restore CDATA
