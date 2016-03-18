@@ -1714,8 +1714,8 @@ this.attrsInspector = function(event) {
 // https://forum.mozilla-russia.org/viewtopic.php?id=56041
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Attributes_Inspector
 
-// (c) Infocatcher 2010-2014
-// version 0.6.3 - 2014-06-19
+// (c) Infocatcher 2010-2016
+// version 0.6.4 - 2016-02-23
 
 //===================
 // Attributes Inspector button for Custom Buttons
@@ -2473,9 +2473,15 @@ function init() {
 				.equals(Components.interfaces.nsIStyleSheetService);
 		},
 		stopEvent: function(e) {
-			e.preventDefault();
-			e.stopPropagation();
-			"stopImmediatePropagation" in e && e.stopImmediatePropagation();
+			try {
+				e.preventDefault();
+				e.stopPropagation();
+				"stopImmediatePropagation" in e && e.stopImmediatePropagation();
+			}
+			catch(e) { // e10s: TypeError: 'preventDefault' called on an object that does not implement interface Event.
+				if(_debug || ("" + e).indexOf("does not implement interface") == -1)
+					Components.utils.reportError(e);
+			}
 			//_log("stopEvent: " + e.type);
 		},
 		_timers: { __proto__: null },
@@ -2601,10 +2607,16 @@ function init() {
 			var mo = this.mutationObserver;
 			if(mo) {
 				// http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#mutation-observers
-				mo.observe(node, {
-					attributes: true,
-					attributeOldValue: true
-				});
+				try {
+					mo.observe(node, {
+						attributes: true,
+						attributeOldValue: true
+					});
+				}
+				catch(e) { // e10s: Argument 1 of MutationObserver.observe does not implement interface Node.
+					if(_debug || ("" + e).indexOf("does not implement interface") == -1)
+						Components.utils.reportError(e);
+				}
 				return;
 			}
 			// Legacy version
@@ -3374,8 +3386,14 @@ function init() {
 			popupLocker.init();
 		},
 		_checkPreventDefault: function(e) {
-			if("defaultPrevented" in e ? e.defaultPrevented : e.getPreventDefault())
-				_log('Warning! Default action for "' + e.type + '" event is already cancelled!');
+			try {
+				if("defaultPrevented" in e ? e.defaultPrevented : e.getPreventDefault())
+					_log('Warning! Default action for "' + e.type + '" event is already cancelled!');
+			}
+			catch(e) { // e10s: TypeError: 'getPreventDefault' called on an object that does not implement interface Event.
+				if(_debug || ("" + e).indexOf("does not implement interface") == -1)
+					Components.utils.reportError(e);
+			}
 		},
 		closeMenus: function(node) {
 			// Based on function closeMenus from chrome://browser/content/utilityOverlay.js
