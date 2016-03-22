@@ -150,8 +150,13 @@ function convertE4X(s) {
 	var codes = [];
 	var rndExpr = rnd();
 	// { expressions }
-	s = s.replace(/(=\s*)?\{([^\}]*)\}/g, function(s, eq, code) {
-		//~ todo: don't add ( ... ) for foo, this.foo, this[foo] and foo("something") ?
+	s = s.replace(/(=\s*)?\{([^\}]*)\}/g, function(s, eq, code, offset, str) {
+		if(
+			!eq
+			&& /\s[-:\w]+\s*=\s*(?:"[^"]*|'[^']*)$/.test(str.substr(0, offset)) // foo="something{
+			&& /^(?:[^"]*"|[^']*')(?:\s|\/?>)/.test(str.substr(offset)) // something"
+		)
+			return s; // Looks like we're inside attribute, leave as is
 		code = "e4xConv_encodeHTML(" + code + (eq ? ", true" : "") + ")";
 		var q = eq ? '"' : "";
 		code = q + "' + " + code + " + '" + q;
