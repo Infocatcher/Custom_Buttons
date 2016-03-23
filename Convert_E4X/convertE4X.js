@@ -28,8 +28,13 @@ addEventListener("click", function getButton(e) {
 	if(!codes)
 		return;
 	removeEventListener(e.type, getButton, true);
-	e.preventDefault();
-	e.stopPropagation();
+	try {
+		e.preventDefault();
+		e.stopPropagation();
+	}
+	catch(e) { // TypeError: 'preventDefault' called on an object that does not implement interface Event
+		Components.utils.reportError(e);
+	}
 	btn.checked = false;
 	if(trg != btn)
 		codes.forEach(convertCode);
