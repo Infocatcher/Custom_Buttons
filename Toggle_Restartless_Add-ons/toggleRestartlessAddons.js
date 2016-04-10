@@ -185,14 +185,9 @@ function getNewDisabled(addon) {
 }
 function setDisabled(mi, disabled) {
 	var askToActivate = "STATE_ASK_TO_ACTIVATE" in AddonManager && disabled == AddonManager.STATE_ASK_TO_ACTIVATE;
-	if(askToActivate)
-		mi.classList.add("toggleRestartlessAddons-askToActivate");
-	else
-		mi.classList.remove("toggleRestartlessAddons-askToActivate");
-	if(disabled && !askToActivate)
-		mi.classList.add("toggleRestartlessAddons-disabled");
-	else
-		mi.classList.remove("toggleRestartlessAddons-disabled");
+	var cl = mi.classList;
+	cl.toggle("toggleRestartlessAddons-askToActivate", askToActivate);
+	cl.toggle("toggleRestartlessAddons-disabled", disabled && !askToActivate);
 }
 
 if(
