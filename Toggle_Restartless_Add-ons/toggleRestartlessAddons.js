@@ -35,9 +35,9 @@ var options = {
 	closeMenu: true,
 	// Close menu after left-click (use Shift+click to invert this behavior)
 	closeMenuClickToPlay: -1
-	// For click to play plugins:
+	// Special handling for click to play plugins:
 	// -1 - invert Shift+click behavior
-	// 0  - do nothing special
+	// 0  - do nothing special (and use "closeMenu" option)
 	// 1  - always don't close menu
 };
 
