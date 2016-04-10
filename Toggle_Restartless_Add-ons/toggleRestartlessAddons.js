@@ -11,8 +11,8 @@
 // https://github.com/Infocatcher/Custom_Buttons/blob/master/Check_for_Addons_Updates/checkForAddonsUpdates.js
 // after "//== Check for Addons Updates begin"
 
-// (c) Infocatcher 2013-2014
-// version 0.1.2.1 - 2014-02-21
+// (c) Infocatcher 2013-2016
+// version 0.1.2.2 - 2016-04-10
 
 var options = {
 	addonTypes: ["extension", "plugin"],
