@@ -317,7 +317,12 @@ function dontSelectHiddenTab(e) {
 			return;
 }
 function ProgressIcon(btn) {
+	if(!(btn instanceof XULElement)) {
+		this.loading = this.restore = function() {};
+		return;
+	}
 	var app = Services.appinfo.name;
+	var pv = parseFloat(Services.appinfo.platformVersion);
 	if(app == "SeaMonkey")
 		this.imgConnecting = this.imgLoading = "chrome://communicator/skin/icons/loading.gif";
 	else if(app == "Thunderbird") {
@@ -326,13 +331,11 @@ function ProgressIcon(btn) {
 	}
 	else {
 		this.imgConnecting = "chrome://browser/skin/tabbrowser/connecting.png";
-		this.imgLoading = "chrome://browser/skin/tabbrowser/loading.png";
+		this.imgLoading = app == "Firefox" && pv >= 48
+			? "chrome://global/skin/icons/loading.png"
+			: "chrome://browser/skin/tabbrowser/loading.png";
 	}
-	if(!(btn instanceof XULElement)) {
-		this.loading = this.restore = function() {};
-		return this;
-	}
-	var useAnimation = app == "Firefox" && parseFloat(Services.appinfo.platformVersion) >= 32;
+	var useAnimation = app == "Firefox" && pv >= 32;
 	var btnIcon = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon");
 	var origIcon = btnIcon.src;
 	btnIcon.src = this.imgConnecting;
@@ -369,6 +372,5 @@ function ProgressIcon(btn) {
 		if(useAnimation)
 			btnIcon._restore();
 	};
-	return this;
 }
 }).call(this);
