@@ -49,6 +49,7 @@ var options = {
 	hotkeys: {
 		cleanAndRestart: "control alt shift R",
 		attrsInspector: "control alt I",
+		openErrorConsole: "control alt J",
 		openScratchpad: {
 			key: "shift VK_F4",
 			override: "key_scratchpad"
