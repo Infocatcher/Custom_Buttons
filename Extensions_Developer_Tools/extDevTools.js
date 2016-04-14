@@ -391,6 +391,14 @@ var cmds = this.commands = {
 				mi.setAttribute("default", cbId == defaultAction);
 				if(cbId == "switchLocale")
 					this.initSwitchLocaleItem(mi);
+				else if(cbId == "errorConsole") {
+					var kId = "openErrorConsole";
+					if(
+						!document.getElementById("key_errorConsole")
+						&& kId in this.options.hotkeys
+					)
+						mi.setAttribute("key", keyCbId + "-" + kId);
+				}
 				else if(cbId == "attrsInspector") {
 					//~ Note: should be "inspectDOMNode" in window for Firefox 1.5
 					this.setPartiallyAvailable(
