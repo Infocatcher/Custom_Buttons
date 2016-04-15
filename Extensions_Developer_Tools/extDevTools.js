@@ -570,7 +570,7 @@ var cmds = this.commands = {
 
 		var win = this.openBrowserWindow();
 		win.addEventListener("load", function moveTabs() {
-		win.removeEventListener("load", moveTabs, false);
+			win.removeEventListener("load", moveTabs, false);
 
 			if(window.windowState == window.STATE_NORMAL)
 				win.moveTo(window.screenX, window.screenY);
