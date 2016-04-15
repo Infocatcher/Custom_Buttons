@@ -592,7 +592,8 @@ var cmds = this.commands = {
 				// (chrome://global/content/bindings/browser.xml, <method name="swapDocShells">)
 				if(
 					tab.getAttribute("pending") == "true" // Gecko >= 9.0
-					|| tab.linkedBrowser.contentDocument.readyState == "uninitialized"
+					|| tab.linkedBrowser.contentDocument
+						&& tab.linkedBrowser.contentDocument.readyState == "uninitialized"
 				)
 					tab.linkedBrowser.reload();
 			});
