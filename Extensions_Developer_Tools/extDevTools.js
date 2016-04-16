@@ -583,6 +583,7 @@ var cmds = this.commands = {
 			var selectedTab = gBrowser.selectedTab;
 			var newBrowser = win.gBrowser;
 
+			var hasUnloadedTabs = false;
 			tabs.forEach(function(tab) {
 				if(!tab.linkedBrowser) // What?
 					return;
@@ -594,9 +595,15 @@ var cmds = this.commands = {
 					tab.getAttribute("pending") == "true" // Gecko >= 9.0
 					|| tab.linkedBrowser.contentDocument
 						&& tab.linkedBrowser.contentDocument.readyState == "uninitialized"
-				)
+				) {
+					hasUnloadedTabs = true;
 					tab.linkedBrowser.reload();
+				}
 			});
+			if(hasUnloadedTabs) {
+				setTimeout(moveTabs, 500);
+				return;
+			}
 			//~ todo: add support for tab groups
 
 			if("treeStyleTab" in gBrowser) {
