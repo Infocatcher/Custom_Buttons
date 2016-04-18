@@ -254,6 +254,9 @@ function _localize(s, key) {
 			ru: "Изменить настройку «%S»:"
 		},
 
+		"Middle-click: action not selected, middle-click on some item to set/unset": {
+			ru: "Клик средней кнопкой мыши: действие не выбрано, кликните средней кнопкой по какому-нибудь пункту для установки/снятия"
+		},
 		"Middle-click: %S": {
 			ru: "Клик средней кнопкой мыши: %S"
 		}
@@ -467,7 +470,7 @@ var cmds = this.commands = {
 			btn.tooltipText = btn.tooltipText.replace(/ \n.*$/, "") + (
 				mi
 					? " \n" + _localize("Middle-click: %S").replace("%S", mi.getAttribute("label"))
-					: ""
+					: " \n" + _localize("Middle-click: action not selected, middle-click on some item to set/unset")
 			);
 			if(!_this.options.changeButtonIcon)
 				return;
