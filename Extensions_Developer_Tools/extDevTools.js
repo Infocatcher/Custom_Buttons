@@ -33,6 +33,7 @@ var options = {
 	// Use icon of default menu item as button icon
 	// (middle-click on menu item to mark it as default,
 	// middle-click on button to execute default action)
+	showMiddleClickActionTip: true, // Show "Middle-click: action not selected…" in tooltip
 	prefValues: {
 		// https://developer.mozilla.org/en-US/Add-ons/Installing_extensions#Disabling_install_locations
 		"extensions.autoDisableScopes": 14
@@ -470,7 +471,9 @@ var cmds = this.commands = {
 			btn.tooltipText = btn.tooltipText.replace(/ \n.*$/, "") + (
 				mi
 					? " \n" + _localize("Middle-click: %S").replace("%S", mi.getAttribute("label"))
-					: " \n" + _localize("Middle-click: action not selected, middle-click on some item to set/unset")
+					: _this.options.showMiddleClickActionTip
+						? " \n" + _localize("Middle-click: action not selected, middle-click on some item to set/unset")
+						: ""
 			);
 			if(!_this.options.changeButtonIcon)
 				return;
