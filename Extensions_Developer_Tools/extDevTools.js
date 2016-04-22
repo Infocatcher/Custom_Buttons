@@ -373,7 +373,7 @@ var cmds = this.commands = {
 	},
 	set defaultAction(val) {
 		if(!val)
-			this.prefSvc.clearUserPref(this.defaultActionPref);
+			this.resetPref(this.defaultActionPref);
 		else
 			this.setPref(this.defaultActionPref, val);
 	},
@@ -1096,11 +1096,11 @@ var cmds = this.commands = {
 	},
 	restoreErrorConsole: function() {
 		if(this.getPref(this.restoreErrorConsolePref)) {
-			this.prefSvc.clearUserPref(this.restoreErrorConsolePref);
+			this.resetPref(this.restoreErrorConsolePref);
 			this.openErrorConsole();
 		}
 		if(this.getPref(this.restoreBrowserConsolePref)) {
-			this.prefSvc.clearUserPref(this.restoreBrowserConsolePref);
+			this.resetPref(this.restoreBrowserConsolePref);
 			if(this.canOpenBrowserConsole)
 				this.openBrowserConsole();
 		}
@@ -1347,7 +1347,7 @@ var cmds = this.commands = {
 			if(pVal) // Checked
 				this.setPref(pref, this.options.prefValues[pref]);
 			else
-				this.prefSvc.clearUserPref(pref);
+				this.resetPref(pref);
 			setTimeout(function(_this) {
 				mi.setAttribute("tooltiptext", pref + " = " + _this.getPref(pref));
 			}, 0, this);
@@ -1426,6 +1426,9 @@ var cmds = this.commands = {
 	},
 	prefHasDefaultValue: function(pName) {
 		return this.getPref(pName, null, this.defaultBranch) != null;
+	},
+	resetPref: function(pName) {
+		this.prefSvc.clearUserPref(pName);
 	},
 
 	prefsChanged: false,
