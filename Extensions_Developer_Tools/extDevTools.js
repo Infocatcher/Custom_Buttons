@@ -24,10 +24,7 @@ var options = {
 	forceRestartOnLocaleChange: false,
 	updateLocales: true,
 	closeOptionsMenu: false,
-	restoreErrorConsole: 1,
-	// 0 - disable
-	// 1 - restore old Error Console
-	// 2 - restore new Browser Console (if available)
+	restoreErrorConsole: true, // Restore Error Console and Browser Console (if available)
 	reopenWindowFlushCaches: true,
 	changeButtonIcon: true,
 	// Use icon of default menu item as button icon
@@ -1004,7 +1001,7 @@ var cmds = this.commands = {
 			toJavaScriptConsole();
 			return;
 		}
-		var w = this.wm.getMostRecentWindow("global:console");
+		var w = this.getErrorConsole();
 		if(w) {
 			w.focus();
 			return;
@@ -1014,6 +1011,9 @@ var cmds = this.commands = {
 			? "chrome://console2/content/console2.xul"
 			: "chrome://global/content/console.xul";
 		window.openDialog(consoleURI, "_blank", "chrome,all,centerscreen,resizable,dialog=0");
+	},
+	getErrorConsole: function() {
+		return this.wm.getMostRecentWindow("global:console");
 	},
 	// Note: Browser Console isn't supported without opened browser windows
 	get browserWindow() {
@@ -1045,6 +1045,8 @@ var cmds = this.commands = {
 		window.document.getElementById("menu_browserConsole").doCommand();
 	},
 	getBrowserConsole: function(window) {
+		if(!window)
+			window = this.browserWindow;
 		if("HUDService" in window && "getBrowserConsole" in window.HUDService) { // Firefox 27.0a1+
 			var hud = window.HUDService.getBrowserConsole();
 			return hud && hud.iframeWindow;
@@ -1064,6 +1066,10 @@ var cmds = this.commands = {
 		delete this.restoreErrorConsolePref;
 		return this.restoreErrorConsolePref = "extensions.custombuttons.button" + this.btnNum + ".restoreErrorConsole";
 	},
+	get restoreBrowserConsolePref() {
+		delete this.restoreBrowserConsolePref;
+		return this.restoreBrowserConsolePref = "extensions.custombuttons.button" + this.btnNum + ".restoreBrowserConsole";
+	},
 	initErrorConsoleRestoring: function() {
 		if(this._restoreErrorConsoleObserver/* || this.platformVersion < 2*/)
 			return;
@@ -1073,8 +1079,10 @@ var cmds = this.commands = {
 		var observer = this._restoreErrorConsoleObserver = {
 			observe: function() {
 				obs.removeObserver(observer, "quit-application-granted");
-				if(_this.errorConsoleOpened)
-					_this.setPref(_this.restoreErrorConsolePref, _this.options.restoreErrorConsole);
+				if(_this.getErrorConsole())
+					_this.setPref(_this.restoreErrorConsolePref, true);
+				if(_this.getBrowserConsole())
+					_this.setPref(_this.restoreBrowserConsolePref, true);
 			}
 		};
 		obs.addObserver(observer, "quit-application-granted", false);
@@ -1086,22 +1094,15 @@ var cmds = this.commands = {
 			this.obs.removeObserver(o, "quit-application-granted");
 		}
 	},
-	get errorConsoleOpened() {
-		if(
-			this.options.restoreErrorConsole == 2
-			&& this.canOpenBrowserConsole
-		)
-			return !!this.getBrowserConsole();
-		return !!this.wm.getMostRecentWindow("global:console");
-	},
 	restoreErrorConsole: function() {
-		var restore = this.getPref(this.restoreErrorConsolePref);
-		if(restore) {
+		if(this.getPref(this.restoreErrorConsolePref)) {
 			this.prefSvc.clearUserPref(this.restoreErrorConsolePref);
-			if(restore == 2 && this.canOpenBrowserConsole)
+			this.openErrorConsole();
+		}
+		if(this.getPref(this.restoreBrowserConsolePref)) {
+			this.prefSvc.clearUserPref(this.restoreBrowserConsolePref);
+			if(this.canOpenBrowserConsole)
 				this.openBrowserConsole();
-			else
-				this.openErrorConsole();
 		}
 	},
 	attrsInspector: function(e) {
