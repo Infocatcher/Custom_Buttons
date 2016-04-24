@@ -1101,8 +1101,9 @@ var cmds = this.commands = {
 		}
 		if(this.getPref(this.restoreBrowserConsolePref)) {
 			this.resetPref(this.restoreBrowserConsolePref);
-			if(this.canOpenBrowserConsole)
-				this.openBrowserConsole();
+			// Note: #menu_browserConsole doesn't exist yet on startup
+			//if(this.canOpenBrowserConsole)
+			this.openBrowserConsole();
 		}
 	},
 	attrsInspector: function(e) {
