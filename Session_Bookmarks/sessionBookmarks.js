@@ -700,7 +700,9 @@ this.bookmarks = {
 			cb_buttonId: btnId
 		});
 		mi._bookmarks = this;
-		var insPoint = this.bmItem.nextSibling;
+		var insPoint = this.bmItem.parentNode.localName == "menugroup"
+			? this.$("context-savepage") || this.bmItem.parentNode.nextSibling
+			: this.bmItem.nextSibling;
 		while(insPoint && insPoint.getAttribute("cb_id") == cbId)
 			insPoint = insPoint.nextSibling;
 		this.bmPopup.insertBefore(mi, insPoint);
@@ -712,7 +714,10 @@ this.bookmarks = {
 		if(!bmItem)
 			return;
 		_log("initPageContextMenu()");
-		var bmPopup = this.bmPopup = bmItem.parentNode;
+		var bmPopup = bmItem.parentNode;
+		if(bmPopup.localName == "menugroup")
+			bmPopup = bmPopup.parentNode;
+		this.bmPopup = bmPopup;
 		bmPopup.addEventListener("popupshowing", this, true);
 	},
 	destroyPageContextMenu: function(force) {
