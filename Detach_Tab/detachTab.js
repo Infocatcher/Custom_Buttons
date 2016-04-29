@@ -102,6 +102,7 @@ function compactWindow(win) {
 	// But don't use "display: none;"
 	var style = '\
 		#TabsToolbar,\n\
+		#nav-bar, /* Just force hide, now used too complex tricks to handle "chromehidden" */\n\
 		.tabbrowser-strip,\n\
 		.treestyletab-splitter,\n\
 		.chromeclass-menubar,\n\
