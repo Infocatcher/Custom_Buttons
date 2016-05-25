@@ -53,7 +53,8 @@ var backToClose = {
 				|| backContext.getAttribute("aria-label");
 			var backContextTip = backContext.getAttribute("tooltiptext");
 		}
-		if(backMenu)    var backMenuLabel    = backMenu   .getAttribute("label");
+		if(backMenu)
+			var backMenuLabel = backMenu.getAttribute("label");
 
 		this.setTip = function(enable) {
 			ttLabel.setAttribute("value", enable ? closeTip : baseTip);
@@ -65,7 +66,7 @@ var backToClose = {
 				if(backContextTip)
 					backContext.setAttribute("tooltiptext", backContextTip + addLabel);
 			}
-			backMenu    && backMenu   .setAttribute("label", backMenuLabel    + addLabel);
+			backMenu && backMenu.setAttribute("label", backMenuLabel + addLabel);
 		};
 		this.setTip(enable);
 	}
