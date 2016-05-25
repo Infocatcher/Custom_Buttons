@@ -48,13 +48,23 @@ var backToClose = {
 
 		var backContext = $("context-back");
 		var backMenu = $("historyMenuBack");
-		if(backContext) var backContextLabel = backContext.getAttribute("label");
+		if(backContext) {
+			var backContextLabel = backContext.getAttribute("label")
+				|| backContext.getAttribute("aria-label");
+			var backContextTip = backContext.getAttribute("tooltiptext");
+		}
 		if(backMenu)    var backMenuLabel    = backMenu   .getAttribute("label");
 
 		this.setTip = function(enable) {
 			ttLabel.setAttribute("value", enable ? closeTip : baseTip);
 			var addLabel = enable ? closeAdd : "";
-			backContext && backContext.setAttribute("label", backContextLabel + addLabel);
+			if(backContext) {
+				backContext.setAttribute("label", backContextLabel + addLabel);
+				if(backContext.hasAttribute("aria-label"))
+					backContext.setAttribute("aria-label", backContextLabel + addLabel);
+				if(backContextTip)
+					backContext.setAttribute("tooltiptext", backContextTip + addLabel);
+			}
 			backMenu    && backMenu   .setAttribute("label", backMenuLabel    + addLabel);
 		};
 		this.setTip(enable);
