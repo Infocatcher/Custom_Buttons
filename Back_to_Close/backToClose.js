@@ -12,7 +12,7 @@ if(UpdateBackForwardCommands.toString().indexOf("_cb_backToClose") != -1) {
 }
 
 var backBtn = $("back-button");
-var backToClose = {
+var backToClose = window.cbBackToClose = {
 	enabled: false,
 	set: function(enable) {
 		if(enable == this.enabled)
@@ -96,7 +96,7 @@ eval(
 		.replace(
 			/\}$/,
 			'\n\n\
-			backToClose.set(!aWebNavigation.canGoBack);\n}'
+			cbBackToClose.set(!aWebNavigation.canGoBack);\n}'
 		)
 );
 UpdateBackForwardCommands(gBrowser.webNavigation);
