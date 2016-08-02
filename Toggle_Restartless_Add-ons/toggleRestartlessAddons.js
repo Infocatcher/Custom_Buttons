@@ -153,11 +153,11 @@ function setNewDisabled(addon) {
 	if(realDis != newDis) { // We can't enable vulnerable plugins
 		var err = "Can't set addon.userDisabled to " + newDis + ", real value: " + realDis;
 		if(newDis) {
-			LOG(err + "\nSTATE_ASK_TO_ACTIVATE not supported?");
+			_log(err + "\nSTATE_ASK_TO_ACTIVATE not supported?");
 			newDis = false;
 		}
 		else {
-			LOG(err + "\nVulnerable plugin?");
+			_log(err + "\nVulnerable plugin?");
 			if(oldDis == AddonManager.STATE_ASK_TO_ACTIVATE)
 				newDis = true;
 			else
@@ -369,6 +369,12 @@ function closeMenus(node) {
 		)
 			node.hidePopup();
 	}
+}
+function _log(s) {
+	if(typeof LOG == "function") // Custom Buttons
+		LOG(s);
+	else // Or something else
+		Services.console.logStringMessage("Toggle Restartless Add-ons: " + s);
 }
 
 function hasUpdater() {
