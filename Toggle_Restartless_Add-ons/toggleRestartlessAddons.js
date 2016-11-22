@@ -99,6 +99,9 @@ mp.updateMenu = function() {
 			mi.setAttribute("image", icon);
 			var desc = addon.description;
 			desc && mi.setAttribute("tooltiptext", desc);
+			var delay = "delayedStartupAddons" in Services
+				&& Services.delayedStartupAddons[addon.id] || null;
+			mi.classList.toggle("toggleRestartlessAddons-isDelayed", delay !== null);
 			setDisabled(mi, addon.userDisabled);
 			mi._cbAddon = addon;
 			df.appendChild(mi);
@@ -335,6 +338,10 @@ function addStyle() {
 	if(addStyle.hasOwnProperty("_style"))
 		return;
 	var style = '\
+		.toggleRestartlessAddons-isDelayed > .menu-iconic-text {\n\
+			opacity: 0.75;\n\
+			color: #070;\n\
+		}\n\
 		.toggleRestartlessAddons-disabled > .menu-iconic-left {\n\
 			opacity: 0.4;\n\
 		}\n\
