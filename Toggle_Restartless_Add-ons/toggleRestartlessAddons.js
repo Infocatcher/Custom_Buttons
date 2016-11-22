@@ -277,6 +277,8 @@ else { // Mouse gestures or something other...
 function getRestartlessAddons(addonTypes, callback, context) {
 	if(!("AddonManager" in window))
 		Components.utils.import("resource://gre/modules/AddonManager.jsm");
+	if(!("Services" in window))
+		Components.utils.import("resource://gre/modules/Services.jsm");
 	AddonManager.getAddonsByTypes(addonTypes, function(addons) {
 		var restartless = addons.filter(function(addon) {
 			var ops = addon.operationsRequiringRestart;
@@ -289,7 +291,6 @@ function getRestartlessAddons(addonTypes, callback, context) {
 function openAddonOptions(addon) {
 	// Based on code from chrome://mozapps/content/extensions/extensions.js
 	// Firefox 21.0a1 (2013-01-27)
-	Components.utils.import("resource://gre/modules/Services.jsm");
 	var optionsURL = addon.optionsURL;
 	if(!addon.isActive || !optionsURL)
 		return false;
