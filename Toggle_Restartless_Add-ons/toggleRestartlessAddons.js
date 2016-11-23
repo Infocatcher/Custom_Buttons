@@ -97,11 +97,14 @@ mp.updateMenu = function() {
 				mi.setAttribute("acceltext", addon.version);
 			mi.setAttribute("label", label);
 			mi.setAttribute("image", icon);
-			var desc = addon.description;
-			desc && mi.setAttribute("tooltiptext", desc);
+			var tip = addon.description || "";
 			var delay = "delayedStartupAddons" in Services
 				&& Services.delayedStartupAddons[addon.id] || null;
-			mi.classList.toggle("toggleRestartlessAddons-isDelayed", delay !== null);
+			var isDelayed = delay !== null;
+			mi.classList.toggle("toggleRestartlessAddons-isDelayed", isDelayed);
+			if(isDelayed)
+				tip = "[Delayed Startup: " + delay.toLocaleString() + "]" + (tip ? "\n" + tip : "");
+			tip && mi.setAttribute("tooltiptext", tip);
 			setDisabled(mi, addon.userDisabled);
 			mi._cbAddon = addon;
 			df.appendChild(mi);
