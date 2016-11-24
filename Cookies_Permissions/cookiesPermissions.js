@@ -5,8 +5,8 @@
 // Cookies Permissions button for Custom Buttons
 // (code for "initialization" section)
 
-// (c) Infocatcher 2010-2015
-// version 0.2.1pre3 - 2015-09-19
+// (c) Infocatcher 2010-2016
+// version 0.2.1pre4 - 2016-11-24
 
 var {Components} = window; // Prevent garbage collection in Firefox 3.6 and older
 
