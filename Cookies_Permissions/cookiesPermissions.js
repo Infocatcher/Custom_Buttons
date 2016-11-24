@@ -85,6 +85,9 @@ function _localize(sid) {
 			showCookiesAccesskey: "h",
 			removeTempPermissionsLabel: "Remove Temporary Permissions",
 			removeTempPermissionsAccesskey: "T",
+			autoRemoveUnprotectedCookiesLabel: "Automatically Remove Unprotected Cookies",
+			autoRemoveUnprotectedCookiesTip: "Periodically remove unprotected cookies (if checked)",
+			autoRemoveUnprotectedCookiesAccesskey: "n",
 			removeUnprotectedCookiesLabel: "Remove Unprotected Cookies",
 			removeUnprotectedCookiesTip: "Except cookies marked as “Allow” and except cookies from opened sites",
 			removeUnprotectedCookiesAccesskey: "U",
@@ -137,6 +140,9 @@ function _localize(sid) {
 			showCookiesAccesskey: "П",
 			removeTempPermissionsLabel: "Удалить временные исключения",
 			removeTempPermissionsAccesskey: "ы",
+			autoRemoveUnprotectedCookiesLabel: "Автоматически удалять незащищённые cookies",
+			autoRemoveUnprotectedCookiesTip: "Периодически удалять незащищённые cookies (если установлена галочка)",
+			autoRemoveUnprotectedCookiesAccesskey: "А",
 			removeUnprotectedCookiesLabel: "Удалить незащищённые cookies",
 			removeUnprotectedCookiesTip: "Исключая cookies, помеченные как «Разрешить», и исключая cookies из открытых сайтов",
 			removeUnprotectedCookiesAccesskey: "н",
@@ -426,6 +432,13 @@ this.permissions = {
 					accesskey="' + _localize("removeTempPermissionsAccesskey") + '" />\
 				<menuseparator />\
 				<menuitem\
+					cb_id="autoRemoveUnprotectedCookies"\
+					type="checkbox"\
+					oncommand="this.parentNode.parentNode.permissions.setAutoRemove(this.getAttribute(\'checked\') == \'true\');"\
+					label="' + _localize("autoRemoveUnprotectedCookiesLabel") + '"\
+					tooltiptext="' + _localize("autoRemoveUnprotectedCookiesTip") + '"\
+					accesskey="' + _localize("autoRemoveUnprotectedCookiesAccesskey") + '" />\
+				<menuitem\
 					cb_id="removeUnprotectedCookies"\
 					oncommand="this.parentNode.parentNode.permissions.confirm(\'removeUnprotectedCookiesConfirm\', \'removeUnprotectedCookies\', false);"\
 					label="' + _localize("removeUnprotectedCookiesLabel") + '"\
@@ -474,6 +487,11 @@ this.permissions = {
 			menu.appendChild(cbPopup);
 		}
 	},
+	setAutoRemove: function(enable) {
+		var timer = this.timer || null;
+		if(timer)
+			timer.enabled = enable;
+	},
 	initCleanupTimer: function() {
 		//if(this.options.removeUnprotectedCookiesInterval > 0) {
 		//	setInterval(function(_this) {
@@ -490,6 +508,7 @@ this.permissions = {
 		timer = this.timer = {
 			timerId: timerId,
 			interval: interval,
+			enabled: true,
 			permissions: this,
 			get timer() {
 				delete this.timer;
@@ -518,7 +537,7 @@ this.permissions = {
 				if(topic == "quit-application-granted")
 					this.destroy();
 				else if(topic == "timer-callback")
-					this.permissions.removeUnprotectedCookies();
+					this.enabled && this.permissions.removeUnprotectedCookies();
 			}
 		};
 		this.storage.set(timerId, timer);
@@ -699,6 +718,11 @@ this.permissions = {
 		mi.hidden = noPermissions;
 		if(!noPermissions)
 			mi.tooltipText = this.removeCurrentSiteCookiesHost;
+
+		var timer = this.timer || null;
+		var autoRemove = this.mp.getElementsByAttribute("cb_id", "autoRemoveUnprotectedCookies")[0];
+		autoRemove.setAttribute("checked", timer ? timer.enabled : false);
+		autoRemove.hidden = !timer;
 
 		return true;
 	},
