@@ -714,10 +714,10 @@ this.permissions = {
 			}, this).join(", \n");
 		}
 
-		var mi = this.mp.getElementsByAttribute("cb_id", "removeCurrentSiteCookies")[0];
-		mi.hidden = noPermissions;
+		var removeCurrent = this.mp.getElementsByAttribute("cb_id", "removeCurrentSiteCookies")[0];
+		removeCurrent.hidden = noPermissions;
 		if(!noPermissions)
-			mi.tooltipText = this.removeCurrentSiteCookiesHost;
+			removeCurrent.tooltipText = this.removeCurrentSiteCookiesHost;
 
 		var timer = this.timer || null;
 		var autoRemove = this.mp.getElementsByAttribute("cb_id", "autoRemoveUnprotectedCookies")[0];
