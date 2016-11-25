@@ -12,7 +12,10 @@ var {Components} = window; // Prevent garbage collection in Firefox 3.6 and olde
 
 var cp = Components.interfaces.nsICookiePermission;
 var options = {
-	removeUnprotectedCookiesInterval: -1,
+	removeUnprotectedCookiesEnabled: false,
+	// true  - periodically remove unprotected cookies by default
+	// false - don't remove by default
+	removeUnprotectedCookiesInterval: 10*60*1000,
 	// Periodically remove unprotected cookies (leave only cookies with "Allow" permission)
 	// Time in milliseconds like 30*60*1000 (30 minutes) or -1 to disable
 	removeAllUnprotectedCookies: false,
@@ -488,6 +491,10 @@ this.permissions = {
 		}
 	},
 	setAutoRemove: function(enable) {
+		if(enable) {
+			this.options.removeUnprotectedCookiesEnabled = true;
+			this.initCleanupTimer(); // Ensure initialized
+		}
 		var timer = this.timer || null;
 		if(timer)
 			timer.enabled = enable;
@@ -498,6 +505,8 @@ this.permissions = {
 		//		_this.removeUnprotectedCookies();
 		//	}, this.options.removeUnprotectedCookiesInterval, this);
 		//}
+		if(!this.options.removeUnprotectedCookiesEnabled)
+			return;
 		var interval = this.options.removeUnprotectedCookiesInterval;
 		if(interval <= 0)
 			return;
@@ -722,7 +731,7 @@ this.permissions = {
 		var timer = this.timer || null;
 		var autoRemove = this.mp.getElementsByAttribute("cb_id", "autoRemoveUnprotectedCookies")[0];
 		autoRemove.setAttribute("checked", timer ? timer.enabled : false);
-		autoRemove.hidden = !timer;
+		autoRemove.hidden = this.options.removeUnprotectedCookiesInterval <= 0;
 
 		return true;
 	},
