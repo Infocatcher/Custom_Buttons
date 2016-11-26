@@ -585,15 +585,11 @@ this.permissions = {
 		var tmp = { __proto__: null };
 		var ws = this.wm.getEnumerator("navigator:browser");
 		while(ws.hasMoreElements()) {
-			let w = ws.getNext();
-			let gBrowser = w.gBrowser;
+			let gBrowser = ws.getNext().gBrowser;
 			let tabs = gBrowser.visibleTabs || gBrowser.tabs || gBrowser.tabContainer.childNodes;
 			for(let i = 0, l = tabs.length; i < l; ++i) {
-				let tab = tabs[i];
-				let browser = tab.linkedBrowser;
-				if(!browser)
-					continue;
-				let host = this.getHostFromBrowser(browser);
+				let browser = tabs[i].linkedBrowser;
+				let host = browser && this.getHostFromBrowser(browser);
 				if(!host)
 					continue;
 				host = this.getHost(this.options.useBaseDomain.preserveCurrentSitesCookies, host);
