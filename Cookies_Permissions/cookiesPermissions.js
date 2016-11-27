@@ -500,11 +500,6 @@ this.permissions = {
 			timer.enabled = enable;
 	},
 	initCleanupTimer: function() {
-		//if(this.options.removeUnprotectedCookiesInterval > 0) {
-		//	setInterval(function(_this) {
-		//		_this.removeUnprotectedCookies();
-		//	}, this.options.removeUnprotectedCookiesInterval, this);
-		//}
 		if(!this.options.removeUnprotectedCookiesEnabled)
 			return;
 		var interval = this.options.removeUnprotectedCookiesInterval;
