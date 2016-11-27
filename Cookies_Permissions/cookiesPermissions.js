@@ -688,8 +688,8 @@ this.permissions = {
 				&& permission.expireType != this.pm.EXPIRE_NEVER
 			)
 				cbPermission += "-temp";
-			let mi = this.mp.getElementsByAttribute("cb_permission", cbPermission);
-			mi.length && mi[0].setAttribute("checked", "true");
+			let mi = this.mp.getElementsByAttribute("cb_permission", cbPermission)[0] || null;
+			mi && mi.setAttribute("checked", "true");
 		}
 
 		if(this.hasTempPermissions) {
