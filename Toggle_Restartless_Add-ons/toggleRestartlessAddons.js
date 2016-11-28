@@ -154,7 +154,21 @@ function isAskToActivateAddon(addon) {
 function setNewDisabled(addon) {
 	var newDis = getNewDisabled(addon);
 	var oldDis = addon.userDisabled;
-	addon.userDisabled = newDis;
+	try {
+		addon.userDisabled = newDis;
+	}
+	catch(e) { // Error: Cannot disable hidden add-on firefox@getpocket.com
+		_log(e);
+		if(addon.hidden) {
+			_log("Let's try set addon.userDisabled using raw hack");
+			var g = Components.utils.import("resource://gre/modules/addons/XPIProvider.jsm", {});
+			// See "set userDisabled(val)"
+			var addonFor = g.eval("addonFor");
+			var rawAddon = addonFor(addon);
+			//rawAddon.userDisabled = newDis;
+			g.XPIProvider.updateAddonDisabledState(rawAddon, newDis);
+		}
+	}
 	var realDis = addon.userDisabled;
 	if(realDis != newDis) { // We can't enable vulnerable plugins
 		var err = "Can't set addon.userDisabled to " + newDis + ", real value: " + realDis;
