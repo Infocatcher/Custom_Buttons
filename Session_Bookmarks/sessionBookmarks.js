@@ -1755,8 +1755,11 @@ this.bookmarks = {
 		if(
 			!types.contains("application/x-moz-tabbrowser-tab")
 			&& !types.contains(this.dragDataNS + "tagname")
-			&& ( // Firefox 8 (https://bugzilla.mozilla.org/show_bug.cgi?id=674732)
-				!types.contains("text/x-moz-url")
+			&& ( // Firefox 8+ (https://bugzilla.mozilla.org/show_bug.cgi?id=674732)
+				!(
+					types.contains("text/x-moz-url")
+					|| types.contains("text/x-moz-text-internal") // Firefox 50+
+				)
 				|| !("mozSourceNode" in dt)
 				|| !this.getTabFromChild(dt.mozSourceNode)
 			)
@@ -1806,7 +1809,10 @@ this.bookmarks = {
 			return;
 		}
 		if(
-			types.contains("text/x-moz-url")
+			(
+				types.contains("text/x-moz-url")
+				|| types.contains("text/x-moz-text-internal") // Firefox 50+
+			)
 			&& "mozSourceNode" in dt
 			&& (tab = this.getTabFromChild(dt.mozSourceNode))
 		) { // Firefox 8
