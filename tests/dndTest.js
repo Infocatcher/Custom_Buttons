@@ -24,7 +24,7 @@ else {
 			var c = dt.mozItemCount;
 			var r = [];
 			for(var i = 0, li = types.length; i < li; ++i) {
-				var type = types.item(i);
+				var type = types[i];
 				r.push(i + ": " + type);
 				for(var j = 0; j < c; ++j) {
 					var data = dt.mozGetDataAt(type, j);
