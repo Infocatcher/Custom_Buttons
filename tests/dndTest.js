@@ -21,13 +21,13 @@ else {
 		var dt = e.dataTransfer;
 		setTimeout(function() {
 			var types = dt.types;
-			var c = dt.mozItemCount;
+			var c = dt.itemCount || dt.mozItemCount;
 			var r = [];
 			for(var i = 0, li = types.length; i < li; ++i) {
 				var type = types[i];
 				r.push(i + ": " + type);
 				for(var j = 0; j < c; ++j) {
-					var data = dt.mozGetDataAt(type, j);
+					var data = "getDataAt" in dt ? dt.getDataAt(type, j) : dt.mozGetDataAt(type, j);
 					if(data)
 						r.push("  " + j + ": " + data);
 				}
