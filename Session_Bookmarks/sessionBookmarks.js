@@ -251,10 +251,16 @@ this.onmousedown = function(e) {
 		this.bookmarks.addContextMenu();
 	this.setAttribute("context", showCbMenu ? this.defaultContextId : this.bookmarks.cmId);
 };
-this.setAttribute("ondraggesture", "return this.bookmarks.handleDragStart(event);");
-this.setAttribute("ondragover",    "return this.bookmarks.handleDragOver(event);");
-this.setAttribute("ondragexit",    "return this.bookmarks.handleDragExit(event);");
-this.setAttribute("ondragdrop",    "return this.bookmarks.handleDrop(event);");
+if("ondragstart" in window)
+	this.setAttribute("ondragstart", "return this.bookmarks.handleDragStart(event);");
+else
+	this.setAttribute("ondraggesture", "return this.bookmarks.handleDragStart(event);");
+this.setAttribute("ondragover", "return this.bookmarks.handleDragOver(event);");
+this.setAttribute("ondragexit", "return this.bookmarks.handleDragExit(event);");
+if("ondrop" in window)
+	this.setAttribute("ondrop", "return this.bookmarks.handleDrop(event);");
+else
+	this.setAttribute("ondragdrop", "return this.bookmarks.handleDrop(event);");
 
 this.bookmarks = {
 	button: this,
