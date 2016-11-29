@@ -158,7 +158,7 @@ function setNewDisabled(addon) {
 		addon.userDisabled = newDis;
 	}
 	catch(e) { // Error: Cannot disable hidden add-on firefox@getpocket.com
-		_log(e);
+		_log("Can't set addon.userDisabled to " + newDis + ", error:\n" + e);
 		if(addon.hidden) {
 			_log("Let's try set addon.userDisabled using raw hack");
 			var g = Components.utils.import("resource://gre/modules/addons/XPIProvider.jsm", {});
