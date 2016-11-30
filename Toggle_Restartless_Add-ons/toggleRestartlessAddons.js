@@ -161,17 +161,17 @@ function setNewDisabled(addon) {
 		_log("Can't set addon.userDisabled to " + newDis + ", error:\n" + e);
 		if(addon.hidden) {
 			_log("Let's try set addon.userDisabled using raw hack");
-			var g = Components.utils.import("resource://gre/modules/addons/XPIProvider.jsm", {});
+			let g = Components.utils.import("resource://gre/modules/addons/XPIProvider.jsm", {});
 			// See "set userDisabled(val)"
-			var addonFor = g.eval("addonFor");
-			var rawAddon = addonFor(addon);
+			let addonFor = g.eval("addonFor");
+			let rawAddon = addonFor(addon);
 			//rawAddon.userDisabled = newDis;
 			g.XPIProvider.updateAddonDisabledState(rawAddon, newDis);
 		}
 	}
 	var realDis = addon.userDisabled;
 	if(realDis != newDis) { // We can't enable vulnerable plugins
-		var err = "Can't set addon.userDisabled to " + newDis + ", real value: " + realDis;
+		let err = "Can't set addon.userDisabled to " + newDis + ", real value: " + realDis;
 		if(newDis) {
 			_log(err + "\nSTATE_ASK_TO_ACTIVATE not supported?");
 			newDis = false;
