@@ -105,6 +105,7 @@ mp.updateMenu = function() {
 			if(isDelayed)
 				tip = "[Delayed Startup: " + delay.toLocaleString() + "]" + (tip ? "\n" + tip : "");
 			tip && mi.setAttribute("tooltiptext", tip);
+			mi.classList.toggle("toggleRestartlessAddons-isHidden", addon.hidden || false);
 			setDisabled(mi, addon.userDisabled);
 			mi._cbAddon = addon;
 			df.appendChild(mi);
@@ -358,6 +359,9 @@ function addStyle() {
 		.toggleRestartlessAddons-isDelayed > .menu-iconic-text {\n\
 			opacity: 0.75;\n\
 			color: #070;\n\
+		}\n\
+		.toggleRestartlessAddons-isHidden > .menu-iconic-text {\n\
+			color: #609;\n\
 		}\n\
 		.toggleRestartlessAddons-disabled > .menu-iconic-left {\n\
 			opacity: 0.4;\n\
