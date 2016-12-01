@@ -11,6 +11,8 @@
 // https://github.com/Infocatcher/Custom_Buttons/blob/master/Check_for_Addons_Updates/checkForAddonsUpdates.js
 // after "//== Check for Addons Updates begin"
 
+// See "var style = " to modify styles for specific add-ons
+
 // (c) Infocatcher 2013-2016
 // version 0.1.2.3 - 2016-08-02
 
