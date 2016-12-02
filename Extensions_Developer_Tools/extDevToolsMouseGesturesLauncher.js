@@ -29,7 +29,10 @@ var popup = ps.firstChild;
 var e;
 if(typeof event == "object" && event instanceof Event && "screenX" in event) // FireGestures
 	e = event;
-else if(this == window && "mgGestureState" in window && "endEvent" in mgGestureState) // Mouse Gestures Redox
+else if(
+	this instanceof Components.interfaces.nsIDOMChromeWindow
+	&& "mgGestureState" in window && "endEvent" in mgGestureState // Mouse Gestures Redox
+)
 	e = mgGestureState.endEvent;
 else {
 	var anchor = this instanceof XULElement && this

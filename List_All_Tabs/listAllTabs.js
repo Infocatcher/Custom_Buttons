@@ -87,7 +87,10 @@ function getEvent() {
 	var e;
 	if(typeof event == "object" && event instanceof Event && "screenX" in event) // FireGestures
 		e = event;
-	else if(btn == window && "mgGestureState" in window && "endEvent" in mgGestureState) // Mouse Gestures Redox
+	else if(
+		btn instanceof Components.interfaces.nsIDOMChromeWindow
+		&& "mgGestureState" in window && "endEvent" in mgGestureState // Mouse Gestures Redox
+	)
 		e = mgGestureState.endEvent;
 	else {
 		var anchor = btn instanceof XULElement && btn
