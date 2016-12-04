@@ -1129,7 +1129,7 @@ this.permissions = {
 			let cookie = cookies.getNext()
 				.QueryInterface(Components.interfaces.nsICookie);
 			let cookieHost = cookie.host;
-			if(checkHost && !checkHost.call(this, cookieHost))
+			if(checkHost && !checkHost(cookieHost))
 				continue;
 			if(types) {
 				// Trick for Firefox 42+, assumed pm.UNKNOWN_ACTION == 0
