@@ -1118,8 +1118,16 @@ this.permissions = {
 		});
 	},
 	checkCookieHost: function(cookieHost, host) {
-		return host == cookieHost
-			|| cookieHost.substr(-host.length - 1) == "." + host;
+		var fn = this.checkCookieHost = "endsWith" in String.prototype // Firefox 17+
+			? function(cookieHost, host) {
+				return host == cookieHost
+					|| cookieHost.endsWith("." + host);
+			}
+			: function(cookieHost, host) {
+				return host == cookieHost
+					|| cookieHost.substr(-host.length - 1) == "." + host;
+			};
+		return fn(cookieHost, host);
 	},
 	removeCookies: function(types, checkHost) {
 		var cm = this.cm;
