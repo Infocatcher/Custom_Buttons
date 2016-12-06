@@ -423,7 +423,8 @@ this.permissions = {
 					accesskey="' + _localize("showPermissionsAccesskey") + '" />\
 				<menuitem\
 					cb_id="showCookies"\
-					oncommand="this.parentNode.parentNode.permissions.showCookies();"\
+					oncommand="this.parentNode.parentNode.permissions.showCookies(event.shiftKey || event.ctrlKey || event.metaKey);"\
+					onclick="if(event.button == 1) this.parentNode.parentNode.permissions.showCookies(true);"\
 					label="' + _localize("showCookiesLabel") + '"\
 					accesskey="' + _localize("showCookiesAccesskey") + '" />\
 				<menuseparator hidden="' + noTempPermissions + '" />\
@@ -1007,8 +1008,8 @@ this.permissions = {
 			return this.cp.ACCESS_SESSION;
 		return this.cp.ACCESS_ALLOW;
 	},
-	showCookies: function() {
-		var host = this.getHost(this.options.useBaseDomain.showCookies);
+	showCookies: function(showAll) {
+		var host = showAll ? "" : this.getHost(this.options.useBaseDomain.showCookies);
 		if("coomanPlus" in window && "coomanPlusCore" in window && this.options.useCookiesManagerPlus) {
 			// https://addons.mozilla.org/firefox/addon/cookies-manager-plus/
 			this.showCookiesCMP(host);
@@ -1026,7 +1027,7 @@ this.permissions = {
 		};
 		if(win) {
 			win.focus();
-			host && setFilter();
+			(host || showAll) && setFilter();
 		}
 		else {
 			win = window.openDialog("chrome://browser/content/preferences/cookies.xul", "_blank", "");
