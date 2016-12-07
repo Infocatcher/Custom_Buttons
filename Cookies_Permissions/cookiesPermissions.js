@@ -1011,8 +1011,10 @@ this.permissions = {
 	showCookiesEvent: function(e) {
 		if(e.type == "command")
 			this.showCookies(this.hasModifier(e));
-		else if(e.type == "click" && e.button == 1)
+		else if(e.type == "click" && e.button == 1) {
+			this.mp.hidePopup();
 			this.showCookies(true);
+		}
 	},
 	showCookies: function(showAll) {
 		var host = showAll ? "" : this.getHost(this.options.useBaseDomain.showCookies);
