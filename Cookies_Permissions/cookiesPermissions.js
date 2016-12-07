@@ -423,8 +423,8 @@ this.permissions = {
 					accesskey="' + _localize("showPermissionsAccesskey") + '" />\
 				<menuitem\
 					cb_id="showCookies"\
-					oncommand="this.parentNode.parentNode.permissions.showCookies(event.shiftKey || event.ctrlKey || event.metaKey);"\
-					onclick="if(event.button == 1) this.parentNode.parentNode.permissions.showCookies(true);"\
+					oncommand="this.parentNode.parentNode.permissions.showCookiesEvent(event);"\
+					onclick="this.parentNode.parentNode.permissions.showCookiesEvent(event);"\
 					label="' + _localize("showCookiesLabel") + '"\
 					accesskey="' + _localize("showCookiesAccesskey") + '" />\
 				<menuseparator hidden="' + noTempPermissions + '" />\
@@ -1007,6 +1007,12 @@ this.permissions = {
 		if(this.prefs.lifetimePolicy == 2)
 			return this.cp.ACCESS_SESSION;
 		return this.cp.ACCESS_ALLOW;
+	},
+	showCookiesEvent: function(e) {
+		if(e.type == "command")
+			this.showCookies(this.hasModifier(e));
+		else if(e.type == "click" && e.button == 1)
+			this.showCookies(true);
 	},
 	showCookies: function(showAll) {
 		var host = showAll ? "" : this.getHost(this.options.useBaseDomain.showCookies);
