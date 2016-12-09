@@ -187,16 +187,15 @@ function _localize(sid) {
 this.onclick = function(e) {
 	if(e.target != this)
 		return;
-	var but = e.button;
-	var hasModifier = this.permissions.hasModifier(e);
-	if(but == 0 && !hasModifier) {
+	var btn = e.button;
+	if(btn == 1 || btn == 0 && this.permissions.hasModifier(e))
+		this.permissions.openPermissions();
+	else if(btn == 0) {
 		this.permissions.togglePermission(this.permissions.options.toggleMode);
-		// Allow use "command" section only from hotkey:
+		// Prevent "command" event to use "command" section only from hotkey
 		e.preventDefault();
 		e.stopPropagation();
 	}
-	else if(but == 1 || but == 0 && hasModifier)
-		this.permissions.openPermissions();
 };
 if(!this.hasOwnProperty("defaultContextId"))
 	this.defaultContextId = this.getAttribute("context") || "custombuttons-contextpopup";
