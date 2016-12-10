@@ -492,15 +492,16 @@ this.permissions = {
 	},
 	setAutoRemove: function(enable) {
 		if(enable) {
-			this.options.removeUnprotectedCookiesEnabled = true;
+			this._forceEnableCleanup = true;
 			this.initCleanupTimer(); // Ensure initialized
 		}
 		var timer = this.timer || null;
 		if(timer)
 			timer.enabled = enable;
 	},
+	_forceEnableCleanup: false,
 	initCleanupTimer: function() {
-		if(!this.options.removeUnprotectedCookiesEnabled)
+		if(!this.options.removeUnprotectedCookiesEnabled && !this._forceEnableCleanup)
 			return;
 		var interval = this.options.removeUnprotectedCookiesInterval;
 		if(interval <= 0)
