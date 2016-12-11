@@ -412,7 +412,7 @@ function _log(s) {
 }
 
 function hasUpdater() {
-	var has = checkForAddonsUpdates.toString().indexOf("Services.jsm") != -1;
+	var has = checkForAddonsUpdates.toString().indexOf("about:addons") != -1;
 	hasUpdater = function() {
 		return has;
 	};
