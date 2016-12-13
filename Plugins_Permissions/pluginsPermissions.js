@@ -769,7 +769,7 @@ this.permissions = {
 			tb.value = val;
 		tb.focus();
 		if(val && "inputField" in tb) {
-			var ifi = tb.inputField;
+			let ifi = tb.inputField;
 			switch(this.options.prefillMode) {
 				case 0: ifi.selectionStart = ifi.selectionEnd = 0;          break;
 				case 2: ifi.selectionStart = ifi.selectionEnd = val.length; break;
@@ -909,7 +909,7 @@ this.permissions = {
 		catch(e) {
 			// See https://bugzilla.mozilla.org/show_bug.cgi?id=1170200
 			if("Services" in window) try { // Firefox 42+
-				var uri = Services.io.newURI(this.currentProtocol + "://" + host, null, null);
+				let uri = Services.io.newURI(this.currentProtocol + "://" + host, null, null);
 				this.pm.remove(uri, this.permissionType);
 				return;
 			}
