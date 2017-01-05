@@ -197,7 +197,7 @@ this.onmouseover = function(e) {
 		return;
 	if(!this.disabled)
 		this.undoCloseTabsList.updUI();
-	this.undoCloseTabsList.options.useMenu && Array.some(
+	this.undoCloseTabsList.options.useMenu && Array.prototype.some.call(
 		this.parentNode.getElementsByTagName("*"),
 		function(node) {
 			if(
@@ -292,7 +292,7 @@ this.undoCloseTabsList = {
 		cbPopup = cbPopup.cloneNode(true);
 		var id = "-" + this.button.id.match(/\d*$/)[0] + "-cloned";
 		cbPopup.id += id;
-		Array.slice(cbPopup.getElementsByAttribute("id", "*")).forEach(function(node) {
+		Array.prototype.slice.call(cbPopup.getElementsByAttribute("id", "*")).forEach(function(node) {
 			node.id += id;
 		});
 		var menu = this.createElement("menu", {

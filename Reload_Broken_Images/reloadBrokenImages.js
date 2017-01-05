@@ -167,16 +167,16 @@ function feedback(s, replacements, isLast) {
 	}
 }
 function parseWin(win) {
-	Array.forEach(win.frames, parseWin);
+	Array.prototype.forEach.call(win.frames, parseWin);
 	var doc = win.document;
 	if("images" in doc) // HTML document
-		Array.forEach(doc.images, reloadImage);
+		Array.prototype.forEach.call(doc.images, reloadImage);
 	else {
-		Array.forEach(
+		Array.prototype.forEach.call(
 			doc.getElementsByTagNameNS("http://www.w3.org/1999/xhtml", "img"),
 			reloadImage
 		);
-		Array.forEach(
+		Array.prototype.forEach.call(
 			doc.getElementsByTagNameNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "image"),
 			reloadImage
 		);

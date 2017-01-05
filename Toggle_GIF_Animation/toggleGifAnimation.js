@@ -34,7 +34,7 @@ var gifAnimation = {
 			: ic.kNormalAnimMode;
 	},
 	setMode: function(win, mode) {
-		Array.forEach(win.frames, function(win) {
+		Array.prototype.forEach.call(win.frames, function(win) {
 			this.setMode(win, mode);
 		}, this);
 		var utils = this.getUtils(win);

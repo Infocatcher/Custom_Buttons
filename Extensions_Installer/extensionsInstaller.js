@@ -104,7 +104,7 @@ mp.createMenu = function() {
 	}
 };
 mp.updateMenu = function() {
-	Array.forEach(
+	Array.prototype.forEach.call(
 		mp.getElementsByTagName("menuitem"),
 		function(mi) {
 			setStyle(mi, mi.getAttribute("cb_uid"));
@@ -362,7 +362,7 @@ if(isCbInit) {
 	this.onmouseover = function(e) {
 		if(e.target != this)
 			return;
-		Array.some(
+		Array.prototype.some.call(
 			this.parentNode.getElementsByTagName("*"),
 			function(node) {
 				if(

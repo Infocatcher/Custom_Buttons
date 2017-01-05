@@ -15,7 +15,7 @@
 this.onmouseover = function(e) {
 	if(e.target != this)
 		return;
-	Array.some(
+	Array.prototype.some.call(
 		this.parentNode.getElementsByTagName("*"),
 		function(node) {
 			if(

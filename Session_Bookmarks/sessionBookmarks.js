@@ -219,7 +219,7 @@ this.onmouseover = function(e) {
 		this.bookmarks.loadDelayed();
 	if(this.disabled)
 		return;
-	Array.some(
+	Array.prototype.some.call(
 		this.parentNode.getElementsByTagName("*"),
 		function(node) {
 			if(
@@ -677,7 +677,7 @@ this.bookmarks = {
 			cbPopup = cbPopup.cloneNode(true);
 			let id = "-" + this.btnNum + "-cloned";
 			cbPopup.id += id;
-			Array.slice(cbPopup.getElementsByAttribute("id", "*")).forEach(function(node) {
+			Array.prototype.slice.call(cbPopup.getElementsByAttribute("id", "*")).forEach(function(node) {
 				node.id += id;
 			});
 			let menu = cm.lastChild;
@@ -693,7 +693,7 @@ this.bookmarks = {
 		this._hasPageContextItem = true;
 		var cbId = "sessionBookmarksPageContextItem";
 		var btnId = this.button.id;
-		Array.slice(document.getElementsByAttribute("cb_buttonId", btnId)).forEach(function(mi) {
+		Array.prototype.slice.call(document.getElementsByAttribute("cb_buttonId", btnId)).forEach(function(mi) {
 			mi.parentNode.removeChild(mi);
 		});
 		var mi = this.createElement("menuitem", {
@@ -765,7 +765,7 @@ this.bookmarks = {
 		this._changed = false;
 
 		var data = [];
-		Array.forEach(
+		Array.prototype.forEach.call(
 			this.mp.getElementsByAttribute("cb_bookmarkItem", "*"),
 			function(mi) {
 				if(mi.localName == "menuseparator") {
@@ -1049,7 +1049,7 @@ this.bookmarks = {
 	_bookmarkAllTabs: function(insPoint) {
 		var undo = [];
 		var tabs = gBrowser.visibleTabs || gBrowser.tabs || gBrowser.tabContainer.childNodes;
-		Array.forEach(tabs, function(tab) {
+		Array.prototype.forEach.call(tabs, function(tab) {
 			var mi = this._addBookmark(insPoint, tab, undo);
 			if(mi)
 				insPoint = mi.nextSibling;
@@ -1205,7 +1205,7 @@ this.bookmarks = {
 		catch(e) {
 			Components.utils.reportError(e);
 		}
-		Array.forEach(
+		Array.prototype.forEach.call(
 			mis,
 			function(mi) {
 				var uri = mi.getAttribute("cb_uri");
@@ -1409,7 +1409,7 @@ this.bookmarks = {
 	},
 	deleteAllBookmarks: function() {
 		var undo = [];
-		Array.slice(this.mp.getElementsByAttribute("cb_bookmarkItem", "*")).forEach(function(mi) {
+		Array.prototype.slice.call(this.mp.getElementsByAttribute("cb_bookmarkItem", "*")).forEach(function(mi) {
 			undo.push({ action: "add", mi: mi, pn: mi.parentNode, ns: mi.nextSibling });
 			mi.parentNode.removeChild(mi);
 		});
@@ -1480,7 +1480,7 @@ this.bookmarks = {
 				o.pn.insertBefore(o.mi, o.ns);
 			else if(action == "attrs") {
 				let mi = o.mi;
-				Array.slice(mi.attributes).forEach(function(attr) {
+				Array.prototype.slice.call(mi.attributes).forEach(function(attr) {
 					mi.removeAttributeNS(attr.namespaceURI, attr.name);
 				});
 				(invert ? o.newAttrs : o.oldAttrs).forEach(function(attr) {
@@ -1511,7 +1511,7 @@ this.bookmarks = {
 		}
 	},
 	getAttributes: function(node) {
-		return Array.slice(node.attributes).map(function(attr) {
+		return Array.prototype.slice.call(node.attributes).map(function(attr) {
 			return { // Simple way to get immutable copy
 				namespaceURI: attr.namespaceURI,
 				name:         attr.name,
@@ -1650,7 +1650,7 @@ this.bookmarks = {
 		w && w.close();
 	},
 	closePropertiesWindows: function() {
-		var mis = Array.slice(this.mp.getElementsByAttribute("cb_uri", "*"));
+		var mis = Array.prototype.slice.call(this.mp.getElementsByAttribute("cb_uri", "*"));
 		var ws = this.propertiesWindows;
 		while(ws.hasMoreElements()) {
 			let w = ws.getNext();
@@ -1874,7 +1874,7 @@ this.bookmarks = {
 		return null;
 	},
 	clearHighlight: function() {
-		Array.slice(
+		Array.prototype.slice.call(
 			this.mp.getElementsByAttributeNS("urn:custombuttons:namespace", "cb_dragOver", "*")
 		).forEach(function(node) {
 			node.removeAttributeNS("urn:custombuttons:namespace", "cb_dragOver");

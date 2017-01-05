@@ -567,7 +567,7 @@ function init() {
 				addedAttrs = removedAttrs = changedAttrs = { __proto__: null };
 			}
 
-			var attrs = Array.slice(node.attributes);
+			var attrs = Array.prototype.slice.call(node.attributes);
 			for(var name in removedAttrs)
 				attrs.push(removedAttrs[name]);
 
@@ -1068,7 +1068,7 @@ function init() {
 
 			if(fxVersion <= 2) {
 				// Ugly workaround...
-				var text = Array.map(tt.childNodes, function(node) {
+				var text = Array.prototype.map.call(tt.childNodes, function(node) {
 					return node.textContent;
 				}).join("\n");
 				//while(tt.hasChildNodes())
@@ -1274,7 +1274,7 @@ function init() {
 			if(!siblings || siblings.length < 2)
 				return;
 			var max = siblings.length - 1;
-			var pos = Array.indexOf(siblings, node);
+			var pos = Array.prototype.indexOf.call(siblings, node);
 			if(pos == -1)
 				return;
 			var shift = toNext ? 1 : -1;
@@ -1452,16 +1452,16 @@ function init() {
 			var node = this._node;
 			var sourceWindow = node && (node.ownerDocument || node).defaultView;
 			var tt = this.context.tt;
-			var text = Array.map(tt.childNodes, function(node) {
+			var text = Array.prototype.map.call(tt.childNodes, function(node) {
 				return node.textContent;
 			}).join("\n");
 			var _tt = tt.cloneNode(true);
-			Array.forEach(_tt.getElementsByAttribute("class", "attrsInspector-value"), function(elt) {
+			Array.prototype.forEach.call(_tt.getElementsByAttribute("class", "attrsInspector-value"), function(elt) {
 				elt.style.whiteSpace = "pre";
 			});
 			if(_tt.firstChild.style.whiteSpace == "-moz-pre-wrap") // Part of hack for Firefox 1.5 and 2.0
 				_tt.firstChild.style.whiteSpace = "pre";
-			var html = Array.map(_tt.childNodes, function(node) {
+			var html = Array.prototype.map.call(_tt.childNodes, function(node) {
 				return new XMLSerializer().serializeToString(node);
 			}).join("\n");
 			this.setClipboardData({
@@ -1499,11 +1499,11 @@ function init() {
 			// We don't check anonymous nodes now
 			var browser;
 			const XULNS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
-			Array.concat(
-				Array.slice(doc.getElementsByTagNameNS(XULNS, "tabbrowser")),
-				Array.slice(doc.getElementsByTagNameNS(XULNS, "browser")),
-				Array.slice(doc.getElementsByTagName("iframe")),
-				Array.slice(doc.getElementsByTagName("frame"))
+			Array.prototype.concat.call(
+				Array.prototype.slice.call(doc.getElementsByTagNameNS(XULNS, "tabbrowser")),
+				Array.prototype.slice.call(doc.getElementsByTagNameNS(XULNS, "browser")),
+				Array.prototype.slice.call(doc.getElementsByTagName("iframe")),
+				Array.prototype.slice.call(doc.getElementsByTagName("frame"))
 			).some(function(br) {
 				if(!("contentDocument" in br))
 					return false;

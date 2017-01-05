@@ -204,7 +204,7 @@ if(!watcher) {
 							var mp = document.getElementById("sourceEditorContext");
 							if(mp.state == "closed")
 								return;
-							Array.forEach(
+							Array.prototype.forEach.call(
 								mp.getElementsByAttribute("command", "*"),
 								function(mi) {
 									var cmd = mi.getAttribute("command");
@@ -288,7 +288,7 @@ if(!watcher) {
 
 			var tabs = document.getElementById("custombuttons-editbutton-tabbox");
 			var selectedPanel = tabs.selectedPanel;
-			Array.slice(document.getElementsByTagName("cbeditor")).forEach(function(cbEditor) {
+			Array.prototype.slice.call(document.getElementsByTagName("cbeditor")).forEach(function(cbEditor) {
 				if("__sourceEditor" in cbEditor)
 					return;
 				var code = cbEditor.value;
@@ -548,7 +548,7 @@ if(!watcher) {
 				delete tabs.__cmdControllers;
 			}
 
-			Array.slice(document.getElementsByTagName("cbeditor")).forEach(function(cbEditor) {
+			Array.prototype.slice.call(document.getElementsByTagName("cbeditor")).forEach(function(cbEditor) {
 				if(!("__sourceEditor" in cbEditor))
 					return;
 				var se = cbEditor.__sourceEditor;
@@ -620,14 +620,14 @@ if(!watcher) {
 		initBrowserWindow: function(window, reason) {
 			_log("initBrowserWindow()");
 			window.addEventListener("DOMContentLoaded", this, false);
-			Array.forEach(window.frames, function(frame) {
+			Array.prototype.forEach.call(window.frames, function(frame) {
 				this.initWindow(frame, reason, true);
 			}, this);
 		},
 		destroyBrowserWindow: function(window, reason) {
 			_log("destroyBrowserWindow()");
 			window.removeEventListener("DOMContentLoaded", this, false);
-			Array.forEach(window.frames, function(frame) {
+			Array.prototype.forEach.call(window.frames, function(frame) {
 				this.destroyWindow(frame, reason, true);
 			}, this);
 		},

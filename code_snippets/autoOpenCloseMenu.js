@@ -41,7 +41,7 @@ this.onmouseout = function(e) {
 	}, closeDelay);
 };
 function closeOtherMenus() {
-	return Array.some(
+	return Array.prototype.some.call(
 		self.parentNode.getElementsByTagName("*"),
 		function(node) {
 			if(

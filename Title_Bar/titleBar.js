@@ -10,7 +10,7 @@ var flexibleWidth = true;
 
 if(
 	flexibleWidth
-	&& Array.some(
+	&& Array.prototype.some.call(
 		this.parentNode.childNodes,
 		function(node) {
 			if(node == this)

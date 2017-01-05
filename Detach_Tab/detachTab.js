@@ -21,7 +21,7 @@ function detachTab() {
 	var selectedTab = gBrowser.selectedTab;
 	btn[ns + "tabPos"] = "_tPos" in selectedTab
 		? selectedTab._tPos
-		: Array.indexOf(gBrowser.tabs || gBrowser.tabContainer.childNodes, selectedTab);
+		: Array.prototype.indexOf.call(gBrowser.tabs || gBrowser.tabContainer.childNodes, selectedTab);
 	if("TreeStyleTabService" in window)
 		btn[ns + "parentTab"] = TreeStyleTabService.getParentTab(selectedTab);
 	// See replaceTabWithWindow() in chrome://browser/content/tabbrowser.xml

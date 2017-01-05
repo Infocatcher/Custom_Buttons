@@ -47,7 +47,7 @@ toggleEnabled.setAttribute("oncommand", "toggleCustomButtonEnabled();");
 //toggleEnabled.removeAttribute("observes"); // For Firefox 3.6 and older
 deleteItem.parentNode.insertBefore(toggleEnabled, deleteItem);
 
-Array.filter( // Process already cloned menu items
+Array.prototype.filter.call( // Process already cloned menu items
 	document.getElementsByAttribute("observes", deleteItem.getAttribute("observes")),
 	function(mi) {
 		return mi != deleteItem && (mi.id || "").substr(0, deleteId.length) == deleteId;
@@ -144,7 +144,7 @@ var styleNode = document.insertBefore(
 function destructor(reason) {
 	if(reason == "update" || reason == "delete") {
 		styleNode.parentNode.removeChild(styleNode);
-		Array.slice(document.getElementsByAttribute("cb_id", toggleEnabledId)).forEach(function(btn) {
+		Array.prototype.slice.call(document.getElementsByAttribute("cb_id", toggleEnabledId)).forEach(function(btn) {
 			btn.parentNode.removeChild(btn);
 		});
 		delete window.toggleCustomButtonEnabled;

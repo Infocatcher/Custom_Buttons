@@ -450,7 +450,7 @@ this.permissions = {
 			cbPopup = cbPopup.cloneNode(true);
 			let id = "-" + this.button.id.match(/\d*$/)[0] + "-cloned";
 			cbPopup.id += id;
-			Array.slice(cbPopup.getElementsByAttribute("id", "*")).forEach(function(node) {
+			Array.prototype.slice.call(cbPopup.getElementsByAttribute("id", "*")).forEach(function(node) {
 				node.id += id;
 			});
 			cbPopup.setAttribute(
@@ -571,7 +571,7 @@ this.permissions = {
 			: this.getPermission();
 
 		var noPermissions = permission == this.PERMISSIONS_NOT_SUPPORTED;
-		Array.forEach(
+		Array.prototype.forEach.call(
 			this.mp.getElementsByAttribute("cb_permission", "*"),
 			function(mi) {
 				mi.hidden = noPermissions;
