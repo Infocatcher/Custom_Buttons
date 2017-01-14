@@ -235,6 +235,9 @@ function _localize(s, key) {
 		"Enable E4X for content": {
 			ru: "Включить E4X для content"
 		},
+		"Enable multi-process mode": {
+			ru: "Включить мультипроцессный режим"
+		},
 
 		"Debug extensions": {
 			ru: "Отладка расширений"
@@ -1183,6 +1186,15 @@ var cmds = this.commands = {
 		delete this.canDisableE4X;
 		return this.canDisableE4X = this.prefHasDefaultValue("javascript.options.xml.chrome");
 	},
+	get hasMultiProcessMode() {
+		delete this.hasMultiProcessMode;
+		return this.hasMultiProcessMode = this.prefHasDefaultValue("browser.tabs.remote.autostart");
+	},
+	ensureMultiProcessMode: function(isMultiProcess) {
+		// It's enough to enable only using browser.tabs.remote.force-enable = true
+		// But to disable should be also browser.tabs.remote.autostart = false
+		this.setPref("browser.tabs.remote.autostart", isMultiProcess);
+	},
 
 	hasModifier: function(e) {
 		return e.ctrlKey || e.shiftKey || e.altKey || e.metaKey;
@@ -1659,6 +1671,12 @@ var mp = cmds.popup = this.appendChild(parseXULFromString('\
 					type="checkbox"\
 					label="' + _localize("Enable E4X for content") + '"\
 					hidden="' + !this.commands.canDisableE4X + '" />\
+				<menuseparator hidden="' + !this.commands.hasMultiProcessMode + '" />\
+				<menuitem cb_pref="browser.tabs.remote.force-enable"\
+					type="checkbox"\
+					label="' + _localize("Enable multi-process mode") + '"\
+					oncommand="this.parentNode.parentNode.parentNode.parentNode.commands.ensureMultiProcessMode(this.getAttribute(\'checked\') == \'true\');"\
+					hidden="' + !this.commands.hasMultiProcessMode + '" />\
 				<menuseparator cb_id="debugPrefsSeparator" hidden="true" />\
 				<menu cb_id="debugPrefsExtMenu" hidden="true"\
 					label="' + _localize("Debug extensions") + '"\
