@@ -158,6 +158,9 @@ function _localize(s, key) {
 		errorConsoleKey: {
 			ru: "К"
 		},
+		"Error Console not found!" : {
+			ru: "Консоль ошибок не обнаружена!"
+		},
 		"Browser console": {
 			ru: "Консоль браузера"
 		},
