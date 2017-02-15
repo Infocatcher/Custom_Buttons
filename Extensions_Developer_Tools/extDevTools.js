@@ -1124,7 +1124,8 @@ var cmds = this.commands = {
 	restoreErrorConsole: function() {
 		if(this.getPref(this.restoreErrorConsolePref)) {
 			this.resetPref(this.restoreErrorConsolePref);
-			this.openErrorConsole();
+			if(this.hasErrorConsole)
+				this.openErrorConsole();
 		}
 		if(this.getPref(this.restoreBrowserConsolePref)) {
 			this.resetPref(this.restoreBrowserConsolePref);
