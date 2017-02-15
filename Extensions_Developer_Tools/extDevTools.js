@@ -995,6 +995,20 @@ var cmds = this.commands = {
 		if(woc != undefined)
 			this.setPref("browser.tabs.warnOnClose", woc);
 	},
+	get _hasConsole() {
+		// Removed in Firefox 50+: https://bugzilla.mozilla.org/show_bug.cgi?id=1278368
+		delete this._hasConsole;
+		return this._hasConsole = "@mozilla.org/toolkit/console-clh;1" in Components.classes;
+	},
+	get _hasConsole2() {
+		delete this._hasConsole2;
+		return this._hasConsole2 = "@zeniko/console2-clh;1" in Components.classes
+			|| "@mozilla.org/commandlinehandler/general-startup;1?type=console2" in Components.classes; // Firefox <= 3.6
+	},
+	get hasErrorConsole() {
+		delete this.hasErrorConsole;
+		return this.hasErrorConsole = this._hasConsole || this._hasConsole2;
+	},
 	openErrorConsole: function() {
 		if("toErrorConsole" in window) {
 			toErrorConsole();
@@ -1009,8 +1023,15 @@ var cmds = this.commands = {
 			w.focus();
 			return;
 		}
-		var consoleURI = "@zeniko/console2-clh;1" in Components.classes
-			|| "@mozilla.org/commandlinehandler/general-startup;1?type=console2" in Components.classes // Firefox <= 3.6
+		if(!this.hasErrorConsole) {
+			this.ps.alert(
+				window,
+				_localize("Extensions Developer Tools"),
+				_localize("Error Console not found!")
+			);
+			return;
+		}
+		var consoleURI = this._hasConsole2
 			? "chrome://console2/content/console2.xul"
 			: "chrome://global/content/console.xul";
 		window.openDialog(consoleURI, "_blank", "chrome,all,centerscreen,resizable,dialog=0");
@@ -1198,10 +1219,9 @@ var cmds = this.commands = {
 			"browser.tabs.remote.autostart.1",
 			"browser.tabs.remote.autostart.2"
 		].forEach(function(pref) {
-			if(this.prefHasDefaultValue(pref))
+			this.resetPref(pref);
+			if(this.prefSvc.getPrefType(pref) == this.prefSvc.PREF_BOOL)
 				this.setPref(pref, isMultiProcess);
-			else
-				this.resetPref(pref);
 		}, this);
 	},
 
@@ -1596,7 +1616,8 @@ var mp = cmds.popup = this.appendChild(parseXULFromString('\
 			label="' + _localize("Error console") + '"\
 			accesskey="' + _localize("E", "errorConsoleKey") + '"\
 			class="menuitem-iconic"\
-			image="' + images.errorConsole + '" />\
+			image="' + images.errorConsole + '"\
+			hidden="' + !cmds.hasErrorConsole + '" />\
 		<menuitem cb_id="browserConsole"\
 			oncommand="this.parentNode.parentNode.commands.openBrowserConsole();"\
 			key="key_browserConsole"\
