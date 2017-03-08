@@ -2332,10 +2332,16 @@ this.bookmarks = {
 			node.setAttribute(attrName, attrs[attrName]);
 		return node;
 	},
-	parseXULFromString: function(xul) {
-		xul = xul.replace(/>\s+</g, "><");
-		return new DOMParser().parseFromString(xul, "application/xml").documentElement;
-	},
+    parseXULFromString: function(xul) {
+        xul = xul.replace(/>\s+</g, "><");
+        try {
+            return new DOMParser().parseFromString(xul, "application/xml").documentElement;
+        } catch(ex) {
+            var dummy = document.createElement("dummy");
+            dummy.innerHTML = xul.trim();
+            return dummy.firstChild;
+        }
+    },
 	encodeHTML: function(s) {
 		return s.replace(/&/g, "&amp;")
 			.replace(/</g, "&lt;")
