@@ -5,8 +5,8 @@
 // Convert E4X button for Custom Buttons
 // Code for "code" section
 
-// (c) Infocatcher 2012-2013
-// version 0.1.0b1pre2 - 2013-02-17
+// (c) Infocatcher 2012-2013, 2016
+// version 0.1.0b1pre3 - 2016-03-23
 
 // Tries convert deprecated E4X to string literals.
 // Click on button and then click on another button with E4X in code (or click on opened page with *.js file).
