@@ -1787,7 +1787,16 @@ if(options.restoreErrorConsole && !cmds.onlyPopup)
 
 function parseXULFromString(xul) {
 	xul = xul.replace(/>\s+</g, "><");
-	return new DOMParser().parseFromString(xul, "application/xml").documentElement;
+	try {
+		return new DOMParser().parseFromString(xul, "application/xml").documentElement;
+	}
+	catch(e) {
+		// See http://custombuttons.sourceforge.net/forum/viewtopic.php?f=5&t=3720
+		// + https://forum.mozilla-russia.org/viewtopic.php?pid=732243#p732243
+		var dummy = document.createElement("dummy");
+		dummy.innerHTML = xul.trimLeft();
+		return dummy.firstChild;
+	}
 }
 
 this.attrsInspector = function(event) {

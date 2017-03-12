@@ -2334,7 +2334,16 @@ this.bookmarks = {
 	},
 	parseXULFromString: function(xul) {
 		xul = xul.replace(/>\s+</g, "><");
-		return new DOMParser().parseFromString(xul, "application/xml").documentElement;
+		try {
+			return new DOMParser().parseFromString(xul, "application/xml").documentElement;
+		}
+		catch(e) {
+			// See http://custombuttons.sourceforge.net/forum/viewtopic.php?f=5&t=3720
+			// + https://forum.mozilla-russia.org/viewtopic.php?pid=732243#p732243
+			var dummy = document.createElement("dummy");
+			dummy.innerHTML = xul.trimLeft();
+			return dummy.firstChild;
+		}
 	},
 	encodeHTML: function(s) {
 		return s.replace(/&/g, "&amp;")
