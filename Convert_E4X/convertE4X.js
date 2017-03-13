@@ -49,6 +49,10 @@ function convertE4XCode(s) {
 	convertE4XCode = convertCode;
 	return convertCode(s);
 
+	var _debug = false;
+	function _log(s) {
+		_debug && LOG(s);
+	};
 	function convertCode(s) {
 		if(!s || s == "/*CODE*/" || s == "/*Initialization Code*/")
 			return "";
@@ -69,21 +73,21 @@ function convertE4XCode(s) {
 			.replace(/<>([\s\S]+?)<\/>(?:\s*\.\s*toXMLString\s*\(\))?/g, function(s, e4x) {
 				if(e4x.substr(0, 9) == "<![CDATA[")
 					return s;
-				LOG("<> ... </>\n" + s);
+				_log("<> ... </>\n" + s);
 				return convertE4X(e4x);
 			})
 			// <![CDATA[ ... ]]>
 			.replace(/(?:<>)?<!\[CDATA\[([\s\S]+?)\]\]>(?:<\/>)?(?:\s*\.\s*toString\s*\(\))?/g, function(s, cdata) {
 				if(inE4X(RegExp.leftContext) || alreadyConverted(cdata))
 					return s;
-				LOG("<![CDATA[ ... ]]>\n" + s);
+				_log("<![CDATA[ ... ]]>\n" + s);
 				return convertCDATA(cdata);
 			})
 			// <tag ... />
 			.replace(/<\w+\s([^>]+?)\/>(?:\s*\.\s*toXMLString\s*\(\))?/g, function(s) {
 				if(inE4X(RegExp.leftContext) || alreadyConverted(s) || /^(?:\\n)?\\[\n\r]/.test(RegExp.rightContext))
 					return s;
-				LOG("<tag ... />\n" + s);
+				_log("<tag ... />\n" + s);
 				return convertE4X(s);
 			})
 			// <tag> ... </tag>
@@ -91,7 +95,7 @@ function convertE4XCode(s) {
 			.replace(getTagsPattern(), function(s) {
 				if(inE4X(RegExp.leftContext) || alreadyConverted(s))
 					return s;
-				LOG("<tag> ... </tag>\n" + s);
+				_log("<tag> ... </tag>\n" + s);
 				return convertE4X(s);
 			})
 			// All .toXMLString() calls are useless
