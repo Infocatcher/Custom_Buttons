@@ -4,15 +4,16 @@
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Convert_E4X
 // Note: this isn't a real code... just looks like
 
-var x = 2;
+var x = "E4X";
 var y = "y";
+var xulNS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 XML.prettyPrinting = false;
-var xml = <menupopup xnlns="foo">
+var xml = <menupopup xmlns={xulNS}>
 	<menuitem label="1" />
 	<menu label="q\w">
 		<menupopup>
 			<menuitem label={x} />
-			<menuitem label={"Some " + x + "here"} />
+			<menuitem label={"Some " + x + " here"} />
 			<menuitem label="{" />
 			<menuitem label="}" />
 			<menuitem label="{x}" />
@@ -22,7 +23,7 @@ var xml = <menupopup xnlns="foo">
 </menupopup>;
 this.appendChild(cbu.makeXML(xml));
 
-var xml = <menupopup xnlns="foo">
+var xml = <menupopup xmlns={xulNS}>
 	<menuitem label="1" />
 	<menu label="Menu 1">
 		<menupopup>
@@ -44,16 +45,16 @@ var xml = <menupopup xnlns="foo">
 </menupopup>;
 this.appendChild(cbu.makeXML(xml));
 
-var xml = <menupopup xnlns="foo">
+var xml = <menupopup xmlns={xulNS}>
 	<menuitem label="1" />
 	<menuitem label={x} />
 </menupopup>;
 this.appendChild(cbu.makeXML(xml));
 
-var xml = <menupopup xnlns="foo" />;
+var xml = <menupopup xmlns={xulNS} />;
 this.appendChild(cbu.makeXML(xml));
 
-var xml = <menupopup xnlns="foo"></menupopup>;
+var xml = <menupopup xmlns={xulNS}></menupopup>;
 this.appendChild(cbu.makeXML(xml));
 
 var box = "hbox";
