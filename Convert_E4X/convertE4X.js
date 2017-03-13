@@ -36,13 +36,18 @@ addEventListener("click", function getButton(e) {
 		Components.utils.reportError(e);
 	}
 	btn.checked = false;
-	if(trg != btn)
-		codes.forEach(convertCode);
+	if(trg != btn) codes.forEach(function(code) {
+		code = convertCode(code);
+		if(!code) // Nothing to convert
+			return;
+		var uri = "data:text/plain;charset=utf-8," + encodeURIComponent(code);
+		gBrowser.selectedTab = gBrowser.addTab(uri, makeURI("about:blank"));
+	});
 }, true);
 
 function convertCode(s) {
 	if(!s || s == "/*CODE*/" || s == "/*Initialization Code*/")
-		return;
+		return "";
 	var orig = s;
 
 	// Replace old parsers
@@ -104,8 +109,9 @@ function convertCode(s) {
 			addFuncs += "\n" + e4xConv_encodeHTML;
 		if(addFuncs)
 			s += "\n" + addFuncs;
-		out(s);
+		return s;
 	}
+	return "";
 }
 function getTagsPattern() {
 	// I'm too lazy to write a real tags parser, sorry...
