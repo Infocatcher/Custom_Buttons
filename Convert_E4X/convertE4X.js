@@ -56,6 +56,9 @@ function convertE4XCode(s) {
 	function convertCode(s) {
 		if(!s || s == "/*CODE*/" || s == "/*Initialization Code*/")
 			return "";
+		var convertedNote = "/* Converted with https://github.com/Infocatcher/Custom_Buttons/tree/master/Convert_E4X */\n";
+		if(s.indexOf(convertedNote) != -1)
+			return "";
 		var orig = s;
 
 		// Replace old parsers
@@ -104,12 +107,10 @@ function convertE4XCode(s) {
 			.replace(/\s*\.\s*toXMLString\s*\(\)/g, "");
 
 		if(s != orig) {
-			if(/\WXML\s*\.\s*\w/.test(orig)) {
-				s = s.replace(
-					/^(?:\/\*(?:CODE|Initialization Code)\*\/\n?)?/,
-					"$&var XML = window.XML || {};\n\n"
-				);
-			}
+			var codeHeader = /^(?:\/\*(?:CODE|Initialization Code)\*\/\n?)?/;
+			if(/\WXML\s*\.\s*\w/.test(orig))
+				s = s.replace(codeHeader, "$&var XML = window.XML || {};\n\n");
+			s = s.replace(codeHeader, "$&" + convertedNote);
 			var addFuncs = "";
 			if(s.indexOf("e4xConv_parseXULFromString") != -1)
 				addFuncs += "\n" + trimFunc(e4xConv_parseXULFromString);
