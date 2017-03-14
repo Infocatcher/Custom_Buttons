@@ -112,9 +112,9 @@ function convertE4XCode(s) {
 			}
 			var addFuncs = "";
 			if(s.indexOf("e4xConv_parseXULFromString") != -1)
-				addFuncs += "\n" + e4xConv_parseXULFromString;
+				addFuncs += "\n" + trimFunc(e4xConv_parseXULFromString);
 			if(s.indexOf("e4xConv_encodeHTML") != -1)
-				addFuncs += "\n" + e4xConv_encodeHTML;
+				addFuncs += "\n" + trimFunc(e4xConv_encodeHTML);
 			if(addFuncs)
 				s += "\n" + addFuncs;
 			return s;
@@ -204,6 +204,13 @@ function convertE4XCode(s) {
 			.replace(/$/mg, "\\n\\")
 			.replace(/^\\n(\\[\n\r])/, "$1")
 			.slice(0, -3);
+	}
+	function trimFunc(fn) {
+		var fnCode = "" + fn;
+		var spaces = /([ \t]+)\}$/.test(fnCode) && RegExp.$1;
+		if(!spaces)
+			return fnCode;
+		return fnCode.replace(new RegExp("^" + spaces, "mg"), "");
 	}
 	function rnd() {
 		return Date.now()
