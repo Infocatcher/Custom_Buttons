@@ -44,10 +44,11 @@ eval((function getCodeToEval() {
 // Code from from https://github.com/Infocatcher/Custom_Buttons/blob/master/Convert_E4X/convertE4X.js
 //== convertE4XCode() begin
 function convertE4XCode(s) {
+	var _debug = false;
+
 	convertE4XCode = convertCode;
 	return convertCode(s);
 
-	var _debug = false;
 	function _log(s) {
 		_debug && LOG(s);
 	};
@@ -86,7 +87,9 @@ function convertE4XCode(s) {
 			})
 			// <tag ... />
 			.replace(/<\w+\s([^>]+?)\/>(?:\s*\.\s*toXMLString\s*\(\))?/g, function(s) {
-				if(inE4X(RegExp.leftContext) || alreadyConverted(s) || /^(?:\\n)?\\[\n\r]/.test(RegExp.rightContext))
+				var lc = RegExp.leftContext;
+				var rc = RegExp.rightContext;
+				if(inE4X(lc) || inString(lc) || alreadyConverted(s) || /^(?:\\n)?\\[\n\r]/.test(rc))
 					return s;
 				_log("<tag ... />\n" + s);
 				return convertE4X(s);
@@ -94,7 +97,8 @@ function convertE4XCode(s) {
 			// <tag> ... </tag>
 			//.replace(/<(\w+)(?:[^>]*[^>\/])?>([\s\S]*?)<\/\1>(?:\s*\.\s*toXMLString\s*\(\))?/g, function(s) {
 			.replace(getTagsPattern(), function(s) {
-				if(inE4X(RegExp.leftContext) || alreadyConverted(s))
+				var lc = RegExp.leftContext;
+				if(inE4X(lc) || inString(lc) || alreadyConverted(s))
 					return s;
 				_log("<tag> ... </tag>\n" + s);
 				return convertE4X(s);
@@ -150,6 +154,11 @@ function convertE4XCode(s) {
 	}
 	function inE4X(prev) {
 		return />\s*(?:(?:\\n)?\\[\n\r]\s*)?$/.test(prev);
+	}
+	function inString(prev) {
+		// Very basic check to not convert something like
+		// node.innerHTML = '<div>...</div>';
+		return /['"]$/.test(prev);
 	}
 	function alreadyConverted(s) {
 		return /['">][ \t]*(?:\\n)?\\[\n\r]/.test(s);
