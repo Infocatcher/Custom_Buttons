@@ -46,10 +46,11 @@ addEventListener("click", function getButton(e) {
 }, true);
 
 function convertE4XCode(s) {
+	var _debug = false;
+
 	convertE4XCode = convertCode;
 	return convertCode(s);
 
-	var _debug = false;
 	function _log(s) {
 		_debug && LOG(s);
 	};
