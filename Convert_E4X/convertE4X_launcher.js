@@ -9,6 +9,7 @@
 //   /*** E4X ***
 //   <code with E4X here>
 //   *** E4X ***/
+// Note: since used /* comments */ to store code with E4X, that code shouldn't contain such comments inside
 
 // (c) Infocatcher 2012-2013, 2016-2017
 // Converter version: 0.1.0b2 - 2017-03-15
