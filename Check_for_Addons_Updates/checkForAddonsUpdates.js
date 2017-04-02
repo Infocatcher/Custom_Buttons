@@ -330,10 +330,14 @@ function ProgressIcon(btn) {
 		this.imgLoading = "chrome://messenger/skin/icons/loading.png";
 	}
 	else {
-		this.imgConnecting = "chrome://browser/skin/tabbrowser/connecting.png";
-		this.imgLoading = app == "Firefox" && pv >= 48
-			? "chrome://global/skin/icons/loading.png"
-			: "chrome://browser/skin/tabbrowser/loading.png";
+		this.imgConnecting = pv >= 55
+			? "chrome://browser/skin/tabbrowser/connecting.svg"
+			: "chrome://browser/skin/tabbrowser/connecting.png";
+		this.imgLoading = pv >= 55
+			? "chrome://browser/skin/tabbrowser/loading.svg"
+			: pv >= 48
+				? "chrome://global/skin/icons/loading.png"
+				: "chrome://browser/skin/tabbrowser/loading.png";
 	}
 	var useAnimation = app == "Firefox" && pv >= 32;
 	var btnIcon = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon");
@@ -342,8 +346,17 @@ function ProgressIcon(btn) {
 	if(useAnimation) {
 		let cs = btnIcon.ownerDocument.defaultView.getComputedStyle(btnIcon, null);
 		let s = btnIcon.style;
-		s.margin = [cs.marginTop, cs.marginRight, cs.marginBottom, cs.marginLeft].join(" ");
-		s.padding = [cs.paddingTop, cs.paddingRight, cs.paddingBottom, cs.paddingLeft].join(" ");
+		// Trick for asymmetric right/left padding in Firefox 55+
+		let mr = parseFloat(cs.marginRight);
+		let ml = parseFloat(cs.marginLeft);
+		let pr = parseFloat(cs.paddingRight);
+		let pl = parseFloat(cs.paddingLeft);
+		if(pr > pl) {
+			mr += pr - pl;
+			pr = pl;
+		}
+		s.margin = [cs.marginTop, mr + "px", cs.marginBottom, ml + "px"].join(" ");
+		s.padding = [cs.paddingTop, pr + "px", cs.paddingBottom, pl + "px"].join(" ");
 		s.width = cs.width;
 		s.height = cs.height;
 		s.boxShadow = "none";
