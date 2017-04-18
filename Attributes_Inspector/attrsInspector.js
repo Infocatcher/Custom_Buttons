@@ -85,7 +85,7 @@ function _log(s) {
 	function ts() {
 		var d = new Date();
 		var ms = d.getMilliseconds();
-		return d.toLocaleFormat("%M:%S:") + "000".substr(String(ms).length) + ms;
+		return d.toTimeString().replace(/^.*\d+:(\d+:\d+).*$/, "$1") + ":" + "000".substr(("" + ms).length) + ms + " ";
 	}
 	_log = function(s) {
 		cs.logStringMessage("[Attributes Inspector]: " + ts() + " " + s);
