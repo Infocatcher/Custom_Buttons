@@ -928,13 +928,13 @@ this.undoCloseTabsList = {
 					if(!closedAt)
 						break;
 					let dt = Math.round(Math.max(0, Date.now() - closedAt)/1000);
-					let d = Math.floor(dt/24/3600);
-					dt -= d*24*3600;
-					let ts = new Date((dt + new Date(dt).getTimezoneOffset()*60)*1000)
-						.toLocaleFormat("%H:%M")
-						.replace(/^0/, "");
-					if(d)
-						ts = d + _localize("day") + " " + ts;
+					let days = Math.floor(dt/24/3600);
+					dt -= days*24*3600;
+					let d = new Date((dt + new Date(dt).getTimezoneOffset()*60)*1000);
+					let m = d.getMinutes();
+					let ts = d.getHours() + ":" + (m > 9 ? m : "0" + m);
+					if(days)
+						ts = days + _localize("day") + " " + ts;
 					let tsTip = _localize("itemTip")
 						.replace("%ago", ts)
 						.replace("%date", new Date(closedAt).toLocaleString());
