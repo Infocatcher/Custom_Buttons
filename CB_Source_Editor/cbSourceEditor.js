@@ -754,9 +754,11 @@ if(
 else
 	this.onDestroy = destructor;
 
-function _log(s) {
+function ts() {
 	var d = new Date();
 	var ms = d.getMilliseconds();
-	var ts = d.toLocaleFormat("%M:%S:") + "000".substr(String(ms).length) + ms + " ";
-	Services.console.logStringMessage("[Custom Buttons :: Source Editor] " + ts + s);
+	return d.toTimeString().replace(/^.*\d+:(\d+:\d+).*$/, "$1") + ":" + "000".substr(("" + ms).length) + ms + " ";
+}
+function _log(s) {
+	Services.console.logStringMessage("[Custom Buttons :: Source Editor] " + ts() + s);
 }
