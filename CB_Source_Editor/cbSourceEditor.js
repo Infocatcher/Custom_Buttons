@@ -118,7 +118,7 @@ if(!watcher) {
 				var loader = this.platformVersion >= 44 // See https://bugzilla.mozilla.org/show_bug.cgi?id=912121
 					? "resource://devtools/shared/Loader.jsm"
 					: "resource://gre/modules/devtools/Loader.jsm";
-				var require = Components.utils.import("resource://gre/modules/devtools/Loader.jsm", {}).devtools.require;
+				var require = Components.utils.import(loader, {}).devtools.require;
 				try {
 					window.SourceEditor = require("devtools/sourceeditor/editor");
 				}
