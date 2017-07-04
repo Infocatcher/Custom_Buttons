@@ -133,4 +133,9 @@ function compactWindow(win) {
 	};
 	root.removeAttribute("disablechrome");
 	root.offsetHeight; // Force reflow
+	try { // Mark as popup window to open new tabs in window with visible tab bar
+		win.toolbar.visible = false;
+	}
+	catch(e) {
+	}
 }
