@@ -4,8 +4,8 @@
 // Detach Tab button for Custom Buttons
 // (code for "code" section)
 
-// (c) Infocatcher 2012
-// version 0.2.1 - 2012-10-15
+// (c) Infocatcher 2012, 2016-2017
+// version 0.2.2 - 2017-07-04
 
 var forceHideTabBar = false;
 
