@@ -25,6 +25,10 @@ var options = {
 	// 0 - don't show versions
 	// 1 - show after name: "Addon Name 1.2"
 	// 2 - show as "acceltext" (in place for hotkey text)
+	showHidden: 1,
+	// 0  - don't show hidden add-ons
+	// -1 - show only enabled hidden add-ons (e.g. to track new items)
+	// 1  - show all hidden add-ons
 	sort: {
 		enabled:     0,
 		clickToPlay: 0,
@@ -309,7 +313,12 @@ function getRestartlessAddons(addonTypes, callback, context) {
 		var restartless = addons.filter(function(addon) {
 			var ops = addon.operationsRequiringRestart;
 			return !addon.appDisabled
-				&& !(ops & AddonManager.OP_NEEDS_RESTART_ENABLE || ops & AddonManager.OP_NEEDS_RESTART_DISABLE);
+				&& !(ops & AddonManager.OP_NEEDS_RESTART_ENABLE || ops & AddonManager.OP_NEEDS_RESTART_DISABLE)
+				&& (
+					!addon.hidden
+					|| options.showHidden > 0
+					|| options.showHidden == -1 && !addon.userDisabled
+				);
 		});
 		callback.call(context, restartless);
 	});
