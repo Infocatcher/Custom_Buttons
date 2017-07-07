@@ -114,11 +114,11 @@ window.editCustomButtonInTab = function(btn, newTab) { // Should be global to wo
 			let browser = tab.linkedBrowser;
 			if(!browser)
 				continue;
-			let win = browser.contentWindow;
-			let loc = win.location.href;
+			let loc = browser.currentURI.spec;
 			if(loc.substr(0, editorBaseUriLength) != editorBaseUri)
 				continue;
 			let isSameEditor = loc == editorUriFull;
+			let win = browser.contentWindow;
 			if(!isSameEditor) {
 				let rawWin = unwrap(win);
 				let winParam = "arguments" in rawWin && rawWin.arguments.length
