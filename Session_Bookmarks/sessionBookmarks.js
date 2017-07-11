@@ -1226,7 +1226,7 @@ this.bookmarks = {
 			let privateAttr = "privateTab-isPrivate";
 			let isPrivate = _isPrivate || false;
 			if(_isPrivate === undefined) try {
-				let contentWindow = (browser.contentWindow || browser.contentWindowAsCPOW)
+				let contentWindow = browser.contentWindow
 					.QueryInterface(Components.interfaces.nsIDOMWindow); // Ensure initialized
 				isPrivate = "PrivateBrowsingUtils" in window
 					&& PrivateBrowsingUtils.isWindowPrivate(contentWindow)
@@ -1333,7 +1333,7 @@ this.bookmarks = {
 					&& !tab.selected // Selected tab will be loaded automatically
 					&& (
 						tab.getAttribute("pending") == "true" // Gecko >= 9.0
-						|| (browser.contentDocument || browser.contentDocumentAsCPOW).readyState == "uninitialized"
+						|| browser.contentDocument && browser.contentDocument.readyState == "uninitialized"
 						// || browser.__SS_restoreState == 1
 					)
 				) {
