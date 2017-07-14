@@ -753,6 +753,9 @@ this.bookmarks = {
 		else
 			this.loadData(data);
 	},
+	get items() {
+		return this.mp.getElementsByAttribute("cb_bookmarkItem", "*");
+	},
 	unsaved: false,
 	_saveInProgress: false,
 	_changed: false,
@@ -765,25 +768,21 @@ this.bookmarks = {
 		this._changed = false;
 
 		var data = [];
-		Array.prototype.forEach.call(
-			this.mp.getElementsByAttribute("cb_bookmarkItem", "*"),
-			function(mi) {
-				if(mi.localName == "menuseparator") {
-					data.push(this._sep);
-					return;
-				}
-				var section = [
-					this._label + this.escapeString(mi.getAttribute("label")),
-					this._uri   + this.escapeString(mi.getAttribute("cb_uri"))
-				];
-				var icon   = mi.getAttribute("image");
-				var ssData = mi.getAttribute("cb_ssData");
-				icon   && section.push(this._icon    + this.escapeString(icon));
-				ssData && section.push(this._session + this.escapeString(ssData));
-				data.push(section.join("\n"));
-			},
-			this
-		);
+		Array.prototype.forEach.call(this.items, function(mi) {
+			if(mi.localName == "menuseparator") {
+				data.push(this._sep);
+				return;
+			}
+			var section = [
+				this._label + this.escapeString(mi.getAttribute("label")),
+				this._uri   + this.escapeString(mi.getAttribute("cb_uri"))
+			];
+			var icon   = mi.getAttribute("image");
+			var ssData = mi.getAttribute("cb_ssData");
+			icon   && section.push(this._icon    + this.escapeString(icon));
+			ssData && section.push(this._session + this.escapeString(ssData));
+			data.push(section.join("\n"));
+		}, this);
 		this.copyFileAsync(this.file, this.backupFile, function(status) {
 			if(!Components.isSuccessCode(status))
 				Components.utils.reportError(this.errPrefix + "copyFileAsync() failed");
@@ -1409,7 +1408,7 @@ this.bookmarks = {
 	},
 	deleteAllBookmarks: function() {
 		var undo = [];
-		Array.prototype.slice.call(this.mp.getElementsByAttribute("cb_bookmarkItem", "*")).forEach(function(mi) {
+		Array.prototype.slice.call(this.items).forEach(function(mi) {
 			undo.push({ action: "add", mi: mi, pn: mi.parentNode, ns: mi.nextSibling });
 			mi.parentNode.removeChild(mi);
 		});
