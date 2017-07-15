@@ -756,6 +756,9 @@ this.bookmarks = {
 	get items() {
 		return this.mp.getElementsByAttribute("cb_bookmarkItem", "*");
 	},
+	get bookmarks() {
+		return this.mp.getElementsByAttribute("cb_uri", "*");
+	},
 	unsaved: false,
 	_saveInProgress: false,
 	_changed: false,
@@ -1192,7 +1195,7 @@ this.bookmarks = {
 			this.deleteBookmark(mi);
 	},
 	openAllBookmarks: function() {
-		var mis = this.mp.getElementsByAttribute("cb_uri", "*");
+		var mis = this.bookmarks;
 		if(
 			"PlacesUIUtils" in window
 			&& "_confirmOpenInTabs" in PlacesUIUtils
@@ -1204,16 +1207,12 @@ this.bookmarks = {
 		catch(e) {
 			Components.utils.reportError(e);
 		}
-		Array.prototype.forEach.call(
-			mis,
-			function(mi) {
-				var uri = mi.getAttribute("cb_uri");
-				var tab = gBrowser.addTab(this.options.useSessions ? "about:blank" : uri);
-				if(this.options.useSessions)
-					this.setTabSession(tab, mi.getAttribute("cb_ssData"), uri, false, true);
-			},
-			this
-		);
+		Array.prototype.forEach.call(mis, function(mi) {
+			var uri = mi.getAttribute("cb_uri");
+			var tab = gBrowser.addTab(this.options.useSessions ? "about:blank" : uri);
+			if(this.options.useSessions)
+				this.setTabSession(tab, mi.getAttribute("cb_ssData"), uri, false, true);
+		}, this);
 		if(this.options.deleteAfterOpen)
 			this.deleteAllBookmarks();
 	},
@@ -1649,7 +1648,7 @@ this.bookmarks = {
 		w && w.close();
 	},
 	closePropertiesWindows: function() {
-		var mis = Array.prototype.slice.call(this.mp.getElementsByAttribute("cb_uri", "*"));
+		var mis = Array.prototype.slice.call(this.bookmarks);
 		var ws = this.propertiesWindows;
 		while(ws.hasMoreElements()) {
 			let w = ws.getNext();
@@ -1664,7 +1663,7 @@ this.bookmarks = {
 	},
 	onBookmarksChanged: function(hasBookmarks) {
 		if(hasBookmarks === undefined)
-			hasBookmarks = this.mp.getElementsByAttribute("cb_uri", "*").length > 0;
+			hasBookmarks = this.bookmarks.length > 0;
 		this.button.disabled =
 			this.$(this.sepId).hidden =
 			this.$(this.openAllId).hidden =
