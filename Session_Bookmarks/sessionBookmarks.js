@@ -753,11 +753,14 @@ this.bookmarks = {
 		else
 			this.loadData(data);
 	},
+	getItems: function(type, val) {
+		return this.mp.getElementsByAttribute(type, val || "*");
+	},
 	get items() {
-		return this.mp.getElementsByAttribute("cb_bookmarkItem", "*");
+		return this.getItems("cb_bookmarkItem");
 	},
 	get bookmarks() {
-		return this.mp.getElementsByAttribute("cb_uri", "*");
+		return this.getItems("cb_uri");
 	},
 	unsaved: false,
 	_saveInProgress: false,
@@ -975,7 +978,7 @@ this.bookmarks = {
 		}
 	},
 	getItemByTabData: function(td, checkSession) {
-		var mis = this.mp.getElementsByAttribute("cb_uri", td.uri);
+		var mis = this.getItems("cb_uri", td.uri);
 		var mi = mis.length && mis[0];
 		if(
 			mi
