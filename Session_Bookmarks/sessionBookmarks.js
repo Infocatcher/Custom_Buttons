@@ -2150,7 +2150,7 @@ this.bookmarks = {
 			return;
 		}
 		var ostream = FileUtils.openSafeFileOutputStream(file);
-		var uc = this.unicodeConverter("UTF-8");
+		var uc = this.unicodeConverter;
 		var istream = uc.convertToInputStream(str);
 		NetUtil.asyncCopy(istream, ostream, callback && function(status) {
 			callback.call(context, status, str);
@@ -2243,7 +2243,7 @@ this.bookmarks = {
 		return this.convertToUnicode(str);
 	},
 	convertToUnicode: function(str) {
-		var uc = this.unicodeConverter("UTF-8");
+		var uc = this.unicodeConverter;
 		try {
 			return uc.ConvertToUnicode(str);
 		}
@@ -2252,11 +2252,12 @@ this.bookmarks = {
 		}
 		return str;
 	},
-	unicodeConverter: function(charset) {
+	get unicodeConverter() {
 		var uc = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"]
 			.createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
-		uc.charset = charset;
-		return uc;
+		uc.charset = "UTF-8";
+		delete this.unicodeConverter;
+		return this.unicodeConverter = uc;
 	},
 	copyFileAsync: function(file, newFile, callback, context) {
 		if(this.platformVersion >= 20) try {
