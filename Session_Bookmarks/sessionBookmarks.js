@@ -2079,7 +2079,11 @@ this.bookmarks = {
 	},
 	get platformVersion() {
 		delete this.platformVersion;
-		return this.platformVersion = parseFloat(this.appInfo.platformVersion);
+		return this.platformVersion = parseFloat(
+			this.appInfo.name == "Pale Moon"
+				? this.appInfo.version
+				: this.appInfo.platformVersion
+		);
 	},
 	get appName() {
 		delete this.appName;
