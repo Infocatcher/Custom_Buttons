@@ -356,7 +356,12 @@ function openAddonsManager(view) {
 	openAddonsMgr(view);
 }
 function openAddonPage(addon, scrollToPreferences) {
-	scrollToPreferences = scrollToPreferences && parseFloat(Services.appinfo.platformVersion) >= 12
+	var platformVersion = parseFloat(
+		Services.appinfo.name == "Pale Moon"
+			? Services.appinfo.version
+			: Services.appinfo.platformVersion
+	);
+	scrollToPreferences = scrollToPreferences && platformVersion >= 12
 		? "/preferences"
 		: "";
 	openAddonsManager("addons://detail/" + encodeURIComponent(addon.id) + scrollToPreferences);
