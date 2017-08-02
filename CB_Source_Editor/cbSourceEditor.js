@@ -73,12 +73,17 @@ if(!watcher) {
 		},
 		get platformVersion() {
 			delete this.platformVersion;
-			return this.platformVersion = "Services" in window ? parseFloat(Services.appinfo.platformVersion) : 0;
+			return this.platformVersion = parseFloat(Services.appinfo.platformVersion);
+		},
+		get hasCodeMirror() {
+			delete this.hasCodeMirror;
+			return this.hasCodeMirror = Services.appinfo.name == "Pale Moon" //~ todo: test
+				|| this.platformVersion >= 27;
 		},
 		init: function(reason) {
-			if(this.platformVersion < 27) {
+			if(!this.hasCodeMirror) {
 				this.isBrowserWindow = function() {
-					return false; // CodeMirror is available only since Firefox 27.0a1 (2013-09-24)
+					return false;
 				};
 			}
 			this.obs.addObserver(this, "quit-application-granted", false);
@@ -134,9 +139,11 @@ if(!watcher) {
 			var psXUL = (isCodeMirror
 			? '<!DOCTYPE popupset [\
 				<!ENTITY % sourceEditorStrings SYSTEM "' + (
-					this.platformVersion >= 45
-						? "chrome://devtools/locale/sourceeditor.dtd"
-						: "chrome://browser/locale/devtools/sourceeditor.dtd"
+					Services.appinfo.name == "Pale Moon"
+						? "chrome://global/locale/devtools/sourceeditor.dtd"
+						: this.platformVersion >= 45
+							? "chrome://devtools/locale/sourceeditor.dtd"
+							: "chrome://browser/locale/devtools/sourceeditor.dtd"
 				) + '">\
 				%sourceEditorStrings;\
 			]>\
