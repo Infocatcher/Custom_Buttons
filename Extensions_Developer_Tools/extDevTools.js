@@ -2535,6 +2535,10 @@ function init() {
 				.getService(Components.interfaces.nsIXULAppInfo);
 		},
 		get fxVersion() {
+			if(this.appInfo.name == "Pale Moon") {
+				// In Pale Moon 27.4.0 we have platformVersion = 3.2.2
+				return 28; // D'oh
+			}
 			var pv = this.appInfo.platformVersion;
 			// https://developer.mozilla.org/en-US/docs/Mozilla/Gecko/Versions
 			var v = parseFloat(pv);
