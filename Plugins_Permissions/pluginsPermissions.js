@@ -213,7 +213,8 @@ this.permissions = {
 	},
 	get perPluginPermissions() {
 		delete this.perPluginPermissions;
-		return this.perPluginPermissions = parseFloat(this.appInfo.platformVersion) >= 20;
+		return this.perPluginPermissions = this.appInfo.name == "Pale Moon" //~ todo: test
+			|| parseFloat(this.appInfo.platformVersion) >= 20;
 	},
 	popupClass: "cbPluginsPermissionsPopup",
 
