@@ -220,12 +220,12 @@ if(!watcher) {
 			}
 		},
 		get hasSizeModeChangeEvent() {
+			var appinfo = "Services" in window && Services.appinfo;
 			delete this.hasSizeModeChangeEvent;
-			return this.hasSizeModeChangeEvent = parseFloat(
-				Components.classes["@mozilla.org/xre/app-info;1"]
-					.getService(Components.interfaces.nsIXULAppInfo)
-					.platformVersion
-			) >= 8;
+			return this.hasSizeModeChangeEvent = appinfo && (
+				appinfo.name == "Pale Moon"
+				|| parseFloat(appinfo.platformVersion) >= 8
+			);
 		},
 		legacySizeModeChange: function(window) {
 			var lastState = window.windowState;
