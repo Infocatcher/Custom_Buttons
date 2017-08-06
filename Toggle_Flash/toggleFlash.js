@@ -8,7 +8,7 @@
 // version 0.1.4.2 - 2015-05-31
 
 var options = {
-	pluginName: "Shockwave Flash", // Or name of any other plugin
+	pluginName: Services.appinfo.name == "Pale Moon" ? "Adobe Flash" : "Shockwave Flash", // Or name of any other plugin
 	searchInTypes: ["plugin"], // Use "extension" to toggle restartless extensions
 	// Button styles, possible values:
 	// checked:       [true|false]
@@ -123,7 +123,7 @@ this.__defineSetter__("pluginDisabled", function(dis) {
 				icon.style.cssText = style.iconStyle;
 			if(style.hasOwnProperty("iconGrayscale")) {
 				icon.style.filter = style.iconGrayscale
-					? parseFloat(Services.appinfo.platformVersion) >= 36
+					? parseFloat(Services.appinfo.platformVersion) >= 36 || Services.appinfo.name == "Pale Moon"
 						? "grayscale(1)"
 						: 'url("chrome://mozapps/skin/extensions/extensions.svg#greyscale")'
 					: "";
