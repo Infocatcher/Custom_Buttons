@@ -291,10 +291,11 @@ if(!watcher) {
 			), document.documentElement);
 		},
 		removeStyle: function(document) {
+			var mark = 'id="' + this.styleId + '"';
 			for(var child = document.documentElement; child = child.previousSibling; ) {
 				if(
 					child.nodeType == child.PROCESSING_INSTRUCTION_NODE
-					&& child.data.indexOf(this.styleId) != -1
+					&& child.data.substr(0, mark.length) == mark
 				) {
 					document.removeChild(child);
 					break;
