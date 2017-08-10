@@ -284,17 +284,14 @@ if(!watcher) {
 				.replace(/%iconPinned%/g, this.iconPinned)
 				.replace(/%naAttr%/g, this.naAttr);
 
-			document.insertBefore(
-				document.createProcessingInstruction(
-					"xml-stylesheet",
-					'id="' + this.styleId + '" href="' + "data:text/css,"
-						+ encodeURIComponent(style) + '" type="text/css"'
-				),
-				document.firstChild
-			);
+			document.insertBefore(document.createProcessingInstruction(
+				"xml-stylesheet",
+				'id="' + this.styleId + '" href="' + "data:text/css,"
+					+ encodeURIComponent(style) + '" type="text/css"'
+			), document.documentElement);
 		},
 		removeStyle: function(document) {
-			for(var child = document.firstChild; child; child = child.nextSibling) {
+			for(var child = document.documentElement; child = child.previousSibling; ) {
 				if(
 					child.nodeType == child.PROCESSING_INSTRUCTION_NODE
 					&& child.data.indexOf(this.styleId) != -1
