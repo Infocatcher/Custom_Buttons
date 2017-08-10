@@ -177,6 +177,8 @@ if(!watcher) {
 				let box = btn.parentNode;
 				box.parentNode.removeChild(box);
 				this.removeStyle(document);
+				let xulWin = this.getXulWin(window);
+				xulWin.zLevel = xulWin.normalZ;
 			}
 		},
 		isTargetWindow: function(window) {
