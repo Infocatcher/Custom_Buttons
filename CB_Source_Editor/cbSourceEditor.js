@@ -286,6 +286,16 @@ if(!watcher) {
 								mi._key = _key;
 							}
 						}
+						// Fix styles for autocomplete tooltip
+						function css(uri) {
+							document.insertBefore(document.createProcessingInstruction(
+								"xml-stylesheet",
+								'href="' + uri + '" type="text/css"'
+							), document.documentElement);
+						}
+						css("resource://devtools/client/themes/variables.css");
+						css("resource://devtools/client/themes/common.css");
+						css("chrome://devtools/skin/tooltips.css");
 					},
 					["chrome://global/content/editMenuOverlay.xul", function check(window) {
 						return window.document.getElementById("editMenuCommands").hasChildNodes();
@@ -618,6 +628,16 @@ if(!watcher) {
 				].forEach(function(p) {
 					delete window[p];
 				});
+				for(var child = document.documentElement; child = child.previousSibling; ) {
+					if(
+						child.nodeType == child.PROCESSING_INSTRUCTION_NODE
+						&& child.data.indexOf("://devtools/") != -1
+					) {
+						setTimeout(function(child) {
+							child.parentNode.removeChild(child);
+						}, 0, child);
+					}
+				}
 				delete window.SourceEditor;
 			}
 			var hke = this.handleKeyEvent;
