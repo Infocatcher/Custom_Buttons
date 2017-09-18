@@ -18,8 +18,10 @@ var storage = (function() {
 	// Simple replacement for Application.storage
 	// See https://bugzilla.mozilla.org/show_bug.cgi?id=1090880
 	//var global = Components.utils.getGlobalForObject(Services);
-	// Ensure, that we have global object (because window.Services may be overwriten)
-	var global = Components.utils.import("resource://gre/modules/Services.jsm", {});
+	// Ensure, that we have global object (because window.Services may be overwritten)
+	var global = Components.utils.getGlobalForObject( // Trick for Firefox 57+
+		Components.utils.import("resource://gre/modules/Services.jsm", {})
+	);
 	var ns = "_cbEditorToggleOnTopStorage";
 	var storage = global[ns] || (global[ns] = global.Object.create(null));
 	return {
