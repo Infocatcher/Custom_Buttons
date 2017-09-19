@@ -1220,11 +1220,9 @@ this.permissions = {
 		// See https://bugzilla.mozilla.org/show_bug.cgi?id=1090880
 		//var global = Components.utils.getGlobalForObject(Services);
 		// Ensure, that we have global object (because window.Services may be overwritten)
-		var global = Components.utils.getGlobalForObject( // Trick for Firefox 57+
-			Components.utils.import("resource://gre/modules/Services.jsm", {})
-		);
+		var global = Components.utils.import("resource://gre/modules/Services.jsm", {});
 		var ns = "_cbCookiesPermissionsStorage";
-		var storage = global[ns] || (global[ns] = global.Object.create(null));
+		var storage = global[ns] || (global[ns] = Components.utils.getGlobalForObject(global).Object.create(null));
 		return this.storage = {
 			get: function(key, defaultVal) {
 				if(key in storage)
