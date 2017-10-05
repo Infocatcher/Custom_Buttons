@@ -5,6 +5,7 @@
 * or read instructions in *.js and copy code to the “code” or “initialization” section in custom button editor (be careful: this is development version and may contain some bugs)
 
 <hr>
+
 #### Buttons in alphabetical order
 
 ##### ![icon](https://raw.github.com/Infocatcher/Custom_Buttons/master/Add_New_Buttons_After_This_Button/icon.png)&nbsp;[Add New Buttons After This Button](Add_New_Buttons_After_This_Button)
@@ -126,6 +127,7 @@ Just looks like toolbar space, may be useful in Firefox 29+ (Australis)
 Allows restore recently closed tabs and windows
 
 <hr>
+
 #### [Code snippets](code_snippets)
 Some code snippets related to Custom Buttons.
 
