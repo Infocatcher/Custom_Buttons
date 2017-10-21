@@ -45,10 +45,6 @@ var _addedColor = "-moz-hyperlinktext";
 var _removedColor = "grayText";
 var _changedColor = "-moz-visitedhyperlinktext";
 
-// See https://github.com/Infocatcher/Custom_Buttons/issues/25
-// Force repaint tooltip, may solve display glitches in Gecko 29+
-// (disabled by default for better performance)
-
 var _maxTooltipWidth = 600; // Max width in px, 0 to not force limits
 
 var _excludeChildTextNodes = 1;
