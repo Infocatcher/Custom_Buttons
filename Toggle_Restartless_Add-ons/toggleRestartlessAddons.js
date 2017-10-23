@@ -90,10 +90,7 @@ mp.updateMenu = function() {
 			if(prevType && type != prevType)
 				df.appendChild(document.createElement("menuseparator"));
 			prevType = type;
-			var icon = addon.iconURL || addon.icon64URL
-				|| type == "plugin"    && "chrome://mozapps/skin/plugins/pluginGeneric-16.png"
-				|| type == "extension" && "chrome://mozapps/skin/extensions/extensionGeneric-16.png"
-				|| "";
+			var icon = addon.iconURL || addon.icon64URL || mp.icons[type] || "";
 			var mi = document.createElement("menuitem");
 			mi.className = "menuitem-iconic";
 			var label = addon.name;
@@ -152,6 +149,25 @@ mp.destroyMenu = function() {
 	cleanupTimer = setTimeout(function() {
 		mp.textContent = "";
 	}, 5000);
+};
+mp.icons = {
+	get useSVG() {
+		delete this.useSVG;
+		return this.useSVG = Services.appinfo.name == "Firefox"
+			&& parseFloat(Services.appinfo.version) >= 57;
+	},
+	get plugin() {
+		delete this.plugin;
+		return this.plugin = this.useSVG
+			? "chrome://mozapps/skin/plugins/pluginGeneric.svg"
+			: "chrome://mozapps/skin/plugins/pluginGeneric-16.png";
+	},
+	get extension() {
+		delete this.extension;
+		return this.extension = this.useSVG
+			? "chrome://mozapps/skin/extensions/extensionGeneric-16.svg"
+			: "chrome://mozapps/skin/extensions/extensionGeneric-16.png";
+	}
 };
 function isAskToActivateAddon(addon) {
 	return addon.type == "plugin"
