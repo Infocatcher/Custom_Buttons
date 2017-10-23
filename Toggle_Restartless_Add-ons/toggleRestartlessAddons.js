@@ -186,10 +186,15 @@ function setNewDisabled(addon) {
 			_log("Let's try set addon.userDisabled using raw hack");
 			let g = Components.utils.import("resource://gre/modules/addons/XPIProvider.jsm", {});
 			// See "set userDisabled(val)"
-			let addonFor = g.eval("addonFor");
-			let rawAddon = addonFor(addon);
-			//rawAddon.userDisabled = newDis;
-			g.XPIProvider.updateAddonDisabledState(rawAddon, newDis);
+			if("eval" in g) {
+				let addonFor = g.eval("addonFor");
+				let rawAddon = addonFor(addon);
+				//rawAddon.userDisabled = newDis;
+				g.XPIProvider.updateAddonDisabledState(rawAddon, newDis);
+			}
+			else { // Firefox 57+? See https://forum.mozilla-russia.org/viewtopic.php?pid=745272#p745272
+				updateAddonDisabledState(addon, newDis);
+			}
 		}
 	}
 	var realDis = addon.userDisabled;
@@ -225,6 +230,20 @@ function getNewDisabled(addon) {
 			newDis = false;
 	}
 	return newDis;
+}
+function updateAddonDisabledState(addon, newDis) {
+	var nsvo = Components.utils.import("resource://gre/modules/addons/XPIProvider.jsm", {});
+	var key = "_cbToggleRestartlessAddonsData";
+	var url = URL.createObjectURL(new Blob([
+		"XPIProvider.updateAddonDisabledState(addonFor(this." + key + "[0]), this." + key + "[1]); delete this." + key + ";"
+	]));
+	addDestructor(function() {
+		URL.revokeObjectURL(url);
+	});
+	(updateAddonDisabledState = function(addon, newDis) {
+		nsvo[key] = [addon, newDis];
+		Services.scriptloader.loadSubScript(url, nsvo);
+	})(addon, newDis);
 }
 function setDisabled(mi, disabled) {
 	var askToActivate = "STATE_ASK_TO_ACTIVATE" in AddonManager && disabled == AddonManager.STATE_ASK_TO_ACTIVATE;
