@@ -198,7 +198,11 @@ function setStyle(mi, uid, addon) {
 		if(addon) {
 			icon = addon.iconURL
 				|| addon.icon64URL
-				|| "chrome://mozapps/skin/extensions/extensionGeneric-16.png";
+				|| (
+					Services.appinfo.name == "Firefox" && parseFloat(Services.appinfo.version) >= 57
+						? "chrome://mozapps/skin/extensions/extensionGeneric-16.svg"
+						: "chrome://mozapps/skin/extensions/extensionGeneric-16.png"
+				);
 			if(addon.isActive)
 				color = iconOpacity = "";
 			else if(addon.appDisabled)
@@ -434,7 +438,11 @@ function notify(title, text, icon) {
 	Components.classes["@mozilla.org/alerts-service;1"]
 		.getService(Components.interfaces.nsIAlertsService)
 		.showAlertNotification(
-			icon || "chrome://mozapps/skin/extensions/extensionGeneric.png",
+			icon || (
+				Services.appinfo.name == "Firefox" && parseFloat(Services.appinfo.version) >= 57
+					? "chrome://mozapps/skin/extensions/extensionGeneric.svg"
+					: "chrome://mozapps/skin/extensions/extensionGeneric.png"
+			),
 			"Extensions Installer: " + title,
 			text
 		);
