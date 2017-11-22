@@ -1440,30 +1440,42 @@ var cmds = this.commands = {
 		var ps = prefBranch || this.prefSvc;
 		try { // getPrefType() returns type of changed value for default branch
 			switch(ps.getPrefType(pName)) {
-				case ps.PREF_STRING: return ps.getComplexValue(pName, Components.interfaces.nsISupportsString).data;
-				case ps.PREF_INT:    return ps.getIntPref(pName);
 				case ps.PREF_BOOL:   return ps.getBoolPref(pName);
+				case ps.PREF_INT:    return ps.getIntPref(pName);
+				case ps.PREF_STRING:
+					if("getStringPref" in ps) // Firefox 58+
+						return ps.getStringPref(pName);
+					return ps.getComplexValue(pName, Components.interfaces.nsISupportsString).data;
 			}
 		}
 		catch(e) {
 		}
 		return defaultVal;
 	},
-	setPref: function(pName, pVal) {
-		var ps = this.prefSvc;
+	setPref: function(pName, val, prefBranch) {
+		var ps = prefBranch || this.prefSvc;
 		var pType = ps.getPrefType(pName);
-		var isNew = pType == ps.PREF_INVALID;
-		var vType = typeof pVal;
-		if(pType == ps.PREF_BOOL || isNew && vType == "boolean")
-			ps.setBoolPref(pName, pVal);
-		else if(pType == ps.PREF_INT || isNew && vType == "number")
-			ps.setIntPref(pName, pVal);
-		else if(pType == ps.PREF_STRING || isNew) {
-			var str = Components.classes["@mozilla.org/supports-string;1"]
-				.createInstance(Components.interfaces.nsISupportsString);
-			str.data = pVal;
-			ps.setComplexValue(pName, Components.interfaces.nsISupportsString, str);
+		if(pType == ps.PREF_INVALID)
+			pType = this.getValueType(val);
+		switch(pType) {
+			case ps.PREF_BOOL: return ps.setBoolPref(pName, val);
+			case ps.PREF_INT:  return ps.setIntPref(pName, val);
+			case ps.PREF_STRING:
+				if("setStringPref" in ps) // Firefox 58+
+					return ps.setStringPref(pName, val);
+				var ss = Components.interfaces.nsISupportsString;
+				var str = Components.classes["@mozilla.org/supports-string;1"]
+					.createInstance(ss);
+				str.data = val;
+				return ps.setComplexValue(pName, ss, str);
 		}
+	},
+	getValueType: function(val) {
+		switch(typeof val) {
+			case "boolean": return this.prefSvc.PREF_BOOL;
+			case "number":  return this.prefSvc.PREF_INT;
+		}
+		return this.prefSvc.PREF_STRING;
 	},
 	prefHasUserValue: function(pName) {
 		if(!this.prefHasDefaultValue(pName))
