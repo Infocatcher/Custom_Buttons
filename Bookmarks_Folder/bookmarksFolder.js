@@ -36,10 +36,15 @@ function _localize(s, key) {
 		}
 	};
 	var locale = (function() {
-		var prefs = Services.prefs;
-		if(!prefs.getBoolPref("intl.locale.matchOS")) {
-			var locale = prefs.getCharPref("general.useragent.locale");
-			if(locale.substr(0, 9) != "chrome://")
+		var prefs = "Services" in window && Services.prefs
+			|| Components.classes["@mozilla.org/preferences-service;1"]
+				.getService(Components.interfaces.nsIPrefBranch);
+		function pref(name, type) {
+			return prefs.getPrefType(name) != prefs.PREF_INVALID ? prefs["get" + type + "Pref"](name) : undefined;
+		}
+		if(!pref("intl.locale.matchOS", "Bool")) { // Also see https://bugzilla.mozilla.org/show_bug.cgi?id=1414390
+			var locale = pref("general.useragent.locale", "Char");
+			if(locale && locale.substr(0, 9) != "chrome://")
 				return locale;
 		}
 		return Components.classes["@mozilla.org/chrome/chrome-registry;1"]
