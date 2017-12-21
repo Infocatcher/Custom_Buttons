@@ -7,6 +7,9 @@
 // (c) Infocatcher 2012-2017
 // version 0.1.0a8 - 2017-05-28
 
+// Compatibility note: for Firefox 25 and older replace "function*" with "function"
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*
+
 var options = {
 	cssInHelp: true,
 	codeMirror: {
@@ -710,7 +713,7 @@ if(!watcher) {
 		loadOverlays: function() {
 			this.runGenerator(this.loadOverlaysGen, this, arguments);
 		},
-		loadOverlaysGen: function loadOverlaysGen(window, callback/*, overlayData1, ...*/) {
+		loadOverlaysGen: function* loadOverlaysGen(window, callback/*, overlayData1, ...*/) {
 			var gen = loadOverlaysGen.__generator;
 			for(var i = 2, l = arguments.length; i < l; ++i) {
 				var overlayData = arguments[i];
