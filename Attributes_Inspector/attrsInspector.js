@@ -1811,8 +1811,14 @@ function init() {
 	this.overrideBoolPref = function(prefName, prefVal) {
 		var prefs = Components.classes["@mozilla.org/preferences-service;1"]
 			.getService(Components.interfaces.nsIPrefBranch);
-		var origVal = prefs.getBoolPref(prefName)
-		if(origVal == prefVal)
+		try {
+			var origVal = prefs.getBoolPref(prefName);
+		}
+		catch(e) {
+			// Firefox 58+: Remove support for extensions having their own prefs file
+			// https://bugzilla.mozilla.org/show_bug.cgi?id=1413413
+		}
+		if(origVal == prefVal || origVal === undefined)
 			return function restore() {};
 		prefs.setBoolPref(prefName, prefVal);
 		return function restore() {
