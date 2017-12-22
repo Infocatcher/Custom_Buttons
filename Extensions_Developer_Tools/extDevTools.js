@@ -50,7 +50,8 @@ var options = {
 		openErrorConsole: "control alt J",
 		openScratchpad: {
 			key: "shift VK_F4",
-			override: "key_scratchpad"
+			override: "key_scratchpad",
+			has: "hasScratchpad"
 		}
 	}
 };
@@ -1757,6 +1758,8 @@ if(!cmds.onlyPopup) for(var kId in options.hotkeys) if(options.hotkeys.hasOwnPro
 	var cmd = options.hotkeys[kId];
 	var key = typeof cmd == "string" ? cmd : cmd.key;
 	if(!key)
+		continue;
+	if(cmd.hasOwnProperty("has") && !cmds[cmd.has])
 		continue;
 	var keyElt;
 	if(cmd.hasOwnProperty("override")) {
