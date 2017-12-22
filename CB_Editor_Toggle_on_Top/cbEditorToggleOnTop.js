@@ -56,6 +56,7 @@ if(!watcher) {
 		styleId: "cbToggleOnTopStyle",
 		get btnTip() {
 			var locale = (function() {
+				if("Services" in window && Services.locale && Services.locale.getRequestedLocales) {					var locales = Services.locale.getRequestedLocales();					return locales && locales[0];				}
 				var prefs = "Services" in window && Services.prefs
 					|| Components.classes["@mozilla.org/preferences-service;1"]
 						.getService(Components.interfaces.nsIPrefBranch);
