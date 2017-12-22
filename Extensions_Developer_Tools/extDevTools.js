@@ -751,8 +751,12 @@ var cmds = this.commands = {
 		return this.getLocale(this.defaultBranch);
 	},
 	getLocale: function(prefs) {
+		if("Services" in window && Services.locale && Services.locale.getRequestedLocales) {
+			var locales = Services.locale.getRequestedLocales();
+			return locales && locales[0];
+		}
 		var locale = this.getPref("general.useragent.locale", "", prefs);
-		if(locale.substr(0, 9) != "chrome://")
+		if(locale && locale.substr(0, 9) != "chrome://")
 			return locale;
 		return prefs.getComplexValue(
 			"general.useragent.locale",
@@ -802,8 +806,12 @@ var cmds = this.commands = {
 		});
 	},
 	_setLocale: function(locale) {
-		this.setPref("intl.locale.matchOS", false);
-		this.setPref("general.useragent.locale", locale);
+		if("Services" in window && Services.locale && Services.locale.setRequestedLocales)
+			Services.locale.setRequestedLocales([locale]);
+		else {
+			this.setPref("intl.locale.matchOS", false);
+			this.setPref("general.useragent.locale", locale);
+		}
 		var reopen = !this.options.forceRestartOnLocaleChange
 			&& this.canReopenWindow
 			&& this.platformVersion >= 18;
