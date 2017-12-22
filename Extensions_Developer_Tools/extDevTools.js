@@ -829,6 +829,11 @@ var cmds = this.commands = {
 		}
 		return locale;
 	},
+	get alwaysUpdateLocale() {
+		var isAlpha = /^\d+(?:\.\d+)*a\d/.test(this.appInfo.version);
+		delete this.alwaysUpdateLocale;
+		return this.alwaysUpdateLocale = isAlpha;
+	},
 	ensureLocaleAvailable: function(locale, callback, tryESR) {
 		if(locale == this.defaultLocale) {
 			callback(true);
@@ -844,7 +849,7 @@ var cmds = this.commands = {
 		var id = "langpack-" + locale + "@firefox.mozilla.org";
 		var _this = this;
 		AddonManager.getAddonByID(id, function(addon) {
-			if(addon && addon.isCompatible) {
+			if(addon && addon.isCompatible && !_this.alwaysUpdateLocale) {
 				callback(true);
 				return;
 			}
