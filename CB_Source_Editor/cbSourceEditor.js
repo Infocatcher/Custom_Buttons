@@ -7,9 +7,6 @@
 // (c) Infocatcher 2012-2017
 // version 0.1.0a8 - 2017-05-28
 
-// Compatibility note: for Firefox 25 and older replace "function*" with "function"
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*
-
 var options = {
 	cssInHelp: true,
 	codeMirror: {
@@ -713,17 +710,30 @@ if(!watcher) {
 		loadOverlays: function() {
 			this.runGenerator(this.loadOverlaysGen, this, arguments);
 		},
-		loadOverlaysGen: function* loadOverlaysGen(window, callback/*, overlayData1, ...*/) {
+
+		get loadOverlaysGen() {
+			var fn = this._loadOverlaysGen.toString()
+				.replace(/__yield/g, "yield");
+			try {
+				new Function("function test() { yield 0; }");
+			}
+			catch(e) { // Firefox 26+, SyntaxError: yield expression is only valid in generators
+				fn = fn.replace("function", "function*");
+			}
+			delete this.loadOverlaysGen;
+			return this.loadOverlaysGen = eval("(" + fn + ")");
+		},
+		_loadOverlaysGen: function loadOverlaysGen(window, callback/*, overlayData1, ...*/) {
 			var gen = loadOverlaysGen.__generator;
 			for(var i = 2, l = arguments.length; i < l; ++i) {
 				var overlayData = arguments[i];
 				this.loadOverlay(window, overlayData[0], overlayData[1], function() {
 					gen.next();
 				});
-				yield 0;
+				__yield(0);
 			}
 			callback();
-			yield 0;
+			__yield(0);
 		},
 		loadOverlay: function(window, uri, check, callback) {
 			var document = window.document;
