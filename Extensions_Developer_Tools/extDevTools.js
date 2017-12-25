@@ -267,7 +267,10 @@ function _localize(s, key) {
 		}
 	};
 	var locale = (function() {
-		if("Services" in window && Services.locale && Services.locale.getRequestedLocales) {			var locales = Services.locale.getRequestedLocales();			return locales && locales[0];		}
+		if("Services" in window && Services.locale && Services.locale.getRequestedLocales) {
+			var locales = Services.locale.getRequestedLocales();
+			return locales && locales[0];
+		}
 		var prefs = "Services" in window && Services.prefs
 			|| Components.classes["@mozilla.org/preferences-service;1"]
 				.getService(Components.interfaces.nsIPrefBranch);
@@ -1170,14 +1173,18 @@ var cmds = this.commands = {
 	},
 	get hasScratchpad() {
 		delete this.hasScratchpad;
-		return this.hasScratchpad = "Scratchpad" in window
-			&& "openScratchpad" in Scratchpad;
+		return this.hasScratchpad = "Scratchpad" in window && "openScratchpad" in Scratchpad
+			|| !!document.getElementById("menu_scratchpad"); // Firefox 59+
 	},
 	openScratchpad: function() {
-		if("ScratchpadManager" in Scratchpad) { // Firefox 10+
+		var ScratchpadManager = "Scratchpad" in window
+			? "ScratchpadManager" in Scratchpad && Scratchpad.ScratchpadManager // Firefox 10+
+			: Components.utils["import"]("resource://devtools/client/scratchpad/scratchpad-manager.jsm", {})
+				.ScratchpadManager; // Firefox 59+
+		if(ScratchpadManager) {
 			// Use JSON.stringify(win.Scratchpad.getState()) to get state object
 			var context = this.getPref("devtools.chrome.enabled") ? 2 : 1;
-			Scratchpad.ScratchpadManager.openScratchpad({ text: "", executionContext: context, saved: true });
+			ScratchpadManager.openScratchpad({ text: "", executionContext: context, saved: true });
 			return;
 		}
 
@@ -3650,8 +3657,14 @@ function init() {
 	this.overrideBoolPref = function(prefName, prefVal) {
 		var prefs = Components.classes["@mozilla.org/preferences-service;1"]
 			.getService(Components.interfaces.nsIPrefBranch);
-		var origVal = prefs.getBoolPref(prefName)
-		if(origVal == prefVal)
+		try {
+			var origVal = prefs.getBoolPref(prefName);
+		}
+		catch(e) {
+			// Firefox 58+: Remove support for extensions having their own prefs file
+			// https://bugzilla.mozilla.org/show_bug.cgi?id=1413413
+		}
+		if(origVal == prefVal || origVal === undefined)
 			return function restore() {};
 		prefs.setBoolPref(prefName, prefVal);
 		return function restore() {
