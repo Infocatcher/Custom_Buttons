@@ -868,7 +868,7 @@ var cmds = this.commands = {
 				&& !_this.ps.confirm(
 					window,
 					_localize("Extensions Developer Tools"),
-					_localize(addon && !addon.isCompatible ? "Update %S locale?" : "Install %S locale?")
+					_localize(addon ? "Update %S locale?" : "Install %S locale?")
 						.replace("%S", locale)
 				)
 			) {
