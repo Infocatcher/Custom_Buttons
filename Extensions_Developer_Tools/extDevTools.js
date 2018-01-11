@@ -961,11 +961,14 @@ var cmds = this.commands = {
 		else if(os == "Darwin") platform = "mac";
 		else                    platform = "linux-i686";
 		if(!isRelease) {
+			// https://ftp.mozilla.org/pub/firefox/nightly/latest-mozilla-central/firefox-###.en-US.langpack.xpi
 			// https://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/latest-mozilla-central-l10n/win32/xpi/
 			// https://ftp.mozilla.org/pub/mozilla.org/seamonkey/nightly/latest-comm-central-trunk-l10n/win32/xpi/
 			// https://ftp.mozilla.org/pub/mozilla.org/thunderbird/nightly/latest-comm-central-l10n/win32/xpi/
 			// firefox-25.0a1.fr.langpack.xpi
 			var file = app + "-" + version + "." + locale + ".langpack.xpi";
+			if(locale == "en-US")
+				return "https://ftp.mozilla.org/pub/" + app + "/nightly/latest-mozilla-central/" + file;
 			var dir;
 			if(app == "firefox")        dir = "latest-mozilla-central-l10n";
 			else if(app == "seamonkey") dir = "latest-comm-central-trunk-l10n";
