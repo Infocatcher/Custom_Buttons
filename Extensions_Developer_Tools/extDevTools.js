@@ -749,16 +749,24 @@ var cmds = this.commands = {
 		obs.notifyObservers(null, "chrome-flush-caches", null);
 	},
 	get currentLocale() {
-		return this.getLocale(this.prefSvc);
+		return this.getLocale();
 	},
 	get defaultLocale() {
-		return this.getLocale(this.defaultBranch);
+		return this.getLocale(true);
 	},
-	getLocale: function(prefs) {
+	getLocale: function(getDefault) {
 		if("Services" in window && Services.locale && Services.locale.getRequestedLocales) {
+			var localePref = "intl.locale.requested";
+			if(getDefault && this.prefSvc.prefHasUserValue(localePref)) {
+				var origLocales = this.getPref(localePref);
+				this.resetPref(localePref);
+			}
 			var locales = Services.locale.getRequestedLocales();
+			if(origLocales)
+				this.setPref(localePref, origLocales);
 			return locales && locales[0];
 		}
+		var prefs = getDefault ? this.defaultBranch : this.prefSvc;
 		var locale = this.getPref("general.useragent.locale", "", prefs);
 		if(locale && locale.substr(0, 9) != "chrome://")
 			return locale;
