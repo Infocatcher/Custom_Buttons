@@ -12,7 +12,7 @@
 
 // Usage:
 //   Use middle-click or Ctrl + left-click (or press Ctrl+I) to inspect node in DOM Inspector
-//   (additionally hold Shift key to enable pupup locker)
+//   (additionally hold Shift key to enable popup locker)
 //   Hold Shift key to show and don't hide tooltips and popups
 // Hotkeys:
 //   Escape                - cancel or disable popup locker
