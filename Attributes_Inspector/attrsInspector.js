@@ -1317,8 +1317,10 @@ function init() {
 		},
 		get dwu() {
 			delete this.dwu;
-			return this.dwu = Components.classes["@mozilla.org/inspector/dom-utils;1"]
-				.getService(Components.interfaces.inIDOMUtils);
+			return this.dwu = "inIDOMUtils" in Components.interfaces
+				? Components.classes["@mozilla.org/inspector/dom-utils;1"]
+					.getService(Components.interfaces.inIDOMUtils)
+				: InspectorUtils; // Firefox 59+
 		},
 		getParentNode: function(node, top) {
 			var pn = this.dwu.getParentForNode(node, true);
