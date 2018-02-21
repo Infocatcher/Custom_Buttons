@@ -9,8 +9,11 @@
 // version 0.3.0 - 2015-09-08
 
 var rootDir = "d:\\extensions\\";
-if(!file(rootDir).exists())
+var fixBlockedXpi = false; // Becomes blocked until browser restart on flash drives in Firefox 57+
+if(!file(rootDir).exists()) {
 	rootDir = "z:\\dev\\extensions\\";
+	fixBlockedXpi = true;
+}
 var extensions = {
 	"extensionsId1@example": {
 		name: "Extension 1",
@@ -49,7 +52,10 @@ function _localize(s, key) {
 		}
 	};
 	var locale = (function() {
-		if("Services" in window && Services.locale && Services.locale.getRequestedLocales) {			var locales = Services.locale.getRequestedLocales();			return locales && locales[0];		}
+		if("Services" in window && Services.locale && Services.locale.getRequestedLocales) {
+			var locales = Services.locale.getRequestedLocales();
+			return locales && locales[0];
+		}
 		var prefs = "Services" in window && Services.prefs
 			|| Components.classes["@mozilla.org/preferences-service;1"]
 				.getService(Components.interfaces.nsIPrefBranch);
@@ -301,6 +307,33 @@ mp.installExtension = function(e) {
 		restore();
 		error("Error", "File not found:\n" + xpi);
 		return;
+	}
+
+	if(fixBlockedXpi) {
+		var _p = function(n) {
+			return n > 9 ? "" + n : "0" + n;
+		};
+		var d = new Date(xpiFile.lastModifiedTime);
+		var ds = "_" + d.getFullYear() + _p(d.getMonth() + 1) + _p(d.getDate())
+			+ _p(d.getHours()) + _p(d.getMinutes()) + _p(d.getSeconds());
+		var name = xpiFile.leafName.replace(/\.[^.]+$/, ds + "$&");
+		var newXpiFile = xpiFile.clone();
+		newXpiFile.leafName = name;
+		if(!newXpiFile.exists())
+			xpiFile.copyTo(null, name);
+		xpiFile = newXpiFile;
+		var _restore = restore;
+		restore = function() {
+			_restore();
+			try {
+				xpiFile.remove();
+			}
+			catch(e) {
+				Components.classes["@mozilla.org/uriloader/external-helper-app-service;1"]
+					.getService(Components.interfaces.nsPIExternalAppLauncher)
+					.deleteTemporaryFileOnExit(xpiFile);
+			}
+		};
 	}
 
 	AddonManager.getInstallForFile(
