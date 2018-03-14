@@ -1085,6 +1085,14 @@ var cmds = this.commands = {
 		return window && !!window.document.getElementById("menu_browserConsole");
 	},
 	openBrowserConsole: function() {
+		try { // For Firefox 60+
+			var require = Components.utils["import"]("resource://devtools/shared/Loader.jsm", {}).require;
+			var HUDService = require("devtools/client/webconsole/hudservice").HUDService;
+			HUDService.openBrowserConsoleOrFocus();
+			return;
+		}
+		catch(e) {
+		}
 		var window = this.browserWindow;
 		if(!window)
 			return;
