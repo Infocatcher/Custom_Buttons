@@ -1082,7 +1082,8 @@ var cmds = this.commands = {
 	},
 	get canOpenBrowserConsole() {
 		var window = this.browserWindow;
-		return window && !!window.document.getElementById("menu_browserConsole");
+		return window && !!window.document.getElementById("menu_browserConsole")
+			|| this.fxVersion >= 57; // Force show menuitem
 	},
 	openBrowserConsole: function() {
 		try { // For Firefox 60+
