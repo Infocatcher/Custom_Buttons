@@ -743,10 +743,17 @@ var cmds = this.commands = {
 
 	flushCaches: function() {
 		// See resource://gre/modules/XPIProvider.jsm
+		// resource://gre/modules/addons/XPIProvider.jsm
 		var obs = this.obs;
 		obs.notifyObservers(null, "startupcache-invalidate", null);
 		obs.notifyObservers(null, "chrome-flush-skin-caches", null);
 		obs.notifyObservers(null, "chrome-flush-caches", null);
+
+		obs.notifyObservers(null, "message-manager-flush-caches", null);
+		if("Services" in window && Services.mm && Services.mm.broadcastAsyncMessage)
+			Services.mm.broadcastAsyncMessage("AddonMessageManagerCachesFlush", null);
+		if("Services" in window && Services.strings && Services.strings.flushBundles)
+			Services.strings.flushBundles();
 	},
 	get currentLocale() {
 		return this.getLocale();
