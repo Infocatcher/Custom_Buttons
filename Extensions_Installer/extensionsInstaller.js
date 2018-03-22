@@ -49,6 +49,12 @@ function _localize(s, key) {
 		},
 		"Successfully installed:\n%N %V": {
 			ru: "Успешно установлено:\n%N %V"
+		},
+		"Disabled by application!": {
+			ru: "Отключено приложением!"
+		},
+		"Installed, but blocked:\n%N %V": {
+			ru: "Установлено, но заблокировано:\n%N %V"
 		}
 	};
 	var locale = (function() {
@@ -346,9 +352,10 @@ mp.installExtension = function(e) {
 					install.removeListener(this);
 					restore();
 					var icon = addon.iconURL || addon.icon64URL;
+					var blocked = addon.appDisabled;
 					notify(
-						_localize("Ok!"),
-						_localize("Successfully installed:\n%N %V")
+						_localize(blocked ? "Disabled by application!" : "Ok!"),
+						_localize(blocked ? "Installed, but blocked:\n%N %V" : "Successfully installed:\n%N %V")
 							.replace("%N", addon.name)
 							.replace("%V", addon.version),
 						icon
