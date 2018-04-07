@@ -294,10 +294,12 @@ this.bookmarks = {
 
 	get ss() {
 		delete this.ss;
-		return this.ss = (
-			Components.classes["@mozilla.org/browser/sessionstore;1"]
-			|| Components.classes["@mozilla.org/suite/sessionstore;1"]
-		).getService(Components.interfaces.nsISessionStore);
+		return this.ss = "nsISessionStore" in Components.interfaces
+			? (
+				Components.classes["@mozilla.org/browser/sessionstore;1"]
+				|| Components.classes["@mozilla.org/suite/sessionstore;1"]
+			).getService(Components.interfaces.nsISessionStore)
+			: SessionStore; // Firefox 61+ https://bugzilla.mozilla.org/show_bug.cgi?id=1450559
 	},
 	get ios() {
 		delete this.ios;

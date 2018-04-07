@@ -115,7 +115,10 @@ function _localize(sid) {
 		}
 	};
 	var locale = (function() {
-		if("Services" in window && Services.locale && Services.locale.getRequestedLocales) {			var locales = Services.locale.getRequestedLocales();			return locales && locales[0];		}
+		if("Services" in window && Services.locale && Services.locale.getRequestedLocales) {
+			var locales = Services.locale.getRequestedLocales();
+			return locales && locales[0];
+		}
 		var prefs = "Services" in window && Services.prefs
 			|| Components.classes["@mozilla.org/preferences-service;1"]
 				.getService(Components.interfaces.nsIPrefBranch);
@@ -316,10 +319,12 @@ this.undoCloseTabsList = {
 	},
 	get ss() {
 		delete this.ss;
-		return this.ss = (
-			Components.classes["@mozilla.org/browser/sessionstore;1"]
-			|| Components.classes["@mozilla.org/suite/sessionstore;1"]
-		).getService(Components.interfaces.nsISessionStore);
+		return this.ss = "nsISessionStore" in Components.interfaces
+			? (
+				Components.classes["@mozilla.org/browser/sessionstore;1"]
+				|| Components.classes["@mozilla.org/suite/sessionstore;1"]
+			).getService(Components.interfaces.nsISessionStore)
+			: SessionStore; // Firefox 61+ https://bugzilla.mozilla.org/show_bug.cgi?id=1450559
 	},
 	get appInfo() {
 		delete this.appInfo;

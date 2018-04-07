@@ -352,7 +352,7 @@ var cmds = this.commands = {
 	get ss() {
 		delete this.ss;
 		if(!("nsISessionStore" in Components.interfaces)) // Thunderbird
-			return this.ss = null;
+			return this.ss = window.SessionStore || null; // Firefox 61+ https://bugzilla.mozilla.org/show_bug.cgi?id=1450559
 		return this.ss = (
 			Components.classes["@mozilla.org/browser/sessionstore;1"]
 			|| Components.classes["@mozilla.org/suite/sessionstore;1"]
