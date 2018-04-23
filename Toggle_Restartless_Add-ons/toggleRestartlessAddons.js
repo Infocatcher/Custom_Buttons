@@ -344,7 +344,7 @@ function getRestartlessAddons(addonTypes, callback, context) {
 		Components.utils.import("resource://gre/modules/AddonManager.jsm");
 	if(!("Services" in window))
 		Components.utils.import("resource://gre/modules/Services.jsm");
-	AddonManager.getAddonsByTypes(addonTypes, function(addons) {
+	var then, promise = AddonManager.getAddonsByTypes(addonTypes, then = function(addons) {
 		var restartless = addons.filter(function(addon) {
 			var ops = addon.operationsRequiringRestart;
 			return !addon.appDisabled
@@ -357,6 +357,7 @@ function getRestartlessAddons(addonTypes, callback, context) {
 		});
 		callback.call(context, restartless);
 	});
+	promise && typeof promise.then == "function" && promise.then(then, Components.utils.reportError); // Firefox 61+
 }
 function openAddonOptions(addon) {
 	// Based on code from chrome://mozapps/content/extensions/extensions.js
