@@ -141,7 +141,7 @@ mp.toggleExtension = function(mi) {
 	var uid = mi.getAttribute("cb_uid");
 	if(!uid)
 		return;
-	AddonManager.getAddonByID(uid, function(addon) {
+	getAddonByID(uid, function(addon) {
 		if(addon) {
 			addon.userDisabled = !addon.userDisabled;
 			setStyle(mi, uid, addon);
@@ -152,7 +152,7 @@ mp.openExtensionOptions = function(mi) {
 	var uid = mi.getAttribute("cb_uid");
 	if(!uid)
 		return;
-	AddonManager.getAddonByID(uid, function(addon) {
+	getAddonByID(uid, function(addon) {
 		if(addon && openAddonOptions(addon))
 			mi.parentNode.hidePopup();
 	});
@@ -237,7 +237,7 @@ function setStyle(mi, uid, addon) {
 	if(addon !== undefined)
 		getAddonCallback(addon);
 	else
-		AddonManager.getAddonByID(uid, getAddonCallback);
+		getAddonByID(uid, getAddonCallback);
 	setTimeout(function() {
 		var dir = file(expandVariables(extensions[uid].dir));
 		mi.style.textDecoration = dir.exists() ? "" : "line-through";
@@ -342,46 +342,48 @@ mp.installExtension = function(e) {
 		};
 	}
 
-	AddonManager.getInstallForFile(
-		xpiFile,
-		function(install) {
-			if(progressIcon)
-				progressIcon.loading();
-			install.addListener({
-				onInstallEnded: function(install, addon) {
-					install.removeListener(this);
-					restore();
-					var icon = addon.iconURL || addon.icon64URL;
-					var blocked = addon.appDisabled;
-					notify(
-						_localize(blocked ? "Disabled by application!" : "Ok!"),
-						_localize(blocked ? "Installed, but blocked:\n%N %V" : "Successfully installed:\n%N %V")
-							.replace("%N", addon.name)
-							.replace("%V", addon.version),
-						icon
-					);
-					if(addon.pendingOperations)
-						appRestart();
-				},
-				onInstallFailed: function(install) {
-					install.removeListener(this);
-					var err = "Installation failed\n" + xpi;
-					Components.utils.reportError(err);
-					restore();
-					error("Error", err);
-				},
-				onDownloadFailed: function(install) {
-					install.removeListener(this);
-					var err = "Downloading failed\n" + xpi;
-					Components.utils.reportError(err);
-					restore();
-					error("Error", err);
-				}
-			});
-			install.install();
-		},
-		"application/x-xpinstall"
-	);
+	function handleInstall(install) {
+		if(progressIcon)
+			progressIcon.loading();
+		install.addListener({
+			onInstallEnded: function(install, addon) {
+				install.removeListener(this);
+				restore();
+				var icon = addon.iconURL || addon.icon64URL;
+				var blocked = addon.appDisabled;
+				notify(
+					_localize(blocked ? "Disabled by application!" : "Ok!"),
+					_localize(blocked ? "Installed, but blocked:\n%N %V" : "Successfully installed:\n%N %V")
+						.replace("%N", addon.name)
+						.replace("%V", addon.version),
+					icon
+				);
+				if(addon.pendingOperations)
+					appRestart();
+			},
+			onInstallFailed: function(install) {
+				install.removeListener(this);
+				var err = "Installation failed\n" + xpi;
+				Components.utils.reportError(err);
+				restore();
+				error("Error", err);
+			},
+			onDownloadFailed: function(install) {
+				install.removeListener(this);
+				var err = "Downloading failed\n" + xpi;
+				Components.utils.reportError(err);
+				restore();
+				error("Error", err);
+			}
+		});
+		install.install();
+	}
+	if(AddonManager.getInstallForFile.length == 3)
+		AddonManager.getInstallForFile(xpiFile, handleInstall, "application/x-xpinstall");
+	else { // Firefox 61+
+		AddonManager.getInstallForFile(xpiFile, "application/x-xpinstall")
+			.then(handleInstall, Components.utils.reportError);
+	}
 };
 // Based on code from resource:///components/fuelApplication.js in Firefox 38
 function appRestart() {
@@ -478,6 +480,10 @@ else { // Mouse gestures or something other...
 	mp.openPopupAtScreen(e.screenX, e.screenY);
 }
 
+function getAddonByID(id, callback) {
+	var promise = AddonManager.getAddonByID(id, callback);
+	promise && typeof promise.then == "function" && promise.then(callback, Components.utils.reportError); // Firefox 61+
+}
 function notify(title, text, icon) {
 	Components.classes["@mozilla.org/alerts-service;1"]
 		.getService(Components.interfaces.nsIAlertsService)
