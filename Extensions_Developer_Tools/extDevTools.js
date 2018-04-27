@@ -858,7 +858,7 @@ var cmds = this.commands = {
 			callback(true);
 			return;
 		}
-		try {
+		if(!("AddonManager" in window)) try {
 			Components.utils["import"]("resource://gre/modules/AddonManager.jsm");
 		}
 		catch(e) {
