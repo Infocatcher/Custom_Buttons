@@ -867,7 +867,18 @@ var cmds = this.commands = {
 		}
 		var id = "langpack-" + locale + "@firefox.mozilla.org";
 		var _this = this;
-		AddonManager.getAddonByID(id, function(addon) {
+		function getAddonByID(id, callback) {
+			var promise = AddonManager.getAddonByID(id, callback);
+			if(promise && typeof promise.then == "function") // Firefox 61+
+				promise.then(callback, Components.utils.reportError);
+		}
+		function getInstallForURL(url, callback, mimeType) {
+			if(AddonManager.getInstallForURL.length == 3)
+				AddonManager.getInstallForURL(url, callback, mimeType);
+			else // Firefox 61+
+				AddonManager.getInstallForURL(url, mimeType).then(callback, Components.utils.reportError);
+		}
+		getAddonByID(id, function(addon) {
 			if(addon && addon.isCompatible && !_this.alwaysUpdateLocale) {
 				callback(true);
 				return;
@@ -893,7 +904,7 @@ var cmds = this.commands = {
 
 			var btn = _this.button;
 			var progressIcon = new ProgressIcon(btn);
-			AddonManager.getInstallForURL(
+			getInstallForURL(
 				installURL,
 				function(install) {
 					LOG("[Language pack]: Call install()");
