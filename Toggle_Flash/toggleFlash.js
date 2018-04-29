@@ -188,7 +188,7 @@ this.initAddonListener = function() {
 };
 
 var btn = this;
-AddonManager.getAddonsByTypes(options.searchInTypes, function(addons) {
+var then, promise = AddonManager.getAddonsByTypes(options.searchInTypes, then = function(addons) {
 	addons.some(function(addon) {
 		if(addon.name.indexOf(options.pluginName) == -1)
 			return false;
@@ -201,6 +201,7 @@ AddonManager.getAddonsByTypes(options.searchInTypes, function(addons) {
 		btn.pluginDisabled = stateNotInstalled;
 	btn.initAddonListener();
 });
+promise && typeof promise.then == "function" && promise.then(then, Components.utils.reportError); // Firefox 61+
 
 this.onclick = function(e) {
 	if(e.button != 0)
