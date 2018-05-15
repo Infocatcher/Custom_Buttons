@@ -1240,7 +1240,11 @@ this.bookmarks = {
 					|| tab.hasAttribute(privateAttr);
 			}
 			catch(e2) {
-				if(String.indexOf(e2, ".QueryInterface is not a function") == -1)
+				var e2s = "" + e2;
+				if(
+					e2s.indexOf(".QueryInterface is not a function") == -1
+					&& e2s.indexOf("browser.contentWindow is null") == -1
+				)
 					Components.utils.reportError(e2);
 				// Looks like e10s, will wait for remote frame initialization
 				// Note: we can't unload frame script due to https://bugzilla.mozilla.org/show_bug.cgi?id=1051238
