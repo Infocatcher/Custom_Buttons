@@ -1329,7 +1329,7 @@ this.bookmarks = {
 			}
 			try {
 				var entriesCount = data && data.entries && data.entries.length;
-				if(entriesCount) {
+				if(entriesCount) try { // Broken at least in Firefox 62+
 					var sh = browser.sessionHistory
 						.QueryInterface(Components.interfaces.nsISHistory);
 					var maxLength = sh.maxLength;
@@ -1337,6 +1337,9 @@ this.bookmarks = {
 						_log("Override nsISHistory.maxLength: " + maxLength + " -> " + entriesCount);
 						sh.maxLength = entriesCount;
 					}
+				}
+				catch(e2) {
+					Components.utils.reportError(e2);
 				}
 				_this.ss.setTabState(tab, ssData);
 				if(
