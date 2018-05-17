@@ -177,7 +177,10 @@ function _localize(s, key) {
 		}
 	};
 	var locale = (function() {
-		if("Services" in window && Services.locale && Services.locale.getRequestedLocales) {			var locales = Services.locale.getRequestedLocales();			return locales && locales[0];		}
+		if("Services" in window && Services.locale && Services.locale.getRequestedLocales) {
+			var locales = Services.locale.getRequestedLocales();
+			return locales && locales[0];
+		}
 		var prefs = "Services" in window && Services.prefs
 			|| Components.classes["@mozilla.org/preferences-service;1"]
 				.getService(Components.interfaces.nsIPrefBranch);
@@ -1640,6 +1643,15 @@ this.bookmarks = {
 				]]></script>\n\
 			</dialog>';
 
+		if("Services" in window && Services.prefs.getBoolPref.length > 1) { // Firefox 57+
+			let pref = "security.data_uri.unique_opaque_origin";
+			if(Services.prefs.getBoolPref(pref, false)) {
+				Services.prefs.setBoolPref(pref, false);
+				setTimeout(function() {
+					Services.prefs.setBoolPref(pref, true);
+				}, 0);
+			}
+		}
 		window.openDialog(
 			"data:application/vnd.mozilla.xul+xml," + encodeURIComponent(dialog.replace(/^\s+/, "")),
 			"_blank",
