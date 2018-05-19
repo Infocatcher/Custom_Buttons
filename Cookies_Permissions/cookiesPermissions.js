@@ -1159,7 +1159,7 @@ this.permissions = {
 				if(types.indexOf(permission) == -1)
 					continue;
 			}
-			cm.remove(cookieHost, cookie.name, cookie.path, false);
+			cm.remove(cookieHost, cookie.name, cookie.path, false, cookie.originAttributes || undefined);
 		}
 	},
 
