@@ -350,6 +350,15 @@ this.bookmarks = {
 			folder = folderId;
 		};
 		var folderId = this.getFolderId(this.folder);
+		if("Services" in window && Services.prefs.getBoolPref.length > 1) { // Firefox 57+
+			let pref = "security.data_uri.unique_opaque_origin";
+			if(Services.prefs.getBoolPref(pref, false)) {
+				Services.prefs.setBoolPref(pref, false);
+				setTimeout(function() {
+					Services.prefs.setBoolPref(pref, true);
+				}, 0);
+			}
+		}
 		window.openDialog(
 			"data:application/vnd.mozilla.xul+xml," + encodeURIComponent(winSrc.replace(/^\s+/, "")),
 			"_blank",
