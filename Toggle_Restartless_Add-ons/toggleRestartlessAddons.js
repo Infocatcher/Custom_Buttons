@@ -186,6 +186,10 @@ function setNewDisabled(addon) {
 			setNewDisabledRaw(addon, newDis);
 	}
 	var realDis = addon.userDisabled;
+	if(realDis != newDis && addon.type == "extension") { // Firefox 62+? Weird things happens
+		setNewDisabledRaw(addon, newDis);
+		realDis = addon.userDisabled;
+	}
 	if(realDis != newDis) { // We can't enable vulnerable plugins
 		let err = "Can't set addon.userDisabled to " + newDis + ", real value: " + realDis;
 		if(newDis) {
