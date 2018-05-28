@@ -182,25 +182,8 @@ function setNewDisabled(addon) {
 	}
 	catch(e) { // Error: Cannot disable hidden add-on firefox@getpocket.com
 		_log("Can't set addon.userDisabled to " + newDis + ", error:\n" + e);
-		if(addon.hidden) {
-			_log("Let's try set addon.userDisabled using raw hack");
-			let g = Components.utils.import("resource://gre/modules/addons/XPIProvider.jsm", {});
-			if("XPIDatabase" in g && "updateAddonDisabledState" in g.XPIDatabase) { // Firefox 61+
-				let rawAddon = g.XPIDatabase.syncGetAddon(function(rawAddon) {
-					return rawAddon.id == addon.id;
-				});
-				g.XPIDatabase.updateAddonDisabledState(rawAddon, newDis);
-			}
-			else if("eval" in g) { // See "set userDisabled(val)"
-				let addonFor = g.eval("addonFor");
-				let rawAddon = addonFor(addon);
-				//rawAddon.userDisabled = newDis;
-				g.XPIProvider.updateAddonDisabledState(rawAddon, newDis);
-			}
-			else { // Firefox 57+? See https://forum.mozilla-russia.org/viewtopic.php?pid=745272#p745272
-				updateAddonDisabledState(addon, newDis);
-			}
-		}
+		if(addon.hidden)
+			setNewDisabledRaw(addon, newDis);
 	}
 	var realDis = addon.userDisabled;
 	if(realDis != newDis) { // We can't enable vulnerable plugins
@@ -235,6 +218,25 @@ function getNewDisabled(addon) {
 			newDis = false;
 	}
 	return newDis;
+}
+function setNewDisabledRaw(addon, newDis) {
+	_log("Let's try set addon.userDisabled using raw hack");
+	let g = Components.utils.import("resource://gre/modules/addons/XPIProvider.jsm", {});
+	if("XPIDatabase" in g && "updateAddonDisabledState" in g.XPIDatabase) { // Firefox 61+
+		let rawAddon = g.XPIDatabase.syncGetAddon(function(rawAddon) {
+			return rawAddon.id == addon.id;
+		});
+		g.XPIDatabase.updateAddonDisabledState(rawAddon, newDis);
+	}
+	else if("eval" in g) { // See "set userDisabled(val)"
+		let addonFor = g.eval("addonFor");
+		let rawAddon = addonFor(addon);
+		//rawAddon.userDisabled = newDis;
+		g.XPIProvider.updateAddonDisabledState(rawAddon, newDis);
+	}
+	else { // Firefox 57+? See https://forum.mozilla-russia.org/viewtopic.php?pid=745272#p745272
+		updateAddonDisabledState(addon, newDis);
+	}
 }
 function updateAddonDisabledState(addon, newDis) {
 	var nsvo = Components.utils.import("resource://gre/modules/addons/XPIProvider.jsm", {});
