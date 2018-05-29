@@ -139,13 +139,16 @@ mp.handleClick = function(e) {
 };
 mp.toggleExtension = function(mi) {
 	var uid = mi.getAttribute("cb_uid");
-	if(!uid)
-		return;
-	getAddonByID(uid, function(addon) {
-		if(addon) {
-			addon.userDisabled = !addon.userDisabled;
-			setStyle(mi, uid, addon);
+	uid && getAddonByID(uid, function(addon) {
+		if(!addon)
+			return;
+		var oldDis = addon.userDisabled;
+		addon.userDisabled = !oldDis;
+		if(addon.userDisabled == oldDis) {
+			// Firefox 62+, https://bugzilla.mozilla.org/show_bug.cgi?id=1461146
+			oldDis ? addon.enable() : addon.disable();
 		}
+		setStyle(mi, uid, addon);
 	});
 };
 mp.openExtensionOptions = function(mi) {
