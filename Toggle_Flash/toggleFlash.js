@@ -58,7 +58,10 @@ function _localize(s, key) {
 		}
 	};
 	var locale = (function() {
-		if("Services" in window && Services.locale && Services.locale.getRequestedLocales) {			var locales = Services.locale.getRequestedLocales();			return locales && locales[0];		}
+		if("Services" in window && Services.locale && Services.locale.getRequestedLocales) {
+			var locales = Services.locale.getRequestedLocales();
+			return locales && locales[0];
+		}
 		var prefs = "Services" in window && Services.prefs
 			|| Components.classes["@mozilla.org/preferences-service;1"]
 				.getService(Components.interfaces.nsIPrefBranch);
@@ -218,6 +221,10 @@ function setNewDisabled(addon) {
 	var oldDis = addon.userDisabled;
 	addon.userDisabled = newDis;
 	var realDis = addon.userDisabled;
+	if(realDis != newDis && "enable" in addon) { // Firefox 62+? Not needed for now, just fail safe
+		newDis ? addon.disable() : addon.enable();
+		realDis = addon.userDisabled;
+	}
 	if(realDis != newDis) { // We can't enable vulnerable plugins
 		var err = "Can't set addon.userDisabled to " + newDis + ", real value: " + realDis;
 		if(newDis)
