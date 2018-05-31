@@ -93,6 +93,8 @@ mp.updateMenu = function() {
 			var icon = addon.iconURL || addon.icon64URL || mp.icons[type] || "";
 			var mi = document.createElement("menuitem");
 			mi.className = "menuitem-iconic";
+			if(mp.icons.useSVG)
+				mi.style.fill = "#15c";
 			var label = addon.name;
 			if(options.showVersions == 1)
 				label += " " + addon.version;
