@@ -90,18 +90,18 @@ mp.updateMenu = function() {
 			if(prevType && type != prevType)
 				df.appendChild(document.createElement("menuseparator"));
 			prevType = type;
-			var icon = addon.iconURL || addon.icon64URL || mp.icons[type] || "";
+			var icon = addon.iconURL || addon.icon64URL;
 			var mi = document.createElement("menuitem");
 			mi.className = "menuitem-iconic";
-			if(mp.icons.useSVG)
-				mi.style.fill = "#15c";
 			var label = addon.name;
 			if(options.showVersions == 1)
 				label += " " + addon.version;
 			else if(options.showVersions == 2)
 				mi.setAttribute("acceltext", addon.version);
 			mi.setAttribute("label", label);
-			mi.setAttribute("image", icon);
+			mi.setAttribute("image", icon || mp.icons[type] || "");
+			if(!icon && mp.icons.useSVG)
+				mi.style.fill = "#15c";
 			var tip = addon.description || "";
 			var delay = "delayedStartupAddons" in Services
 				&& Services.delayedStartupAddons[addon.id] || null;
