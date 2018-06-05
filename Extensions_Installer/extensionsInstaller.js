@@ -97,6 +97,7 @@ mp.setAttribute("oncommand", "this.installExtension(event);");
 mp.setAttribute("onpopupshowing", "this.createMenu();");
 mp.setAttribute("onmousedown", "event.target.setAttribute('closemenu', event.shiftKey ? 'none' : 'auto');");
 mp.setAttribute("onclick", "this.handleClick(event);");
+mp.setAttribute("oncontextmenu", "var e = event; if(!(e.ctrlKey || e.altKey || e.shiftKey || e.metaKey)) e.preventDefault();");
 
 var tb = this.parentNode;
 if(tb.getAttribute("orient") == "vertical") {
