@@ -154,9 +154,7 @@ mp.toggleExtension = function(mi) {
 };
 mp.openExtensionOptions = function(mi) {
 	var uid = mi.getAttribute("cb_uid");
-	if(!uid)
-		return;
-	getAddonByID(uid, function(addon) {
+	uid && getAddonByID(uid, function(addon) {
 		if(addon && openAddonOptions(addon))
 			mi.parentNode.hidePopup();
 	});
@@ -211,41 +209,45 @@ function openAddonPage(addon, scrollToPreferences) {
 	openAddonsManager("addons://detail/" + encodeURIComponent(addon.id) + scrollToPreferences);
 }
 function setStyle(mi, uid, addon) {
-	function getAddonCallback(addon) {
-		var icon = "";
-		var color = "grayText";
-		var iconOpacity = "0.5";
-		if(addon) {
-			icon = addon.iconURL
-				|| addon.icon64URL
-				|| (
-					Services.appinfo.name == "Firefox" && parseFloat(Services.appinfo.version) >= 57
-						? "chrome://mozapps/skin/extensions/extensionGeneric-16.svg"
-						: "chrome://mozapps/skin/extensions/extensionGeneric-16.png"
-				);
-			if(addon.isActive)
-				color = iconOpacity = "";
-			else if(addon.appDisabled)
-				color = "red";
-			var tt = (mi.tooltipText || "").replace(/ \n[\s\S]*$/, "");
-			mi.tooltipText = tt
-				+ " \n" + _localize("Version: %S").replace("%S", addon.version)
-				+ " \n" + _localize("Updated: %S").replace("%S", addon.updateDate ? new Date(addon.updateDate).toLocaleString() : "???");
-		}
-		mi.setAttribute("image", icon);
-		mi.style.color = color;
-		var icon = mi.ownerDocument.getAnonymousElementByAttribute(mi, "class", "menu-iconic-icon");
-		if(icon)
-			icon.style.opacity = iconOpacity;
+	if(addon)
+		setStyleForAddon(mi, addon);
+	else {
+		getAddonByID(uid, function(addon) {
+			setStyleForAddon(mi, addon);
+		});
 	}
-	if(addon !== undefined)
-		getAddonCallback(addon);
-	else
-		getAddonByID(uid, getAddonCallback);
 	setTimeout(function() {
 		var dir = file(expandVariables(extensions[uid].dir));
 		mi.style.textDecoration = dir.exists() ? "" : "line-through";
 	}, 0);
+}
+function setStyleForAddon(mi, addon) {
+	var icon = "";
+	var color = "grayText";
+	var iconOpacity = "0.5";
+	if(addon) {
+		icon = addon.iconURL
+			|| addon.icon64URL
+			|| (
+				Services.appinfo.name == "Firefox" && parseFloat(Services.appinfo.version) >= 57
+					? "chrome://mozapps/skin/extensions/extensionGeneric-16.svg"
+					: "chrome://mozapps/skin/extensions/extensionGeneric-16.png"
+			);
+		if(addon.isActive)
+			color = iconOpacity = "";
+		else if(addon.appDisabled)
+			color = "red";
+		var tt = (mi.tooltipText || "").replace(/ \n[\s\S]*$/, "");
+		var updateDate = addon.updateDate ? new Date(addon.updateDate).toLocaleString() : "???";
+		mi.tooltipText = tt
+			+ " \n" + _localize("Version: %S").replace("%S", addon.version)
+			+ " \n" + _localize("Updated: %S").replace("%S", updateDate);
+	}
+	mi.setAttribute("image", icon);
+	mi.style.color = color;
+	var icon = mi.ownerDocument.getAnonymousElementByAttribute(mi, "class", "menu-iconic-icon");
+	if(icon)
+		icon.style.opacity = iconOpacity;
 }
 
 mp.installExtension = function(e) {
