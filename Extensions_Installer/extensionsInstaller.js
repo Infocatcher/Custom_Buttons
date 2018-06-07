@@ -226,13 +226,7 @@ function setStyleForAddon(mi, addon) {
 	var color = "grayText";
 	var iconOpacity = "0.5";
 	if(addon) {
-		icon = addon.iconURL
-			|| addon.icon64URL
-			|| (
-				Services.appinfo.name == "Firefox" && parseFloat(Services.appinfo.version) >= 57
-					? "chrome://mozapps/skin/extensions/extensionGeneric-16.svg"
-					: "chrome://mozapps/skin/extensions/extensionGeneric-16.png"
-			);
+		icon = addon.iconURL || addon.icon64URL || mp.icons.extension;
 		if(addon.isActive)
 			color = iconOpacity = "";
 		else if(addon.appDisabled)
@@ -249,6 +243,19 @@ function setStyleForAddon(mi, addon) {
 	if(icon)
 		icon.style.opacity = iconOpacity;
 }
+mp.icons = {
+	get useSVG() {
+		delete this.useSVG;
+		return this.useSVG = Services.appinfo.name == "Firefox"
+			&& parseFloat(Services.appinfo.version) >= 57;
+	},
+	get extension() {
+		delete this.extension;
+		return this.extension = this.useSVG
+			? "chrome://mozapps/skin/extensions/extensionGeneric-16.svg"
+			: "chrome://mozapps/skin/extensions/extensionGeneric-16.png";
+	}
+};
 
 mp.installExtension = function(e) {
 	var mi = e.target;
@@ -494,11 +501,7 @@ function notify(title, text, icon) {
 	Components.classes["@mozilla.org/alerts-service;1"]
 		.getService(Components.interfaces.nsIAlertsService)
 		.showAlertNotification(
-			icon || (
-				Services.appinfo.name == "Firefox" && parseFloat(Services.appinfo.version) >= 57
-					? "chrome://mozapps/skin/extensions/extensionGeneric.svg"
-					: "chrome://mozapps/skin/extensions/extensionGeneric.png"
-			),
+			icon || mp.icons.extension,
 			"Extensions Installer: " + title,
 			text
 		);
