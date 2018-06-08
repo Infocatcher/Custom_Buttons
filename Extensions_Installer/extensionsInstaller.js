@@ -226,7 +226,7 @@ function setStyleForAddon(mi, addon) {
 	var color = "grayText";
 	var iconOpacity = "0.5";
 	if(addon) {
-		icon = addon.iconURL || addon.icon64URL || mp.icons.extension;
+		icon = addon.iconURL || addon.icon64URL;
 		if(addon.isActive)
 			color = iconOpacity = "";
 		else if(addon.appDisabled)
@@ -237,7 +237,9 @@ function setStyleForAddon(mi, addon) {
 			+ " \n" + _localize("Version: %S").replace("%S", addon.version)
 			+ " \n" + _localize("Updated: %S").replace("%S", updateDate);
 	}
-	mi.setAttribute("image", icon);
+	if(!icon && mp.icons.useSVG)
+		mi.style.fill = "#15c";
+	mi.setAttribute("image", icon || mp.icons.extension);
 	mi.style.color = color;
 	var icon = mi.ownerDocument.getAnonymousElementByAttribute(mi, "class", "menu-iconic-icon");
 	if(icon)
