@@ -227,6 +227,9 @@ function _localize(s, key) {
 		"Allow XUL and XBL for file://": {
 			ru: "Разрешить XUL и XBL для file://"
 		},
+		"Don't inherit privileged context for data:": {
+			ru: "Не наследовать привилегированный контекст для data:"
+		},
 		"Enable developer tools for chrome": {
 			ru: "Включить инструменты разработчика для chrome"
 		},
@@ -1762,6 +1765,10 @@ var mp = cmds.popup = this.appendChild(parseXULFromString('\
 					type="checkbox"\
 					label="' + _localize("Allow XUL and XBL for file://") + '"\
 					hidden="' + (cmds.platformVersion < 2) + '" />\
+				<menuitem cb_pref="security.data_uri.unique_opaque_origin"\
+					type="checkbox"\
+					label="' + _localize("Don't inherit privileged context for data:") + '"\
+					hidden="' + !cmds.prefHasDefaultValue("security.data_uri.unique_opaque_origin") + '" />\
 				<menuitem cb_pref="devtools.chrome.enabled"\
 					type="checkbox"\
 					label="' + _localize("Enable developer tools for chrome") + '"\
