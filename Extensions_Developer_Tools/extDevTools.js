@@ -1899,7 +1899,7 @@ this.attrsInspector = function(event) {
 
 // Usage:
 //   Use middle-click or Ctrl + left-click (or press Ctrl+I) to inspect node in DOM Inspector
-//   (additionally hold Shift key to enable pupup locker)
+//   (additionally hold Shift key to enable popup locker)
 //   Hold Shift key to show and don't hide tooltips and popups
 // Hotkeys:
 //   Escape                - cancel or disable popup locker
@@ -1931,10 +1931,6 @@ var _borderStyle = "solid"; // border-style property in CSS
 var _addedColor = "-moz-hyperlinktext";
 var _removedColor = "grayText";
 var _changedColor = "-moz-visitedhyperlinktext";
-
-// See https://github.com/Infocatcher/Custom_Buttons/issues/25
-// Force repaint tooltip, may solve display glitches in Gecko 29+
-// (disabled by default for better performance)
 
 var _maxTooltipWidth = 600; // Max width in px, 0 to not force limits
 
@@ -3208,8 +3204,10 @@ function init() {
 		},
 		get dwu() {
 			delete this.dwu;
-			return this.dwu = Components.classes["@mozilla.org/inspector/dom-utils;1"]
-				.getService(Components.interfaces.inIDOMUtils);
+			return this.dwu = "inIDOMUtils" in Components.interfaces
+				? Components.classes["@mozilla.org/inspector/dom-utils;1"]
+					.getService(Components.interfaces.inIDOMUtils)
+				: InspectorUtils; // Firefox 59+
 		},
 		getParentNode: function(node, top) {
 			var pn = this.dwu.getParentForNode(node, true);
