@@ -1889,8 +1889,8 @@ this.attrsInspector = function(event) {
 // https://forum.mozilla-russia.org/viewtopic.php?id=56041
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Attributes_Inspector
 
-// (c) Infocatcher 2010-2016
-// version 0.6.4 - 2016-02-23
+// (c) Infocatcher 2010-2018
+// version 0.6.4.1 - 2018-06-12
 
 //===================
 // Attributes Inspector button for Custom Buttons
@@ -1921,7 +1921,7 @@ var _highlight = true; // Hightlight current node
 var _highlightUsingFlasher = false; // Don't modify DOM, but has some side effects (and slower)
 // Note: inIFlasher works in Firefox 4+ only with disabled hardware acceleration!
 // See https://bugzilla.mozilla.org/show_bug.cgi?id=368608 and https://bugzilla.mozilla.org/show_bug.cgi?id=594299
-// Also inIFlasher isn't available in Firefox 33+, see https://bugzilla.mozilla.org/show_bug.cgi?id=1018324
+// Also inIFlasher not available in Firefox 33+, see https://bugzilla.mozilla.org/show_bug.cgi?id=1018324
 var _borderColor = "red"; // Any valid CSS color
 var _borderWidth = 1; // Border width in pixels
 var _borderStyle = "solid"; // border-style property in CSS
@@ -2700,7 +2700,7 @@ function init() {
 				flasher.invert = false;
 			}
 			catch(e) {
-				_log("inIFlasher isn't available");
+				_log("inIFlasher not available");
 				Components.utils.reportError(e);
 			}
 			delete this.flasher;
@@ -3444,7 +3444,7 @@ function init() {
 					|| "Attributes Inspector";
 				Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
 					.getService(Components.interfaces.nsIPromptService)
-					.alert(top, label, "DOM Inspector isn't found!");
+					.alert(top, label, "DOM Inspector not found!");
 			}
 		},
 		getPopup: function(node) {
