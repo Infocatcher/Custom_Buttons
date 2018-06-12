@@ -502,7 +502,7 @@ var cmds = this.commands = {
 		var ss = this.ss;
 		delete this.canReopenWindow;
 		return this.canReopenWindow = ss && "getWindowState" in ss && "setWindowState" in ss
-			&& "gBrowser" in window && gBrowser.localName == "tabbrowser";
+			&& "gBrowser" in window && "addTab" in gBrowser;
 	},
 	reopenWindow: function() {
 		return this.confirm("reopen", "_reopenWindow", arguments);
