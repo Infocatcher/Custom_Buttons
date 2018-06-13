@@ -1215,7 +1215,7 @@ var cmds = this.commands = {
 	get hasScratchpad() {
 		delete this.hasScratchpad;
 		return this.hasScratchpad = "Scratchpad" in window && "openScratchpad" in Scratchpad
-			|| !!document.getElementById("menu_scratchpad"); // Firefox 59+
+			|| this.appInfo.name == "Firefox" && this.platformVersion >= 59;
 	},
 	openScratchpad: function() {
 		var ScratchpadManager = "Scratchpad" in window
