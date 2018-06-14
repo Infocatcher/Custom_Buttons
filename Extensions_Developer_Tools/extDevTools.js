@@ -1259,10 +1259,18 @@ var cmds = this.commands = {
 	},
 	get hasEyedropper() {
 		delete this.hasEyedropper;
-		return this.hasEyedropper = "openEyedropper" in window;
+		return this.hasEyedropper = "openEyedropper" in window
+			|| this.appInfo.name == "Firefox" && this.platformVersion >= 60;
 	},
 	openEyedropper: function() {
-		openEyedropper();
+		if("openEyedropper" in window)
+			return openEyedropper();
+		// Firefox 60+, based on code from resource://devtools/client/menus.js
+		var require = Components.utils["import"]("resource://devtools/shared/Loader.jsm", {}).require;
+		var CommandUtils = require("devtools/client/shared/developer-toolbar").CommandUtils;
+		var TargetFactory = require("devtools/client/framework/target").TargetFactory;
+		var target = TargetFactory.forTab(gBrowser.selectedTab);
+		return CommandUtils.executeOnTarget(target, "eyedropper --frommenu");
 	},
 
 	get isDebugBuild() { //~ todo: find another way
