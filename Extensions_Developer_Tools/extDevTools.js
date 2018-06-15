@@ -1215,7 +1215,7 @@ var cmds = this.commands = {
 	get hasScratchpad() {
 		delete this.hasScratchpad;
 		return this.hasScratchpad = "Scratchpad" in window && "openScratchpad" in Scratchpad
-			|| this.appInfo.name == "Firefox" && this.platformVersion >= 59;
+			|| this.appInfo.name == "Firefox" && this.platformVersion >= 58;
 	},
 	openScratchpad: function() {
 		var ScratchpadManager = "Scratchpad" in window
@@ -1260,17 +1260,27 @@ var cmds = this.commands = {
 	get hasEyedropper() {
 		delete this.hasEyedropper;
 		return this.hasEyedropper = "openEyedropper" in window
-			|| this.appInfo.name == "Firefox" && this.platformVersion >= 60;
+			|| this.appInfo.name == "Firefox" && this.platformVersion >= 50;
 	},
 	openEyedropper: function() {
-		if("openEyedropper" in window)
-			return openEyedropper();
-		// Firefox 60+, based on code from resource://devtools/client/menus.js
+		if("openEyedropper" in window) {
+			openEyedropper();
+			return;
+		}
+		// Firefox 50+, based on code from resource://devtools/client/menus.js
 		var require = Components.utils["import"]("resource://devtools/shared/Loader.jsm", {}).require;
 		var CommandUtils = require("devtools/client/shared/developer-toolbar").CommandUtils;
 		var TargetFactory = require("devtools/client/framework/target").TargetFactory;
 		var target = TargetFactory.forTab(gBrowser.selectedTab);
-		return CommandUtils.executeOnTarget(target, "eyedropper --frommenu");
+		if("executeOnTarget" in CommandUtils) // Firefox 54+
+			CommandUtils.executeOnTarget(target, "eyedropper --frommenu");
+		else {
+			CommandUtils.createRequisition(target, {
+				environment: CommandUtils.createEnvironment({target})
+			}).then(function(requisition) {
+				requisition.updateExec("eyedropper --frommenu");
+			}, Components.utils.reportError);
+		}
 	},
 
 	get isDebugBuild() { //~ todo: find another way
