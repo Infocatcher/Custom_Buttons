@@ -419,14 +419,13 @@ var cmds = this.commands = {
 				}
 				else if(cbId == "attrsInspector") {
 					//~ Note: should be "inspectDOMNode" in window for Firefox 1.5
-					this.setPartiallyAvailable(
-						mi,
-						"@mozilla.org/commandlinehandler/general-startup;1?type=inspector" in Components.classes
+					this.setPartiallyAvailable(mi,
+						!("@mozilla.org/commandlinehandler/general-startup;1?type=inspector" in Components.classes)
 					);
 					this.setAttrsInspectorActive(mi);
 				}
 				else if(cbId == "scratchpad") {
-					this.setPartiallyAvailable(mi, this.getPref("devtools.chrome.enabled"));
+					this.setPartiallyAvailable(mi, !this.getPref("devtools.chrome.enabled"));
 				}
 			},
 			this
@@ -444,8 +443,8 @@ var cmds = this.commands = {
 				.replace("%S", this.currentLocale || "???")
 		);
 	},
-	setPartiallyAvailable: function(mi, available) {
-		mi.style.color = available ? "" : "grayText";
+	setPartiallyAvailable: function(mi, partially) {
+		mi.style.color = partially ? "grayText" : "";
 	},
 	setCloseMenu: function(e) {
 		var mi = e.target;
