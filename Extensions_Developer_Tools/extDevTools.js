@@ -470,8 +470,7 @@ var cmds = this.commands = {
 	},
 	updateTipOnMouseover: false,
 	setDefaultActionTip: function(delay) {
-		var _this = this;
-		setTimeout(function() {
+		setTimeout(function(_this) {
 			var mi = _this.defaultActionItem;
 			if(mi && mi.getAttribute("cb_id") == "switchLocale") {
 				_this.updateTipOnMouseover = true;
@@ -494,7 +493,7 @@ var cmds = this.commands = {
 			icon.src = mi
 				? mi.getAttribute("image")
 				: btn.image;
-		}, delay || 0);
+		}, delay || 0, this);
 	},
 
 	get canReopenWindow() {
