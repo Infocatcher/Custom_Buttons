@@ -472,13 +472,8 @@ var cmds = this.commands = {
 	setDefaultActionTip: function(delay) {
 		setTimeout(function(_this) {
 			var mi = _this.defaultActionItem;
-			if(mi && mi.getAttribute("cb_id") == "switchLocale") {
-				_this.updateTipOnMouseover = true;
-				_this.initSwitchLocaleItem(mi);
-			}
-			else {
-				_this.updateTipOnMouseover = false;
-			}
+			var upd = _this.updateTipOnMouseover = mi && mi.getAttribute("cb_id") == "switchLocale";
+			upd && _this.initSwitchLocaleItem(mi);
 			var btn = _this.button;
 			btn.tooltipText = btn.tooltipText.replace(/ \n.*$/, "") + (
 				mi
