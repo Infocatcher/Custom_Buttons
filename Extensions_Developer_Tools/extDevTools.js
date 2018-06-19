@@ -79,6 +79,7 @@ var images = {
 	browserConsole: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAq5JREFUeNqMk19IU1Ecx3/37t5uXmRuKyndalMpFcl0NHFE0UMOVGIP0hqh5FPTiVRKTCeIPQh7EHwIcWSLkBFBPQYFUY+9SS4RQdLNP0Q6y+sftqn33tPv3FBIV3TYh/Pbub/f93zPj3MYQghkGwzDmHEqR3aRGcxLZsvjRkdHjyz6/f4iu91+c2hoqEWSpFRHR0cUBSPd3d2pIwImkymbcPnIyIhPPL5anKfXQ39//4/29vYJnuc/HU5kDy94vd7Kzs7ORqv1dPHmah+k10Pgcrnqq6urr4ZCIcsRB/F44uBPb29PDt29q6vrdmL+GVReYCCzvQKzyx9gcHCwuaGhYcJoNC7/y0FFJBJp4bktQ17ua2j0COC9K8Ax+QmUlFgrPB6PKxAIlGUVwN3zzWazs6mp6Xp8LgRnLTxkMgBb2wDnbTJ8W3wF6KyFOozH47APi5aAQj+MjT1tln5OCrbCL0BkBtLptAZR98DIvgBBkE+hA3c4HL70h4O2Nl9RXV3dNYfDXjM/EwS9yIGSzhwIZNaTcFKQYPXrY2htbfUWFBQ4UUTUBBRF1XYfGHh0ZynxFsqsEuxIK7CzsY7WNzXIHmgU8h9hLTktBIPBeqypEkURGAwqfb42X0/gvj/x+QaUntnEJaL9FhZ1mk1LvgJ4ClDxTs4mrWBzRgEb2huLxaJU4NbkZCy8thQ1lOrH8Q4TvMYAG1sqeB/magJvhlOaANnDvqQIfDf2wfaubdrtdj9gHY4al14vGHI2xkHJEFCx8wqi7tD3wGrQmBZTER5NK3PDUHXxQgX24gqHb4lRsQ2W2pfAsizodBQdiBi/f4eFNAHPo2LSbwick3EmWu909AiXa2ud90ymEwae54DjKDptpoK0SFEUjf1YlmVYwDE1NfWc+dtz/t/xS4ABAFPwJo86gIiiAAAAAElFTkSuQmCC",
 	// nuove by Alexander Moore, http://www.iconsearch.ru/detailed/278/1/
 	attrsInspector: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACW0lEQVQ4jW2TQUsbQRiG3/l2ui4hPaSbCBZPsR6kMXrwYP9AK+JJKOJZKPgD1KMXf0ELPffsoRDpxUv2aLUHKamHikJxi1gQktXNzrqbna+HJJPE9oNhGJh55n3f+UYwM7a2tuzNzc13RETMTADAzOjN/bVGr7Isw+rq6vuzszMtAWB8fDxXKBQ+EBHSNIXWGpZlGYgQAkIIEBGEENBaw3XdjwASCQCO41Cr1YLv+8jlchBCIAxDFItFlEolc5CZDaxarUoDsG3nme//xuLiK3NDlmmcn/9EEAQoFAp4XBMTExIACAB8/2ppbm4OzAytu1YtizA19QI3Nzf/HBZCoFgsSgCQXdrz6bSjIZIEJGhkY5p2Rtb9yufztlHQaDR81hpRO0a7raDUA1T8gLCtcHd3Z3wPB+o4DhnA/X3wpV73kKYdPCQJokihHUb40WjAdV0T4jDEtu2BhbW1tbhUKuHgoIby1DSeSImLi3Ocnn7DwsICZmcrBtCHSCkHCpgZlUoF6+tv8TRvQ4gUKytL2N7eRr1eR61WGwH0eoKMAgDUk4X5+Xkws2mi3d1d7O3twXEcLC8v97pTQAgxUNAHDHskIhARJicnsbOzA8/z4HketGZkWpvnpu6bW3I4qMejXC5jY2MDx8fHODr6CtYZkiQZAIiIhrz9FzIz8xKv3yzh6uoXpLRwcnISoh/g4eFhNY5jVkqxUoqjKBoZYdjmZjPgZrPFSim+vLz87rquw8zdEJVSrevr60+9L6uZWQshNDNrZuhMs+50Eu2MjSVBEPzZ39//fHt7GwPAX9zKMQVPs/QoAAAAAElFTkSuQmCC",
+	browserToolbox: "chrome://devtools/skin/images/command-pick.svg",
 	// FatCow icons, http://www.iconfinder.com/icondetails/36398/16/code_script_icon
 	scratchpad: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAArBJREFUeNqMU11IFFEU/vbO7Iyuums/GvmXhISBiOWWGFgGiyaC0UMkWRT11FNPQbEl9iNb0mtgUEQW+xjUQ5RrlClZ5IbaQ0bpw+paSGLGbrs7O3emc2d/kKjowBnm3HvnO9/5vju2Tb4ARJiUOjcQ1fhizUZnkVORsBzXMT7/HZLNZp0RT8ZssEuUjEGVWZWMdJimibhuXO4/UFvUWVeKf0Xg0yJcOXa03359i2UWDQKIackTmY91qkXyVWmmz/qezyBBbCvX5TXLGfpUo7mquETUEY1bgKtD0JeIvsMu4cXsNxz2R6DIDHJGAOqQX6CmyjjnEN/bfqPuYJIFrPLY5Ly346RYyzLQE/Hq7SUu66CWNFJd0+KZaTYFioxgeAV2mKH1vYPBfFVCWgOa0eB76stcpHwSmmFAQMiktkjxLpJUR2glBtlIzArsn9QoxYAaGJxXr8lVECHruGHSrEDxhccWfLinLcXozEM4cmTkJmITWVuzNkpKQ32pC1GuW1039DzB6OlWSCQaSUoacTCJYfiUB2ZRxR3RRAzGLAeIQmFeTrkAUumCVF4ZxMCR3bg0HLaU13UDMaJr0GjnhkLoP9gIjXNT1CxJUHT7zKhuFO68MYKqa8/g62jEgw/LePP5I3ZVroV/cgGin9m3HyPT0/BPLcHbskOMasoJQl+52Ja1ip19hIWoBofKLG2ut29Fp/8duraVIvwjBiGe2AtHEpYIjGnRt30vZxCizTnKJRLs7qsp5NOdONRQi703x9Dt2QInWbj56hC6GutQoNpxb+w9vpzf57Y5Pcc9SlNngEaxRJFpZoVEFN4fbarDwMhkyiXaFYofo7X7oxP42t3mrvAFgsIJlbLmTz9NWe/TcRvxnPO2uEVd3js4LrSY97a66S8O4j+iPp1/q/FLgAEAGto2bg8Nx1UAAAAASUVORK5CYII=",
 	// Fugue Icons by Yusuke Kamiyamane, https://www.iconfinder.com/icons/84569/eyedropper_icon
@@ -173,6 +174,12 @@ function _localize(s, key) {
 		},
 		attrsInspectorKey: {
 			ru: "И"
+		},
+		"Browser Toolbox": {
+			ru: "Инструменты браузера"
+		},
+		browserToolboxKey: {
+			ru: "з"
 		},
 		"Scratchpad": {
 			ru: "Простой редактор JavaScript"
@@ -1205,6 +1212,15 @@ var cmds = this.commands = {
 			mi.removeAttribute("checked");
 		}
 	},
+	get hasBrowserToolbox() {
+		delete this.hasBrowserToolbox;
+		return this.hasBrowserToolbox = this.appInfo.name == "Firefox" && this.platformVersion >= 56;
+	},
+	openBrowserToolbox: function() {
+		var btp = Components.utils["import"]("resource://devtools/client/framework/ToolboxProcess.jsm", {})
+			.BrowserToolboxProcess;
+		btp.init(/*onClose, onRun, options*/);
+	},
 	get hasScratchpad() {
 		delete this.hasScratchpad;
 		return this.hasScratchpad = "Scratchpad" in window && "openScratchpad" in Scratchpad
@@ -1725,6 +1741,14 @@ var mp = cmds.popup = this.appendChild(parseXULFromString('\
 			accesskey="' + _localize("A", "attrsInspectorKey") + '"\
 			class="menuitem-iconic"\
 			image="' + images.attrsInspector + '" />\
+		<menuitem cb_id="openBrowserToolbox"\
+			oncommand="this.parentNode.parentNode.commands.openBrowserToolbox();"\
+			key="key_browserToolbox"\
+			label="' + _localize("Browser Toolbox") + '"\
+			accesskey="' + _localize("e", "browserToolboxKey") + '"\
+			class="menuitem-iconic"\
+			image="' + (cmds.hasBrowserToolbox ? images.browserToolbox : "") + '"\
+			hidden="' + !cmds.hasBrowserToolbox + '" />\
 		<menuitem cb_id="openScratchpad"\
 			oncommand="this.parentNode.parentNode.commands.openScratchpad();"\
 			label="' + _localize("Scratchpad") + '"\
