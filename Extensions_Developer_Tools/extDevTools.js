@@ -1781,7 +1781,7 @@ var mp = cmds.popup = this.appendChild(parseXULFromString('\
 				<menuitem cb_pref="javascript.options.strict.debug"\
 					type="checkbox"\
 					label="' + _localize("Show strict warnings in debug builds") + '"\
-					hidden="' + !this.commands.isDebugBuild + '" />\
+					hidden="' + !cmds.isDebugBuild + '" />\
 				<menuitem cb_pref="dom.report_all_js_exceptions"\
 					type="checkbox"\
 					label="' + _localize("Show all exceptions") + '"\
@@ -1813,21 +1813,21 @@ var mp = cmds.popup = this.appendChild(parseXULFromString('\
 					type="checkbox"\
 					label="' + _localize("Silently install extensions from browser profile") + '"\
 					hidden="' + (cmds.platformVersion < 8 || !cmds.prefHasDefaultValue("extensions.autoDisableScopes")) + '" />\
-				<menuseparator hidden="' + !this.commands.canDisableE4X + '" />\
+				<menuseparator hidden="' + !cmds.canDisableE4X + '" />\
 				<menuitem cb_pref="javascript.options.xml.chrome"\
 					type="checkbox"\
 					label="' + _localize("Enable E4X for chrome") + '"\
-					hidden="' + !this.commands.canDisableE4X + '" />\
+					hidden="' + !cmds.canDisableE4X + '" />\
 				<menuitem cb_pref="javascript.options.xml.content"\
 					type="checkbox"\
 					label="' + _localize("Enable E4X for content") + '"\
-					hidden="' + !this.commands.canDisableE4X + '" />\
-				<menuseparator hidden="' + !this.commands.hasMultiProcessMode + '" />\
+					hidden="' + !cmds.canDisableE4X + '" />\
+				<menuseparator hidden="' + !cmds.hasMultiProcessMode + '" />\
 				<menuitem cb_pref="browser.tabs.remote.force-enable"\
 					type="checkbox"\
 					label="' + _localize("Enable multi-process mode") + '"\
 					oncommand="this.parentNode.parentNode.parentNode.parentNode.commands.ensureMultiProcessMode(this.getAttribute(\'checked\') == \'true\');"\
-					hidden="' + !this.commands.hasMultiProcessMode + '" />\
+					hidden="' + !cmds.hasMultiProcessMode + '" />\
 				<menuseparator cb_id="debugPrefsSeparator" hidden="true" />\
 				<menu cb_id="debugPrefsExtMenu" hidden="true"\
 					label="' + _localize("Debug extensions") + '"\
