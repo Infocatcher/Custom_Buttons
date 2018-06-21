@@ -410,6 +410,13 @@ var cmds = this.commands = {
 			menu = this.popup;
 		var defaultAction = this.defaultAction;
 		Array.prototype.forEach.call(
+			menu.getElementsByAttribute("cb_show", "*"),
+			function(mi) {
+				mi.setAttribute("hidden", !this[mi.getAttribute("cb_show")]);
+			},
+			this
+		);
+		Array.prototype.forEach.call(
 			menu.getElementsByAttribute("cb_id", "*"),
 			function(mi) {
 				var cbId = mi.getAttribute("cb_id");
@@ -1674,14 +1681,14 @@ var mp = cmds.popup = this.appendChild(parseXULFromString('\
 		onclick="this.parentNode.commands.setDefaultAction(event);">\
 		<menuitem cb_id="reopenWindow"\
 			oncommand="this.parentNode.parentNode.commands.reopenWindow();"\
-			hidden="' + !cmds.canReopenWindow + '"\
+			cb_show="canReopenWindow"\
 			label="' + _localize("Reopen window") + '"\
 			accesskey="' + _localize("w", "reopenWindowKey") + '"\
 			class="menuitem-iconic"\
 			image="' + images.reopenWindow + '" />\
 		<menuitem cb_id="moveTabsToNewWindow"\
 			oncommand="this.parentNode.parentNode.commands.moveTabsToNewWindow();"\
-			hidden="' + !cmds.canMoveTabsToNewWindow + '"\
+			cb_show="canMoveTabsToNewWindow"\
 			label="' + _localize("Move tabs to new window") + '"\
 			accesskey="' + _localize("t", "moveTabsToNewWindowKey") + '"\
 			class="menuitem-iconic"\
@@ -1717,7 +1724,7 @@ var mp = cmds.popup = this.appendChild(parseXULFromString('\
 			accesskey="' + _localize("x", "saveSessionAndExitKey") + '"\
 			class="menuitem-iconic"\
 			image="' + images.saveSessionAndExit + '"\
-			hidden="' + !cmds.canSaveSessionAndExit + '" />\
+			cb_show="canSaveSessionAndExit" />\
 		<menuseparator />\
 		<menuitem cb_id="errorConsole"\
 			oncommand="this.parentNode.parentNode.commands.openErrorConsole();"\
@@ -1726,7 +1733,7 @@ var mp = cmds.popup = this.appendChild(parseXULFromString('\
 			accesskey="' + _localize("E", "errorConsoleKey") + '"\
 			class="menuitem-iconic"\
 			image="' + images.errorConsole + '"\
-			hidden="' + !cmds.hasErrorConsole + '" />\
+			cb_show="hasErrorConsole" />\
 		<menuitem cb_id="browserConsole"\
 			oncommand="this.parentNode.parentNode.commands.openBrowserConsole();"\
 			key="key_browserConsole"\
@@ -1734,7 +1741,7 @@ var mp = cmds.popup = this.appendChild(parseXULFromString('\
 			accesskey="' + _localize("B", "browserConsoleKey") + '"\
 			class="menuitem-iconic"\
 			image="' + images.browserConsole + '"\
-			hidden="' + !cmds.canOpenBrowserConsole + '" />\
+			cb_show="canOpenBrowserConsole" />\
 		<menuitem cb_id="attrsInspector"\
 			oncommand="this.parentNode.parentNode.commands.attrsInspector(event);"\
 			label="' + _localize("Attributes Inspector") + '"\
@@ -1748,21 +1755,21 @@ var mp = cmds.popup = this.appendChild(parseXULFromString('\
 			accesskey="' + _localize("e", "browserToolboxKey") + '"\
 			class="menuitem-iconic"\
 			image="' + (cmds.hasBrowserToolbox ? images.browserToolbox : "") + '"\
-			hidden="' + !cmds.hasBrowserToolbox + '" />\
+			cb_show="hasBrowserToolbox" />\
 		<menuitem cb_id="openScratchpad"\
 			oncommand="this.parentNode.parentNode.commands.openScratchpad();"\
 			label="' + _localize("Scratchpad") + '"\
 			accesskey="' + _localize("p", "scratchpadKey") + '"\
 			class="menuitem-iconic"\
 			image="' + images.scratchpad + '"\
-			hidden="' + !cmds.hasScratchpad + '" />\
+			cb_show="hasScratchpad" />\
 		<menuitem cb_id="openEyedropper"\
 			oncommand="this.parentNode.parentNode.commands.openEyedropper();"\
 			label="' + _localize("Grab a color from the page") + '"\
 			accesskey="' + _localize("G", "eyedropperKey") + '"\
 			class="menuitem-iconic"\
 			image="' + images.eyedropper + '"\
-			hidden="' + !cmds.hasEyedropper + '" />\
+			cb_show="hasEyedropper" />\
 		<menuseparator />\
 		<menu\
 			label="' + _localize("Options") + '"\
@@ -1781,7 +1788,7 @@ var mp = cmds.popup = this.appendChild(parseXULFromString('\
 				<menuitem cb_pref="javascript.options.strict.debug"\
 					type="checkbox"\
 					label="' + _localize("Show strict warnings in debug builds") + '"\
-					hidden="' + !cmds.isDebugBuild + '" />\
+					cb_show="cmds.isDebugBuild" />\
 				<menuitem cb_pref="dom.report_all_js_exceptions"\
 					type="checkbox"\
 					label="' + _localize("Show all exceptions") + '"\
@@ -1813,21 +1820,21 @@ var mp = cmds.popup = this.appendChild(parseXULFromString('\
 					type="checkbox"\
 					label="' + _localize("Silently install extensions from browser profile") + '"\
 					hidden="' + (cmds.platformVersion < 8 || !cmds.prefHasDefaultValue("extensions.autoDisableScopes")) + '" />\
-				<menuseparator hidden="' + !cmds.canDisableE4X + '" />\
+				<menuseparator cb_show="canDisableE4X" />\
 				<menuitem cb_pref="javascript.options.xml.chrome"\
 					type="checkbox"\
 					label="' + _localize("Enable E4X for chrome") + '"\
-					hidden="' + !cmds.canDisableE4X + '" />\
+					cb_show="canDisableE4X" />\
 				<menuitem cb_pref="javascript.options.xml.content"\
 					type="checkbox"\
 					label="' + _localize("Enable E4X for content") + '"\
-					hidden="' + !cmds.canDisableE4X + '" />\
-				<menuseparator hidden="' + !cmds.hasMultiProcessMode + '" />\
+					cb_show="canDisableE4X" />\
+				<menuseparator cb_show="hasMultiProcessMode" />\
 				<menuitem cb_pref="browser.tabs.remote.force-enable"\
 					type="checkbox"\
 					label="' + _localize("Enable multi-process mode") + '"\
 					oncommand="this.parentNode.parentNode.parentNode.parentNode.commands.ensureMultiProcessMode(this.getAttribute(\'checked\') == \'true\');"\
-					hidden="' + !cmds.hasMultiProcessMode + '" />\
+					cb_show="hasMultiProcessMode" />\
 				<menuseparator cb_id="debugPrefsSeparator" hidden="true" />\
 				<menu cb_id="debugPrefsExtMenu" hidden="true"\
 					label="' + _localize("Debug extensions") + '"\
