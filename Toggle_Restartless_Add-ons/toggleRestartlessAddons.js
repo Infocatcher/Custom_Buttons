@@ -229,7 +229,7 @@ function setNewDisabledRaw(addon, newDis) {
 	_log("Let's try set addon.userDisabled using raw hack");
 	let g = Components.utils.import("resource://gre/modules/addons/XPIProvider.jsm", {});
 	if("XPIDatabase" in g && "updateAddonDisabledState" in g.XPIDatabase) { // Firefox 61+
-		let rawAddon = g.XPIDatabase.syncGetAddon(function(rawAddon) {
+		let rawAddon = g.XPIDatabase.getAddons().find(function(rawAddon) {
 			return rawAddon.id == addon.id;
 		});
 		g.XPIDatabase.updateAddonDisabledState(rawAddon, newDis);
