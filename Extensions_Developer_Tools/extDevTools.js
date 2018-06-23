@@ -542,23 +542,19 @@ var cmds = this.commands = {
 		}, false);
 
 		// Try remove closed window from undo history
+		var canForget = "forgetClosedWindow" in ss;
+		canForget && ss.setWindowValue(window, "_cb_extDevTools_forget", "1");
 		window.addEventListener("unload", function clearUndo(e) {
 			window.removeEventListener(e.type, clearUndo, false);
 
-			var canForget = "forgetClosedWindow" in ss;
-			if(canForget) {
-				var stateObj = JSON.parse(ss.getWindowState(window)).windows[0];
-				delete stateObj._shouldRestore;
-				var state = JSON.stringify(stateObj);
-				//LOG("state:\n" + state);
-			}
 			win.setTimeout(function() {
 				if(canForget) {
 					var closed = JSON.parse(ss.getClosedWindowData());
 					for(var i = 0, l = closed.length; i < l; ++i) {
-						delete closed[i]._shouldRestore;
-						//LOG("#" + i + "\n" + JSON.stringify(closed[i]));
-						if(JSON.stringify(closed[i]) == state) {
+						var winData = closed[i];
+						delete winData._shouldRestore;
+						//LOG("#" + i + "\n" + JSON.stringify(winData));
+						if(winData.extData && "_cb_extDevTools_forget" in winData.extData) {
 							ss.forgetClosedWindow(i);
 							break;
 						}
