@@ -650,7 +650,8 @@ var cmds = this.commands = {
 			}
 
 			tabs.forEach(function(tab) {
-				var newTab = newBrowser.addTab();
+				var isRemote = tab.linkedBrowser.getAttribute("remote") == "true";
+				var newTab = newBrowser.addTab(isRemote ? "about:blank" : "about:about");
 				newBrowser.swapBrowsersAndCloseOther(newTab, tab);
 				if(tab == selectedTab) {
 					var initialTab = newBrowser.selectedTab;
