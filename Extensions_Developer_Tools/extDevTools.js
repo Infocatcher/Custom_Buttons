@@ -350,15 +350,20 @@ this.onmousedown = function(e) {
 		e.preventDefault();
 };
 
+const btnNum = this.id.match(/\d*$/)[0];
+const prefNS = "extensions.custombuttons.button" + btnNum + ".";
+
 var cmds = this.commands = {
+	prefs: {
+		defaultAction: prefNS + "defaultAction",
+		restoreErrorConsole: prefNS + "restoreErrorConsole",
+		restoreBrowserConsole: prefNS + "restoreBrowserConsole",
+	},
 	options: options,
 	button: this,
 	onlyPopup: this.localName == "popupset",
 	popup: null,
-	get btnNum() {
-		delete this.btnNum;
-		return this.btnNum = this.button.id.match(/\d*$/)[0];
-	},
+
 	get ss() {
 		delete this.ss;
 		if(!("nsISessionStore" in Components.interfaces)) // Thunderbird
@@ -388,18 +393,14 @@ var cmds = this.commands = {
 			.getService(Components.interfaces.nsIWindowMediator);
 	},
 
-	get defaultActionPref() {
-		delete this.defaultActionPref;
-		return this.defaultActionPref = "extensions.custombuttons.button" + this.btnNum + ".defaultAction";
-	},
 	get defaultAction() {
-		return this.getPref(this.defaultActionPref);
+		return this.getPref(this.prefs.defaultAction);
 	},
 	set defaultAction(val) {
 		if(!val)
-			this.resetPref(this.defaultActionPref);
+			this.resetPref(this.prefs.defaultAction);
 		else
-			this.setPref(this.defaultActionPref, val);
+			this.setPref(this.prefs.defaultAction, val);
 	},
 	get defaultActionItem() {
 		var defaultAction = this.defaultAction;
@@ -1156,14 +1157,6 @@ var cmds = this.commands = {
 		return null;
 	},
 	_restoreErrorConsoleObserver: null,
-	get restoreErrorConsolePref() {
-		delete this.restoreErrorConsolePref;
-		return this.restoreErrorConsolePref = "extensions.custombuttons.button" + this.btnNum + ".restoreErrorConsole";
-	},
-	get restoreBrowserConsolePref() {
-		delete this.restoreBrowserConsolePref;
-		return this.restoreBrowserConsolePref = "extensions.custombuttons.button" + this.btnNum + ".restoreBrowserConsole";
-	},
 	initErrorConsoleRestoring: function() {
 		if(this._restoreErrorConsoleObserver/* || this.platformVersion < 2*/)
 			return;
@@ -1174,9 +1167,9 @@ var cmds = this.commands = {
 			observe: function() {
 				obs.removeObserver(observer, "quit-application-granted");
 				if(_this.getErrorConsole())
-					_this.setPref(_this.restoreErrorConsolePref, true);
+					_this.setPref(_this.prefs.restoreErrorConsole, true);
 				if(_this.getBrowserConsole())
-					_this.setPref(_this.restoreBrowserConsolePref, true);
+					_this.setPref(_this.prefs.restoreBrowserConsole, true);
 			}
 		};
 		obs.addObserver(observer, "quit-application-granted", false);
@@ -1189,13 +1182,13 @@ var cmds = this.commands = {
 		}
 	},
 	restoreErrorConsole: function() {
-		if(this.getPref(this.restoreErrorConsolePref)) {
-			this.resetPref(this.restoreErrorConsolePref);
+		if(this.getPref(this.prefs.restoreErrorConsole)) {
+			this.resetPref(this.prefs.restoreErrorConsole);
 			if(this.hasErrorConsole)
 				this.openErrorConsole();
 		}
-		if(this.getPref(this.restoreBrowserConsolePref)) {
-			this.resetPref(this.restoreBrowserConsolePref);
+		if(this.getPref(this.prefs.restoreBrowserConsole)) {
+			this.resetPref(this.prefs.restoreBrowserConsole);
 			// Note: #menu_browserConsole doesn't exist yet on startup
 			//if(this.canOpenBrowserConsole)
 			this.openBrowserConsole();
