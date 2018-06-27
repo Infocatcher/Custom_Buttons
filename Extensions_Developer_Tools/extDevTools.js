@@ -1346,11 +1346,9 @@ var cmds = this.commands = {
 		return nodes.length ? nodes[0] : null;
 	},
 	delayed: function(func, context, delay) {
-		if(!context)
-			context = this;
-		setTimeout(function() {
+		setTimeout(function(context) {
 			func.call(context);
-		}, delay || 0);
+		}, delay || 0, context || this);
 	},
 	initPrefsMenu: function(popup) {
 		var knownPrefs = { __proto__: null };
