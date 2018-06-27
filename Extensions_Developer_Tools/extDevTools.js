@@ -485,25 +485,25 @@ var cmds = this.commands = {
 	},
 	updateTipOnMouseover: false,
 	setDefaultActionTip: function(delay) {
-		setTimeout(function(_this) {
-			var mi = _this.defaultActionItem;
-			var upd = _this.updateTipOnMouseover = mi && mi.getAttribute("cb_id") == "switchLocale";
-			upd && _this.initSwitchLocaleItem(mi);
-			var btn = _this.button;
+		this.delayed(function() {
+			var mi = this.defaultActionItem;
+			var upd = this.updateTipOnMouseover = mi && mi.getAttribute("cb_id") == "switchLocale";
+			upd && this.initSwitchLocaleItem(mi);
+			var btn = this.button;
 			btn.tooltipText = btn.tooltipText.replace(/ \n.*$/, "") + (
 				mi
 					? " \n" + _localize("Middle-click: %S").replace("%S", mi.getAttribute("label"))
-					: _this.options.showMiddleClickActionTip
+					: this.options.showMiddleClickActionTip
 						? " \n" + _localize("Middle-click: action not selected, middle-click on some item to set/unset")
 						: ""
 			);
-			if(!_this.options.changeButtonIcon)
+			if(!this.options.changeButtonIcon)
 				return;
 			var icon = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon");
 			icon.src = mi
 				? mi.getAttribute("image")
 				: btn.image;
-		}, delay || 0, this);
+		}, this, delay || 0);
 	},
 
 	get canReopenWindow() {
@@ -1483,9 +1483,9 @@ var cmds = this.commands = {
 				this.setPref(pref, this.options.prefValues[pref]);
 			else
 				this.resetPref(pref);
-			setTimeout(function(_this) {
-				mi.setAttribute("tooltiptext", pref + " = " + _this.getPref(pref));
-			}, 0, this);
+			this.delayed(function() {
+				mi.setAttribute("tooltiptext", pref + " = " + this.getPref(pref));
+			});
 		}
 		else {
 			this.setPref(pref, pVal);
