@@ -469,6 +469,17 @@ var cmds = this.commands = {
 		)
 			mi.setAttribute("closemenu", this.hasModifier(e) ? "none" : "auto");
 	},
+	setDefaultActionIcon: function() {
+		if(!this.options.changeButtonIcon)
+			return;
+		var defaultAction = this.defaultAction || "";
+		var iconKey = defaultAction.replace(/^open([A-Z])/, function(s, c) {
+			return c.toLowerCase();
+		});
+		var btn = this.button;
+		var icon = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon");
+		icon.src = images[iconKey] || btn.image;
+	},
 	setDefaultAction: function(e) {
 		if(this.onlyPopup)
 			return;
@@ -480,6 +491,7 @@ var cmds = this.commands = {
 			return;
 		this.defaultAction = this.defaultAction == action ? "" : action;
 		this.initMenu();
+		this.setDefaultActionIcon();
 		this.setDefaultActionTip();
 		this.savePrefFile(true);
 	},
@@ -497,12 +509,6 @@ var cmds = this.commands = {
 						? " \n" + _localize("Middle-click: action not selected, middle-click on some item to set/unset")
 						: ""
 			);
-			if(!this.options.changeButtonIcon)
-				return;
-			var icon = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon");
-			icon.src = mi
-				? mi.getAttribute("image")
-				: btn.image;
 		}, this, delay || 0);
 	},
 
@@ -1895,8 +1901,10 @@ if(!cmds.onlyPopup) for(var kId in options.hotkeys) if(options.hotkeys.hasOwnPro
 	mi && mi.setAttribute("key", keyId);
 }
 
-if(!cmds.onlyPopup)
-	cmds.setDefaultActionTip(100);
+if(!cmds.onlyPopup) {
+	cmds.setDefaultActionIcon();
+	cmds.setDefaultActionTip(500);
+}
 if(options.restoreErrorConsole && !cmds.onlyPopup)
 	cmds.initErrorConsoleRestoring();
 
