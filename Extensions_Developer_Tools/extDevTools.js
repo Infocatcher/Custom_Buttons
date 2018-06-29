@@ -487,7 +487,7 @@ var cmds = this.commands = {
 			return;
 		var mi = e.target;
 		var action = mi.getAttribute("cb_id");
-		if(!action)
+		if(!action || mi.localName != "menuitem")
 			return;
 		this.defaultAction = this.defaultAction == action ? "" : action;
 		this.initMenu();
