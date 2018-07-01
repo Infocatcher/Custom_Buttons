@@ -1871,7 +1871,7 @@ if(!cmds.onlyPopup) for(var kId in options.hotkeys) if(options.hotkeys.hasOwnPro
 			if(!keyElt)
 				return;
 			// Break old key
-			keyElt.setAttribute("__disabledByEvtDevTools", "true");
+			keyElt.setAttribute("__disabledByCBExtDevTools", "true");
 			keyElt.setAttribute("key", "\xa0"); // &nbsp;
 			keyElt.removeAttribute("keycode");
 			keyElt.removeAttribute("modifiers");
