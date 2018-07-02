@@ -403,8 +403,16 @@ var cmds = this.commands = {
 			this.setPref(this.prefs.defaultAction, val);
 	},
 	get defaultActionItem() {
-		var defaultAction = this.defaultAction;
-		return defaultAction && this.$(defaultAction);
+		var da = this.defaultAction;
+		return da && (
+			this.$(da)
+			|| this.$(this.cmdToId(da)) // Legacy prefs?
+		);
+	},
+	cmdToId: function(cmd) {
+		return cmd.replace(/^open([A-Z])/, function(s, c) {
+			return c.toLowerCase();
+		});
 	},
 	initMenu: function(menu) {
 		if(!menu)
@@ -424,14 +432,6 @@ var cmds = this.commands = {
 				mi.setAttribute("default", cbId == defaultAction);
 				if(cbId == "switchLocale")
 					this.initSwitchLocaleItem(mi);
-				else if(cbId == "errorConsole") {
-					var kId = "openErrorConsole";
-					if(
-						!document.getElementById("key_errorConsole")
-						&& kId in this.options.hotkeys
-					)
-						mi.setAttribute("key", keyCbId + "-" + kId);
-				}
 				else if(cbId == "attrsInspector") {
 					//~ Note: should be "inspectDOMNode" in window for Firefox 1.5
 					this.setPartiallyAvailable(mi,
@@ -472,13 +472,9 @@ var cmds = this.commands = {
 	setDefaultActionIcon: function() {
 		if(!this.options.changeButtonIcon)
 			return;
-		var defaultAction = this.defaultAction || "";
-		var iconKey = defaultAction.replace(/^open([A-Z])/, function(s, c) {
-			return c.toLowerCase();
-		});
 		var btn = this.button;
 		var icon = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon");
-		icon.src = images[iconKey] || btn.image;
+		icon.src = images[this.defaultAction] || btn.image;
 	},
 	setDefaultAction: function(e) {
 		if(this.onlyPopup)
@@ -1743,7 +1739,7 @@ var mp = cmds.popup = this.appendChild(parseXULFromString('\
 			accesskey="' + _localize("A", "attrsInspectorKey") + '"\
 			class="menuitem-iconic"\
 			image="' + images.attrsInspector + '" />\
-		<menuitem cb_id="openBrowserToolbox"\
+		<menuitem cb_id="browserToolbox"\
 			oncommand="this.parentNode.parentNode.commands.openBrowserToolbox();"\
 			key="key_browserToolbox"\
 			label="' + _localize("Browser Toolbox") + '"\
@@ -1751,14 +1747,14 @@ var mp = cmds.popup = this.appendChild(parseXULFromString('\
 			class="menuitem-iconic"\
 			image="' + (cmds.hasBrowserToolbox ? images.browserToolbox : "") + '"\
 			cb_show="hasBrowserToolbox" />\
-		<menuitem cb_id="openScratchpad"\
+		<menuitem cb_id="scratchpad"\
 			oncommand="this.parentNode.parentNode.commands.openScratchpad();"\
 			label="' + _localize("Scratchpad") + '"\
 			accesskey="' + _localize("p", "scratchpadKey") + '"\
 			class="menuitem-iconic"\
 			image="' + images.scratchpad + '"\
 			cb_show="hasScratchpad" />\
-		<menuitem cb_id="openEyedropper"\
+		<menuitem cb_id="eyedropper"\
 			oncommand="this.parentNode.parentNode.commands.openEyedropper();"\
 			label="' + _localize("Grab a color from the page") + '"\
 			accesskey="' + _localize("G", "eyedropperKey") + '"\
@@ -1897,8 +1893,9 @@ if(!cmds.onlyPopup) for(var kId in options.hotkeys) if(options.hotkeys.hasOwnPro
 	keyElt.setAttribute("modifiers", modifiers);
 	keyElt._cbCommands = cmds;
 	keyElt.setAttribute("oncommand", "this._cbCommands." + kId + "();");
-	var mi = this.getElementsByAttribute("cb_id", kId)[0];
-	mi && mi.setAttribute("key", keyId);
+	var mi = this.getElementsByAttribute("cb_id", cmds.cmdToId(kId))[0];
+	if(mi && (!mi.hasAttribute("key") || !document.getElementById(mi.getAttribute("key"))))
+		mi.setAttribute("key", keyId);
 }
 
 if(!cmds.onlyPopup) {
