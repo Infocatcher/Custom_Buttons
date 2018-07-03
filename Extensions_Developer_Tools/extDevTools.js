@@ -136,8 +136,14 @@ function _localize(s, key) {
 		"Update %S locale?": {
 			ru: "Обновить локаль %S?"
 		},
-		"Can't install %L locale!\nURL: %U": {
-			ru: "Не удалось установить локаль %L!\nСсылка: %U"
+		"Can't install %L locale: %R!\nURL: %U": {
+			ru: "Не удалось установить локаль %L: %R!\nСсылка: %U"
+		},
+		"download failed": {
+			ru: "ошибка загрузки"
+		},
+		"install failed": {
+			ru: "ошибка установки"
 		},
 		"Download language pack…": {
 			ru: "Загрузка языкового пакета…"
@@ -922,21 +928,21 @@ var cmds = this.commands = {
 					install.addListener({
 						onInstallEnded: function(install, addon) {
 							LOG("[Language pack]: Ok");
-							this._done(true);
+							this._done();
 						},
 						onDownloadFailed: function(install) {
 							LOG("[Language pack]: Download failed");
-							this._done(false);
+							this._done("download failed");
 						},
 						onInstallFailed: function(install) {
 							LOG("[Language pack]: Install failed");
-							this._done(false);
+							this._done("install failed");
 						},
-						_done: function(ok) {
+						_done: function(error) {
 							progressIcon.restore();
 							install.removeListener(this);
 							this._progress();
-							if(!ok) {
+							if(error) {
 								if(!tryESR && _this.getInstallURLForLocale(locale, true) != installURL) {
 									LOG("[Language pack]: Will try ESR version");
 									_this.ensureLocaleAvailable(locale, callback, true);
@@ -951,12 +957,13 @@ var cmds = this.commands = {
 								_this.ps.alert(
 									window,
 									_localize("Extensions Developer Tools"),
-									_localize("Can't install %L locale!\nURL: %U")
+									_localize("Can't install %L locale: %R!\nURL: %U")
 										.replace("%L", locale)
+										.replace("%R", _localize(error))
 										.replace("%U", installURLs.join("\n"))
 								);
 							}
-							callback(ok);
+							callback(!!error);
 						},
 						onDownloadStarted: function(install) {
 							this._progress(_localize("Download language pack…"));
