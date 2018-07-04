@@ -356,6 +356,35 @@ this.onmousedown = function(e) {
 		e.preventDefault();
 };
 
+var Services = window.Services || {
+	get prefs() {
+		delete this.prefs;
+		return this.prefs = Components.classes["@mozilla.org/preferences-service;1"]
+			.getService(Components.interfaces.nsIPrefService)
+			.QueryInterface(Components.interfaces.nsIPrefBranch2 || Components.interfaces.nsIPrefBranch);
+	},
+	get appinfo() {
+		delete this.appinfo;
+		return this.appinfo = Components.classes["@mozilla.org/xre/app-info;1"]
+			.getService(Components.interfaces.nsIXULAppInfo);
+	},
+	get prompt() {
+		delete this.prompt;
+		return this.prompt = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
+			.getService(Components.interfaces.nsIPromptService);
+	},
+	get wm() {
+		delete this.wm;
+		return this.wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+			.getService(Components.interfaces.nsIWindowMediator);
+	},
+	get obs() {
+		delete this.obs;
+		return this.obs = Components.classes["@mozilla.org/observer-service;1"]
+			.getService(Components.interfaces.nsIObserverService);
+	}
+};
+
 const btnNum = this.id.match(/\d*$/)[0];
 const prefNS = "extensions.custombuttons.button" + btnNum + ".";
 
@@ -379,24 +408,9 @@ var cmds = this.commands = {
 			|| Components.classes["@mozilla.org/suite/sessionstore;1"]
 		).getService(Components.interfaces.nsISessionStore);
 	},
-	get appInfo() {
-		delete this.appInfo;
-		return this.appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
-			.getService(Components.interfaces.nsIXULAppInfo);
-	},
 	get platformVersion() {
 		delete this.platformVersion;
-		return this.platformVersion = parseFloat(this.appInfo.platformVersion);
-	},
-	get ps() {
-		delete this.ps;
-		return this.ps = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
-			.getService(Components.interfaces.nsIPromptService);
-	},
-	get wm() {
-		delete this.wm;
-		return this.wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-			.getService(Components.interfaces.nsIWindowMediator);
+		return this.platformVersion = parseFloat(Services.appinfo.platformVersion);
 	},
 
 	get defaultAction() {
@@ -730,11 +744,6 @@ var cmds = this.commands = {
 		this._restart();
 	},
 
-	get obs() {
-		delete this.obs;
-		return this.obs = Components.classes["@mozilla.org/observer-service;1"]
-			.getService(Components.interfaces.nsIObserverService);
-	},
 	// Based on code from resource:///components/fuelApplication.js in Firefox 38
 	appQuit: function() {
 		return this._quitWithFlags(Components.interfaces.nsIAppStartup.eAttemptQuit);
@@ -749,7 +758,7 @@ var cmds = this.commands = {
 		var cancelQuit = Components.classes["@mozilla.org/supports-PRBool;1"]
 			.createInstance(Components.interfaces.nsISupportsPRBool);
 		var quitType = flags & Components.interfaces.nsIAppStartup.eRestart ? "restart" : null;
-		this.obs.notifyObservers(cancelQuit, "quit-application-requested", quitType);
+		Services.obs.notifyObservers(cancelQuit, "quit-application-requested", quitType);
 		if(cancelQuit.data)
 			return false; // somebody canceled our quit request
 		var appStartup = Components.classes["@mozilla.org/toolkit/app-startup;1"]
@@ -761,7 +770,7 @@ var cmds = this.commands = {
 	flushCaches: function() {
 		// See resource://gre/modules/XPIProvider.jsm
 		// resource://gre/modules/addons/XPIProvider.jsm
-		var obs = this.obs;
+		var obs = Services.obs;
 		obs.notifyObservers(null, "startupcache-invalidate", null);
 		obs.notifyObservers(null, "chrome-flush-skin-caches", null);
 		obs.notifyObservers(null, "chrome-flush-caches", null);
@@ -781,7 +790,7 @@ var cmds = this.commands = {
 	getLocale: function(getDefault) {
 		if("Services" in window && Services.locale && Services.locale.getRequestedLocales) {
 			var localePref = "intl.locale.requested";
-			if(getDefault && this.prefSvc.prefHasUserValue(localePref)) {
+			if(getDefault && Services.prefs.prefHasUserValue(localePref)) {
 				var origLocales = this.getPref(localePref);
 				this.resetPref(localePref);
 			}
@@ -790,7 +799,7 @@ var cmds = this.commands = {
 				this.setPref(localePref, origLocales);
 			return locales && locales[0];
 		}
-		var prefs = getDefault ? this.defaultBranch : this.prefSvc;
+		var prefs = getDefault ? this.defaultBranch : Services.prefs;
 		var locale = this.getPref("general.useragent.locale", "", prefs);
 		if(locale && locale.substr(0, 9) != "chrome://")
 			return locale;
@@ -815,7 +824,7 @@ var cmds = this.commands = {
 		var locale = {
 			value: this.switchLocale(true)
 		};
-		var ok = this.ps.prompt(
+		var ok = Services.prompt.prompt(
 			window,
 			_localize("Extensions Developer Tools"),
 			_localize("Current locale: %S")
@@ -866,7 +875,7 @@ var cmds = this.commands = {
 		return locale;
 	},
 	get alwaysUpdateLocale() {
-		var isAlpha = /^\d+(?:\.\d+)*a\d/.test(this.appInfo.version);
+		var isAlpha = /^\d+(?:\.\d+)*a\d/.test(Services.appinfo.version);
 		delete this.alwaysUpdateLocale;
 		return this.alwaysUpdateLocale = isAlpha;
 	},
@@ -908,7 +917,7 @@ var cmds = this.commands = {
 			LOG("installURL: " + installURL);
 			if(
 				!tryESR
-				&& !_this.ps.confirm(
+				&& !Services.prompt.confirm(
 					window,
 					_localize("Extensions Developer Tools"),
 					_localize(addon ? "Update %S locale?" : "Install %S locale?")
@@ -954,7 +963,7 @@ var cmds = this.commands = {
 									if(installURLNoESR != installURL)
 										installURLs.unshift(installURLNoESR);
 								}
-								_this.ps.alert(
+								Services.prompt.alert(
 									window,
 									_localize("Extensions Developer Tools"),
 									_localize("Can't install %L locale: %R!\nURL: %U")
@@ -988,7 +997,7 @@ var cmds = this.commands = {
 		});
 	},
 	getInstallURLForLocale: function(locale, useESR) {
-		var appInfo = this.appInfo;
+		var appInfo = Services.appinfo;
 		var app = appInfo.name.toLowerCase();
 		if(
 			app != "firefox"
@@ -1095,7 +1104,7 @@ var cmds = this.commands = {
 			return;
 		}
 		if(!this.hasErrorConsole) {
-			this.ps.alert(
+			Services.prompt.alert(
 				window,
 				_localize("Extensions Developer Tools"),
 				_localize("Error Console not found!")
@@ -1108,13 +1117,13 @@ var cmds = this.commands = {
 		window.openDialog(consoleURI, "_blank", "chrome,all,centerscreen,resizable,dialog=0");
 	},
 	getErrorConsole: function() {
-		return this.wm.getMostRecentWindow("global:console");
+		return Services.wm.getMostRecentWindow("global:console");
 	},
 	// Note: Browser Console isn't supported without opened browser windows
 	get browserWindow() {
 		if(window.location.href == "chrome://browser/content/browser.xul")
 			return window;
-		return this.wm.getMostRecentWindow("navigator:browser");
+		return Services.wm.getMostRecentWindow("navigator:browser");
 	},
 	get canOpenBrowserConsole() {
 		var window = this.browserWindow;
@@ -1170,7 +1179,7 @@ var cmds = this.commands = {
 		if(this._restoreErrorConsoleObserver/* || this.platformVersion < 2*/)
 			return;
 		this.restoreErrorConsole();
-		var obs = this.obs;
+		var obs = Services.obs;
 		var _this = this;
 		var observer = this._restoreErrorConsoleObserver = {
 			observe: function() {
@@ -1187,7 +1196,7 @@ var cmds = this.commands = {
 		var o = this._restoreErrorConsoleObserver;
 		if(o) {
 			this._restoreErrorConsoleObserver = null;
-			this.obs.removeObserver(o, "quit-application-granted");
+			Services.obs.removeObserver(o, "quit-application-granted");
 		}
 	},
 	restoreErrorConsole: function() {
@@ -1221,7 +1230,7 @@ var cmds = this.commands = {
 	},
 	get hasBrowserToolbox() {
 		delete this.hasBrowserToolbox;
-		return this.hasBrowserToolbox = this.appInfo.name == "Firefox" && this.platformVersion >= 56;
+		return this.hasBrowserToolbox = Services.appinfo.name == "Firefox" && this.platformVersion >= 56;
 	},
 	openBrowserToolbox: function() {
 		var btp = Components.utils["import"]("resource://devtools/client/framework/ToolboxProcess.jsm", {})
@@ -1231,7 +1240,7 @@ var cmds = this.commands = {
 	get hasScratchpad() {
 		delete this.hasScratchpad;
 		return this.hasScratchpad = "Scratchpad" in window && "openScratchpad" in Scratchpad
-			|| this.appInfo.name == "Firefox" && this.platformVersion >= 58;
+			|| Services.appinfo.name == "Firefox" && this.platformVersion >= 58;
 	},
 	openScratchpad: function() {
 		var ScratchpadManager = "Scratchpad" in window
@@ -1276,7 +1285,7 @@ var cmds = this.commands = {
 	get hasEyedropper() {
 		delete this.hasEyedropper;
 		return this.hasEyedropper = "openEyedropper" in window
-			|| this.appInfo.name == "Firefox" && this.platformVersion >= 50;
+			|| Services.appinfo.name == "Firefox" && this.platformVersion >= 50;
 	},
 	openEyedropper: function() {
 		if("openEyedropper" in window) {
@@ -1324,7 +1333,7 @@ var cmds = this.commands = {
 			"browser.tabs.remote.autostart.2"
 		].forEach(function(pref) {
 			this.resetPref(pref);
-			if(this.prefSvc.getPrefType(pref) == this.prefSvc.PREF_BOOL)
+			if(Services.prefs.getPrefType(pref) == Services.prefs.PREF_BOOL)
 				this.setPref(pref, isMultiProcess);
 		}, this);
 	},
@@ -1342,7 +1351,7 @@ var cmds = this.commands = {
 		}
 		if(
 			!this.options.confirm[key]
-			|| this.ps.confirm(window, _localize("Extensions Developer Tools"), _localize(msg))
+			|| Services.prompt.confirm(window, _localize("Extensions Developer Tools"), _localize(msg))
 		) {
 			method && this[method].apply(this, args);
 			return true;
@@ -1408,7 +1417,7 @@ var cmds = this.commands = {
 		var app = showDebugPrefs & 2
 			&& document.createDocumentFragment();
 		var trimPrefix = this.options.debugPrefsTrimExtPrefix ? 11 /*"extensions.".length*/ : 0;
-		this.prefSvc.getBranch("")
+		Services.prefs.getBranch("")
 			.getChildList("", {})
 			.filter(function(pName) {
 				return !(pName in knownPrefs)
@@ -1473,7 +1482,7 @@ var cmds = this.commands = {
 		else {
 			var curVal = this.getPref(pref);
 			var prefObj = { value: curVal };
-			var ok = this.ps.prompt(
+			var ok = Services.prompt.prompt(
 				window,
 				_localize("Extensions Developer Tools"),
 				_localize("Change “%S” preference:").replace("%S", pref),
@@ -1524,18 +1533,12 @@ var cmds = this.commands = {
 		node.style.fontWeight = this.prefHasUserValue(pref) ? "bold" : "";
 	},
 
-	get prefSvc() {
-		delete this.prefSvc;
-		return this.prefSvc = Components.classes["@mozilla.org/preferences-service;1"]
-			.getService(Components.interfaces.nsIPrefService)
-			.QueryInterface(Components.interfaces.nsIPrefBranch2 || Components.interfaces.nsIPrefBranch);
-	},
 	get defaultBranch() {
 		delete this.defaultBranch;
-		return this.defaultBranch = this.prefSvc.getDefaultBranch("");
+		return this.defaultBranch = Services.prefs.getDefaultBranch("");
 	},
 	getPref: function(pName, defaultVal, prefBranch) {
-		var ps = prefBranch || this.prefSvc;
+		var ps = prefBranch || Services.prefs;
 		try { // getPrefType() returns type of changed value for default branch
 			switch(ps.getPrefType(pName)) {
 				case ps.PREF_BOOL:   return ps.getBoolPref(pName);
@@ -1551,7 +1554,7 @@ var cmds = this.commands = {
 		return defaultVal;
 	},
 	setPref: function(pName, val, prefBranch) {
-		var ps = prefBranch || this.prefSvc;
+		var ps = prefBranch || Services.prefs;
 		var pType = ps.getPrefType(pName);
 		if(pType == ps.PREF_INVALID)
 			pType = this.getValueType(val);
@@ -1570,21 +1573,21 @@ var cmds = this.commands = {
 	},
 	getValueType: function(val) {
 		switch(typeof val) {
-			case "boolean": return this.prefSvc.PREF_BOOL;
-			case "number":  return this.prefSvc.PREF_INT;
+			case "boolean": return Services.prefs.PREF_BOOL;
+			case "number":  return Services.prefs.PREF_INT;
 		}
-		return this.prefSvc.PREF_STRING;
+		return Services.prefs.PREF_STRING;
 	},
 	prefHasUserValue: function(pName) {
 		if(!this.prefHasDefaultValue(pName))
 			return !!this.getPref(pName);
-		return this.prefSvc.prefHasUserValue(pName);
+		return Services.prefs.prefHasUserValue(pName);
 	},
 	prefHasDefaultValue: function(pName) {
 		return this.getPref(pName, null, this.defaultBranch) != null;
 	},
 	resetPref: function(pName) {
-		this.prefSvc.clearUserPref(pName);
+		Services.prefs.clearUserPref(pName);
 	},
 
 	prefsChanged: false,
@@ -1592,12 +1595,11 @@ var cmds = this.commands = {
 		if(!force && !this.prefsChanged)
 			return;
 		this.prefsChanged = false;
-		var _this = this;
 		var timer = Components.classes["@mozilla.org/timer;1"]
 			.createInstance(Components.interfaces.nsITimer);
 		timer.init({
 			observe: function() {
-				_this.prefSvc.savePrefFile(null);
+				Services.prefs.savePrefFile(null);
 				LOG("savePrefFile()");
 			}
 		}, 100, timer.TYPE_ONE_SHOT);
@@ -3920,17 +3922,12 @@ var focusManager = {
 	button: this,
 	focusedWindow: null,
 	outTimer: 0,
-	get wm() {
-		delete this.wm;
-		return this.wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-			.getService(Components.interfaces.nsIWindowMediator);
-	},
 	handleEvent: function(e) {
 		switch(e.type) {
 			case "mouseover":
 				clearTimeout(this.outTimer);
 				if(e.target == this.button) {
-					var focusedWindow = this.wm.getMostRecentWindow(null);
+					var focusedWindow = Services.wm.getMostRecentWindow(null);
 					this.focusedWindow = focusedWindow != window.top && focusedWindow;
 				}
 			break;
