@@ -287,9 +287,7 @@ function _localize(s, key) {
 			var locales = Services.locale.getRequestedLocales();
 			return locales && locales[0];
 		}
-		var prefs = "Services" in window && Services.prefs
-			|| Components.classes["@mozilla.org/preferences-service;1"]
-				.getService(Components.interfaces.nsIPrefBranch);
+		var prefs = Services.prefs;
 		function pref(name, type) {
 			return prefs.getPrefType(name) != prefs.PREF_INVALID ? prefs["get" + type + "Pref"](name) : undefined;
 		}
