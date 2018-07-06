@@ -1299,7 +1299,7 @@ var cmds = this.commands = {
 			CommandUtils.executeOnTarget(target, "eyedropper --frommenu");
 		else {
 			CommandUtils.createRequisition(target, {
-				environment: CommandUtils.createEnvironment({target})
+				environment: CommandUtils.createEnvironment({ target: target })
 			}).then(function(requisition) {
 				requisition.updateExec("eyedropper --frommenu");
 			}, Components.utils.reportError);
