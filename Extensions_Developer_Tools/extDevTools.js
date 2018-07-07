@@ -390,7 +390,7 @@ var cmds = this.commands = {
 	prefs: {
 		defaultAction: prefNS + "defaultAction",
 		restoreErrorConsole: prefNS + "restoreErrorConsole",
-		restoreBrowserConsole: prefNS + "restoreBrowserConsole",
+		restoreBrowserConsole: prefNS + "restoreBrowserConsole"
 	},
 	options: options,
 	button: this,
@@ -1560,6 +1560,7 @@ var cmds = this.commands = {
 			case ps.PREF_BOOL: return ps.setBoolPref(pName, val);
 			case ps.PREF_INT:  return ps.setIntPref(pName, val);
 			case ps.PREF_STRING:
+			default:
 				if("setStringPref" in ps) // Firefox 58+
 					return ps.setStringPref(pName, val);
 				var ss = Components.interfaces.nsISupportsString;
