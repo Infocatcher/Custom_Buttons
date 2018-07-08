@@ -1041,11 +1041,7 @@ var cmds = this.commands = {
 	get canSaveSessionAndExit() {
 		delete this.canSaveSessionAndExit;
 		return this.canSaveSessionAndExit = this.ss
-			&& this.getPref("browser.sessionstore.resume_session_once") != undefined
-			&& (
-				"goQuitApplication" in window
-				|| "Application" in window && "quit" in Application
-			);
+			&& this.getPref("browser.sessionstore.resume_session_once") != undefined;
 	},
 	saveSessionAndExit: function() {
 		if(!this.confirm("exit"))
