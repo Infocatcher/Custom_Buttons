@@ -1041,7 +1041,8 @@ var cmds = this.commands = {
 	get canSaveSessionAndExit() {
 		delete this.canSaveSessionAndExit;
 		return this.canSaveSessionAndExit = this.ss
-			&& this.getPref("browser.sessionstore.resume_session_once") != undefined;
+			? this.getPref("browser.sessionstore.resume_session_once") != undefined
+			: this.getPref("extensions.crashrecovery.resume_session_once") != undefined; // Session Manager extension?
 	},
 	saveSessionAndExit: function() {
 		if(!this.confirm("exit"))
@@ -1058,8 +1059,12 @@ var cmds = this.commands = {
 				"goQuitApplication" in window
 					? goQuitApplication()
 					: this.appQuit()
-			)
-				this.setPref("browser.sessionstore.resume_session_once", true);
+			) {
+				if(this.ss)
+					this.setPref("browser.sessionstore.resume_session_once", true);
+				else
+					this.setPref("extensions.crashrecovery.resume_session_once", true);
+			}
 		}
 		catch(e) {
 			Components.utils.reportError(e);
