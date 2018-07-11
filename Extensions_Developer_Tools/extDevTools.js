@@ -1041,8 +1041,8 @@ var cmds = this.commands = {
 	get canSaveSessionAndExit() {
 		delete this.canSaveSessionAndExit;
 		return this.canSaveSessionAndExit = this.ss
-			? this.getPref("browser.sessionstore.resume_session_once") != undefined
-			: this.getPref("extensions.crashrecovery.resume_session_once") != undefined; // Session Manager extension?
+			? this.prefHasDefaultValue("browser.sessionstore.resume_session_once")
+			: this.prefHasDefaultValue("extensions.crashrecovery.resume_session_once"); // Session Manager extension?
 	},
 	saveSessionAndExit: function() {
 		if(!this.confirm("exit"))
