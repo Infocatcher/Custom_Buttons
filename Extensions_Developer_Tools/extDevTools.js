@@ -1515,7 +1515,7 @@ var cmds = this.commands = {
 		this.prefsChanged = true;
 	},
 	showPrefValue: function(mi, pVal) {
-		var pStr = String(pVal);
+		var pStr = "" + pVal;
 		var pType = typeof pVal;
 		if(pType != "boolean") {
 			if(pType == "number")

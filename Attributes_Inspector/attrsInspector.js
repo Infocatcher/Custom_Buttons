@@ -452,7 +452,7 @@ function init() {
 					if(doctype.name == "html" && doctype.publicId == "" && doctype.systemId == "")
 						dt = "HTML5";
 					else if(doctype.publicId)
-						dt = String(doctype.publicId).replace(/^-\/\/W3C\/\/DTD\s+|\/\/EN$/ig, "");
+						dt = ("" + doctype.publicId).replace(/^-\/\/W3C\/\/DTD\s+|\/\/EN$/ig, "");
 					else
 						dt = doctype.systemId;
 					df.appendChild(this.getItem("doctype", dt, this.colon));
@@ -710,7 +710,7 @@ function init() {
 				case "http://www.w3.org/1999/02/22-rdf-syntax-ns":                    return "RDF";
 				case "http://www.w3.org/2001/xml-events":                             return "XML Events";
 			}
-			return String(ns); // Can be null for #text
+			return "" + ns; // Can be null for #text
 		},
 		stop: function() {
 			this.context.stop();
