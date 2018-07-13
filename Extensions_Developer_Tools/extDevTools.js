@@ -1591,18 +1591,21 @@ var cmds = this.commands = {
 	},
 
 	prefsChanged: false,
+	_savePrefFileTimer: null,
 	savePrefFile: function(force) {
-		if(!force && !this.prefsChanged)
+		if(this._savePrefFileTimer || !this.prefsChanged && !force)
 			return;
-		this.prefsChanged = false;
-		var timer = Components.classes["@mozilla.org/timer;1"]
+		var timer = this._savePrefFileTimer = Components.classes["@mozilla.org/timer;1"]
 			.createInstance(Components.interfaces.nsITimer);
 		timer.init({
+			context: this,
 			observe: function() {
+				this.context.prefsChanged = false;
+				this.context._savePrefFileTimer = null;
 				Services.prefs.savePrefFile(null);
 				LOG("savePrefFile()");
 			}
-		}, 100, timer.TYPE_ONE_SHOT);
+		}, 500, timer.TYPE_ONE_SHOT);
 	},
 
 	handleEvent: function(e) {
