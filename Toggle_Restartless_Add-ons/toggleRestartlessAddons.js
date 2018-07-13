@@ -38,13 +38,9 @@ var options = {
 		// 0, 0, 1 - show enabled add-ons (of each type) first
 		// 0, 1, 2 - enabled add-ons, then click-to-play and then disabled
 	},
-	closeMenu: true,
-	// Close menu after left-click (use Shift+click to invert this behavior)
-	closeMenuClickToPlay: -1
-	// Special handling for click to play plugins:
-	// -1 - invert Shift+click behavior
-	// 0  - do nothing special (and use "closeMenu" option)
-	// 1  - always don't close menu
+	closeMenu: false, // Close menu after left-click
+	closeMenuClickToPlay: false // Close menu after left-click, for click to play plugins
+	// Use Shift+click to invert closeMenu* behavior
 };
 
 var mp = document.createElement("menupopup");
@@ -125,10 +121,12 @@ mp.handleEvent = function(e) {
 		return;
 	var addon = mi._cbAddon;
 	if(e.type == "mousedown") {
-		var stayOpen = options.closeMenu ? e.shiftKey : !e.shiftKey;
-		if(options.closeMenuClickToPlay && isAskToActivateAddon(addon))
-			stayOpen = options.closeMenuClickToPlay == -1 ? !stayOpen : true;
-		mi.setAttribute("closemenu", stayOpen ? "none" : "auto");
+		var closeMenu = isAskToActivateAddon(addon)
+			? options.closeMenuClickToPlay
+			: options.closeMenu;
+		if(e.shiftKey)
+			closeMenu = !closeMenu;
+		mi.setAttribute("closemenu", closeMenu ? "auto" : "none");
 		return;
 	}
 	var hasMdf = hasModifier(e);
