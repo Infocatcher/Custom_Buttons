@@ -53,6 +53,9 @@ var _excludeChildTextNodes = 1;
 // 2 - always exclude
 var _excludeSiblingTextNodes = false;
 
+var _useCycleNavigation = false;
+// Use cycle navigation for sibling nodes: first -> second -> ... -> last --> first
+
 var _preferNotAnonymousChildNodes = false;
 // true  - use not anonymous child nodes, if any (as in version 0.6.1pre and older)
 // false - always try get real child nodes (may work wrong in Gecko < 7.0)
@@ -1280,14 +1283,14 @@ function init() {
 			var shift = toNext ? 1 : -1;
 			var sibling;
 			for(var i = pos + shift; ; i += shift) {
-				/* Uncomment to use cycle navigation
-				if(i < 0)
-					i = max;
-				else if(i > max)
-					i = 0;
-				if(i == pos)
-					break;
-				*/
+				if(_useCycleNavigation) {
+					if(i < 0)
+						i = max;
+					else if(i > max)
+						i = 0;
+					if(i == pos)
+						break;
+				}
 				if(i < 0 || i > max)
 					break;
 				var sb = siblings[i];
