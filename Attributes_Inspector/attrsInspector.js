@@ -443,6 +443,8 @@ function init() {
 				tt.removeAttribute("width");
 				tt.removeAttribute("height");
 				tt.appendChild(df);
+				if("state" in tt && tt.state == "closed") // Strange things happens
+					_this.mousemoveHandler(); // Force show
 			}
 
 			if(node.nodeType == node.DOCUMENT_NODE) {
