@@ -89,7 +89,7 @@ function _log(s) {
 	_log = function(s) {
 		cs.logStringMessage("[Attributes Inspector]: " + ts() + " " + s);
 	};
-	return _log.apply(this, arguments);
+	return _log(s);
 }
 
 const _ns = "__attributesInspector";
@@ -411,16 +411,16 @@ function init() {
 			var dt = this._setDataLast[0] + this._setDataMinDelay - Date.now();
 			if(dt > 0) {
 				this._setDataScheduled = true;
-				this.timer(function(node) {
+				this.timer(function() {
 					if(node == this._node) {
-						this.setData.apply(this, arguments);
+						this.setData(node);
 						this.setDataProxyTime();
 					}
 					this._setDataScheduled = false;
-				}, this, dt, arguments);
+				}, this, dt);
 				return;
 			}
-			this.setData.apply(this, arguments);
+			this.setData(node);
 			this.setDataProxyTime();
 		},
 		setDataProxyTime: function() {
