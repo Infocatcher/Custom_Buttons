@@ -402,8 +402,8 @@ function init() {
 			}
 			return overflowBox;
 		},
-		_setDataLast: [0, 0, 0, 0, 0],
-		_setDataMinDelay: 5*150,
+		_setDataLast: [0, 0, 0, 0, 0], // Array length - count of fast updates
+		_setDataMinDelay: 750, // Delay between two series of fast updates
 		_setDataScheduled: false,
 		setDataProxy: function(node) {
 			if(this._setDataScheduled)
@@ -412,11 +412,11 @@ function init() {
 			if(dt > 0) {
 				this._setDataScheduled = true;
 				this.timer(function() {
+					this._setDataScheduled = false;
 					if(node == this._node) {
 						this.setData(node);
 						this.setDataProxyTime();
 					}
-					this._setDataScheduled = false;
 				}, this, dt);
 				return;
 			}
