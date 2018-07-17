@@ -436,8 +436,6 @@ function init() {
 			var _this = this;
 			var df = tt.ownerDocument.createDocumentFragment();
 			function flush() {
-				//while(tt.hasChildNodes())
-				//	tt.removeChild(tt.lastChild);
 				tt.textContent = "";
 				// Firefox sometimes sets width/height to limit very huge tooltip
 				tt.removeAttribute("width");
@@ -1076,8 +1074,6 @@ function init() {
 				var text = Array.prototype.map.call(tt.childNodes, function(node) {
 					return node.textContent;
 				}).join("\n");
-				//while(tt.hasChildNodes())
-				//	tt.removeChild(tt.lastChild);
 				tt.textContent = "";
 				var d = this.e("div");
 				d.style.whiteSpace = "-moz-pre-wrap";
