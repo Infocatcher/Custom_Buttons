@@ -65,7 +65,7 @@ var _popupLocker = 1;
 // Lock all popups in window while DOM Inspector is opened (or until Escape was not pressed)
 // Values: 0 - disable, 1 - only if Shift pressed, 2 - always enable
 var _showNamespaceURI = 2; // 0 - don't show, 1 - show as is, 2 - show pretty name instead of URI
-var _showMargins = 2; // 0 - don't show, 1 - only if Shift pressed, 2 - always show
+var _showMargins = 3; // 0 - don't show, 1 - only if Shift pressed, 2 - only if Shift pressed + auto update, 3 - always show
 var _showFullTree = 2; // 0 - current frame, 1 - top frame, 2 - topmost frame
 // Note: "View - Show Anonymous Content" should be checked to inspect content documents with "_showFullTree = 2"
 var _nodePosition = 0.55; // Position of selected node in DOM Inspector's tree, 0..1 (-1 - don't change)
@@ -537,7 +537,7 @@ function init() {
 						changedStyles[p] = true;
 				for(var p in styles)
 					prevStyles[p] = styles[p];
-				if(_showMargins > 1 || this._shiftKey) {
+				if(_showMargins >= 3 || this._shiftKey) {
 					df.appendChild(this.getItem("margin", styles.margin, this.colon, {
 						isChanged: "margin" in changedStyles
 					}));
@@ -1705,8 +1705,12 @@ function init() {
 			return this.__shiftKey;
 		},
 		set _shiftKey(val) {
+			if(val == this.__shiftKey)
+				return;
 			this.__shiftKey = val;
 			!val && this.hideUnclosedPopups();
+			if(_showMargins == 2 && this._node)
+				this.setDataProxy(this._node);
 		},
 		hideUnclosedPopups: function() {
 			this._popups.forEach(function(popup) {
