@@ -483,9 +483,11 @@ function init() {
 			if(!w && !h)
 				df.appendChild(this.getItem(node.nodeName));
 			else {
-				if(Math.floor(w) != w)
+				//if(Math.floor(w) != w)
+				if(/\.\d{4,}$/.test(w))
 					w = w.toFixed(3);
-				if(Math.floor(h) != h)
+				//if(Math.floor(h) != h)
+				if(/\.\d{4,}$/.test(h))
 					h = h.toFixed(3);
 				df.appendChild(this.getItem(node.nodeName, "[" + w + "\xd7" + h + "]", this.space));
 			}
