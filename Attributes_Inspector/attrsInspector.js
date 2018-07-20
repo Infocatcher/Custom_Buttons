@@ -588,16 +588,8 @@ function init() {
 					if(name == this.context.hlAttr && ns == this.context.hlAttrNS)
 						return;
 					if(this.noStyles && name == "style") {
-						val = val
-							.replace(
-								"outline-color: " + _borderColor + "; "
-									+ "outline-style: " + _borderStyle + "; "
-									+ "outline-width: " + _borderWidth + "px; "
-									+ "outline-offset: -" + _borderWidth + "px;",
-								""
-							)
-							.replace(/^ | $/g, "");
-						if(!val)
+						val = this._oldStyle;
+						if(val === false)
 							return;
 					}
 				}
@@ -840,11 +832,12 @@ function init() {
 				return;
 			}
 
+			if(node.hasAttributeNS(this.context.hlAttrNS, this.context.hlAttr))
+				return;
 			if(this.noStyles) {
 				this._oldStyle = node.hasAttribute("style") && node.getAttribute("style");
 				node.style.outline = _borderWidth + "px " + _borderStyle + " " + _borderColor;
 				node.style.outlineOffset = "-" + _borderWidth + "px";
-				//return;
 			}
 			node.setAttributeNS(this.context.hlAttrNS, this.context.hlAttr, "true");
 		},
@@ -871,11 +864,10 @@ function init() {
 			}
 
 			if(this.noStyles) {
-				if(this._oldStyle || this._oldStyle === "")
-					node.setAttribute("style", this._oldStyle);
-				else
+				if(this._oldStyle === false)
 					node.removeAttribute("style");
-				//return;
+				else
+					node.setAttribute("style", this._oldStyle);
 			}
 			node.removeAttributeNS(this.context.hlAttrNS, this.context.hlAttr);
 		},
