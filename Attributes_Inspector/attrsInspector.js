@@ -873,13 +873,9 @@ function init() {
 		},
 
 		get mutationObserver() {
-			var _this = this;
-			function callback() {
-				_this.handleMutations.apply(_this, arguments);
-			}
 			delete this.mutationObserver;
 			return this.mutationObserver = "MutationObserver" in this.window // Firefox 14+
-				&& new this.window.MutationObserver(callback);
+				&& new this.window.MutationObserver(this.handleMutations.bind(this));
 		},
 		watchAttrs: function(node) {
 			this.unwatchAttrs(); // Only one watched node
