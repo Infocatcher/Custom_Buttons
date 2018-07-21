@@ -901,10 +901,9 @@ function init() {
 				return;
 			}
 			// Legacy version
-			if(this.fxVersion != 2)
-				var aw = this;
-			else { // Hack for Firefox 2.0
-				var aw = this._attrsWatcher = {
+			var aw = this;
+			if(this.fxVersion == 2) { // Hack for Firefox 2.0
+				aw = this._attrsWatcher = {
 					parent: this,
 					handleEvent: function(e) {
 						this.parent.DOMAttrModifiedHandler(e);
