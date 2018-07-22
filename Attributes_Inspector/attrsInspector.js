@@ -692,9 +692,7 @@ function init() {
 			return true;
 		},
 		getNS: function(ns) {
-			if(_showNamespaceURI == 1)
-				return ns;
-			switch(ns) {
+			if(_showNamespaceURI == 2) switch(ns) {
 				case "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul": return "XUL";
 				case "http://www.w3.org/1999/xhtml":                                  return "XHTML";
 				case "http://www.mozilla.org/xbl":                                    return "XBL";
