@@ -265,7 +265,7 @@ function init() {
 			this.setListeners(action, ws.getNext());
 	};
 	this.setListeners = function(action, w) {
-		var h = new this.evtHandler(w);
+		var h = new this.EvtHandler(w);
 
 		action("mouseover", h, true, w);
 		action("mousemove", h, true, w);
@@ -1783,7 +1783,7 @@ function init() {
 			}
 		}
 	};
-	this.evtHandler = function(win) {
+	this.EvtHandler = function(win) {
 		var gh = this.globalHandler;
 		var hi = gh._windows.indexOf(win);
 		if(hi != -1)
@@ -1794,7 +1794,7 @@ function init() {
 		gh._windows.push(win);
 		return this;
 	};
-	this.evtHandler.prototype = {
+	this.EvtHandler.prototype = {
 		globalHandler: this.evtHandlerGlobal,
 		destroy: function() {
 			var gh = this.globalHandler;
