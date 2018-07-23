@@ -1887,17 +1887,10 @@ function init() {
 			};
 		}
 
-		var ws = this.wm.getEnumerator(null);
-		while(ws.hasMoreElements()) {
-			var w = ws.getNext();
-			if("inspectDOMNode" in w) {
-				return function(node, top) {
-					w.inspectDOMNode(node);
-				};
-			}
-		}
-		_log("Can't find window with DOM Inspector's inspectDOMNode()");
-		return null;
+		// See window.inspectDOMNode()
+		return function(node, top) {
+			window.openDialog("chrome://inspector/content/", "_blank", "chrome,all,dialog=no", node);
+		};
 	});
 
 	this.setAllListeners(ael);
