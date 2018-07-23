@@ -291,12 +291,8 @@ function init() {
 			action("popuphiding",  h, true, w);
 		}
 
-		if(action == rel) {
-			var ehg = this.evtHandlerGlobal;
-			var hi = ehg._windows.indexOf(w);
-			delete ehg._windows[hi];
-			delete ehg._handlers[hi];
-		}
+		if(action == rel)
+			h.destroy();
 	};
 	this.ww = Components.classes["@mozilla.org/embedcomp/window-watcher;1"]
 		.getService(Components.interfaces.nsIWindowWatcher);
@@ -1800,6 +1796,12 @@ function init() {
 	};
 	this.evtHandler.prototype = {
 		globalHandler: this.evtHandlerGlobal,
+		destroy: function() {
+			var gh = this.globalHandler;
+			var hi = gh._windows.indexOf(this.currentWindow);
+			delete gh._windows[hi];
+			delete gh._handlers[hi];
+		},
 		handleEvent: function(e) {
 			this.globalHandler[e.type + "Handler"](e, this.currentWindow);
 		}
