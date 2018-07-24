@@ -298,8 +298,6 @@ function init() {
 		.getService(Components.interfaces.nsIWindowWatcher);
 
 	this.evtHandlerGlobal = {
-		_handlers: [],
-		_windows: [],
 		context: this,
 		window: window,
 		_hl: null,
@@ -1784,23 +1782,23 @@ function init() {
 		}
 	};
 	this.EvtHandler = function(win) {
-		var gh = this.globalHandler;
-		var hi = gh._windows.indexOf(win);
+		var hi = this._windows.indexOf(win);
 		if(hi != -1)
-			return gh._handlers[hi];
+			return this._handlers[hi];
 
 		this.currentWindow = win;
-		gh._handlers.push(this);
-		gh._windows.push(win);
+		this._handlers.push(this);
+		this._windows.push(win);
 		return this;
 	};
 	this.EvtHandler.prototype = {
 		globalHandler: this.evtHandlerGlobal,
+		_handlers: [],
+		_windows: [],
 		destroy: function() {
-			var gh = this.globalHandler;
-			var hi = gh._windows.indexOf(this.currentWindow);
-			delete gh._windows[hi];
-			delete gh._handlers[hi];
+			var hi = this._windows.indexOf(this.currentWindow);
+			delete this._windows[hi];
+			delete this._handlers[hi];
 		},
 		handleEvent: function(e) {
 			this.globalHandler[e.type + "Handler"](e, this.currentWindow);
