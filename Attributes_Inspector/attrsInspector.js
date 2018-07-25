@@ -199,9 +199,8 @@ function toggle() {
 		destroy.call(this);
 }
 function init() {
-	const ttId = this.ttId = "__attrsInspectorTooltip";
 	var tt = this.tt = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "tooltip");
-	tt.id = ttId;
+	tt.id = "__attrsInspectorTooltip";
 	tt.setAttribute("orient", "vertical");
 	if(_maxTooltipWidth > 0) {
 		_maxTooltipWidth = Math.min(_maxTooltipWidth, (screen.availWidth || screen.width) - 20) + "px";
@@ -1704,7 +1703,7 @@ function init() {
 		},
 		popupshowingHandler: function(e) {
 			var tar = e.originalTarget;
-			if(tar.id == this.context.ttId)
+			if(tar == this.context.tt)
 				return;
 			if(this._shiftKey)
 				return;
@@ -1715,7 +1714,7 @@ function init() {
 		},
 		popupshownHandler: function(e) {
 			var tar = e.originalTarget;
-			if(tar.id == this.context.ttId)
+			if(tar == this.context.tt)
 				return;
 			if(/*this._shiftKey && */tar.localName == "tooltip")
 				return;
@@ -1730,7 +1729,7 @@ function init() {
 			if(!this._shiftKey)
 				return;
 			var tar = e.originalTarget;
-			if(/*tar.localName == "tooltip" && */tar.id != this.context.ttId) {
+			if(/*tar.localName == "tooltip" && */tar != this.context.tt) {
 				this.stopEvent(e);
 				if(this._popups.indexOf(tar) == -1)
 					this._popups.push(tar);
