@@ -633,6 +633,15 @@ function init() {
 				Components.utils.reportError(e);
 			}
 
+			if(!(node instanceof Element)) try {
+				var rng = node.ownerDocument.createRange();
+				rng.selectNodeContents(node);
+				node = rng;
+			}
+			catch(e) {
+				Components.utils.reportError(e);
+			}
+
 			if("getBoundingClientRect" in node) {
 				var rect = node.getBoundingClientRect();
 				return {
