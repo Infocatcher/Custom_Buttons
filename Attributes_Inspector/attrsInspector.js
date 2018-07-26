@@ -597,40 +597,18 @@ function init() {
 			flush();
 		},
 		getRect: function(node) {
-			if(!(node instanceof Element)) try {
-				var rng = node.ownerDocument.createRange();
-				rng.selectNodeContents(node);
-				node = rng;
-			}
-			catch(e) {
-				Components.utils.reportError(e);
-			}
-			try {
-				var rect = "getBoundingClientRect" in node
-					? node.getBoundingClientRect()
-					: node instanceof XULElement
-						? node.boxObject
-						: node.ownerDocument && "getBoxObjectFor" in node.ownerDocument
-							&& node.ownerDocument.getBoxObjectFor(node);
-			}
-			catch(e) {
-			}
-			if(rect && !("width" in rect)) {
-				rect.width = rect.right - rect.left;
-				rect.height = rect.bottom - rect.top;
-			}
-			return rect;
+			return this.getScreenRect(node, 1);
 		},
-		getScreenRect: function(node) {
+		getScreenRect: function(node, scale) {
 			var win = node.ownerDocument.defaultView;
-			var scale = 1;
-			try {
+			if(!scale) try {
 				var utils = win.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
 					.getInterface(Components.interfaces.nsIDOMWindowUtils);
 				scale = utils.screenPixelsPerCSSPixel || 1;
 			}
 			catch(e) {
 				Components.utils.reportError(e);
+				scale = 1;
 			}
 
 			if(!(node instanceof Element)) try {
