@@ -1285,22 +1285,22 @@ function init() {
 			this._nodes = [sibling];
 			this.handleNode(sibling);
 		},
-		get dwu() {
-			delete this.dwu;
-			return this.dwu = "inIDOMUtils" in Components.interfaces
+		get domUtils() {
+			delete this.domUtils;
+			return this.domUtils = "inIDOMUtils" in Components.interfaces
 				? Components.classes["@mozilla.org/inspector/dom-utils;1"]
 					.getService(Components.interfaces.inIDOMUtils)
 				: InspectorUtils; // Firefox 59+
 		},
 		getParentNode: function(node, top) {
-			var pn = this.dwu.getParentForNode(node, true);
+			var pn = this.domUtils.getParentForNode(node, true);
 			if(!pn && node.nodeType == Node.DOCUMENT_NODE && node != top.document)
 				pn = this.getParentBrowser(node, top.document); // Only for Firefox 1.5
 			return pn;
 		},
 		getTopWindow: function(window) {
 			for(;;) {
-				var browser = this.dwu.getParentForNode(window.document, true);
+				var browser = this.domUtils.getParentForNode(window.document, true);
 				if(!browser)
 					break;
 				window = browser.ownerDocument.defaultView.top;
@@ -1314,9 +1314,9 @@ function init() {
 					childNodes = node.ownerDocument.getAnonymousNodes(node);
 				return childNodes;
 			}
-			var dwu = this.dwu;
-			if("getChildrenForNode" in dwu) // Gecko 7.0+
-				return dwu.getChildrenForNode(node, true);
+			var du = this.domUtils;
+			if("getChildrenForNode" in du) // Gecko 7.0+
+				return du.getChildrenForNode(node, true);
 			var childNodes = node instanceof XULElement
 				&& "getAnonymousNodes" in node.ownerDocument
 				&& node.ownerDocument.getAnonymousNodes(node)
