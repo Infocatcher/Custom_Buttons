@@ -602,9 +602,11 @@ function init() {
 		getScreenRect: function(node, scale) {
 			var win = node.ownerDocument.defaultView;
 			if(!scale) try {
-				var utils = win.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
-					.getInterface(Components.interfaces.nsIDOMWindowUtils);
-				scale = utils.screenPixelsPerCSSPixel || 1;
+				var dwu = "windowUtils" in win && win.windowUtils instanceof Components.interfaces.nsIDOMWindowUtils
+					? win.windowUtils // Firefox 63+
+					: win.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+						.getInterface(Components.interfaces.nsIDOMWindowUtils);
+				scale = dwu.screenPixelsPerCSSPixel || 1;
 			}
 			catch(e) {
 				Components.utils.reportError(e);
