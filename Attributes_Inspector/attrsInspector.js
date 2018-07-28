@@ -1167,7 +1167,9 @@ function init() {
 					return;
 				this.stopSingleEvent(top, "keyup");
 				var nodes = this._nodes;
-				nodes.length && this.inspect(nodes[0], top, e.shiftKey);
+				var node = nodes.length && nodes[0];
+				// Get top window from node in case of key event from another active window
+				node && this.inspect(node, this.getTopWindow(node), e.shiftKey);
 			}
 			else if( // Ctrl+Shift+W
 				ctrlShift && (
@@ -1298,14 +1300,17 @@ function init() {
 				pn = this.getParentBrowser(node, top.document); // Only for Firefox 1.5
 			return pn;
 		},
-		getTopWindow: function(window) {
+		getTopWindow: function(node) {
+			var win = node.ownerDocument && node.ownerDocument.defaultView
+				|| node.defaultView
+				|| node;
 			for(;;) {
-				var browser = this.domUtils.getParentForNode(window.document, true);
+				var browser = this.domUtils.getParentForNode(win.document, true);
 				if(!browser)
 					break;
-				window = browser.ownerDocument.defaultView.top;
+				win = browser.ownerDocument.defaultView.top;
 			}
-			return window;
+			return win;
 		},
 		getChildNodes: function(node, child) {
 			if(_preferNotAnonymousChildNodes) {
