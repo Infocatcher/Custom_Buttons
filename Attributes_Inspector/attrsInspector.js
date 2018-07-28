@@ -839,7 +839,7 @@ function init() {
 				win.clearInterval(this._hlInterval);
 				this.flasher.repaintElement(node);
 				//this.flasher.repaintElement(node.ownerDocument.documentElement);
-				this.flasher.repaintElement(this.getTopWindow(win.top).document.documentElement);
+				this.flasher.repaintElement(this.getTopWindow(win).document.documentElement);
 				return;
 			}
 
@@ -1365,7 +1365,7 @@ function init() {
 		inspectWindow: function(top, node) {
 			if(!("@mozilla.org/commandlinehandler/general-startup;1?type=inspector" in Components.classes)) {
 				_log("DOM Inspector not installed!");
-				this.domInspectorNotFound(top);
+				this.domInspectorNotFound();
 				return;
 			}
 			_log("inspectWindow(): open DOM Inspector for <" + node.nodeName + ">");
@@ -1513,14 +1513,14 @@ function init() {
 			inspect && inspect(node, top, forcePopupLocker);
 			this.closeMenus(node);
 			this.hideUnclosedPopups();
-			!inspect && this.domInspectorNotFound(top);
+			!inspect && this.domInspectorNotFound();
 		},
-		domInspectorNotFound: function(top) {
+		domInspectorNotFound: function() {
 			var label = this.context.button && this.context.button.label
 				|| "Attributes Inspector";
 			Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
 				.getService(Components.interfaces.nsIPromptService)
-				.alert(top, label, "DOM Inspector not found!");
+				.alert(null, label, "DOM Inspector not found!");
 		},
 		getPopup: function(node) {
 			for(; node && "tagName" in node; node = node.parentNode)
