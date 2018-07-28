@@ -264,7 +264,7 @@ function init() {
 			this.setListeners(action, ws.getNext());
 	};
 	this.setListeners = function(action, w) {
-		var h = this.evtHandlerGlobal;
+		var h = this.eventHandler;
 
 		action("mouseover", h, true, w);
 		action("mousemove", h, true, w);
@@ -293,7 +293,7 @@ function init() {
 	this.ww = Components.classes["@mozilla.org/embedcomp/window-watcher;1"]
 		.getService(Components.interfaces.nsIWindowWatcher);
 
-	this.evtHandlerGlobal = {
+	this.eventHandler = {
 		context: this,
 		window: window,
 		_hl: null,
@@ -1779,7 +1779,7 @@ function init() {
 			_log("DOM Inspector not installed!");
 			return null;
 		}
-		if((_showFullTree || _nodePosition >= 0) && this.evtHandlerGlobal.fxVersion >= 2) {
+		if((_showFullTree || _nodePosition >= 0) && this.eventHandler.fxVersion >= 2) {
 			return function(node, top) {
 				var inspWin = window.openDialog(
 					"chrome://inspector/content/",
@@ -1847,7 +1847,7 @@ function init() {
 	});
 
 	this.setAllListeners(ael);
-	this.ww.registerNotification(this.evtHandlerGlobal);
+	this.ww.registerNotification(this.eventHandler);
 	var btn = this.button;
 	if(btn) {
 		var destructor = function(reason) {
@@ -1882,7 +1882,7 @@ function init() {
 		+ ", highlighter: " + (
 			_highlightUsingFlasher
 				? "inIFlasher"
-				: this.evtHandlerGlobal.noStyles
+				: this.eventHandler.noStyles
 					? "inline CSS"
 					: "nsIStyleSheetService"
 		)
@@ -1895,10 +1895,10 @@ function destroy() {
 	tt.hidePopup();
 	tt.parentNode.removeChild(tt);
 
-	var ehg = this.evtHandlerGlobal;
-	ehg.unwatchAttrs();
-	ehg.unhl();
-	ehg.destroyTimers();
+	var eh = this.eventHandler;
+	eh.unwatchAttrs();
+	eh.unhl();
+	eh.destroyTimers();
 	if(!_highlightUsingFlasher) {
 		var sss = this.sss;
 		var cssURI = this.cssURI;
@@ -1908,7 +1908,7 @@ function destroy() {
 			sss.unregisterSheet(cssURI, sss.USER_SHEET);
 	}
 	this.setAllListeners(rel);
-	this.ww.unregisterNotification(ehg);
+	this.ww.unregisterNotification(eh);
 	var btn = this.button;
 	if(btn) {
 		if("_attrsInspectorOrigOnDestroy" in btn)
