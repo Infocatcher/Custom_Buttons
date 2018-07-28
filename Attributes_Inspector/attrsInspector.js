@@ -1535,6 +1535,7 @@ function init() {
 				return;
 
 			var popupLocker = {
+				context: this,
 				domiWindow: null,
 				window: win,
 				popup: popup,
@@ -1543,7 +1544,9 @@ function init() {
 				fxVersion: this.fxVersion,
 				closeMenus: this.closeMenus,
 				stopEvent: this.stopEvent,
-				stopSingleEvent: this.stopSingleEvent,
+				stopSingleEvent: function() {
+					this.context.stopSingleEvent.apply(this.context, arguments);
+				},
 				_getPopupInfo: this._getPopupInfo,
 				_popups: [],
 				init: function() {
