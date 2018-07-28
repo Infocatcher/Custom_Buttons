@@ -1308,11 +1308,22 @@ function init() {
 			var win = node.ownerDocument && node.ownerDocument.defaultView
 				|| node.defaultView
 				|| node;
-			for(;;) {
-				var browser = this.domUtils.getParentForNode(win.document, true);
-				if(!browser)
-					break;
-				win = browser.ownerDocument.defaultView.top;
+			//for(;;) {
+			//	var browser = this.domUtils.getParentForNode(win.document, true);
+			//	if(!browser)
+			//		break;
+			//	win = browser.ownerDocument.defaultView.top;
+			//}
+			try {
+				return win.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+					.getInterface(Components.interfaces.nsIWebNavigation)
+					.QueryInterface(Components.interfaces.nsIDocShellTreeItem)
+					.rootTreeItem
+					.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+					.getInterface(Components.interfaces.nsIDOMWindow);
+			}
+			catch(e) {
+				Components.utils.reportError(e);
 			}
 			return win;
 		},
