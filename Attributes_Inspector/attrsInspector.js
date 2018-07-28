@@ -1128,7 +1128,7 @@ function init() {
 			if(ctrlOrCtrlShift && e.keyCode == e.DOM_VK_UP) { // Ctrl+Up
 				this.stopEvent(e);
 				if(!onlyStop)
-					this.navigateUp(top);
+					this.navigateUp();
 			}
 			else if(ctrlOrCtrlShift && e.keyCode == e.DOM_VK_DOWN) { // Ctrl+Down
 				this.stopEvent(e);
@@ -1138,12 +1138,12 @@ function init() {
 			if(ctrlOrCtrlShift && e.keyCode == e.DOM_VK_RIGHT) { // Ctrl+Right
 				this.stopEvent(e);
 				if(!onlyStop)
-					this.navigateNext(top);
+					this.navigateNext();
 			}
 			else if(ctrlOrCtrlShift && e.keyCode == e.DOM_VK_LEFT) { // Ctrl+Left
 				this.stopEvent(e);
 				if(!onlyStop)
-					this.navigatePrev(top);
+					this.navigatePrev();
 			}
 			else if( // Ctrl+Shift+C
 				ctrlShift && (
@@ -1192,7 +1192,7 @@ function init() {
 				}
 			}
 		},
-		navigateUp: function(top) {
+		navigateUp: function() {
 			var nodes = this._nodes;
 			var node = nodes.length && this.getParentNode(nodes[0]);
 			if(node) {
@@ -1227,13 +1227,13 @@ function init() {
 				}
 			}
 		},
-		navigateNext: function(top) {
-			this.navigateSibling(true, top);
+		navigateNext: function() {
+			this.navigateSibling(true);
 		},
-		navigatePrev: function(top) {
-			this.navigateSibling(false, top);
+		navigatePrev: function() {
+			this.navigateSibling(false);
 		},
-		navigateSibling: function(toNext, top) {
+		navigateSibling: function(toNext) {
 			var nodes = this._nodes;
 			if(!nodes.length)
 				return;
