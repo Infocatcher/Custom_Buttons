@@ -1112,7 +1112,7 @@ function init() {
 				this.stopEvent(e);
 				if(onlyStop)
 					return;
-				this.stopSingleEvent(top, "keyup");
+				this.stopSingleEvent(e, "keyup");
 				this.stop();
 				return;
 			}
@@ -1165,7 +1165,7 @@ function init() {
 				this.stopEvent(e);
 				if(onlyStop)
 					return;
-				this.stopSingleEvent(top, "keyup");
+				this.stopSingleEvent(e, "keyup");
 				var nodes = this._nodes;
 				var node = nodes.length && nodes[0];
 				// Get top window from node in case of key event from another active window
@@ -1181,7 +1181,7 @@ function init() {
 				this.stopEvent(e);
 				if(onlyStop)
 					return;
-				this.stopSingleEvent(top, "keyup");
+				this.stopSingleEvent(e, "keyup");
 				var nodes = this._nodes;
 				var node = nodes.length && nodes[0];
 				if(node) {
@@ -1478,14 +1478,12 @@ function init() {
 			delete this.lineBreak;
 			return this.lineBreak = this.appInfo.OS == "WINNT" ? "\r\n" : "\n";
 		},
-		stopSingleEvent: function(target, type) {
-			target.addEventListener(type, {
-				target: target,
-				context: this,
-				handleEvent: function(e) {
-					this.target.removeEventListener(e.type, this, true);
-					this.context.stopEvent(e);
-				}
+		stopSingleEvent: function(e, type) {
+			var top = this.getTopWindow(e.target);
+			var stopEvent = this.stopEvent;
+			top.addEventListener(type, function handler(e) {
+				top.removeEventListener(type, handler, true);
+				stopEvent(e);
 			}, true);
 		},
 		mousedownHandler: function(e) {
@@ -1605,7 +1603,7 @@ function init() {
 								this.stopEvent(e);
 								if(onlyStop)
 									return;
-								this.stopSingleEvent(this.window, "keyup");
+								this.stopSingleEvent(e, "keyup");
 								_log("Popup locker: Escape pressed => destroy");
 								this.destroy();
 								this.closeMenus(this.popup);
