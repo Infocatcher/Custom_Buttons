@@ -1194,7 +1194,7 @@ function init() {
 		},
 		navigateUp: function(top) {
 			var nodes = this._nodes;
-			var node = nodes.length && this.getParentNode(nodes[0], top);
+			var node = nodes.length && this.getParentNode(nodes[0]);
 			if(node) {
 				nodes.unshift(node);
 				this.handleNode(node);
@@ -1241,7 +1241,7 @@ function init() {
 			//var sibling = node;
 			//do sibling = toNext ? sibling.nextSibling : sibling.previousSibling;
 			//while(_excludeSiblingTextNodes && sibling && !(sibling instanceof Element));
-			var parent = this.getParentNode(node, top);
+			var parent = this.getParentNode(node);
 			var siblings = parent && this.getChildNodes(parent, node);
 			if(!siblings || siblings.length < 2)
 				return;
@@ -1294,9 +1294,9 @@ function init() {
 					.getService(Components.interfaces.inIDOMUtils)
 				: InspectorUtils; // Firefox 59+
 		},
-		getParentNode: function(node, top) {
+		getParentNode: function(node) {
 			var pn = this.domUtils.getParentForNode(node, true);
-			if(!pn && node.nodeType == Node.DOCUMENT_NODE && node != top.document) { // Firefox 1.5?
+			if(!pn && node.nodeType == Node.DOCUMENT_NODE) { // Firefox 1.5?
 				pn = node.defaultView.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
 					.getInterface(Components.interfaces.nsIWebNavigation)
 					.QueryInterface(Components.interfaces.nsIDocShell)
