@@ -1188,7 +1188,7 @@ function init() {
 					this.stop();
 					this.hideUnclosedPopups();
 					this.closeMenus(node);
-					this.inspectWindow(top, node);
+					this.inspectWindow(node);
 				}
 			}
 		},
@@ -1362,13 +1362,14 @@ function init() {
 			}
 			return childNodes;
 		},
-		inspectWindow: function(top, node) {
+		inspectWindow: function(node) {
 			if(!("@mozilla.org/commandlinehandler/general-startup;1?type=inspector" in Components.classes)) {
 				_log("DOM Inspector not installed!");
 				this.domInspectorNotFound();
 				return;
 			}
 			_log("inspectWindow(): open DOM Inspector for <" + node.nodeName + ">");
+			var top = this.getTopWindow(node);
 			var inspWin = top.openDialog(
 				"chrome://inspector/content/",
 				"_blank",
