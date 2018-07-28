@@ -1168,8 +1168,7 @@ function init() {
 				this.stopSingleEvent(e, "keyup");
 				var nodes = this._nodes;
 				var node = nodes.length && nodes[0];
-				// Get top window from node in case of key event from another active window
-				node && this.inspect(node, this.getTopWindow(node), e.shiftKey);
+				node && this.inspect(node, e.shiftKey);
 			}
 			else if( // Ctrl+Shift+W
 				ctrlShift && (
@@ -1503,15 +1502,16 @@ function init() {
 			this.stopEvent(e);
 			var nodes = this._nodes;
 			var node = nodes.length ? nodes[0] : e.originalTarget;
-			this.inspect(node, top, e.shiftKey);
+			this.inspect(node, e.shiftKey);
 		},
-		inspect: function(node, top, forcePopupLocker) {
+		inspect: function(node, forcePopupLocker) {
 			var inspect = this.context.inspector;
+			var top = this.getTopWindow(node);
 			if(inspect && _popupLocker && (_popupLocker == 2 || forcePopupLocker))
 				this.lockPopup(node, top);
 			this.stop();
 			_log(inspect ? "Open DOM Inspector for <" + node.nodeName + ">" : "DOM Inspector not found!");
-			inspect && inspect(node, top, forcePopupLocker);
+			inspect && inspect(node, top);
 			this.closeMenus(node);
 			this.hideUnclosedPopups();
 			!inspect && this.domInspectorNotFound();
@@ -1532,14 +1532,14 @@ function init() {
 					return node;
 			return null;
 		},
-		lockPopup: function(node, top) {
+		lockPopup: function(node, win) {
 			var popup = this.getPopup(node);
 			if(!popup)
 				return;
 
 			var popupLocker = {
 				domiWindow: null,
-				window: top,
+				window: win,
 				popup: popup,
 				tt: this.context.tt,
 				ww: this.context.ww,
