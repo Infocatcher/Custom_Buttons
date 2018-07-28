@@ -1296,8 +1296,12 @@ function init() {
 		},
 		getParentNode: function(node, top) {
 			var pn = this.domUtils.getParentForNode(node, true);
-			if(!pn && node.nodeType == Node.DOCUMENT_NODE && node != top.document)
-				pn = this.getParentBrowser(node, top.document); // Only for Firefox 1.5
+			if(!pn && node.nodeType == Node.DOCUMENT_NODE && node != top.document) { // Firefox 1.5?
+				pn = node.defaultView.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+					.getInterface(Components.interfaces.nsIWebNavigation)
+					.QueryInterface(Components.interfaces.nsIDocShell)
+					.chromeEventHandler;
+			}
 			return pn;
 		},
 		getTopWindow: function(node) {
@@ -1472,34 +1476,6 @@ function init() {
 					this.context.stopEvent(e);
 				}
 			}, true);
-		},
-		getParentBrowser: function(document, doc) {
-			// We don't check anonymous nodes now
-			var browser;
-			const XULNS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
-			Array.prototype.concat.call(
-				Array.prototype.slice.call(doc.getElementsByTagNameNS(XULNS, "tabbrowser")),
-				Array.prototype.slice.call(doc.getElementsByTagNameNS(XULNS, "browser")),
-				Array.prototype.slice.call(doc.getElementsByTagName("iframe")),
-				Array.prototype.slice.call(doc.getElementsByTagName("frame"))
-			).some(function(br) {
-				if(!("contentDocument" in br))
-					return false;
-				var doc = br.contentDocument;
-				_log(
-					"Search parent frame: <" + br.nodeName + "> "
-					+ (doc.title ? doc.title + " " : "") + doc.documentURI
-				);
-				if(
-					doc == document
-					|| (br = this.getParentBrowser(document, doc))
-				) {
-					browser = br.localName.toLowerCase() == "tabbrowser" && br.selectedBrowser || br;
-					return true;
-				}
-				return false;
-			}, this);
-			return browser;
 		},
 		mousedownHandler: function(e) {
 			if(this.canInspect(e)) {
