@@ -264,7 +264,7 @@ function init() {
 			this.setListeners(action, ws.getNext());
 	};
 	this.setListeners = function(action, w) {
-		var h = new this.EvtHandler(w);
+		var h = this.evtHandlerGlobal;
 
 		action("mouseover", h, true, w);
 		action("mousemove", h, true, w);
@@ -289,9 +289,6 @@ function init() {
 			action("popupshowing", h, true, w);
 			action("popuphiding",  h, true, w);
 		}
-
-		if(action == rel)
-			h.destroy();
 	};
 	this.ww = Components.classes["@mozilla.org/embedcomp/window-watcher;1"]
 		.getService(Components.interfaces.nsIWindowWatcher);
@@ -1099,7 +1096,7 @@ function init() {
 			this._shiftKey = e.shiftKey;
 			this.keypressHandler.apply(this, arguments);
 		},
-		keypressHandler: function(e, top) {
+		keypressHandler: function(e) {
 			// See https://github.com/Infocatcher/Custom_Buttons/issues/12
 			// keydown  => stopEvent() + hetkey action in Firefox >= 25
 			// keypress => stopEvent() + hetkey action in Firefox < 25
@@ -1495,7 +1492,7 @@ function init() {
 		mouseupHandler: function(e) {
 			this.mousedownHandler.apply(this, arguments);
 		},
-		clickHandler: function(e, top) {
+		clickHandler: function(e) {
 			if(!this.canInspect(e))
 				return;
 			this._checkPreventDefault(e);
@@ -1758,29 +1755,6 @@ function init() {
 					this.stop();
 				_log("Window closed: " + (subject.document && subject.document.title) + " (" + subject.location + ")");
 			}
-		}
-	};
-	this.EvtHandler = function(win) {
-		var hi = this._windows.indexOf(win);
-		if(hi != -1)
-			return this._handlers[hi];
-
-		this.currentWindow = win;
-		this._handlers.push(this);
-		this._windows.push(win);
-		return this;
-	};
-	this.EvtHandler.prototype = {
-		globalHandler: this.evtHandlerGlobal,
-		_handlers: [],
-		_windows: [],
-		destroy: function() {
-			var hi = this._windows.indexOf(this.currentWindow);
-			delete this._windows[hi];
-			delete this._handlers[hi];
-		},
-		handleEvent: function(e) {
-			this.globalHandler[e.type + "Handler"](e, this.currentWindow);
 		}
 	};
 	this.overrideBoolPref = function(prefName, prefVal) {
