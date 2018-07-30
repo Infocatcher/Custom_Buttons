@@ -1358,12 +1358,91 @@ function init() {
 			}
 			return childNodes;
 		},
-		inspectWindow: function(node) {
-			if(!("@mozilla.org/commandlinehandler/general-startup;1?type=inspector" in Components.classes)) {
-				_log("DOM Inspector not installed!");
-				this.domInspectorNotFound();
+		get hasDOMInspector() {
+			delete this.hasDOMInspector;
+			return this.hasDOMInspector = "@mozilla.org/commandlinehandler/general-startup;1?type=inspector" in Components.classes;
+		},
+		checkDOMInspector: function() {
+			if(this.hasDOMInspector)
+				return true;
+			_log("DOM Inspector not installed!");
+			this.domInspectorNotFound();
+			return false;
+		},
+		inspectNode: function(node) {
+			if(!this.checkDOMInspector())
+				return;
+
+			var top = this.getTopWindow(node);
+			_log("Open DOM Inspector for <" + node.nodeName + ">");
+			if(!_showFullTree || _nodePosition < 0 || this.fxVersion < 2) {
+				// See window.inspectDOMNode()
+				top.openDialog("chrome://inspector/content/", "_blank", "chrome,all,dialog=no", node);
 				return;
 			}
+
+			var inspWin = top.openDialog(
+				"chrome://inspector/content/",
+				"_blank",
+				"chrome,all,dialog=no",
+				_showFullTree == 0
+					? node.ownerDocument || node
+					: _showFullTree == 1
+						? (node.ownerDocument || node).defaultView.top.document
+						: (top || window.top).document
+			);
+			var _this = this;
+			var tryDelay = 5;
+			function inspect() {
+				if("inspector" in inspWin && inspWin.inspector) try {
+					try {
+						// Avoid warnings in error console after getViewer("dom")
+						var hash = inspWin.inspector.mPanelSet.registry.mViewerHash;
+					}
+					catch(e1) {
+						Components.utils.reportError(e1);
+					}
+					if(!hash || ("dom" in hash)) {
+						var viewer = inspWin.inspector.getViewer("dom");
+						var restoreBlink = _this.overrideBoolPref("inspector.blink.on", false);
+						try {
+							if("showNodeInTree" in viewer) // New DOM Inspector
+								viewer.showNodeInTree(node);
+							else
+								viewer.selectElementInTree(node);
+							if(_nodePosition >= 0) {
+								var tbo = viewer.mDOMTree.treeBoxObject;
+								var cur = tbo.view.selection.currentIndex;
+								var first = tbo.getFirstVisibleRow();
+								var visibleRows = tbo.height/tbo.rowHeight;
+								var newFirst = cur - _nodePosition*visibleRows + 1;
+								tbo.scrollByLines(Math.round(newFirst - first));
+								tbo.ensureRowIsVisible(cur); // Should be visible, but...
+							}
+							return;
+						}
+						catch(e2) {
+							Components.utils.reportError(e2);
+						}
+						finally {
+							restoreBlink();
+						}
+					}
+				}
+				catch(e) {
+					Components.utils.reportError(e);
+				}
+				inspWin.setTimeout(inspect, tryDelay);
+			}
+			inspWin.addEventListener("load", function showNode(e) {
+				inspWin.removeEventListener("load", showNode, false);
+				inspect();
+			}, false);
+		},
+		inspectWindow: function(node) {
+			if(!this.checkDOMInspector())
+				return;
+
 			_log("inspectWindow(): open DOM Inspector for <" + node.nodeName + ">");
 			var top = this.getTopWindow(node);
 			var inspWin = top.openDialog(
@@ -1377,7 +1456,7 @@ function init() {
 			inspWin.addEventListener("load", function load(e) {
 				inspWin.removeEventListener(e.type, load, false);
 				_log("inspectWindow(): DOM Inspector loaded");
-				var restoreBlink = _this.context.overrideBoolPref("inspector.blink.on", false);
+				var restoreBlink = _this.overrideBoolPref("inspector.blink.on", false);
 				var doc = inspWin.document;
 				var stopTime = Date.now() + 3e3;
 				inspWin.setTimeout(function selectJsPanel() {
@@ -1437,6 +1516,23 @@ function init() {
 					js.doCommand();
 				}, _this.fxVersion == 1.5 ? 200 : 0);
 			}, false);
+		},
+		overrideBoolPref: function(prefName, prefVal) {
+			var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+				.getService(Components.interfaces.nsIPrefBranch);
+			try {
+				var origVal = prefs.getBoolPref(prefName);
+			}
+			catch(e) {
+				// Firefox 58+: Remove support for extensions having their own prefs file
+				// https://bugzilla.mozilla.org/show_bug.cgi?id=1413413
+			}
+			if(origVal == prefVal || origVal === undefined)
+				return function restore() {};
+			prefs.setBoolPref(prefName, prefVal);
+			return function restore() {
+				prefs.setBoolPref(prefName, origVal);
+			};
 		},
 		copyTootipContent: function() {
 			var node = this._node;
@@ -1502,16 +1598,13 @@ function init() {
 			this.inspect(node, e.shiftKey);
 		},
 		inspect: function(node, forcePopupLocker) {
-			var inspect = this.context.inspector;
 			var top = this.getTopWindow(node);
-			if(inspect && _popupLocker && (_popupLocker == 2 || forcePopupLocker))
-				this.lockPopup(node, top);
+			if(this.hasDOMInspector && _popupLocker && (_popupLocker == 2 || forcePopupLocker))
+				this.lockPopup(node);
 			this.stop();
-			_log(inspect ? "Open DOM Inspector for <" + node.nodeName + ">" : "DOM Inspector not found!");
-			inspect && inspect(node, top);
 			this.closeMenus(node);
 			this.hideUnclosedPopups();
-			!inspect && this.domInspectorNotFound();
+			this.inspectNode(node);
 		},
 		domInspectorNotFound: function() {
 			var label = this.context.button && this.context.button.label
@@ -1529,7 +1622,7 @@ function init() {
 					return node;
 			return null;
 		},
-		lockPopup: function(node, win) {
+		lockPopup: function(node) {
 			var popup = this.getPopup(node);
 			if(!popup)
 				return;
@@ -1537,7 +1630,7 @@ function init() {
 			var popupLocker = {
 				context: this,
 				domiWindow: null,
-				window: win,
+				window: this.getTopWindow(node),
 				popup: popup,
 				tt: this.context.tt,
 				ww: this.context.ww,
@@ -1760,94 +1853,6 @@ function init() {
 			}
 		}
 	};
-	this.overrideBoolPref = function(prefName, prefVal) {
-		var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-			.getService(Components.interfaces.nsIPrefBranch);
-		try {
-			var origVal = prefs.getBoolPref(prefName);
-		}
-		catch(e) {
-			// Firefox 58+: Remove support for extensions having their own prefs file
-			// https://bugzilla.mozilla.org/show_bug.cgi?id=1413413
-		}
-		if(origVal == prefVal || origVal === undefined)
-			return function restore() {};
-		prefs.setBoolPref(prefName, prefVal);
-		return function restore() {
-			prefs.setBoolPref(prefName, origVal);
-		};
-	};
-	defineGetter(this, "inspector", function() {
-		if(!("@mozilla.org/commandlinehandler/general-startup;1?type=inspector" in Components.classes)) {
-			_log("DOM Inspector not installed!");
-			return null;
-		}
-		if((_showFullTree || _nodePosition >= 0) && this.eventHandler.fxVersion >= 2) {
-			return function(node, top) {
-				var inspWin = window.openDialog(
-					"chrome://inspector/content/",
-					"_blank",
-					"chrome,all,dialog=no",
-					_showFullTree == 0
-						? node.ownerDocument || node
-						: _showFullTree == 1
-							? (node.ownerDocument || node).defaultView.top.document
-							: (top || window.top).document
-				);
-				var tryDelay = 5;
-				function inspect() {
-					if("inspector" in inspWin && inspWin.inspector) try {
-						try {
-							// Avoid warnings in error console after getViewer("dom")
-							var hash = inspWin.inspector.mPanelSet.registry.mViewerHash;
-						}
-						catch(e1) {
-							Components.utils.reportError(e1);
-						}
-						if(!hash || ("dom" in hash)) {
-							var viewer = inspWin.inspector.getViewer("dom");
-							var restoreBlink = context.overrideBoolPref("inspector.blink.on", false);
-							try {
-								if("showNodeInTree" in viewer) // New DOM Inspector
-									viewer.showNodeInTree(node);
-								else
-									viewer.selectElementInTree(node);
-								if(_nodePosition >= 0) {
-									var tbo = viewer.mDOMTree.treeBoxObject;
-									var cur = tbo.view.selection.currentIndex;
-									var first = tbo.getFirstVisibleRow();
-									var visibleRows = tbo.height/tbo.rowHeight;
-									var newFirst = cur - _nodePosition*visibleRows + 1;
-									tbo.scrollByLines(Math.round(newFirst - first));
-									tbo.ensureRowIsVisible(cur); // Should be visible, but...
-								}
-								return;
-							}
-							catch(e2) {
-								Components.utils.reportError(e2);
-							}
-							finally {
-								restoreBlink();
-							}
-						}
-					}
-					catch(e) {
-						Components.utils.reportError(e);
-					}
-					inspWin.setTimeout(inspect, tryDelay);
-				}
-				inspWin.addEventListener("load", function showNode(e) {
-					inspWin.removeEventListener("load", showNode, false);
-					inspect();
-				}, false);
-			};
-		}
-
-		// See window.inspectDOMNode()
-		return function(node, top) {
-			window.openDialog("chrome://inspector/content/", "_blank", "chrome,all,dialog=no", node);
-		};
-	});
 
 	this.setAllListeners(ael);
 	this.ww.registerNotification(this.eventHandler);
