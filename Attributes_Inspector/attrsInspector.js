@@ -1291,7 +1291,14 @@ function init() {
 				: InspectorUtils; // Firefox 59+
 		},
 		getParentNode: function(node) {
-			var pn = this.domUtils.getParentForNode(node, true);
+			try {
+				var pn = this.domUtils.getParentForNode(node, true);
+			}
+			catch(e) {
+				if(("" + e).indexOf("NS_ERROR_XPC_CANT_PASS_CPOW_TO_NATIVE") == -1)
+					Components.utils.reportError(e);
+				pn = node.parentNode;
+			}
 			if(!pn && node.nodeType == Node.DOCUMENT_NODE) { // Firefox 1.5?
 				pn = node.defaultView.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
 					.getInterface(Components.interfaces.nsIWebNavigation)
@@ -1331,8 +1338,14 @@ function init() {
 				return childNodes;
 			}
 			var du = this.domUtils;
-			if("getChildrenForNode" in du) // Gecko 7.0+
+			if("getChildrenForNode" in du) try { // Gecko 7.0+
 				return du.getChildrenForNode(node, true);
+			}
+			catch(e) {
+				if(("" + e).indexOf("NS_ERROR_XPC_CANT_PASS_CPOW_TO_NATIVE") == -1)
+					Components.utils.reportError(e);
+				//return node.childNodes;
+			}
 			var childNodes = node instanceof XULElement
 				&& "getAnonymousNodes" in node.ownerDocument
 				&& node.ownerDocument.getAnonymousNodes(node)
