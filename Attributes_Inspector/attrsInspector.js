@@ -1379,7 +1379,11 @@ function init() {
 			if(this.hasDOMInspector)
 				return true;
 			_log("DOM Inspector not installed!");
-			this.domInspectorNotFound();
+			var label = this.context.button && this.context.button.label
+				|| "Attributes Inspector";
+			Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
+				.getService(Components.interfaces.nsIPromptService)
+				.alert(null, label, "DOM Inspector not found!");
 			return false;
 		},
 		inspectNode: function(node) {
@@ -1618,13 +1622,6 @@ function init() {
 			this.closeMenus(node);
 			this.hideUnclosedPopups();
 			this.inspectNode(node);
-		},
-		domInspectorNotFound: function() {
-			var label = this.context.button && this.context.button.label
-				|| "Attributes Inspector";
-			Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
-				.getService(Components.interfaces.nsIPromptService)
-				.alert(null, label, "DOM Inspector not found!");
 		},
 		getPopup: function(node) {
 			for(; node && "tagName" in node; node = node.parentNode)
