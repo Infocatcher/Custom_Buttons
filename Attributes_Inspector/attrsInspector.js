@@ -1408,6 +1408,7 @@ function init() {
 						? (node.ownerDocument || node).defaultView.top.document
 						: (top || window.top).document
 			);
+			inspWin = inspWin.wrappedJSObject || inspWin; // At least for Firefox 3.0
 			inspWin.addEventListener("load", function showNode(e) {
 				inspWin.removeEventListener("load", showNode, false);
 				inspect();
