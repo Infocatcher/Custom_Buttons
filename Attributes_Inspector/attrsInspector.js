@@ -1408,53 +1408,61 @@ function init() {
 						? (node.ownerDocument || node).defaultView.top.document
 						: (top || window.top).document
 			);
-			var _this = this;
-			var tryDelay = 5;
-			function inspect() {
-				if("inspector" in inspWin && inspWin.inspector) try {
-					try {
-						// Avoid warnings in error console after getViewer("dom")
-						var hash = inspWin.inspector.mPanelSet.registry.mViewerHash;
-					}
-					catch(e1) {
-						Components.utils.reportError(e1);
-					}
-					if(!hash || ("dom" in hash)) {
-						var viewer = inspWin.inspector.getViewer("dom");
-						var restoreBlink = _this.overrideBoolPref("inspector.blink.on", false);
-						try {
-							if("showNodeInTree" in viewer) // New DOM Inspector
-								viewer.showNodeInTree(node);
-							else
-								viewer.selectElementInTree(node);
-							if(_nodePosition >= 0) {
-								var tbo = viewer.mDOMTree.treeBoxObject;
-								var cur = tbo.view.selection.currentIndex;
-								var first = tbo.getFirstVisibleRow();
-								var visibleRows = tbo.height/tbo.rowHeight;
-								var newFirst = cur - _nodePosition*visibleRows + 1;
-								tbo.scrollByLines(Math.round(newFirst - first));
-								tbo.ensureRowIsVisible(cur); // Should be visible, but...
-							}
-							return;
-						}
-						catch(e2) {
-							Components.utils.reportError(e2);
-						}
-						finally {
-							restoreBlink();
-						}
-					}
-				}
-				catch(e) {
-					Components.utils.reportError(e);
-				}
-				inspWin.setTimeout(inspect, tryDelay);
-			}
 			inspWin.addEventListener("load", function showNode(e) {
 				inspWin.removeEventListener("load", showNode, false);
 				inspect();
 			}, false);
+
+			var _this = this;
+			var tryDelay = 5;
+			var stopTime = Date.now() + 5e3;
+			function wait() {
+				if(Date.now() < stopTime)
+					inspWin.setTimeout(inspect, tryDelay);
+				else
+					_log("inspectNode(): take too many time");
+			}
+			function inspect() {
+				var inspector = "inspector" in inspWin && inspWin.inspector;
+				if(!inspector)
+					return wait();
+				try {
+					// Avoid warnings in error console after getViewer("dom")
+					var hash = inspector.mPanelSet.registry.mViewerHash;
+					if(hash && !("dom" in hash))
+						return wait();
+				}
+				catch(e) {
+					Components.utils.reportError(e);
+				}
+				try {
+					var viewer = inspector.getViewer("dom");
+				}
+				catch(e) {
+					Components.utils.reportError(e);
+					return wait();
+				}
+
+				var restoreBlink = _this.overrideBoolPref("inspector.blink.on", false);
+				_this.timer(function() {
+					restoreBlink();
+				});
+
+				if("showNodeInTree" in viewer) // New DOM Inspector
+					viewer.showNodeInTree(node);
+				else
+					viewer.selectElementInTree(node);
+				if(_nodePosition >= 0) {
+					var tbo = viewer.mDOMTree.treeBoxObject;
+					var cur = tbo.view.selection.currentIndex;
+					var first = tbo.getFirstVisibleRow();
+					var visibleRows = tbo.height/tbo.rowHeight;
+					var newFirst = cur - _nodePosition*visibleRows + 1;
+					tbo.scrollByLines(Math.round(newFirst - first));
+					tbo.ensureRowIsVisible(cur); // Should be visible, but...
+				}
+				return true;
+			}
 		},
 		inspectWindow: function(node) {
 			if(!this.checkDOMInspector())
