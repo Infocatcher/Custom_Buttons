@@ -1478,6 +1478,7 @@ function init() {
 				//node.ownerDocument || node
 				node
 			);
+			inspWin = inspWin.wrappedJSObject || inspWin; // At least for Firefox 1.5
 			var _this = this;
 			inspWin.addEventListener("load", function load(e) {
 				inspWin.removeEventListener(e.type, load, false);
