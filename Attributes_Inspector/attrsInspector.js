@@ -1417,6 +1417,7 @@ function init() {
 			var _this = this;
 			var tryDelay = 5;
 			var stopTime = Date.now() + 5e3;
+			var restoreBlink = this.overrideBoolPref("inspector.blink.on", false);
 			function wait() {
 				if(Date.now() < stopTime)
 					inspWin.setTimeout(inspect, tryDelay);
@@ -1444,10 +1445,7 @@ function init() {
 					return wait();
 				}
 
-				var restoreBlink = _this.overrideBoolPref("inspector.blink.on", false);
-				_this.timer(function() {
-					restoreBlink();
-				});
+				_this.timer(restoreBlink);
 
 				if("showNodeInTree" in viewer) // New DOM Inspector
 					viewer.showNodeInTree(node);
@@ -1480,10 +1478,10 @@ function init() {
 			);
 			inspWin = inspWin.wrappedJSObject || inspWin; // At least for Firefox 1.5
 			var _this = this;
+			var restoreBlink = this.overrideBoolPref("inspector.blink.on", false);
 			inspWin.addEventListener("load", function load(e) {
 				inspWin.removeEventListener(e.type, load, false);
 				_log("inspectWindow(): DOM Inspector loaded");
-				var restoreBlink = _this.overrideBoolPref("inspector.blink.on", false);
 				var doc = inspWin.document;
 				var stopTime = Date.now() + 3e3;
 				inspWin.setTimeout(function selectJsPanel() {
@@ -1557,9 +1555,13 @@ function init() {
 			if(origVal == prefVal || origVal === undefined)
 				return function restore() {};
 			prefs.setBoolPref(prefName, prefVal);
-			return function restore() {
+			var _this = this;
+			function restore() {
+				_this.cancelTimer(timer);
 				prefs.setBoolPref(prefName, origVal);
-			};
+			}
+			var timer = this.timer(restore, this, 3e3);
+			return restore;
 		},
 		copyTootipContent: function() {
 			var node = this._node;
