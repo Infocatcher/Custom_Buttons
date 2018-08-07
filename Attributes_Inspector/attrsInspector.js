@@ -1409,18 +1409,17 @@ function init() {
 						: (top || window.top).document
 			);
 			inspWin = inspWin.wrappedJSObject || inspWin; // At least for Firefox 3.0
-			inspWin.addEventListener("load", function showNode(e) {
-				inspWin.removeEventListener("load", showNode, false);
+			inspWin.addEventListener("load", function onLoad(e) {
+				inspWin.removeEventListener("load", onLoad, false);
 				inspect();
 			}, false);
 
 			var _this = this;
-			var tryDelay = 5;
 			var stopTime = Date.now() + 5e3;
 			var restoreBlink = this.overrideBoolPref("inspector.blink.on", false);
 			function wait() {
 				if(Date.now() < stopTime)
-					inspWin.setTimeout(inspect, tryDelay);
+					inspWin.setTimeout(inspect, 10);
 				else
 					_log("inspectNode(): take too many time");
 			}
@@ -1477,70 +1476,78 @@ function init() {
 				node
 			);
 			inspWin = inspWin.wrappedJSObject || inspWin; // At least for Firefox 1.5
-			var _this = this;
-			var restoreBlink = this.overrideBoolPref("inspector.blink.on", false);
-			inspWin.addEventListener("load", function load(e) {
-				inspWin.removeEventListener(e.type, load, false);
+			inspWin.addEventListener("load", function onLoad(e) {
+				inspWin.removeEventListener("load", onLoad, false);
 				_log("inspectWindow(): DOM Inspector loaded");
+				wait(_this.fxVersion == 1.5 ? 200 : 0);
+			}, false);
+
+			var _this = this;
+			var stopTime = Date.now() + 5e3;
+			var restoreBlink = this.overrideBoolPref("inspector.blink.on", false);
+			function wait(delay) {
+				if(Date.now() < stopTime)
+					inspWin.setTimeout(inspect, delay || 10);
+				else
+					_log("inspectWindow(): take too many time");
+			}
+			function inspect() {
 				var doc = inspWin.document;
-				var stopTime = Date.now() + 3e3;
-				inspWin.setTimeout(function selectJsPanel() {
-					var panel = doc.getElementById("bxDocPanel");
-					var js = doc.getAnonymousElementByAttribute(panel, "viewerListEntry", "8")
-						|| doc.getAnonymousElementByAttribute(panel, "viewerListEntry", "7"); // DOM Inspector 1.8.1.x, Firefox 2.0.0.x
-					if(!js && Date.now() < stopTime) {
-						inspWin.setTimeout(selectJsPanel, 25);
+				var panel = doc.getElementById("bxDocPanel");
+				if(!panel)
+					return wait();
+				var js = doc.getAnonymousElementByAttribute(panel, "viewerListEntry", "8")
+					|| doc.getAnonymousElementByAttribute(panel, "viewerListEntry", "7"); // DOM Inspector 1.8.1.x, Firefox 2.0.0.x
+				var browser = doc.getAnonymousElementByAttribute(panel, "anonid", "viewer-iframe");
+				if(!js || !browser)
+					return wait();
+				_this.timer(restoreBlink);
+				browser.addEventListener("load", function load(e) {
+					if(e.target.documentURI == "about:blank")
 						return;
-					}
-					restoreBlink();
-					var browser = doc.getAnonymousElementByAttribute(panel, "anonid", "viewer-iframe");
-					browser.addEventListener("load", function load(e) {
-						if(e.target.documentURI == "about:blank")
-							return;
-						browser.removeEventListener(e.type, load, true);
-						stopTime = Date.now() + 3e3;
-						inspWin.setTimeout(function selectWindow() {
-							var brDoc = browser.contentDocument;
-							var tree = brDoc && brDoc.getElementById("treeJSObject");
-							if(tree && tree.view && tree.view.selection && tree.columns) {
-								var keyCol = tree.columns.getKeyColumn();
-								var view = tree.view;
-								var rowCount = view.rowCount;
-								if(rowCount == 1) { // DOM Inspector 1.8.1.x, Firefox 2.0.0.x
-									tree.changeOpenState(0, true);
-									rowCount = view.rowCount;
-								}
-								for(var i = 0; i < rowCount; ++i) {
-									var cellText = view.getCellText(i, keyCol);
-									if(cellText == "defaultView") {
-										_log('inspectWindow(): scroll to "defaultView" entry');
-										var tbo = tree.treeBoxObject;
-										tbo.beginUpdateBatch();
-										tree.changeOpenState(i, true);
-										view.selection.select(i);
-										tbo.scrollByLines(i);
-										tbo.ensureRowIsVisible(i);
-										tbo.endUpdateBatch();
-										inspWin.setTimeout(function() { // Tree not yet loaded?
-											var di = i - tbo.getFirstVisibleRow();
-											if(di) {
-												_log("inspectWindow(): tree changed => scrollByLines(" + di + ")");
-												tbo.scrollByLines(di);
-												tbo.ensureRowIsVisible(i);
-											}
-										}, 0);
-										return;
-									}
+					browser.removeEventListener(e.type, load, true);
+					stopTime = Date.now() + 3e3;
+					inspWin.setTimeout(function selectWindow() {
+						var brDoc = browser.contentDocument;
+						var tree = brDoc && brDoc.getElementById("treeJSObject");
+						if(tree && tree.view && tree.view.selection && tree.columns) {
+							var keyCol = tree.columns.getKeyColumn();
+							var view = tree.view;
+							var rowCount = view.rowCount;
+							if(rowCount == 1) { // DOM Inspector 1.8.1.x, Firefox 2.0.0.x
+								tree.changeOpenState(0, true);
+								rowCount = view.rowCount;
+							}
+							for(var i = 0; i < rowCount; ++i) {
+								var cellText = view.getCellText(i, keyCol);
+								if(cellText == "defaultView") {
+									_log('inspectWindow(): scroll to "defaultView" entry');
+									var tbo = tree.treeBoxObject;
+									tbo.beginUpdateBatch();
+									tree.changeOpenState(i, true);
+									view.selection.select(i);
+									tbo.scrollByLines(i);
+									tbo.ensureRowIsVisible(i);
+									tbo.endUpdateBatch();
+									inspWin.setTimeout(function() { // Tree not yet loaded?
+										var di = i - tbo.getFirstVisibleRow();
+										if(di) {
+											_log("inspectWindow(): tree changed => scrollByLines(" + di + ")");
+											tbo.scrollByLines(di);
+											tbo.ensureRowIsVisible(i);
+										}
+									}, 0);
+									return;
 								}
 							}
-							if(Date.now() < stopTime)
-								inspWin.setTimeout(selectWindow, 25);
-						}, _this.fxVersion == 1.5 ? 50 : 0);
-					}, true);
-					_log("inspectWindow(): select JavaScript Object panel");
-					js.doCommand();
-				}, _this.fxVersion == 1.5 ? 200 : 0);
-			}, false);
+						}
+						if(Date.now() < stopTime)
+							inspWin.setTimeout(selectWindow, 25);
+					}, _this.fxVersion == 1.5 ? 50 : 0);
+				}, true);
+				_log("inspectWindow(): select JavaScript Object panel");
+				return js.doCommand();
+			}
 		},
 		overrideBoolPref: function(prefName, prefVal) {
 			var prefs = Components.classes["@mozilla.org/preferences-service;1"]
