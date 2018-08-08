@@ -5,8 +5,8 @@
 // Extensions Developer Tools button for Custom Buttons
 // (code for "initialization" section)
 
-// (c) Infocatcher 2011-2016
-// version 0.1.2pre9 - 2016-04-24
+// (c) Infocatcher 2011-2018
+// version 0.1.2pre10 - 2018-08-08
 
 // Includes Attributes Inspector
 //   http://infocatcher.ucoz.net/js/cb/attrsInspector.js
