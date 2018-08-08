@@ -451,7 +451,6 @@ var cmds = this.commands = {
 				if(cbId == "switchLocale")
 					this.initSwitchLocaleItem(mi);
 				else if(cbId == "attrsInspector") {
-					//~ Note: should be "inspectDOMNode" in window for Firefox 1.5
 					this.setPartiallyAvailable(mi,
 						!("@mozilla.org/commandlinehandler/general-startup;1?type=inspector" in Components.classes)
 					);
@@ -1938,7 +1937,7 @@ this.attrsInspector = function(event) {
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Attributes_Inspector
 
 // (c) Infocatcher 2010-2018
-// version 0.6.4.1 - 2018-06-12
+// version 0.6.5pre - 2018-08-08
 
 //===================
 // Attributes Inspector button for Custom Buttons
@@ -1988,6 +1987,9 @@ var _excludeChildTextNodes = 1;
 // 2 - always exclude
 var _excludeSiblingTextNodes = false;
 
+var _useCycleNavigation = false;
+// Use cycle navigation for sibling nodes: first -> second -> ... -> last --> first
+
 var _preferNotAnonymousChildNodes = false;
 // true  - use not anonymous child nodes, if any (as in version 0.6.1pre and older)
 // false - always try get real child nodes (may work wrong in Gecko < 7.0)
@@ -1997,7 +1999,7 @@ var _popupLocker = 1;
 // Lock all popups in window while DOM Inspector is opened (or until Escape was not pressed)
 // Values: 0 - disable, 1 - only if Shift pressed, 2 - always enable
 var _showNamespaceURI = 2; // 0 - don't show, 1 - show as is, 2 - show pretty name instead of URI
-var _showMargins = 2; // 0 - don't show, 1 - only if Shift pressed, 2 - always show
+var _showMargins = 3; // 0 - don't show, 1 - only if Shift pressed, 2 - only if Shift pressed + auto update, 3 - always show
 var _showFullTree = 2; // 0 - current frame, 1 - top frame, 2 - topmost frame
 // Note: "View - Show Anonymous Content" should be checked to inspect content documents with "_showFullTree = 2"
 var _nodePosition = 0.55; // Position of selected node in DOM Inspector's tree, 0..1 (-1 - don't change)
@@ -2021,7 +2023,7 @@ function _log(s) {
 	_log = function(s) {
 		cs.logStringMessage("[Attributes Inspector]: " + ts() + " " + s);
 	};
-	return _log.apply(this, arguments);
+	return _log(s);
 }
 
 const _ns = "__attributesInspector";
@@ -2131,9 +2133,8 @@ function toggle() {
 		destroy.call(this);
 }
 function init() {
-	const ttId = this.ttId = "__attrsInspectorTooltip";
 	var tt = this.tt = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "tooltip");
-	tt.id = ttId;
+	tt.id = "__attrsInspectorTooltip";
 	tt.setAttribute("orient", "vertical");
 	if(_maxTooltipWidth > 0) {
 		_maxTooltipWidth = Math.min(_maxTooltipWidth, (screen.availWidth || screen.width) - 20) + "px";
@@ -2197,7 +2198,7 @@ function init() {
 			this.setListeners(action, ws.getNext());
 	};
 	this.setListeners = function(action, w) {
-		var h = new this.evtHandler(w);
+		var h = this.eventHandler;
 
 		action("mouseover", h, true, w);
 		action("mousemove", h, true, w);
@@ -2222,20 +2223,11 @@ function init() {
 			action("popupshowing", h, true, w);
 			action("popuphiding",  h, true, w);
 		}
-
-		if(action == rel) {
-			var ehg = this.evtHandlerGlobal;
-			var hi = ehg._windows.indexOf(w);
-			delete ehg._windows[hi];
-			delete ehg._handlers[hi];
-		}
 	};
 	this.ww = Components.classes["@mozilla.org/embedcomp/window-watcher;1"]
 		.getService(Components.interfaces.nsIWindowWatcher);
 
-	this.evtHandlerGlobal = {
-		_handlers: [],
-		_windows: [],
+	this.eventHandler = {
 		context: this,
 		window: window,
 		_hl: null,
@@ -2334,8 +2326,8 @@ function init() {
 			}
 			return overflowBox;
 		},
-		_setDataLast: [0, 0, 0, 0, 0],
-		_setDataMinDelay: 5*150,
+		_setDataLast: [0, 0, 0, 0, 0], // Array length - count of fast updates
+		_setDataMinDelay: 750, // Delay between two series of fast updates
 		_setDataScheduled: false,
 		setDataProxy: function(node) {
 			if(this._setDataScheduled)
@@ -2343,16 +2335,16 @@ function init() {
 			var dt = this._setDataLast[0] + this._setDataMinDelay - Date.now();
 			if(dt > 0) {
 				this._setDataScheduled = true;
-				this.timer(function(node) {
+				this.timer(function() {
+					this._setDataScheduled = false;
 					if(node == this._node) {
-						this.setData.apply(this, arguments);
+						this.setData(node);
 						this.setDataProxyTime();
 					}
-					this._setDataScheduled = false;
-				}, this, dt, arguments);
+				}, this, dt);
 				return;
 			}
-			this.setData.apply(this, arguments);
+			this.setData(node);
 			this.setDataProxyTime();
 		},
 		setDataProxyTime: function() {
@@ -2368,13 +2360,13 @@ function init() {
 			var _this = this;
 			var df = tt.ownerDocument.createDocumentFragment();
 			function flush() {
-				//while(tt.hasChildNodes())
-				//	tt.removeChild(tt.lastChild);
 				tt.textContent = "";
 				// Firefox sometimes sets width/height to limit very huge tooltip
 				tt.removeAttribute("width");
 				tt.removeAttribute("height");
 				tt.appendChild(df);
+				if("state" in tt && tt.state == "closed") // Strange things happens
+					_this.mousemoveHandler(); // Force show
 			}
 
 			if(node.nodeType == node.DOCUMENT_NODE) {
@@ -2387,7 +2379,7 @@ function init() {
 					if(doctype.name == "html" && doctype.publicId == "" && doctype.systemId == "")
 						dt = "HTML5";
 					else if(doctype.publicId)
-						dt = String(doctype.publicId).replace(/^-\/\/W3C\/\/DTD\s+|\/\/EN$/ig, "");
+						dt = ("" + doctype.publicId).replace(/^-\/\/W3C\/\/DTD\s+|\/\/EN$/ig, "");
 					else
 						dt = doctype.systemId;
 					df.appendChild(this.getItem("doctype", dt, this.colon));
@@ -2415,9 +2407,11 @@ function init() {
 			if(!w && !h)
 				df.appendChild(this.getItem(node.nodeName));
 			else {
-				if(Math.floor(w) != w)
+				//if(Math.floor(w) != w)
+				if(/\.\d{4,}$/.test(w))
 					w = w.toFixed(3);
-				if(Math.floor(h) != h)
+				//if(Math.floor(h) != h)
+				if(/\.\d{4,}$/.test(h))
 					h = h.toFixed(3);
 				df.appendChild(this.getItem(node.nodeName, "[" + w + "\xd7" + h + "]", this.space));
 			}
@@ -2469,7 +2463,7 @@ function init() {
 						changedStyles[p] = true;
 				for(var p in styles)
 					prevStyles[p] = styles[p];
-				if(_showMargins > 1 || this._shiftKey) {
+				if(_showMargins >= 3 || this._shiftKey) {
 					df.appendChild(this.getItem("margin", styles.margin, this.colon, {
 						isChanged: "margin" in changedStyles
 					}));
@@ -2518,16 +2512,8 @@ function init() {
 					if(name == this.context.hlAttr && ns == this.context.hlAttrNS)
 						return;
 					if(this.noStyles && name == "style") {
-						val = val
-							.replace(
-								"outline-color: " + _borderColor + "; "
-									+ "outline-style: " + _borderStyle + "; "
-									+ "outline-width: " + _borderWidth + "px; "
-									+ "outline-offset: -" + _borderWidth + "px;",
-								""
-							)
-							.replace(/^ | $/g, "");
-						if(!val)
+						val = this._oldStyle;
+						if(val === false)
 							return;
 					}
 				}
@@ -2542,37 +2528,26 @@ function init() {
 			flush();
 		},
 		getRect: function(node) {
+			return this.getScreenRect(node, 1);
+		},
+		getScreenRect: function(node, scale) {
+			var win = node.ownerDocument.defaultView;
+			if(!scale) try {
+				var dwu = "windowUtils" in win && win.windowUtils instanceof Components.interfaces.nsIDOMWindowUtils
+					? win.windowUtils // Firefox 63+
+					: win.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+						.getInterface(Components.interfaces.nsIDOMWindowUtils);
+				scale = dwu.screenPixelsPerCSSPixel || 1;
+			}
+			catch(e) {
+				Components.utils.reportError(e);
+				scale = 1;
+			}
+
 			if(!(node instanceof Element)) try {
 				var rng = node.ownerDocument.createRange();
 				rng.selectNodeContents(node);
 				node = rng;
-			}
-			catch(e) {
-				Components.utils.reportError(e);
-			}
-			try {
-				var rect = "getBoundingClientRect" in node
-					? node.getBoundingClientRect()
-					: node instanceof XULElement
-						? node.boxObject
-						: node.ownerDocument && "getBoxObjectFor" in node.ownerDocument
-							&& node.ownerDocument.getBoxObjectFor(node);
-			}
-			catch(e) {
-			}
-			if(rect && !("width" in rect)) {
-				rect.width = rect.right - rect.left;
-				rect.height = rect.bottom - rect.top;
-			}
-			return rect;
-		},
-		getScreenRect: function(node) {
-			var win = node.ownerDocument.defaultView;
-			var scale = 1;
-			try {
-				var utils = win.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
-					.getInterface(Components.interfaces.nsIDOMWindowUtils);
-				scale = utils.screenPixelsPerCSSPixel || 1;
 			}
 			catch(e) {
 				Components.utils.reportError(e);
@@ -2630,9 +2605,7 @@ function init() {
 			return true;
 		},
 		getNS: function(ns) {
-			if(_showNamespaceURI == 1)
-				return ns;
-			switch(ns) {
+			if(_showNamespaceURI == 2) switch(ns) {
 				case "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul": return "XUL";
 				case "http://www.w3.org/1999/xhtml":                                  return "XHTML";
 				case "http://www.mozilla.org/xbl":                                    return "XBL";
@@ -2645,7 +2618,7 @@ function init() {
 				case "http://www.w3.org/1999/02/22-rdf-syntax-ns":                    return "RDF";
 				case "http://www.w3.org/2001/xml-events":                             return "XML Events";
 			}
-			return String(ns); // Can be null for #text
+			return "" + ns; // Can be null for #text
 		},
 		stop: function() {
 			this.context.stop();
@@ -2770,11 +2743,12 @@ function init() {
 				return;
 			}
 
+			if(node.hasAttributeNS(this.context.hlAttrNS, this.context.hlAttr))
+				return;
 			if(this.noStyles) {
 				this._oldStyle = node.hasAttribute("style") && node.getAttribute("style");
 				node.style.outline = _borderWidth + "px " + _borderStyle + " " + _borderColor;
 				node.style.outlineOffset = "-" + _borderWidth + "px";
-				//return;
 			}
 			node.setAttributeNS(this.context.hlAttrNS, this.context.hlAttr, "true");
 		},
@@ -2796,28 +2770,23 @@ function init() {
 				win.clearInterval(this._hlInterval);
 				this.flasher.repaintElement(node);
 				//this.flasher.repaintElement(node.ownerDocument.documentElement);
-				this.flasher.repaintElement(this.getTopWindow(win.top).document.documentElement);
+				this.flasher.repaintElement(this.getTopWindow(win).document.documentElement);
 				return;
 			}
 
 			if(this.noStyles) {
-				if(this._oldStyle || this._oldStyle === "")
-					node.setAttribute("style", this._oldStyle);
-				else
+				if(this._oldStyle === false)
 					node.removeAttribute("style");
-				//return;
+				else
+					node.setAttribute("style", this._oldStyle);
 			}
 			node.removeAttributeNS(this.context.hlAttrNS, this.context.hlAttr);
 		},
 
 		get mutationObserver() {
-			var _this = this;
-			function callback() {
-				_this.handleMutations.apply(_this, arguments);
-			}
 			delete this.mutationObserver;
 			return this.mutationObserver = "MutationObserver" in this.window // Firefox 14+
-				&& new this.window.MutationObserver(callback);
+				&& new this.window.MutationObserver(this.handleMutations.bind(this));
 		},
 		watchAttrs: function(node) {
 			this.unwatchAttrs(); // Only one watched node
@@ -2843,10 +2812,9 @@ function init() {
 				return;
 			}
 			// Legacy version
-			if(this.fxVersion != 2)
-				var aw = this;
-			else { // Hack for Firefox 2.0
-				var aw = this._attrsWatcher = {
+			var aw = this;
+			if(this.fxVersion == 2) { // Hack for Firefox 2.0
+				aw = this._attrsWatcher = {
 					parent: this,
 					handleEvent: function(e) {
 						this.parent.DOMAttrModifiedHandler(e);
@@ -3006,8 +2974,6 @@ function init() {
 				var text = Array.prototype.map.call(tt.childNodes, function(node) {
 					return node.textContent;
 				}).join("\n");
-				//while(tt.hasChildNodes())
-				//	tt.removeChild(tt.lastChild);
 				tt.textContent = "";
 				var d = this.e("div");
 				d.style.whiteSpace = "-moz-pre-wrap";
@@ -3064,7 +3030,7 @@ function init() {
 			this._shiftKey = e.shiftKey;
 			this.keypressHandler.apply(this, arguments);
 		},
-		keypressHandler: function(e, top) {
+		keypressHandler: function(e) {
 			// See https://github.com/Infocatcher/Custom_Buttons/issues/12
 			// keydown  => stopEvent() + hetkey action in Firefox >= 25
 			// keypress => stopEvent() + hetkey action in Firefox < 25
@@ -3077,7 +3043,7 @@ function init() {
 				this.stopEvent(e);
 				if(onlyStop)
 					return;
-				this.stopSingleEvent(top, "keyup");
+				this.stopSingleEvent(e, "keyup");
 				this.stop();
 				return;
 			}
@@ -3093,7 +3059,7 @@ function init() {
 			if(ctrlOrCtrlShift && e.keyCode == e.DOM_VK_UP) { // Ctrl+Up
 				this.stopEvent(e);
 				if(!onlyStop)
-					this.navigateUp(top);
+					this.navigateUp();
 			}
 			else if(ctrlOrCtrlShift && e.keyCode == e.DOM_VK_DOWN) { // Ctrl+Down
 				this.stopEvent(e);
@@ -3103,12 +3069,12 @@ function init() {
 			if(ctrlOrCtrlShift && e.keyCode == e.DOM_VK_RIGHT) { // Ctrl+Right
 				this.stopEvent(e);
 				if(!onlyStop)
-					this.navigateNext(top);
+					this.navigateNext();
 			}
 			else if(ctrlOrCtrlShift && e.keyCode == e.DOM_VK_LEFT) { // Ctrl+Left
 				this.stopEvent(e);
 				if(!onlyStop)
-					this.navigatePrev(top);
+					this.navigatePrev();
 			}
 			else if( // Ctrl+Shift+C
 				ctrlShift && (
@@ -3130,9 +3096,10 @@ function init() {
 				this.stopEvent(e);
 				if(onlyStop)
 					return;
-				this.stopSingleEvent(top, "keyup");
+				this.stopSingleEvent(e, "keyup");
 				var nodes = this._nodes;
-				nodes.length && this.inspect(nodes[0], top, e.shiftKey);
+				var node = nodes.length && nodes[0];
+				node && this.inspect(node, e.shiftKey);
 			}
 			else if( // Ctrl+Shift+W
 				ctrlShift && (
@@ -3144,20 +3111,20 @@ function init() {
 				this.stopEvent(e);
 				if(onlyStop)
 					return;
-				this.stopSingleEvent(top, "keyup");
+				this.stopSingleEvent(e, "keyup");
 				var nodes = this._nodes;
 				var node = nodes.length && nodes[0];
 				if(node) {
 					this.stop();
 					this.hideUnclosedPopups();
 					this.closeMenus(node);
-					this.inspectWindow(top, node);
+					this.inspectWindow(node);
 				}
 			}
 		},
-		navigateUp: function(top) {
+		navigateUp: function() {
 			var nodes = this._nodes;
-			var node = nodes.length && this.getParentNode(nodes[0], top);
+			var node = nodes.length && this.getParentNode(nodes[0]);
 			if(node) {
 				nodes.unshift(node);
 				this.handleNode(node);
@@ -3190,13 +3157,13 @@ function init() {
 				}
 			}
 		},
-		navigateNext: function(top) {
-			this.navigateSibling(true, top);
+		navigateNext: function() {
+			this.navigateSibling(true);
 		},
-		navigatePrev: function(top) {
-			this.navigateSibling(false, top);
+		navigatePrev: function() {
+			this.navigateSibling(false);
 		},
-		navigateSibling: function(toNext, top) {
+		navigateSibling: function(toNext) {
 			var nodes = this._nodes;
 			if(!nodes.length)
 				return;
@@ -3204,7 +3171,7 @@ function init() {
 			//var sibling = node;
 			//do sibling = toNext ? sibling.nextSibling : sibling.previousSibling;
 			//while(_excludeSiblingTextNodes && sibling && !(sibling instanceof Element));
-			var parent = this.getParentNode(node, top);
+			var parent = this.getParentNode(node);
 			var siblings = parent && this.getChildNodes(parent, node);
 			if(!siblings || siblings.length < 2)
 				return;
@@ -3215,14 +3182,14 @@ function init() {
 			var shift = toNext ? 1 : -1;
 			var sibling;
 			for(var i = pos + shift; ; i += shift) {
-				/* Uncomment to use cycle navigation
-				if(i < 0)
-					i = max;
-				else if(i > max)
-					i = 0;
-				if(i == pos)
-					break;
-				*/
+				if(_useCycleNavigation) {
+					if(i < 0)
+						i = max;
+					else if(i > max)
+						i = 0;
+					if(i == pos)
+						break;
+				}
 				if(i < 0 || i > max)
 					break;
 				var sb = siblings[i];
@@ -3250,27 +3217,52 @@ function init() {
 			this._nodes = [sibling];
 			this.handleNode(sibling);
 		},
-		get dwu() {
-			delete this.dwu;
-			return this.dwu = "inIDOMUtils" in Components.interfaces
+		get domUtils() {
+			delete this.domUtils;
+			return this.domUtils = "inIDOMUtils" in Components.interfaces
 				? Components.classes["@mozilla.org/inspector/dom-utils;1"]
 					.getService(Components.interfaces.inIDOMUtils)
 				: InspectorUtils; // Firefox 59+
 		},
-		getParentNode: function(node, top) {
-			var pn = this.dwu.getParentForNode(node, true);
-			if(!pn && node.nodeType == Node.DOCUMENT_NODE && node != top.document)
-				pn = this.getParentBrowser(node, top.document); // Only for Firefox 1.5
+		getParentNode: function(node) {
+			try {
+				var pn = this.domUtils.getParentForNode(node, true);
+			}
+			catch(e) {
+				if(("" + e).indexOf("NS_ERROR_XPC_CANT_PASS_CPOW_TO_NATIVE") == -1)
+					Components.utils.reportError(e);
+				pn = node.parentNode;
+			}
+			if(!pn && node.nodeType == Node.DOCUMENT_NODE) { // Firefox 1.5?
+				pn = node.defaultView.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+					.getInterface(Components.interfaces.nsIWebNavigation)
+					.QueryInterface(Components.interfaces.nsIDocShell)
+					.chromeEventHandler;
+			}
 			return pn;
 		},
-		getTopWindow: function(window) {
-			for(;;) {
-				var browser = this.dwu.getParentForNode(window.document, true);
-				if(!browser)
-					break;
-				window = browser.ownerDocument.defaultView.top;
+		getTopWindow: function(node) {
+			var win = node.ownerDocument && node.ownerDocument.defaultView
+				|| node.defaultView
+				|| node;
+			//for(;;) {
+			//	var browser = this.domUtils.getParentForNode(win.document, true);
+			//	if(!browser)
+			//		break;
+			//	win = browser.ownerDocument.defaultView.top;
+			//}
+			try {
+				return win.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+					.getInterface(Components.interfaces.nsIWebNavigation)
+					.QueryInterface(Components.interfaces.nsIDocShellTreeItem)
+					.rootTreeItem
+					.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+					.getInterface(Components.interfaces.nsIDOMWindow);
 			}
-			return window;
+			catch(e) {
+				Components.utils.reportError(e);
+			}
+			return win;
 		},
 		getChildNodes: function(node, child) {
 			if(_preferNotAnonymousChildNodes) {
@@ -3279,9 +3271,15 @@ function init() {
 					childNodes = node.ownerDocument.getAnonymousNodes(node);
 				return childNodes;
 			}
-			var dwu = this.dwu;
-			if("getChildrenForNode" in dwu) // Gecko 7.0+
-				return dwu.getChildrenForNode(node, true);
+			var du = this.domUtils;
+			if("getChildrenForNode" in du) try { // Gecko 7.0+
+				return du.getChildrenForNode(node, true);
+			}
+			catch(e) {
+				if(("" + e).indexOf("NS_ERROR_XPC_CANT_PASS_CPOW_TO_NATIVE") == -1)
+					Components.utils.reportError(e);
+				//return node.childNodes;
+			}
 			var childNodes = node instanceof XULElement
 				&& "getAnonymousNodes" in node.ownerDocument
 				&& node.ownerDocument.getAnonymousNodes(node)
@@ -3307,12 +3305,103 @@ function init() {
 			}
 			return childNodes;
 		},
-		inspectWindow: function(top, node) {
-			if(!("@mozilla.org/commandlinehandler/general-startup;1?type=inspector" in Components.classes)) {
-				_log("DOM Inspector not installed!");
+		get hasDOMInspector() {
+			delete this.hasDOMInspector;
+			return this.hasDOMInspector = "@mozilla.org/commandlinehandler/general-startup;1?type=inspector" in Components.classes;
+		},
+		checkDOMInspector: function() {
+			if(this.hasDOMInspector)
+				return true;
+			_log("DOM Inspector not installed!");
+			var label = this.context.button && this.context.button.label
+				|| "Attributes Inspector";
+			Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
+				.getService(Components.interfaces.nsIPromptService)
+				.alert(null, label, "DOM Inspector not found!");
+			return false;
+		},
+		inspectNode: function(node) {
+			if(!this.checkDOMInspector())
+				return;
+
+			var top = this.getTopWindow(node);
+			_log("Open DOM Inspector for <" + node.nodeName + ">");
+			if(!_showFullTree || _nodePosition < 0 || this.fxVersion < 2) {
+				// See window.inspectDOMNode()
+				top.openDialog("chrome://inspector/content/", "_blank", "chrome,all,dialog=no", node);
 				return;
 			}
+
+			var inspWin = top.openDialog(
+				"chrome://inspector/content/",
+				"_blank",
+				"chrome,all,dialog=no",
+				_showFullTree == 0
+					? node.ownerDocument || node
+					: _showFullTree == 1
+						? (node.ownerDocument || node).defaultView.top.document
+						: (top || window.top).document
+			);
+			inspWin = inspWin.wrappedJSObject || inspWin; // At least for Firefox 3.0
+			inspWin.addEventListener("load", function onLoad(e) {
+				inspWin.removeEventListener("load", onLoad, false);
+				inspect();
+			}, false);
+
+			var _this = this;
+			var stopTime = Date.now() + 5e3;
+			var restoreBlink = this.overrideBoolPref("inspector.blink.on", false);
+			function wait() {
+				if(Date.now() < stopTime)
+					inspWin.setTimeout(inspect, 10);
+				else
+					_log("inspectNode(): take too many time");
+			}
+			function inspect() {
+				var inspector = "inspector" in inspWin && inspWin.inspector;
+				if(!inspector)
+					return wait();
+				try {
+					// Avoid warnings in error console after getViewer("dom")
+					var hash = inspector.mPanelSet.registry.mViewerHash;
+					if(hash && !("dom" in hash))
+						return wait();
+				}
+				catch(e) {
+					Components.utils.reportError(e);
+				}
+				try {
+					var viewer = inspector.getViewer("dom");
+				}
+				catch(e) {
+					Components.utils.reportError(e);
+					return wait();
+				}
+
+				_this.timer(restoreBlink);
+
+				if("showNodeInTree" in viewer) // New DOM Inspector
+					viewer.showNodeInTree(node);
+				else
+					viewer.selectElementInTree(node);
+				if(_nodePosition >= 0) {
+					var tbo = viewer.mDOMTree.treeBoxObject;
+					var cur = tbo.view.selection.currentIndex;
+					var first = tbo.getFirstVisibleRow();
+					var visibleRows = tbo.height/tbo.rowHeight;
+					var newFirst = cur - _nodePosition*visibleRows + 1;
+					tbo.scrollByLines(Math.round(newFirst - first));
+					tbo.ensureRowIsVisible(cur); // Should be visible, but...
+				}
+				return true;
+			}
+		},
+		inspectWindow: function(node) {
+			if(!this.checkDOMInspector())
+				return;
+
 			_log("inspectWindow(): open DOM Inspector for <" + node.nodeName + ">");
+			var top = this.getTopWindow(node);
 			var inspWin = top.openDialog(
 				"chrome://inspector/content/",
 				"_blank",
@@ -3320,70 +3409,100 @@ function init() {
 				//node.ownerDocument || node
 				node
 			);
-			var _this = this;
-			inspWin.addEventListener("load", function load(e) {
-				inspWin.removeEventListener(e.type, load, false);
+			inspWin = inspWin.wrappedJSObject || inspWin; // At least for Firefox 1.5
+			inspWin.addEventListener("load", function onLoad(e) {
+				inspWin.removeEventListener("load", onLoad, false);
 				_log("inspectWindow(): DOM Inspector loaded");
-				var restoreBlink = _this.context.overrideBoolPref("inspector.blink.on", false);
+				wait(_this.fxVersion == 1.5 ? 200 : 0);
+			}, false);
+
+			var _this = this;
+			var stopTime = Date.now() + 5e3;
+			var restoreBlink = this.overrideBoolPref("inspector.blink.on", false);
+			function wait(delay) {
+				if(Date.now() < stopTime)
+					inspWin.setTimeout(inspect, delay || 10);
+				else
+					_log("inspectWindow(): take too many time");
+			}
+			function inspect() {
 				var doc = inspWin.document;
-				var stopTime = Date.now() + 3e3;
-				inspWin.setTimeout(function selectJsPanel() {
-					var panel = doc.getElementById("bxDocPanel");
-					var js = doc.getAnonymousElementByAttribute(panel, "viewerListEntry", "8")
-						|| doc.getAnonymousElementByAttribute(panel, "viewerListEntry", "7"); // DOM Inspector 1.8.1.x, Firefox 2.0.0.x
-					if(!js && Date.now() < stopTime) {
-						inspWin.setTimeout(selectJsPanel, 25);
+				var panel = doc.getElementById("bxDocPanel");
+				if(!panel)
+					return wait();
+				var js = doc.getAnonymousElementByAttribute(panel, "viewerListEntry", "8")
+					|| doc.getAnonymousElementByAttribute(panel, "viewerListEntry", "7"); // DOM Inspector 1.8.1.x, Firefox 2.0.0.x
+				var browser = doc.getAnonymousElementByAttribute(panel, "anonid", "viewer-iframe");
+				if(!js || !browser)
+					return wait();
+				_this.timer(restoreBlink);
+				browser.addEventListener("load", function load(e) {
+					if(e.target.documentURI == "about:blank")
 						return;
-					}
-					restoreBlink();
-					var browser = doc.getAnonymousElementByAttribute(panel, "anonid", "viewer-iframe");
-					browser.addEventListener("load", function load(e) {
-						if(e.target.documentURI == "about:blank")
-							return;
-						browser.removeEventListener(e.type, load, true);
-						stopTime = Date.now() + 3e3;
-						inspWin.setTimeout(function selectWindow() {
-							var brDoc = browser.contentDocument;
-							var tree = brDoc.getElementById("treeJSObject");
-							if(tree && tree.view && tree.view.selection && tree.columns) {
-								var keyCol = tree.columns.getKeyColumn();
-								var view = tree.view;
-								var rowCount = view.rowCount;
-								if(rowCount == 1) { // DOM Inspector 1.8.1.x, Firefox 2.0.0.x
-									tree.changeOpenState(0, true);
-									rowCount = view.rowCount;
-								}
-								for(var i = 0; i < rowCount; ++i) {
-									var cellText = view.getCellText(i, keyCol);
-									if(cellText == "defaultView") {
-										_log('inspectWindow(): scroll to "defaultView" entry');
-										var tbo = tree.treeBoxObject;
-										tbo.beginUpdateBatch();
-										tree.changeOpenState(i, true);
-										view.selection.select(i);
-										tbo.scrollByLines(i);
-										tbo.ensureRowIsVisible(i);
-										tbo.endUpdateBatch();
-										inspWin.setTimeout(function() { // Tree not yet loaded?
-											var di = i - tbo.getFirstVisibleRow();
-											if(di) {
-												_log("inspectWindow(): tree changed => scrollByLines(" + di + ")");
-												tbo.scrollByLines(di);
-												tbo.ensureRowIsVisible(i);
-											}
-										}, 0);
-										return;
-									}
+					browser.removeEventListener(e.type, load, true);
+					stopTime = Date.now() + 3e3;
+					inspWin.setTimeout(function selectWindow() {
+						var brDoc = browser.contentDocument;
+						var tree = brDoc && brDoc.getElementById("treeJSObject");
+						if(tree && tree.view && tree.view.selection && tree.columns) {
+							var keyCol = tree.columns.getKeyColumn();
+							var view = tree.view;
+							var rowCount = view.rowCount;
+							if(rowCount == 1) { // DOM Inspector 1.8.1.x, Firefox 2.0.0.x
+								tree.changeOpenState(0, true);
+								rowCount = view.rowCount;
+							}
+							for(var i = 0; i < rowCount; ++i) {
+								var cellText = view.getCellText(i, keyCol);
+								if(cellText == "defaultView") {
+									_log('inspectWindow(): scroll to "defaultView" entry');
+									var tbo = tree.treeBoxObject;
+									tbo.beginUpdateBatch();
+									tree.changeOpenState(i, true);
+									view.selection.select(i);
+									tbo.scrollByLines(i);
+									tbo.ensureRowIsVisible(i);
+									tbo.endUpdateBatch();
+									inspWin.setTimeout(function() { // Tree not yet loaded?
+										var di = i - tbo.getFirstVisibleRow();
+										if(di) {
+											_log("inspectWindow(): tree changed => scrollByLines(" + di + ")");
+											tbo.scrollByLines(di);
+											tbo.ensureRowIsVisible(i);
+										}
+									}, 0);
+									return;
 								}
 							}
-							if(Date.now() < stopTime)
-								inspWin.setTimeout(selectWindow, 25);
-						}, _this.fxVersion == 1.5 ? 50 : 0);
-					}, true);
-					_log("inspectWindow(): select JavaScript Object panel");
-					js.doCommand();
-				}, _this.fxVersion == 1.5 ? 200 : 0);
-			}, false);
+						}
+						if(Date.now() < stopTime)
+							inspWin.setTimeout(selectWindow, 25);
+					}, _this.fxVersion == 1.5 ? 50 : 0);
+				}, true);
+				_log("inspectWindow(): select JavaScript Object panel");
+				return js.doCommand();
+			}
+		},
+		overrideBoolPref: function(prefName, prefVal) {
+			var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+				.getService(Components.interfaces.nsIPrefBranch);
+			try {
+				var origVal = prefs.getBoolPref(prefName);
+			}
+			catch(e) {
+				// Firefox 58+: Remove support for extensions having their own prefs file
+				// https://bugzilla.mozilla.org/show_bug.cgi?id=1413413
+			}
+			if(origVal == prefVal || origVal === undefined)
+				return function restore() {};
+			prefs.setBoolPref(prefName, prefVal);
+			var _this = this;
+			function restore() {
+				_this.cancelTimer(timer);
+				prefs.setBoolPref(prefName, origVal);
+			}
+			var timer = this.timer(restore, this, 3e3);
+			return restore;
 		},
 		copyTootipContent: function() {
 			var node = this._node;
@@ -3422,43 +3541,13 @@ function init() {
 			delete this.lineBreak;
 			return this.lineBreak = this.appInfo.OS == "WINNT" ? "\r\n" : "\n";
 		},
-		stopSingleEvent: function(target, type) {
-			target.addEventListener(type, {
-				target: target,
-				context: this,
-				handleEvent: function(e) {
-					this.target.removeEventListener(e.type, this, true);
-					this.context.stopEvent(e);
-				}
+		stopSingleEvent: function(e, type) {
+			var top = this.getTopWindow(e.target);
+			var stopEvent = this.stopEvent;
+			top.addEventListener(type, function handler(e) {
+				top.removeEventListener(type, handler, true);
+				stopEvent(e);
 			}, true);
-		},
-		getParentBrowser: function(document, doc) {
-			// We don't check anonymous nodes now
-			var browser;
-			const XULNS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
-			Array.prototype.concat.call(
-				Array.prototype.slice.call(doc.getElementsByTagNameNS(XULNS, "tabbrowser")),
-				Array.prototype.slice.call(doc.getElementsByTagNameNS(XULNS, "browser")),
-				Array.prototype.slice.call(doc.getElementsByTagName("iframe")),
-				Array.prototype.slice.call(doc.getElementsByTagName("frame"))
-			).some(function(br) {
-				if(!("contentDocument" in br))
-					return false;
-				var doc = br.contentDocument;
-				_log(
-					"Search parent frame: <" + br.nodeName + "> "
-					+ (doc.title ? doc.title + " " : "") + doc.documentURI
-				);
-				if(
-					doc == document
-					|| (br = this.getParentBrowser(document, doc))
-				) {
-					browser = br.localName.toLowerCase() == "tabbrowser" && br.selectedBrowser || br;
-					return true;
-				}
-				return false;
-			}, this);
-			return browser;
 		},
 		mousedownHandler: function(e) {
 			if(this.canInspect(e)) {
@@ -3469,31 +3558,23 @@ function init() {
 		mouseupHandler: function(e) {
 			this.mousedownHandler.apply(this, arguments);
 		},
-		clickHandler: function(e, top) {
+		clickHandler: function(e) {
 			if(!this.canInspect(e))
 				return;
 			this._checkPreventDefault(e);
 			this.stopEvent(e);
 			var nodes = this._nodes;
 			var node = nodes.length ? nodes[0] : e.originalTarget;
-			this.inspect(node, top, e.shiftKey);
+			this.inspect(node, e.shiftKey);
 		},
-		inspect: function(node, top, forcePopupLocker) {
-			var inspect = this.context.inspector;
-			if(inspect && _popupLocker && (_popupLocker == 2 || forcePopupLocker))
-				this.lockPopup(node, top);
+		inspect: function(node, forcePopupLocker) {
+			var top = this.getTopWindow(node);
+			if(this.hasDOMInspector && _popupLocker && (_popupLocker == 2 || forcePopupLocker))
+				this.lockPopup(node);
 			this.stop();
-			_log(inspect ? "Open DOM Inspector for <" + node.nodeName + ">" : "DOM Inspector not found!");
-			inspect && inspect(node, top, forcePopupLocker);
 			this.closeMenus(node);
 			this.hideUnclosedPopups();
-			if(!inspect) {
-				var label = this.context.button && this.context.button.label
-					|| "Attributes Inspector";
-				Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
-					.getService(Components.interfaces.nsIPromptService)
-					.alert(top, label, "DOM Inspector not found!");
-			}
+			this.inspectNode(node);
 		},
 		getPopup: function(node) {
 			for(; node && "tagName" in node; node = node.parentNode)
@@ -3504,21 +3585,24 @@ function init() {
 					return node;
 			return null;
 		},
-		lockPopup: function(node, top) {
+		lockPopup: function(node) {
 			var popup = this.getPopup(node);
 			if(!popup)
 				return;
 
 			var popupLocker = {
+				context: this,
 				domiWindow: null,
-				window: top,
+				window: this.getTopWindow(node),
 				popup: popup,
 				tt: this.context.tt,
 				ww: this.context.ww,
 				fxVersion: this.fxVersion,
 				closeMenus: this.closeMenus,
 				stopEvent: this.stopEvent,
-				stopSingleEvent: this.stopSingleEvent,
+				stopSingleEvent: function() {
+					this.context.stopSingleEvent.apply(this.context, arguments);
+				},
 				_getPopupInfo: this._getPopupInfo,
 				_popups: [],
 				init: function() {
@@ -3576,7 +3660,7 @@ function init() {
 								this.stopEvent(e);
 								if(onlyStop)
 									return;
-								this.stopSingleEvent(this.window, "keyup");
+								this.stopSingleEvent(e, "keyup");
 								_log("Popup locker: Escape pressed => destroy");
 								this.destroy();
 								this.closeMenus(this.popup);
@@ -3637,8 +3721,12 @@ function init() {
 			return this.__shiftKey;
 		},
 		set _shiftKey(val) {
+			if(val == this.__shiftKey)
+				return;
 			this.__shiftKey = val;
 			!val && this.hideUnclosedPopups();
+			if(_showMargins == 2 && this._node)
+				this.setDataProxy(this._node);
 		},
 		hideUnclosedPopups: function() {
 			this._popups.forEach(function(popup) {
@@ -3651,7 +3739,7 @@ function init() {
 		},
 		popupshowingHandler: function(e) {
 			var tar = e.originalTarget;
-			if(tar.id == this.context.ttId)
+			if(tar == this.context.tt)
 				return;
 			if(this._shiftKey)
 				return;
@@ -3662,7 +3750,7 @@ function init() {
 		},
 		popupshownHandler: function(e) {
 			var tar = e.originalTarget;
-			if(tar.id == this.context.ttId)
+			if(tar == this.context.tt)
 				return;
 			if(/*this._shiftKey && */tar.localName == "tooltip")
 				return;
@@ -3677,7 +3765,7 @@ function init() {
 			if(!this._shiftKey)
 				return;
 			var tar = e.originalTarget;
-			if(/*tar.localName == "tooltip" && */tar.id != this.context.ttId) {
+			if(/*tar.localName == "tooltip" && */tar != this.context.tt) {
 				this.stopEvent(e);
 				if(this._popups.indexOf(tar) == -1)
 					this._popups.push(tar);
@@ -3728,121 +3816,9 @@ function init() {
 			}
 		}
 	};
-	this.evtHandler = function(win) {
-		var gh = this.globalHandler;
-		var hi = gh._windows.indexOf(win);
-		if(hi != -1)
-			return gh._handlers[hi];
-
-		this.currentWindow = win;
-		gh._handlers.push(this);
-		gh._windows.push(win);
-		return this;
-	};
-	this.evtHandler.prototype = {
-		globalHandler: this.evtHandlerGlobal,
-		handleEvent: function(e) {
-			this.globalHandler[e.type + "Handler"](e, this.currentWindow);
-		}
-	};
-	this.overrideBoolPref = function(prefName, prefVal) {
-		var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-			.getService(Components.interfaces.nsIPrefBranch);
-		try {
-			var origVal = prefs.getBoolPref(prefName);
-		}
-		catch(e) {
-			// Firefox 58+: Remove support for extensions having their own prefs file
-			// https://bugzilla.mozilla.org/show_bug.cgi?id=1413413
-		}
-		if(origVal == prefVal || origVal === undefined)
-			return function restore() {};
-		prefs.setBoolPref(prefName, prefVal);
-		return function restore() {
-			prefs.setBoolPref(prefName, origVal);
-		};
-	};
-	defineGetter(this, "inspector", function() {
-		if(!("@mozilla.org/commandlinehandler/general-startup;1?type=inspector" in Components.classes)) {
-			_log("DOM Inspector not installed!");
-			return null;
-		}
-		if((_showFullTree || _nodePosition >= 0) && this.evtHandlerGlobal.fxVersion >= 2) {
-			return function(node, top) {
-				var inspWin = window.openDialog(
-					"chrome://inspector/content/",
-					"_blank",
-					"chrome,all,dialog=no",
-					_showFullTree == 0
-						? node.ownerDocument || node
-						: _showFullTree == 1
-							? (node.ownerDocument || node).defaultView.top.document
-							: (top || window.top).document
-				);
-				var tryDelay = 5;
-				function inspect() {
-					if("inspector" in inspWin && inspWin.inspector) try {
-						try {
-							// Avoid warnings in error console after getViewer("dom")
-							var hash = inspWin.inspector.mPanelSet.registry.mViewerHash;
-						}
-						catch(e1) {
-							Components.utils.reportError(e1);
-						}
-						if(!hash || ("dom" in hash)) {
-							var viewer = inspWin.inspector.getViewer("dom");
-							var restoreBlink = context.overrideBoolPref("inspector.blink.on", false);
-							try {
-								if("showNodeInTree" in viewer) // New DOM Inspector
-									viewer.showNodeInTree(node);
-								else
-									viewer.selectElementInTree(node);
-								if(_nodePosition >= 0) {
-									var tbo = viewer.mDOMTree.treeBoxObject;
-									var cur = tbo.view.selection.currentIndex;
-									var first = tbo.getFirstVisibleRow();
-									var visibleRows = tbo.height/tbo.rowHeight;
-									var newFirst = cur - _nodePosition*visibleRows + 1;
-									tbo.scrollByLines(Math.round(newFirst - first));
-									tbo.ensureRowIsVisible(cur); // Should be visible, but...
-								}
-								return;
-							}
-							catch(e2) {
-								Components.utils.reportError(e2);
-							}
-							finally {
-								restoreBlink();
-							}
-						}
-					}
-					catch(e) {
-						Components.utils.reportError(e);
-					}
-					inspWin.setTimeout(inspect, tryDelay);
-				}
-				inspWin.addEventListener("load", function showNode(e) {
-					inspWin.removeEventListener("load", showNode, false);
-					inspect();
-				}, false);
-			};
-		}
-
-		var ws = this.wm.getEnumerator(null);
-		while(ws.hasMoreElements()) {
-			var w = ws.getNext();
-			if("inspectDOMNode" in w) {
-				return function(node, top) {
-					w.inspectDOMNode(node);
-				};
-			}
-		}
-		_log("Can't find window with DOM Inspector's inspectDOMNode()");
-		return null;
-	});
 
 	this.setAllListeners(ael);
-	this.ww.registerNotification(this.evtHandlerGlobal);
+	this.ww.registerNotification(this.eventHandler);
 	var btn = this.button;
 	if(btn) {
 		var destructor = function(reason) {
@@ -3877,7 +3853,7 @@ function init() {
 		+ ", highlighter: " + (
 			_highlightUsingFlasher
 				? "inIFlasher"
-				: this.evtHandlerGlobal.noStyles
+				: this.eventHandler.noStyles
 					? "inline CSS"
 					: "nsIStyleSheetService"
 		)
@@ -3890,10 +3866,10 @@ function destroy() {
 	tt.hidePopup();
 	tt.parentNode.removeChild(tt);
 
-	var ehg = this.evtHandlerGlobal;
-	ehg.unwatchAttrs();
-	ehg.unhl();
-	ehg.destroyTimers();
+	var eh = this.eventHandler;
+	eh.unwatchAttrs();
+	eh.unhl();
+	eh.destroyTimers();
 	if(!_highlightUsingFlasher) {
 		var sss = this.sss;
 		var cssURI = this.cssURI;
@@ -3903,7 +3879,7 @@ function destroy() {
 			sss.unregisterSheet(cssURI, sss.USER_SHEET);
 	}
 	this.setAllListeners(rel);
-	this.ww.unregisterNotification(ehg);
+	this.ww.unregisterNotification(eh);
 	var btn = this.button;
 	if(btn) {
 		if("_attrsInspectorOrigOnDestroy" in btn)
