@@ -1,0 +1,27 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Test</title>
+	<meta charset="utf-8"/>
+	<script type="text/javascript">
+		function toggleTimer(a) {
+			if(toggleTimer._timer || 0) {
+				clearInterval(toggleTimer._timer);
+				toggleTimer._timer = 0;
+				return;
+			}
+			var cnt = 0;
+			toggleTimer._timer = setInterval(function() {
+				a.setAttribute("data-timer", ++cnt);
+			}, 70);
+		}
+	</script>
+</head>
+<body>
+	<a href="javascript:void 0;" onclick="this.className = this.className ? '' : 'test'">Toggle class</a>
+	<br /><a href="javascript:void 0;" onclick="if(this.className) this.removeAttribute('class'); else this.className = 'test';">Toggle class + remove</a>
+	<br /><a href="javascript:void 0;" onclick="this.className = this.className == 'test' ? 'test-modified' : 'test'">Modify class</a>
+	<br /><a href="javascript:void 0;" onclick="toggleTimer(this);">Toggle fast updates</a>
+	<br /><div>Text nodes, <em>nodes</em>…</div>
+</body>
+</html>
