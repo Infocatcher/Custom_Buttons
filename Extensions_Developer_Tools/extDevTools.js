@@ -1471,45 +1471,44 @@ var cmds = this.commands = {
 		return mi;
 	},
 	doPrefsMenuCommand: function(mi) {
-		var pref = mi.getAttribute("cb_pref");
-		if(!pref)
+		var pVal, pName = mi.getAttribute("cb_pref");
+		if(!pName)
 			return;
-		var pVal;
 		if(mi.getAttribute("type") == "checkbox" && mi.getAttribute("autocheck") != "false")
 			pVal = mi.getAttribute("checked") == "true";
 		else {
-			var curVal = this.getPref(pref);
-			var prefObj = { value: curVal };
+			var curVal = this.getPref(pName);
+			var pref = { value: curVal };
 			var ok = Services.prompt.prompt(
 				window,
 				_localize("Extensions Developer Tools"),
-				_localize("Change “%S” preference:").replace("%S", pref),
-				prefObj,
+				_localize("Change “%S” preference:").replace("%S", pName),
+				pref,
 				null,
 				{}
 			);
 			if(!ok)
 				return;
-			pVal = prefObj.value;
+			pVal = pref.value;
 			if(typeof curVal == "number")
 				pVal = +pVal;
 		}
-		if(this.options.prefValues.hasOwnProperty(pref)) {
+		if(this.options.prefValues.hasOwnProperty(pName)) {
 			if(pVal) // Checked
-				this.setPref(pref, this.options.prefValues[pref]);
+				this.setPref(pName, this.options.prefValues[pName]);
 			else
-				this.resetPref(pref);
+				this.resetPref(pName);
 			this.delayed(function() {
-				mi.setAttribute("tooltiptext", pref + " = " + this.getPref(pref));
+				mi.setAttribute("tooltiptext", pName + " = " + this.getPref(pName));
 			});
 		}
 		else {
-			this.setPref(pref, pVal);
+			this.setPref(pName, pVal);
 		}
-		this.hlPrefItem(mi, pref);
+		this.hlPrefItem(mi, pName);
 		if(mi.hasAttribute("acceltext"))
 			this.showPrefValue(mi, pVal);
-		if(pref == "devtools.chrome.enabled")
+		if(pName == "devtools.chrome.enabled")
 			this.initMenu();
 		this.prefsChanged = true;
 	},
@@ -1527,8 +1526,8 @@ var cmds = this.commands = {
 		}
 		mi.setAttribute("acceltext", pStr);
 	},
-	hlPrefItem: function(node, pref) {
-		node.style.fontWeight = this.prefHasUserValue(pref) ? "bold" : "";
+	hlPrefItem: function(node, pName) {
+		node.style.fontWeight = this.prefHasUserValue(pName) ? "bold" : "";
 	},
 
 	get defaultBranch() {
