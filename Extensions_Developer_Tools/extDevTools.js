@@ -274,6 +274,9 @@ function _localize(s, key) {
 		"Change “%S” preference:": {
 			ru: "Изменить настройку «%S»:"
 		},
+		"Reset to default value (%S)": {
+			ru: "Сбросить на значение по умолчанию (%S)"
+		},
 
 		"Middle-click: action not selected, middle-click on some item to set/unset": {
 			ru: "Клик средней кнопкой мыши: действие не выбрано, кликните средней кнопкой по какому-нибудь пункту для установки/снятия"
@@ -1478,14 +1481,19 @@ var cmds = this.commands = {
 			pVal = mi.getAttribute("checked") == "true";
 		else {
 			var curVal = this.getPref(pName);
+			var defVal = this.getPref(pName, undefined, this.defaultBranch);
+			var resetLabel = curVal != defVal
+				? _localize("Reset to default value (%S)").replace("%S", defVal)
+				: "";
 			var pref = { value: curVal };
+			var reset = { value: false };
 			var ok = Services.prompt.prompt(
 				window,
 				_localize("Extensions Developer Tools"),
 				_localize("Change “%S” preference:").replace("%S", pName),
 				pref,
-				null,
-				{}
+				resetLabel,
+				reset
 			);
 			if(!ok)
 				return;
@@ -1493,7 +1501,11 @@ var cmds = this.commands = {
 			if(typeof curVal == "number")
 				pVal = +pVal;
 		}
-		if(this.options.prefValues.hasOwnProperty(pName)) {
+
+		if(reset && reset.value) {
+			this.resetPref(pName);
+		}
+		else if(this.options.prefValues.hasOwnProperty(pName)) {
 			if(pVal) // Checked
 				this.setPref(pName, this.options.prefValues[pName]);
 			else
@@ -1505,6 +1517,7 @@ var cmds = this.commands = {
 		else {
 			this.setPref(pName, pVal);
 		}
+
 		this.hlPrefItem(mi, pName);
 		if(mi.hasAttribute("acceltext"))
 			this.showPrefValue(mi, pVal);
