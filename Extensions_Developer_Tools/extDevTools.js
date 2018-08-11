@@ -36,6 +36,7 @@ var options = {
 		"extensions.autoDisableScopes": 14
 	},
 	showDebugPrefs: 3, // Sum of flags: 1 - extensions, 2 - application
+	debugPrefsTypes: -1, // -1 to show all or sum of flags: 1 - boolean, 2 - integer, 4 - string
 	debugPrefsInclude: /\.(?:debug|dev(?:el(?:opment)?)?Mode)(?:[-.]?\w+)?$/i,
 	debugPrefsExclude: /\.debugger/i,
 	debugPrefsTrimExtPrefix: true, // Remove leading "extensions." from labels
@@ -1418,12 +1419,22 @@ var cmds = this.commands = {
 		var app = showDebugPrefs & 2
 			&& document.createDocumentFragment();
 		var trimPrefix = this.options.debugPrefsTrimExtPrefix ? 11 /*"extensions.".length*/ : 0;
+		var types = this.options.debugPrefsTypes;
 		Services.prefs.getBranch("")
 			.getChildList("", {})
 			.filter(function(pName) {
-				return !(pName in knownPrefs)
+				var show = !(pName in knownPrefs)
 					&& this.options.debugPrefsInclude.test(pName)
 					&& !this.options.debugPrefsExclude.test(pName);
+				if(show && types != 0) {
+					var ps = Services.prefs;
+					switch(ps.getPrefType(pName)) {
+						case ps.PREF_BOOL:   return types & 1;
+						case ps.PREF_INT:    return types & 2;
+						case ps.PREF_STRING: return types & 4;
+					}
+				}
+				return show;
 			}, this)
 			.sort()
 			.forEach(function(pName) {
