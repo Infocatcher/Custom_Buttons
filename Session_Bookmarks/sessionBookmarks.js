@@ -1718,7 +1718,10 @@ this.bookmarks = {
 			delete window[key];
 			btn.removeAttribute(attr);
 		}
-		document.persist(btn.id, attr);
+		if("persist" in document)
+			document.persist(btn.id, attr);
+		else // Firefox 63+
+			Services.xulStore.persist(btn, attr);
 		return isEmpty;
 	},
 	initContextMenu: function(mi) {

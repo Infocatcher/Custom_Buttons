@@ -13,7 +13,10 @@ var notificationPrefix = cbs.getNotificationPrefix(windowId);
 
 this.toggleEnabled = function() {
 	this.checked = !this.checked;
-	document.persist(this.id, "checked");
+	if("persist" in document)
+		document.persist(this.id, "checked");
+	else // Firefox 63+
+		Services.xulStore.persist(this, "checked");
 };
 this.setAttribute("oncommand", "this.toggleEnabled();");
 

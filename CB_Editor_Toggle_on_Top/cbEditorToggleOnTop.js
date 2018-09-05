@@ -56,7 +56,10 @@ if(!watcher) {
 		styleId: "cbToggleOnTopStyle",
 		get btnTip() {
 			var locale = (function() {
-				if("Services" in window && Services.locale && Services.locale.getRequestedLocales) {					var locales = Services.locale.getRequestedLocales();					return locales && locales[0];				}
+				if("Services" in window && Services.locale && Services.locale.getRequestedLocales) {
+					var locales = Services.locale.getRequestedLocales();
+					return locales && locales[0];
+				}
 				var prefs = "Services" in window && Services.prefs
 					|| Components.classes["@mozilla.org/preferences-service;1"]
 						.getService(Components.interfaces.nsIPrefBranch);
@@ -324,7 +327,12 @@ if(!watcher) {
 			if(toggle) {
 				onTop = !onTop;
 				root.setAttribute(this.onTopAttr, onTop);
-				root.id && document.persist(root.id, this.onTopAttr);
+				if(root.id) {
+					if("persist" in document)
+						document.persist(root.id, this.onTopAttr);
+					else // Firefox 63+
+						Services.xulStore.persist(root, this.onTopAttr);
+				}
 			}
 			else if(!onTop) // Just opened or restored window always have zLevel == normalZ
 				return;
