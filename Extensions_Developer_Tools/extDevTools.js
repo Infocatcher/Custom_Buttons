@@ -1296,9 +1296,16 @@ var cmds = this.commands = {
 		}
 		// Firefox 50+, based on code from resource://devtools/client/menus.js
 		var require = Components.utils["import"]("resource://devtools/shared/Loader.jsm", {}).require;
-		var CommandUtils = require("devtools/client/shared/developer-toolbar").CommandUtils;
 		var TargetFactory = require("devtools/client/framework/target").TargetFactory;
 		var target = TargetFactory.forTab(gBrowser.selectedTab);
+		if("getFront" in target) { // Firefox 64+
+			target.makeRemote().then(function() {
+				target.getFront("inspector")
+					.pickColorFromPage({ copyOnSelect: true, fromMenu: true });
+			}, Components.utils.reportError);
+			return;
+		}
+		var CommandUtils = require("devtools/client/shared/developer-toolbar").CommandUtils;
 		if("executeOnTarget" in CommandUtils) // Firefox 54+
 			CommandUtils.executeOnTarget(target, "eyedropper --frommenu");
 		else {
