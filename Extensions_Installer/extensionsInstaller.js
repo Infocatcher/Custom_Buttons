@@ -393,11 +393,12 @@ mp.installExtension = function(e) {
 		});
 		install.install();
 	}
-	if(AddonManager.getInstallForFile.length == 3)
-		AddonManager.getInstallForFile(xpiFile, handleInstall, "application/x-xpinstall");
-	else { // Firefox 61+
+	try { // Firefox 61+
 		AddonManager.getInstallForFile(xpiFile, "application/x-xpinstall")
 			.then(handleInstall, Components.utils.reportError);
+	}
+	catch(e) {
+		AddonManager.getInstallForFile(xpiFile, handleInstall, "application/x-xpinstall");
 	}
 };
 // Based on code from resource:///components/fuelApplication.js in Firefox 38
