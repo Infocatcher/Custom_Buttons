@@ -287,9 +287,11 @@ function _localize(s, key) {
 		}
 	};
 	var locale = (function() {
-		if("Services" in window && Services.locale && Services.locale.getRequestedLocales) {
-			var locales = Services.locale.getRequestedLocales();
-			return locales && locales[0];
+		if("Services" in window && "locale" in Services) {
+			var locales = Services.locale.requestedLocales // Firefox 64+
+				|| Services.locale.getRequestedLocales && Services.locale.getRequestedLocales();
+			if(locales)
+				return locales[0];
 		}
 		var prefs = Services.prefs;
 		function pref(name, type) {
@@ -789,13 +791,16 @@ var cmds = this.commands = {
 		return this.getLocale(true);
 	},
 	getLocale: function(getDefault) {
-		if("Services" in window && Services.locale && Services.locale.getRequestedLocales) {
+		if(
+			"Services" in window && "locale" in Services
+			&& ("getRequestedLocales" in Services.locale || "requestedLocales" in Services.locale)
+		) {
 			var localePref = "intl.locale.requested";
 			if(getDefault && Services.prefs.prefHasUserValue(localePref)) {
 				var origLocales = this.getPref(localePref);
 				this.resetPref(localePref);
 			}
-			var locales = Services.locale.getRequestedLocales();
+			var locales = Services.locale.requestedLocales || Services.locale.getRequestedLocales();
 			if(origLocales)
 				this.setPref(localePref, origLocales);
 			return locales && locales[0];
@@ -852,8 +857,10 @@ var cmds = this.commands = {
 		});
 	},
 	_setLocale: function(locale) {
-		if("Services" in window && Services.locale && Services.locale.setRequestedLocales)
+		if("Services" in window && "locale" in Services && "setRequestedLocales" in Services.locale)
 			Services.locale.setRequestedLocales([locale]);
+		else if("Services" in window && "locale" in Services && "requestedLocales" in Services.locale)
+			Services.locale.requestedLocales = [locale];
 		else {
 			this.setPref("intl.locale.matchOS", false);
 			this.setPref("general.useragent.locale", locale);

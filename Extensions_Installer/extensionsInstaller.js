@@ -58,9 +58,11 @@ function _localize(s, key) {
 		}
 	};
 	var locale = (function() {
-		if("Services" in window && Services.locale && Services.locale.getRequestedLocales) {
-			var locales = Services.locale.getRequestedLocales();
-			return locales && locales[0];
+		if("Services" in window && "locale" in Services) {
+			var locales = Services.locale.requestedLocales // Firefox 64+
+				|| Services.locale.getRequestedLocales && Services.locale.getRequestedLocales();
+			if(locales)
+				return locales[0];
 		}
 		var prefs = "Services" in window && Services.prefs
 			|| Components.classes["@mozilla.org/preferences-service;1"]
