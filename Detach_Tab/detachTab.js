@@ -27,7 +27,10 @@ function detachTab() {
 	// See replaceTabWithWindow() in chrome://browser/content/tabbrowser.xml
 	var opts = "chrome,dialog=no,all";
 	//var opts = "chrome,dialog=0,resizable=1,location=0";
-	var w = btn[ns + "detachedWindow"] = window.openDialog(getBrowserURL(), "_blank", opts, selectedTab);
+	var browserURL = "getBrowserURL" in window
+		? getBrowserURL()
+		: window.AppConstants && AppConstants.BROWSER_CHROME_URL; // Firefox 63+
+	var w = btn[ns + "detachedWindow"] = window.openDialog(browserURL, "_blank", opts, selectedTab);
 	if(forceHideTabBar) {
 		var autoHide = cbu.getPrefs("browser.tabs.autoHide");
 		if(!autoHide)

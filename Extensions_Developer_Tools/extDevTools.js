@@ -690,11 +690,10 @@ var cmds = this.commands = {
 	openBrowserWindow: function() {
 		// In SeaMonkey OpenBrowserWindow() doesn't return link to opened window
 		//return OpenBrowserWindow();
-		return window.openDialog(
-			getBrowserURL(),
-			"_blank",
-			"chrome,all,dialog=no"
-		);
+		var browserURL = "getBrowserURL" in window
+			? getBrowserURL()
+			: window.AppConstants && AppConstants.BROWSER_CHROME_URL; // Firefox 63+
+		return window.openDialog(browserURL, "_blank", "chrome,all,dialog=no");
 	},
 	restart: function() {
 		return this.confirm("restart", "_restart", arguments);
