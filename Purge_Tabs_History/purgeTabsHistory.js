@@ -136,7 +136,11 @@ this.historyManager = {
 				|| Components.classes["@mozilla.org/suite/sessionstore;1"]
 			).getService(Components.interfaces.nsISessionStore)
 			: SessionStore; // Firefox 61+ https://bugzilla.mozilla.org/show_bug.cgi?id=1450559
-		ss.setWindowValue(window, key, "" + Date.now());
+		ss[
+			"setWindowValue" in ss
+				? "setWindowValue"
+				: "setCustomWindowValue" // Firefox 64+
+		](window, key, "" + Date.now());
 		clearTimeout(this._forceSaveSessionTimer);
 		this._forceSaveSessionTimer = setTimeout(function() {
 			ss.deleteWindowValue(window, key);

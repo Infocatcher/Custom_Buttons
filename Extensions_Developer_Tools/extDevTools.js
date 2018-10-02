@@ -570,7 +570,11 @@ var cmds = this.commands = {
 		// Try remove closed window from undo history
 		var canForget = "forgetClosedWindow" in ss;
 		var forgetFlag = "_cb_extDevTools_forget";
-		canForget && ss.setWindowValue(window, forgetFlag, "1");
+		canForget && ss[
+			"setWindowValue" in ss
+				? "setWindowValue"
+				: "setCustomWindowValue" // Firefox 64+
+		](window, forgetFlag, "1");
 		window.addEventListener("unload", function clearUndo(e) {
 			window.removeEventListener(e.type, clearUndo, false);
 
