@@ -468,6 +468,9 @@ var cmds = this.commands = {
 				else if(cbId == "scratchpad") {
 					this.setPartiallyAvailable(mi, !this.getPref("devtools.chrome.enabled"));
 				}
+				else if(cbId == "browserToolbox") {
+					this.setPartiallyAvailable(mi, !this.getPref("devtools.debugger.remote-enabled"));
+				}
 			},
 			this
 		);
@@ -1248,6 +1251,7 @@ var cmds = this.commands = {
 		return this.hasBrowserToolbox = Services.appinfo.name == "Firefox" && this.platformVersion >= 56;
 	},
 	openBrowserToolbox: function() {
+		this.setPref("devtools.debugger.remote-enabled", true);
 		var btp = Components.utils["import"]("resource://devtools/client/framework/ToolboxProcess.jsm", {})
 			.BrowserToolboxProcess;
 		btp.init(/*onClose, onRun, options*/);
@@ -1552,7 +1556,10 @@ var cmds = this.commands = {
 		this.hlPrefItem(mi, pName);
 		if(mi.hasAttribute("acceltext"))
 			this.showPrefValue(mi, pVal);
-		if(pName == "devtools.chrome.enabled")
+		if(
+			pName == "devtools.chrome.enabled"
+			|| pName == "devtools.debugger.remote-enabled"
+		)
 			this.initMenu();
 		this.prefsChanged = true;
 	},
