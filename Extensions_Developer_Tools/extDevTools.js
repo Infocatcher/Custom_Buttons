@@ -247,6 +247,9 @@ function _localize(s, key) {
 		"Enable developer tools for chrome": {
 			ru: "Включить инструменты разработчика для chrome"
 		},
+		"Enable remove debugger (and Browser Toolbox)": {
+			ru: "Включить удаленную отладку (и инструменты браузера)"
+		},
 		"Silently install extensions from browser profile": {
 			ru: "Молча устанавливать расширения из профиля браузера"
 		},
@@ -1857,6 +1860,10 @@ var mp = cmds.popup = this.appendChild(parseXULFromString('\
 					type="checkbox"\
 					label="' + _localize("Enable developer tools for chrome") + '"\
 					hidden="' + (cmds.platformVersion < 4 || !cmds.prefHasDefaultValue("devtools.chrome.enabled")) + '" />\
+				<menuitem cb_pref="devtools.debugger.remote-enabled"\
+					type="checkbox"\
+					label="' + _localize("Enable remove debugger (and Browser Toolbox)") + '"\
+					hidden="' + (!cmds.prefHasDefaultValue("devtools.debugger.remote-enabled")) + '" />\
 				<menuitem cb_pref="extensions.autoDisableScopes"\
 					tooltiptext="extensions.autoDisableScopes"\
 					type="checkbox"\
