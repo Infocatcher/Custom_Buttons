@@ -1550,7 +1550,11 @@ var cmds = this.commands = {
 			});
 		}
 		else {
-			this.setPref(pName, pVal);
+			// We may have "user changed" devtools.chrome.enabled & Co,
+			// will reset for better indication
+			this.resetPref(pName);
+			if(pVal != this.getPref(pName))
+				this.setPref(pName, pVal);
 		}
 
 		this.hlPrefItem(mi, pName);
