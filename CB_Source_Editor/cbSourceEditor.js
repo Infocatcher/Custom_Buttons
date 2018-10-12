@@ -140,7 +140,7 @@ if(!watcher) {
 			var psXUL = (isCodeMirror
 			? '<!DOCTYPE popupset [\
 				<!ENTITY % sourceEditorStrings SYSTEM "' + (
-					Services.appinfo.name == "Pale Moon"
+					Services.appinfo.name == "Pale Moon" || Services.appinfo.name == "Basilisk"
 						? this.platformVersion >= 4.1
 							? "chrome://devtools/locale/sourceeditor.dtd"
 							: "chrome://global/locale/devtools/sourceeditor.dtd"
