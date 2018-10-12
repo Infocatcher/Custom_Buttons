@@ -1248,7 +1248,9 @@ var cmds = this.commands = {
 	},
 	get hasBrowserToolbox() {
 		delete this.hasBrowserToolbox;
-		return this.hasBrowserToolbox = Services.appinfo.name == "Firefox" && this.platformVersion >= 56;
+		return this.hasBrowserToolbox = Services.appinfo.name == "Firefox" && this.platformVersion >= 56
+			|| Services.appinfo.name == "Pale Moon" && this.platformVersion >= 4.1
+			|| Services.appinfo.name == "Basilisk";
 	},
 	openBrowserToolbox: function() {
 		var pref = "devtools.debugger.remote-enabled";
@@ -1267,7 +1269,9 @@ var cmds = this.commands = {
 	get hasScratchpad() {
 		delete this.hasScratchpad;
 		return this.hasScratchpad = "Scratchpad" in window && "openScratchpad" in Scratchpad
-			|| Services.appinfo.name == "Firefox" && this.platformVersion >= 58;
+			|| Services.appinfo.name == "Firefox" && this.platformVersion >= 58
+			|| Services.appinfo.name == "Pale Moon" && this.platformVersion >= 4.1
+			|| Services.appinfo.name == "Basilisk";
 	},
 	openScratchpad: function() {
 		var ScratchpadManager = "Scratchpad" in window
@@ -1312,7 +1316,9 @@ var cmds = this.commands = {
 	get hasEyedropper() {
 		delete this.hasEyedropper;
 		return this.hasEyedropper = "openEyedropper" in window
-			|| Services.appinfo.name == "Firefox" && this.platformVersion >= 50;
+			|| Services.appinfo.name == "Firefox" && this.platformVersion >= 50
+			|| Services.appinfo.name == "Pale Moon" && this.platformVersion >= 4.1
+			|| Services.appinfo.name == "Basilisk";
 	},
 	openEyedropper: function() {
 		if("openEyedropper" in window) {
