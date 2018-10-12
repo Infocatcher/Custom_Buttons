@@ -141,7 +141,9 @@ if(!watcher) {
 			? '<!DOCTYPE popupset [\
 				<!ENTITY % sourceEditorStrings SYSTEM "' + (
 					Services.appinfo.name == "Pale Moon"
-						? "chrome://global/locale/devtools/sourceeditor.dtd"
+						? this.platformVersion >= 4.1
+							? "chrome://devtools/locale/sourceeditor.dtd"
+							: "chrome://global/locale/devtools/sourceeditor.dtd"
 						: this.platformVersion >= 45
 							? "chrome://devtools/locale/sourceeditor.dtd"
 							: "chrome://browser/locale/devtools/sourceeditor.dtd"
@@ -717,8 +719,8 @@ if(!watcher) {
 			try {
 				new Function("function test() { yield 0; }");
 			}
-			catch(e) { // Firefox 26+, SyntaxError: yield expression is only valid in generators
-				fn = fn.replace("function", "function*");
+			catch(e) { // Firefox 58+: SyntaxError: yield expression is only valid in generators
+				fn = fn.replace("function", "function*"); // Firefox 26+
 			}
 			delete this.loadOverlaysGen;
 			return this.loadOverlaysGen = eval("(" + fn + ")");
