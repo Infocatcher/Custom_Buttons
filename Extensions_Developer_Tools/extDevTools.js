@@ -1251,7 +1251,15 @@ var cmds = this.commands = {
 		return this.hasBrowserToolbox = Services.appinfo.name == "Firefox" && this.platformVersion >= 56;
 	},
 	openBrowserToolbox: function() {
-		this.setPref("devtools.debugger.remote-enabled", true);
+		var pref = "devtools.debugger.remote-enabled";
+		if(!this.getPref(pref)) {
+			this.setPref(pref, true);
+			setTimeout(function(_this) {
+				_this.resetPref(pref);
+				if(_this.getPref(pref)) // Ensure disabled
+					_this.setPref(pref, false);
+			}, 100, this);
+		}
 		var btp = Components.utils["import"]("resource://devtools/client/framework/ToolboxProcess.jsm", {})
 			.BrowserToolboxProcess;
 		btp.init(/*onClose, onRun, options*/);
