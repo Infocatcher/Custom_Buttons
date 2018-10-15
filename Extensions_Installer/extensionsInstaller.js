@@ -12,7 +12,12 @@ var rootDir = "d:\\extensions\\";
 var fixBlockedXpi = false; // Becomes blocked until browser restart on flash drives in Firefox 57+
 if(!file(rootDir).exists()) {
 	rootDir = "z:\\dev\\extensions\\";
-	fixBlockedXpi = "Services" in window && parseFloat(Services.appinfo.platformVersion) >= 57;
+	if("Services" in window) {
+		var pv = parseFloat(Services.appinfo.platformVersion);
+		var app = Services.appinfo.name;
+		fixBlockedXpi = pv >= 57
+			|| (app == "Pale Moon" || app == "Basilisk") && pv >= 4.1;
+	}
 }
 var extensions = {
 	"extensionsId1@example": {
