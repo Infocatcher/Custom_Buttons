@@ -264,6 +264,18 @@ this.permissions = {
 		return this.tld = Components.classes["@mozilla.org/network/effective-tld-service;1"]
 			.getService(Components.interfaces.nsIEffectiveTLDService);
 	},
+	get appInfo() {
+		delete this.appInfo;
+		return this.appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
+			.getService(Components.interfaces.nsIXULAppInfo);
+	},
+	get platformVersion() {
+		var pv = parseFloat(this.appInfo.platformVersion);
+		if(this.appInfo.name == "Pale Moon" || this.appInfo.name == "Basilisk")
+			pv = pv >= 4.1 ? 56 : 28;
+		delete this.platformVersion;
+		return this.platformVersion = pv;
+	},
 
 	initialized: false,
 	mp: null,
@@ -739,7 +751,7 @@ this.permissions = {
 
 	openPermissions: function() {
 		var host = this.getHost(this.options.useBaseDomain.openPermissions);
-		if(host && "Services" in window && parseFloat(Services.appinfo.platformVersion) >= 42)
+		if(host && this.platformVersion >= 42)
 			host = this.currentProtocol + "://" + host;
 
 		if(this.isSeaMonkey) {

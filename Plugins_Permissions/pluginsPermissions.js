@@ -222,8 +222,7 @@ this.permissions = {
 	},
 	get perPluginPermissions() {
 		delete this.perPluginPermissions;
-		return this.perPluginPermissions = this.appInfo.name == "Pale Moon" //~ todo: test
-			|| parseFloat(this.appInfo.platformVersion) >= 20;
+		return this.perPluginPermissions = this.platformVersion >= 20;
 	},
 	popupClass: "cbPluginsPermissionsPopup",
 
@@ -527,6 +526,13 @@ this.permissions = {
 		return this.appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
 			.getService(Components.interfaces.nsIXULAppInfo);
 	},
+	get platformVersion() {
+		var pv = parseFloat(this.appInfo.platformVersion);
+		if(this.appInfo.name == "Pale Moon" || this.appInfo.name == "Basilisk")
+			pv = pv >= 4.1 ? 56 : 28;
+		delete this.platformVersion;
+		return this.platformVersion = pv;
+	},
 	get isSeaMonkey() {
 		delete this.isSeaMonkey;
 		return this.isSeaMonkey = this.appInfo.name == "SeaMonkey";
@@ -650,7 +656,7 @@ this.permissions = {
 			return;
 		}
 		var host = this.getHost(this.options.useBaseDomain.openPermissions);
-		if(host && "Services" in window && parseFloat(Services.appinfo.platformVersion) >= 42)
+		if(host && this.platformVersion >= 42)
 			host = this.currentProtocol + "://" + host;
 		// chrome://browser/content/preferences/privacy.js
 		// Like gPrivacyPane.showCookieExceptions()
