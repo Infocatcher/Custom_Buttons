@@ -2712,13 +2712,12 @@ function init() {
 				.getService(Components.interfaces.nsIXULAppInfo);
 		},
 		get fxVersion() {
-			if(this.appInfo.name == "Pale Moon") {
-				// In Pale Moon 27.4.0 we have platformVersion = 3.2.2
-				return 28; // D'oh
-			}
+			delete this.fxVersion;
 			var pv = this.appInfo.platformVersion;
-			// https://developer.mozilla.org/en-US/docs/Mozilla/Gecko/Versions
 			var v = parseFloat(pv);
+			if(this.appInfo.name == "Pale Moon" || this.appInfo.name == "Basilisk")
+				return this.fxVersion = v >= 4.1 ? 56 : 28;
+			// https://developer.mozilla.org/en-US/docs/Mozilla/Gecko/Versions
 			if(v < 5) {
 				var vc = Components.classes["@mozilla.org/xpcom/version-comparator;1"]
 					.getService(Components.interfaces.nsIVersionComparator);
@@ -2735,7 +2734,6 @@ function init() {
 				else //if(vc.compare(pv, "1.8a1pre") >= 0)
 					v = 1.5;
 			}
-			delete this.fxVersion;
 			return this.fxVersion = v;
 		},
 		get noStyles() {
