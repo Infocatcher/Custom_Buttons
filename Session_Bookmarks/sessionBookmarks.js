@@ -2108,12 +2108,11 @@ this.bookmarks = {
 		return this.appVersion = parseFloat(this.appInfo.version);
 	},
 	get platformVersion() {
+		var pv = parseFloat(this.appInfo.platformVersion);
+		if(this.appName == "Pale Moon" || this.appName == "Basilisk")
+			pv = pv >= 4.1 ? 56 : 28;
 		delete this.platformVersion;
-		return this.platformVersion = parseFloat(
-			this.appInfo.name == "Pale Moon"
-				? this.appInfo.version
-				: this.appInfo.platformVersion
-		);
+		return this.platformVersion = pv;
 	},
 	get appName() {
 		delete this.appName;
