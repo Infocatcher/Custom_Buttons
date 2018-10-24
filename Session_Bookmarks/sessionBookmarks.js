@@ -423,17 +423,10 @@ this.bookmarks = {
 			mp.setAttribute("onpopupshowing", "");
 			mp.removeAttribute("onpopupshowing");
 		}
-		var file = this.file;
-		if(file.exists()) {
-			this.readFromFileAsync(file, function(data) {
-				this.loadData(data);
-				callback && callback();
-			}, this);
-		}
-		else {
-			this.loadData("");
+		this.readFromFileAsync(this.file, function(data) {
+			this.loadData(data);
 			callback && callback();
-		}
+		}, this);
 	},
 	ensureLoaded: function(callback, context, args) {
 		if(this._loaded)
