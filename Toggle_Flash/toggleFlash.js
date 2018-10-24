@@ -134,7 +134,7 @@ this.__defineSetter__("pluginDisabled", function(dis) {
 				icon.style.cssText = style.iconStyle;
 			if(style.hasOwnProperty("iconGrayscale")) {
 				icon.style.filter = style.iconGrayscale
-					? parseFloat(Services.appinfo.platformVersion) >= 36 || Services.appinfo.name == "Pale Moon"
+					? "CSS" in window && "supports" in CSS && CSS.supports("filter", "grayscale(1)")
 						? "grayscale(1)"
 						: 'url("chrome://mozapps/skin/extensions/extensions.svg#greyscale")'
 					: "";
