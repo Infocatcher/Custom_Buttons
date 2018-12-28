@@ -109,7 +109,11 @@ else if("gBrowser" in trgWindow && trgWindow.gBrowser.tabs) {
 
 	gBrowser = trgWindow.gBrowser;
 	if(!tab) {
-		tab = gBrowser.addTab(ADDONS_URL);
+		tab = gBrowser.addTab(ADDONS_URL, {
+			triggeringPrincipal: "Services" in window // Firefox 63+
+				&& Services.scriptSecurityManager
+				&& Services.scriptSecurityManager.getSystemPrincipal()
+		});
 		tab.collapsed = true;
 		tab.closing = true; // See "visibleTabs" getter in chrome://browser/content/tabbrowser.xml
 		trgWindow.addEventListener("TabSelect", dontSelectHiddenTab, false);
@@ -281,7 +285,9 @@ function processAddonsTab(e) {
 		Components.classes["@mozilla.org/alerts-service;1"]
 			.getService(Components.interfaces.nsIAlertsService)
 			.showAlertNotification(
-				"chrome://mozapps/skin/extensions/extensionGeneric.png",
+				Services.appinfo.name == "Firefox" && parseFloat(Services.appinfo.version) >= 57
+					? "chrome://mozapps/skin/extensions/extensionGeneric.svg"
+					: "chrome://mozapps/skin/extensions/extensionGeneric.png",
 				btn.label,
 				msg, false, "", null
 			);
