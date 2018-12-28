@@ -93,8 +93,12 @@ window.editCustomButtonInTab = function(btn, newTab) { // Should be global to wo
 	if(!btn)
 		return;
 	var link = custombuttons.makeButtonLink("edit", btn.id);
-	var cbService = Components.classes["@xsms.nm.ru/custombuttons/cbservice;1"]
-		.getService(Components.interfaces.cbICustomButtonsService);
+	var cbService = "cbICustomButtonsService" in Components.interfaces
+		? Components.classes["@xsms.nm.ru/custombuttons/cbservice;1"]
+			.getService(Components.interfaces.cbICustomButtonsService)
+		: Components.classes["@xsms.nm.ru/custombuttons/cbservice;1"] // Custom Buttons 0.0.5.9+
+			.getService(Components.interfaces.nsISupports)
+			.wrappedJSObject;
 	var param = cbService.getButtonParameters(link);
 	var editorUriFull = editorBaseUri
 		+ "?window=" + cbService.getWindowId(document.documentURI)
@@ -149,7 +153,11 @@ window.editCustomButtonInTab = function(btn, newTab) { // Should be global to wo
 	// Or open new tab
 	var tab = newTab;
 	if(!tab) {
-		tab = gBrowser.selectedTab = gBrowser.addTab(editorUri);
+		tab = gBrowser.selectedTab = gBrowser.addTab(editorUri, {
+			triggeringPrincipal: "Services" in window // Firefox 63+
+				&& Services.scriptSecurityManager
+				&& Services.scriptSecurityManager.getSystemPrincipal()
+		});
 		initSessionStore();
 		tab.setAttribute(cbIdTabAttr, btn.id);
 	}
@@ -249,7 +257,7 @@ addEventListener("DOMContentLoaded", function(e) {
 			break;
 		}
 	}
-}, true, gBrowser);
+}, true, document.getElementById("appcontent")); // Firefox 60+, gBrowser isn't a DOM node anymore 
 checkTab(gBrowser.selectedTab);
 
 function destructor(reason) {
