@@ -880,7 +880,11 @@ var cmds = this.commands = {
 		}
 		var reopen = !this.options.forceRestartOnLocaleChange
 			&& this.canReopenWindow
-			&& this.platformVersion >= 18;
+			&& (
+				this.platformVersion >= 18
+				|| this.app == "Pale Moon" && this.platformVersion >= 4.1
+				|| this.app == "Basilisk"
+			);
 		if(!this.confirm(reopen ? "reopen" : "restart"))
 			return false;
 		if(reopen) {
