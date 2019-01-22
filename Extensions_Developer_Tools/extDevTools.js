@@ -26,6 +26,7 @@ var options = {
 	closeOptionsMenu: false,
 	restoreErrorConsole: true, // Restore Error Console and Browser Console (if available)
 	reopenWindowFlushCaches: true,
+	shitchLocaleFlushCaches: true,
 	changeButtonIcon: true,
 	// Use icon of default menu item as button icon
 	// (middle-click on menu item to mark it as default,
@@ -887,10 +888,14 @@ var cmds = this.commands = {
 				|| this.app == "Pale Moon" && this.platformVersion >= 4.1
 				|| this.app == "Basilisk"
 			);
-		if(!this.confirm(reopen ? "reopenAfterLocaleChange" : "restartAfterLocaleChange"))
+		if(!this.confirm(reopen ? "reopenAfterLocaleChange" : "restartAfterLocaleChange")) {
+			if(this.options.shitchLocaleFlushCaches)
+				this.flushCaches();
+			this.savePrefFile(true);
 			return false;
+		}
 		if(reopen) {
-			this._reopenWindow(true);
+			this._reopenWindow(this.options.shitchLocaleFlushCaches);
 			this.savePrefFile(true);
 		}
 		else {
