@@ -42,7 +42,9 @@ var options = {
 	debugPrefsTrimExtPrefix: true, // Remove leading "extensions." from labels
 	confirm: {
 		reopen: false,
+		reopenAfterLocaleChange: true,
 		restart: false,
+		restartAfterLocaleChange: true,
 		exit: false
 	},
 	hotkeys: {
@@ -885,7 +887,7 @@ var cmds = this.commands = {
 				|| this.app == "Pale Moon" && this.platformVersion >= 4.1
 				|| this.app == "Basilisk"
 			);
-		if(!this.confirm(reopen ? "reopen" : "restart"))
+		if(!this.confirm(reopen ? "reopenAfterLocaleChange" : "restartAfterLocaleChange"))
 			return false;
 		if(reopen) {
 			this._reopenWindow(true);
@@ -1393,9 +1395,16 @@ var cmds = this.commands = {
 	confirm: function(key, method, args) {
 		var msg;
 		switch(key) {
-   			case "reopen":  msg = "Reopen window?";       break;
-   			case "restart": msg = "Restart application?"; break;
-   			case "exit":    msg = "Are you sure you want to exit?";
+   			case "reopen":
+   			case "reopenAfterLocaleChange":
+   				msg = "Reopen window?";
+   			break;
+   			case "restart":
+   			case "restartAfterLocaleChange":
+   				msg = "Restart application?";
+   			break;
+   			case "exit":
+   				msg = "Are you sure you want to exit?";
 		}
 		if(
 			!this.options.confirm[key]
