@@ -1449,10 +1449,16 @@ function init() {
 				else
 					viewer.selectElementInTree(node);
 				if(_nodePosition >= 0) {
-					var tbo = viewer.mDOMTree.treeBoxObject;
+					if("nsITreeBoxObject" in Components.interfaces) {
+						var tbo = viewer.mDOMTree.treeBoxObject;
+						var visibleRows = tbo.height/tbo.rowHeight;
+					}
+					else { // Firefox 66+, https://bugzilla.mozilla.org/show_bug.cgi?id=1482389
+						var tbo = viewer.mDOMTree;
+						var visibleRows = tbo.getPageLength();
+					}
 					var cur = tbo.view.selection.currentIndex;
 					var first = tbo.getFirstVisibleRow();
-					var visibleRows = tbo.height/tbo.rowHeight;
 					var newFirst = cur - _nodePosition*visibleRows + 1;
 					tbo.scrollByLines(Math.round(newFirst - first));
 					tbo.ensureRowIsVisible(cur); // Should be visible, but...
@@ -1520,7 +1526,9 @@ function init() {
 								var cellText = view.getCellText(i, keyCol);
 								if(cellText == "defaultView") {
 									_log('inspectWindow(): scroll to "defaultView" entry');
-									var tbo = tree.treeBoxObject;
+									var tbo = "nsITreeBoxObject" in Components.interfaces
+										? tree.treeBoxObject
+										: tree; // Firefox 66+
 									tbo.beginUpdateBatch();
 									tree.changeOpenState(i, true);
 									view.selection.select(i);
