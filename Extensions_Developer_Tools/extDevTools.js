@@ -1160,7 +1160,7 @@ var cmds = this.commands = {
 	},
 	get canOpenBrowserConsole() {
 		var window = this.browserWindow;
-		return window && !!window.document.getElementById("menu_browserConsole")
+		return window && !!window.document.getElementById("key_browserConsole")
 			|| this.platformVersion >= 57; // Force show menuitem
 	},
 	openBrowserConsole: function() {
@@ -1188,7 +1188,7 @@ var cmds = this.commands = {
 			window.HUDConsoleUI.toggleBrowserConsole();
 			return;
 		}
-		window.document.getElementById("menu_browserConsole").doCommand();
+		window.document.getElementById("key_browserConsole").doCommand();
 	},
 	getBrowserConsole: function(window) {
 		if(!window)
@@ -1282,8 +1282,10 @@ var cmds = this.commands = {
 		btp.init(/*onClose, onRun, options*/);
 	},
 	get hasScratchpad() {
+		var window = this.browserWindow;
 		delete this.hasScratchpad;
-		return this.hasScratchpad = "Scratchpad" in window && "openScratchpad" in Scratchpad
+		return this.hasScratchpad = window && "Scratchpad" in window && "openScratchpad" in Scratchpad
+			|| window && !!window.document.getElementById("key_scratchpad")
 			|| this.app == "Firefox" && this.platformVersion >= 58
 			|| this.app == "Pale Moon" && this.platformVersion >= 4.1
 			|| this.app == "Basilisk";
@@ -1329,8 +1331,9 @@ var cmds = this.commands = {
 		}, false);
 	},
 	get hasEyedropper() {
+		var window = this.browserWindow;
 		delete this.hasEyedropper;
-		return this.hasEyedropper = "openEyedropper" in window
+		return this.hasEyedropper = window && "openEyedropper" in window
 			|| this.app == "Firefox" && this.platformVersion >= 50
 			|| this.app == "Pale Moon" && this.platformVersion >= 4.1
 			|| this.app == "Basilisk";
