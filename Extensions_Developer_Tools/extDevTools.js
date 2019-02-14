@@ -1679,7 +1679,8 @@ var cmds = this.commands = {
 		return this.getPref(pName, null, this.defaultBranch) != null;
 	},
 	resetPref: function(pName) {
-		Services.prefs.clearUserPref(pName);
+		if(Services.prefs.prefHasUserValue(pName))
+			Services.prefs.clearUserPref(pName);
 	},
 
 	prefsChanged: false,
