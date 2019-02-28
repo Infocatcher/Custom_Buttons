@@ -332,6 +332,9 @@ if(!watcher) {
 					for(var opt in optsOvr) if(optsOvr.hasOwnProperty(opt))
 						opts[opt] = optsOvr[opt];
 					var se = new SourceEditor(opts);
+					if("insertCommandsController" in se) window.setTimeout(function() {
+						se.insertCommandsController(); // For Pale Moon and Basilisk
+					}, 100);
 				}
 				else {
 					var se = new SourceEditor();
