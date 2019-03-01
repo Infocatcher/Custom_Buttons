@@ -332,9 +332,12 @@ if(!watcher) {
 					for(var opt in optsOvr) if(optsOvr.hasOwnProperty(opt))
 						opts[opt] = optsOvr[opt];
 					var se = new SourceEditor(opts);
-					if("insertCommandsController" in se) window.setTimeout(function() {
-						se.insertCommandsController(); // For Pale Moon and Basilisk
-					}, 100);
+					if("codeMirror" in se) window.setTimeout(function() {
+						if("insertCommandsController" in se)
+							se.insertCommandsController(); // Pale Moon and Basilisk
+						else
+							this.insertCommandsController(se);
+					}.bind(this), 100);
 				}
 				else {
 					var se = new SourceEditor();
@@ -552,6 +555,79 @@ if(!watcher) {
 			window.addEventListener("keydown",  hke, true);
 			window.addEventListener("keypress", hke, true);
 			window.addEventListener("keyup",    hke, true);
+		},
+		insertCommandsController: function(se) {
+			this.insertCommandsController = insertCommandsController;
+			return insertCommandsController(se);
+			// devtools/client/sourceeditor/editor-commands-controller in Pale Moon/Basilisk
+			function createController(ed) {
+				return {
+					supportsCommand: function (cmd) {
+						switch (cmd) {
+							case "cmd_find":
+							case "cmd_findAgain":
+							case "cmd_gotoLine":
+							case "cmd_undo":
+							case "cmd_redo":
+							case "cmd_delete":
+							case "cmd_selectAll":
+								return true;
+						}
+
+						return false;
+					},
+
+					isCommandEnabled: function (cmd) {
+						let cm = ed.codeMirror;
+
+						switch (cmd) {
+							case "cmd_find":
+							case "cmd_gotoLine":
+							case "cmd_selectAll":
+								return true;
+							case "cmd_findAgain":
+								return cm.state.search != null && cm.state.search.query != null;
+							case "cmd_undo":
+								return ed.canUndo();
+							case "cmd_redo":
+								return ed.canRedo();
+							case "cmd_delete":
+								return ed.somethingSelected();
+						}
+
+						return false;
+					},
+
+					doCommand: function (cmd) {
+						let cm = ed.codeMirror;
+
+						let map = {
+							"cmd_selectAll": "selectAll",
+							"cmd_find": "find",
+							"cmd_undo": "undo",
+							"cmd_redo": "redo",
+							"cmd_delete": "delCharAfter",
+							"cmd_findAgain": "findNext"
+						};
+
+						if (map[cmd]) {
+							cm.execCommand(map[cmd]);
+							return;
+						}
+
+						if (cmd == "cmd_gotoLine") {
+							ed.jumpToLine();
+						}
+					},
+
+					onEvent: function () {}
+				};
+			}
+			function insertCommandsController(sourceEditor) {
+				let input = sourceEditor.codeMirror.getInputField();
+				let controller = createController(sourceEditor);
+				input.controllers.insertControllerAt(0, controller);
+			}
 		},
 		destroyWindow: function(window, reason, isFrame) {
 			if(reason == this.REASON_WINDOW_CLOSED)
