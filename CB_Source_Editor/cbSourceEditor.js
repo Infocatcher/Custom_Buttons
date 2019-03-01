@@ -4,8 +4,8 @@
 // Source Editor (formerly Orion Editor) button for Custom Buttons
 // (code for "initialization" section)
 
-// (c) Infocatcher 2012-2017
-// version 0.1.0a8 - 2017-05-28
+// (c) Infocatcher 2012-2019
+// version 0.1.0a9 - 2019-03-01
 
 var options = {
 	cssInHelp: true,
