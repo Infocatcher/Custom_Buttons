@@ -1053,7 +1053,7 @@ this.permissions = {
 			this.showCookiesSM(host);
 			return;
 		}
-		if(this.app.name == "Firefox" && parseFloat(this.app.version) >= 62) { //~ todo: check versions
+		if(this.app.name == "Firefox" && parseFloat(this.app.version) >= 61) {
 			this.showSiteDate(host);
 			return;
 		}
@@ -1117,7 +1117,7 @@ this.permissions = {
 		}
 	},
 	showSiteDate: function(host) {
-		var win = this.wm.getMostRecentWindow("Browser:Cookies");
+		var win = this.wm.getMostRecentWindow("Browser:SiteDataSettings");
 		var _this = this;
 		var setFilter = function setFilter(e) {
 			e && win.removeEventListener("load", setFilter, false);
@@ -1128,8 +1128,11 @@ this.permissions = {
 			host && setFilter();
 		}
 		else {
-			win = window.openDialog("chrome://browser/content/preferences/siteDataSettings.xul", "_blank", "");
-			host && win.addEventListener("load", setFilter, false);
+			var {SiteDataManager} = Components.utils.import("resource:///modules/SiteDataManager.jsm", {});
+			SiteDataManager.updateSites().then(function() {
+				win = window.openDialog("chrome://browser/content/preferences/siteDataSettings.xul", "_blank", "");
+				host && win.addEventListener("load", setFilter, false);
+			}, Components.utils.reportError);
 		}
 	},
 	confirm: function(msg, method/*, arg1, arg2*/) {
