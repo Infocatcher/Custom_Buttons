@@ -635,11 +635,10 @@ this.permissions = {
 			return scheme;
 		return "http";
 	},
-	get isSeaMonkey() {
-		delete this.isSeaMonkey;
-		return this.isSeaMonkey = Components.classes["@mozilla.org/xre/app-info;1"]
-			.getService(Components.interfaces.nsIXULAppInfo)
-			.name == "SeaMonkey";
+	get app() {
+		delete this.app;
+		return this.app = Components.classes["@mozilla.org/xre/app-info;1"]
+			.getService(Components.interfaces.nsIXULAppInfo);
 	},
 	getHost: function(useBaseDomain, host) {
 		if(host === undefined)
@@ -754,7 +753,7 @@ this.permissions = {
 		if(host && this.platformVersion >= 42)
 			host = this.currentProtocol + "://" + host;
 
-		if(this.isSeaMonkey) {
+		if(this.app.name == "SeaMonkey") {
 			this.openPermissionsSM(host);
 			return;
 		}
@@ -1050,7 +1049,7 @@ this.permissions = {
 			this.showCookiesCMP(host);
 			return;
 		}
-		if(this.isSeaMonkey) {
+		if(this.app.name == "SeaMonkey") {
 			this.showCookiesSM(host);
 			return;
 		}
