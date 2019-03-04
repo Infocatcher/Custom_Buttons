@@ -1053,6 +1053,10 @@ this.permissions = {
 			this.showCookiesSM(host);
 			return;
 		}
+		if(this.app.name == "Firefox" && parseFloat(this.app.version) >= 62) { //~ todo: check versions
+			this.showSiteDate(host);
+			return;
+		}
 		var win = this.wm.getMostRecentWindow("Browser:Cookies");
 		var _this = this;
 		var setFilter = function setFilter(e) {
@@ -1110,6 +1114,22 @@ this.permissions = {
 		else {
 			win = window.openDialog("chrome://communicator/content/permissions/cookieViewer.xul", "_blank", "");
 			win.addEventListener("load", setFilter, false);
+		}
+	},
+	showSiteDate: function(host) {
+		var win = this.wm.getMostRecentWindow("Browser:Cookies");
+		var _this = this;
+		var setFilter = function setFilter(e) {
+			e && win.removeEventListener("load", setFilter, false);
+			_this.setTextboxValue(win.document.getElementById("searchBox"), host);
+		};
+		if(win) {
+			win.focus();
+			host && setFilter();
+		}
+		else {
+			win = window.openDialog("chrome://browser/content/preferences/siteDataSettings.xul", "_blank", "");
+			host && win.addEventListener("load", setFilter, false);
 		}
 	},
 	confirm: function(msg, method/*, arg1, arg2*/) {
