@@ -764,13 +764,19 @@ this.permissions = {
 		var bundle = Components.classes["@mozilla.org/intl/stringbundle;1"]
 			.getService(Components.interfaces.nsIStringBundleService)
 			.createBundle("chrome://browser/locale/preferences/preferences.properties");
+		try {
+			var cpTitle = bundle.GetStringFromName("cookiepermissionstitle");
+			var cpText = bundle.GetStringFromName("cookiepermissionstext");
+		}
+		catch(e) { // Not used in Firefox 62+
+		}
 		var params = { blockVisible   : true,
 					   sessionVisible : true,
 					   allowVisible   : true,
 					   prefilledHost  : host,
 					   permissionType : this.permissionType,
-					   windowTitle    : bundle.GetStringFromName("cookiepermissionstitle"),
-					   introText      : bundle.GetStringFromName("cookiepermissionstext") };
+					   windowTitle    : cpTitle,
+					   introText      : cpText };
 
 		var win;
 		var ws = this.wm.getEnumerator("Browser:Permissions");
