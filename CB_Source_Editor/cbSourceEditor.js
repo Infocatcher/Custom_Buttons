@@ -127,7 +127,8 @@ if(!watcher) {
 				var require = Components.utils.import(loader, {}).devtools.require;
 				[
 					"devtools/sourceeditor/editor",
-					"devtools/client/sourceeditor/editor" // Firefox 44+
+					"devtools/client/sourceeditor/editor", // Firefox 44+
+					"devtools/client/shared/sourceeditor/editor" // Firefox 68+
 				].some(function(path) {
 					try {
 						return window.SourceEditor = require(path);
