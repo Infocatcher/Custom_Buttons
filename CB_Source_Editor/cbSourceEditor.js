@@ -154,15 +154,15 @@ if(!watcher) {
 				xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">\
 				<menupopup id="sourceEditorContext"\
 					onpopupshowing="goUpdateSourceEditorMenuItems()">\
-					<menuitem id="menu_undo"/>\
-					<menuitem id="menu_redo"/>\
+					<menuitem id="menu_undo" data-l10n-id="editmenu-undo" />\
+					<menuitem id="menu_redo" data-l10n-id="editmenu-redo" />\
 					<menuseparator/>\
-					<menuitem id="menu_cut"/>\
-					<menuitem id="menu_copy"/>\
-					<menuitem id="menu_paste"/>\
-					<menuitem id="menu_delete"/>\
+					<menuitem id="menu_cut" data-l10n-id="editmenu-cut" />\
+					<menuitem id="menu_copy" data-l10n-id="editmenu-copy" />\
+					<menuitem id="menu_paste" data-l10n-id="editmenu-paste" />\
+					<menuitem id="menu_delete" data-l10n-id="editmenu-delete" />\
 					<menuseparator/>\
-					<menuitem id="menu_selectAll"/>\
+					<menuitem id="menu_selectAll" data-l10n-id="editmenu-select-all" />\
 					<menuseparator/>\
 					<menuitem id="menu_find"/>\
 					<menuitem id="menu_findAgain"/>\
@@ -213,6 +213,12 @@ if(!watcher) {
 				this.loadOverlays(
 					window,
 					function done() {
+						if("MozXULElement" in window) try { // Firefox 66+, for data-l10n-id="..."
+							window.MozXULElement.insertFTLIfNeeded("toolkit/main-window/editmenu.ftl");
+						}
+						catch(e) {
+							Components.utils.reportError(e);
+						}
 						window.setTimeout(function() {
 							var mp = document.getElementById("sourceEditorContext");
 							if(mp.state == "closed")
