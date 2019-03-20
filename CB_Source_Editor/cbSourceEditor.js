@@ -339,7 +339,7 @@ if(!watcher) {
 							se.insertCommandsController(); // Pale Moon and Basilisk
 						else
 							this.insertCommandsController(se);
-					}.bind(this), 100);
+					}.bind(this), 200);
 				}
 				else {
 					var se = new SourceEditor();
