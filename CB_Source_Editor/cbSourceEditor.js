@@ -14,7 +14,8 @@ var options = {
 		enableCodeFolding: true,
 		showTrailingSpace: true,
 		lineWrapping: false,
-		autocomplete: true
+		autocomplete: true,
+		fontSize: 12
 	},
 	orion: {
 		lineNumbers: true
@@ -440,6 +441,12 @@ if(!watcher) {
 					se.appendTo(seElt).then(function() {
 						try {
 							se.setupAutoCompletion();
+						}
+						catch(e) {
+							Components.utils.reportError(e);
+						}
+						if("setFontSize" in se) try {
+							se.setFontSize(options.codeMirror.fontSize);
 						}
 						catch(e) {
 							Components.utils.reportError(e);
