@@ -125,12 +125,17 @@ if(!watcher) {
 					? "resource://devtools/shared/Loader.jsm"
 					: "resource://gre/modules/devtools/Loader.jsm";
 				var require = Components.utils.import(loader, {}).devtools.require;
-				try {
-					window.SourceEditor = require("devtools/sourceeditor/editor");
-				}
-				catch(e2) {
-					window.SourceEditor = require("devtools/client/sourceeditor/editor");
-				}
+				[
+					"devtools/sourceeditor/editor",
+					"devtools/client/sourceeditor/editor" // Firefox 44+
+				].some(function(path) {
+					try {
+						return window.SourceEditor = require(path);
+					}
+					catch(e) {
+					}
+					return null;
+				});
 				isCodeMirror = true;
 			}
 			var SourceEditor = window.SourceEditor;
