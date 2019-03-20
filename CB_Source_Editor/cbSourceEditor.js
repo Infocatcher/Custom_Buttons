@@ -139,6 +139,8 @@ if(!watcher) {
 			// + view-source:chrome://browser/content/devtools/source-editor-overlay.xul
 			var psXUL = (isCodeMirror
 			? '<!DOCTYPE popupset [\
+				<!ENTITY % editMenuStrings SYSTEM "chrome://global/locale/editMenuOverlay.dtd">\
+				%editMenuStrings;\
 				<!ENTITY % sourceEditorStrings SYSTEM "' + (
 					Services.appinfo.name == "Pale Moon" || Services.appinfo.name == "Basilisk"
 						? this.platformVersion >= 4.1
@@ -154,18 +156,18 @@ if(!watcher) {
 				xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">\
 				<menupopup id="sourceEditorContext"\
 					onpopupshowing="goUpdateSourceEditorMenuItems()">\
-					<menuitem id="menu_undo" data-l10n-id="editmenu-undo" />\
-					<menuitem id="menu_redo" data-l10n-id="editmenu-redo" />\
+					<menuitem id="menu_undo" label="&undoCmd.label;" accesskey="&undoCmd.accesskey;" />\
+					<menuitem id="menu_redo" label="&redoCmd.label;" accesskey="&redoCmd.accesskey;" />\
 					<menuseparator/>\
-					<menuitem id="menu_cut" data-l10n-id="editmenu-cut" />\
-					<menuitem id="menu_copy" data-l10n-id="editmenu-copy" />\
-					<menuitem id="menu_paste" data-l10n-id="editmenu-paste" />\
-					<menuitem id="menu_delete" data-l10n-id="editmenu-delete" />\
+					<menuitem id="menu_cut" label="&cutCmd.label;" accesskey="&cutCmd.accesskey;" />\
+					<menuitem id="menu_copy" label="&copyCmd.label;" accesskey="&copyCmd.accesskey;" />\
+					<menuitem id="menu_paste" label="&pasteCmd.label;" accesskey="&pasteCmd.accesskey;" />\
+					<menuitem id="menu_delete" label="&deleteCmd.label;" accesskey="&deleteCmd.accesskey;" />\
 					<menuseparator/>\
-					<menuitem id="menu_selectAll" data-l10n-id="editmenu-select-all" />\
+					<menuitem id="menu_selectAll" label="&selectAllCmd.label;" accesskey="&selectAllCmd.accesskey;" />\
 					<menuseparator/>\
-					<menuitem id="menu_find"/>\
-					<menuitem id="menu_findAgain"/>\
+					<menuitem id="menu_find" label="&findCmd.label;" accesskey="&findCmd.accesskey;" />\
+					<menuitem id="menu_findAgain" label="&findAgainCmd.label;" accesskey="&findAgainCmd.accesskey;" />\
 					<menuseparator/>\
 					<menuitem id="se-menu-gotoLine"\
 						label="&gotoLineCmd.label;"\
@@ -213,12 +215,6 @@ if(!watcher) {
 				this.loadOverlays(
 					window,
 					function done() {
-						if("MozXULElement" in window) try { // Firefox 66+, for data-l10n-id="..."
-							window.MozXULElement.insertFTLIfNeeded("toolkit/main-window/editmenu.ftl");
-						}
-						catch(e) {
-							Components.utils.reportError(e);
-						}
 						window.setTimeout(function() {
 							var mp = document.getElementById("sourceEditorContext");
 							if(mp.state == "closed")
