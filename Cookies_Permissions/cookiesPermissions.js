@@ -1293,7 +1293,8 @@ this.permissions = {
 // Used Fugue and Diagona icons (http://p.yusukekamiyamane.com/)
 
 // Styles can't override hardcoded icon
-var icon = this.ownerDocument.getAnonymousElementByAttribute(this, "class", "toolbarbutton-icon");
+var icon = this.ownerDocument.getAnonymousElementByAttribute(this, "class", "toolbarbutton-icon")
+	|| this.getElementsByClassName("toolbarbutton-icon")[0];
 if(icon)
 	icon.src = "";
 else

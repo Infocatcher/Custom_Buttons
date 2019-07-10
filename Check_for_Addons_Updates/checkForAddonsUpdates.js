@@ -344,7 +344,8 @@ function ProgressIcon(btn) {
 			: "chrome://browser/skin/tabbrowser/loading.png";
 	}
 	var useAnimation = app == "Firefox" && pv >= 32;
-	var btnIcon = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon");
+	var btnIcon = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon")
+		|| btn.getElementsByClassName("toolbarbutton-icon")[0];
 	var origIcon = btnIcon.src;
 	btnIcon.src = this.imgConnecting;
 	if(useAnimation) {

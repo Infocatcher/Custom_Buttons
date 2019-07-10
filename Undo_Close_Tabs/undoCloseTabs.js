@@ -1040,7 +1040,8 @@ if( // Remove icon only if nsIStyleSheetService works on-the-fly (Firefox 3.0+)
 	!Components.ID("{41d979dc-ea03-4235-86ff-1e3c090c5630}")
 		.equals(Components.interfaces.nsIStyleSheetService)
 ) {
-	let icon = this.ownerDocument.getAnonymousElementByAttribute(this, "class", "toolbarbutton-icon");
+	let icon = this.ownerDocument.getAnonymousElementByAttribute(this, "class", "toolbarbutton-icon")
+		|| this.getElementsByClassName("toolbarbutton-icon")[0];
 	if(icon)
 		icon.src = "";
 	else
