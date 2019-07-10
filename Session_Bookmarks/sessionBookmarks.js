@@ -2355,7 +2355,7 @@ this.bookmarks = {
 		};
 	},
 	createElement: function(name, attrs) {
-		var node = document.createElement(name);
+		var node = document.createElementNS(xulns, name);
 		if(attrs) for(var attrName in attrs) if(attrs.hasOwnProperty(attrName))
 			node.setAttribute(attrName, attrs[attrName]);
 		return node;

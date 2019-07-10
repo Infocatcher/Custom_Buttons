@@ -528,7 +528,7 @@ this.undoCloseTabsList = {
 	},
 
 	createElement: function(name, attrs) {
-		var node = document.createElement(name);
+		var node = document.createElementNS(xulns, name);
 		if(attrs) for(var attrName in attrs) if(attrs.hasOwnProperty(attrName))
 			node.setAttribute(attrName, attrs[attrName]);
 		return node;
@@ -705,7 +705,7 @@ this.undoCloseTabsList = {
 				break;
 				case "separator":
 					if(df.hasChildNodes() && df.lastChild.localName != "menuseparator")
-						df.appendChild(document.createElement("menuseparator"));
+						df.appendChild(document.createElementNS(xulns, "menuseparator"));
 				break;
 				default:
 					Components.utils.reportError(this.errPrefix + 'Invalid template entry: "' + sid + '"');
@@ -916,7 +916,7 @@ this.undoCloseTabsList = {
 		var df = document.createDocumentFragment();
 		var hasHeader = header && template.indexOf("header") != -1;
 		function item(key, val) {
-			var lbl = document.createElement("label");
+			var lbl = document.createElementNS(xulns, "label");
 			lbl.className = "cb-" + key;
 			//lbl.setAttribute("value", val);
 			lbl.textContent = val;

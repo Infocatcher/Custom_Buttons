@@ -43,7 +43,9 @@ var options = {
 	// Use Shift+click to invert closeMenu* behavior
 };
 
-var mp = document.createElement("menupopup");
+var xulns = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
+
+var mp = document.createElementNS(xulns, "menupopup");
 mp.setAttribute("onpopupshowing", "this.updateMenu();");
 mp.setAttribute("oncommand", "this.handleEvent(event);");
 mp.setAttribute("onmousedown", "if(event.button == 0) this.handleEvent(event);");
@@ -84,10 +86,10 @@ mp.updateMenu = function() {
 		}).forEach(function(addon) {
 			var type = addon.type;
 			if(prevType && type != prevType)
-				df.appendChild(document.createElement("menuseparator"));
+				df.appendChild(document.createElementNS(xulns, "menuseparator"));
 			prevType = type;
 			var icon = addon.iconURL || addon.icon64URL;
-			var mi = document.createElement("menuitem");
+			var mi = document.createElementNS(xulns, "menuitem");
 			mi.className = "menuitem-iconic";
 			var label = addon.name;
 			if(options.showVersions == 1)
