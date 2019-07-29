@@ -1319,12 +1319,14 @@ function init() {
 			//	win = browser.ownerDocument.defaultView.top;
 			//}
 			try {
-				return win.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
-					.getInterface(Components.interfaces.nsIWebNavigation)
-					.QueryInterface(Components.interfaces.nsIDocShellTreeItem)
-					.rootTreeItem
-					.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
-					.getInterface(Components.interfaces.nsIDOMWindow);
+				return "QueryInterface" in win
+					? win.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+						.getInterface(Components.interfaces.nsIWebNavigation)
+						.QueryInterface(Components.interfaces.nsIDocShellTreeItem)
+						.rootTreeItem
+						.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+						.getInterface(Components.interfaces.nsIDOMWindow)
+					: win.docShell.rootTreeItem.domWindow; // Firefox 70+
 			}
 			catch(e) {
 				Components.utils.reportError(e);
