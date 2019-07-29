@@ -1392,7 +1392,7 @@ function init() {
 				return;
 
 			var top = this.getTopWindow(node);
-			_log("Open DOM Inspector for <" + node.nodeName + ">");
+			_log("Open DOM Inspector for <" + node.nodeName + "> from " + top.location);
 			if(!_showFullTree || _nodePosition < 0 || this.fxVersion < 2) {
 				// See window.inspectDOMNode()
 				top.openDialog("chrome://inspector/content/", "_blank", "chrome,all,dialog=no", node);
