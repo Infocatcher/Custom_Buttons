@@ -949,11 +949,14 @@ function init() {
 			var ta = Components.classes["@mozilla.org/widget/transferable;1"]
 				.createInstance(Components.interfaces.nsITransferable);
 			if(sourceWindow && "init" in ta) {
-				// The clipboard will be cleared when private browsing mode ends
-				var privacyContext = sourceWindow.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+				// The clipboard will be cleared when private browsing mode ends,
+				// removed in Firefox 41+ https://bugzilla.mozilla.org/show_bug.cgi?id=1166840
+				// QueryInterface removed in Firefox 70+ https://bugzilla.mozilla.org/show_bug.cgi?id=1568585
+				var privacyContext = sourceWindow.QueryInterface && sourceWindow
+					.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
 					.getInterface(Components.interfaces.nsIWebNavigation)
 					.QueryInterface(Components.interfaces.nsILoadContext);
-				ta.init(privacyContext);
+				ta.init(privacyContext || null);
 			}
 			for(var flavor in dataObj) if(dataObj.hasOwnProperty(flavor)) {
 				var value = dataObj[flavor];
