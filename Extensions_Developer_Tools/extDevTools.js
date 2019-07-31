@@ -2036,8 +2036,8 @@ this.attrsInspector = function(event) {
 // https://forum.mozilla-russia.org/viewtopic.php?id=56041
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Attributes_Inspector
 
-// (c) Infocatcher 2010-2018
-// version 0.6.5pre - 2018-08-08
+// (c) Infocatcher 2010-2019
+// version 0.6.5pre2 - 2019-07-31
 
 //===================
 // Attributes Inspector button for Custom Buttons
@@ -2983,11 +2983,14 @@ function init() {
 			var ta = Components.classes["@mozilla.org/widget/transferable;1"]
 				.createInstance(Components.interfaces.nsITransferable);
 			if(sourceWindow && "init" in ta) {
-				// The clipboard will be cleared when private browsing mode ends
-				var privacyContext = sourceWindow.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+				// The clipboard will be cleared when private browsing mode ends,
+				// removed in Firefox 41+ https://bugzilla.mozilla.org/show_bug.cgi?id=1166840
+				// QueryInterface removed in Firefox 70+ https://bugzilla.mozilla.org/show_bug.cgi?id=1568585
+				var privacyContext = sourceWindow.QueryInterface && sourceWindow
+					.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
 					.getInterface(Components.interfaces.nsIWebNavigation)
 					.QueryInterface(Components.interfaces.nsILoadContext);
-				ta.init(privacyContext);
+				ta.init(privacyContext || null);
 			}
 			for(var flavor in dataObj) if(dataObj.hasOwnProperty(flavor)) {
 				var value = dataObj[flavor];
@@ -3350,12 +3353,14 @@ function init() {
 			//	win = browser.ownerDocument.defaultView.top;
 			//}
 			try {
-				return win.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
-					.getInterface(Components.interfaces.nsIWebNavigation)
-					.QueryInterface(Components.interfaces.nsIDocShellTreeItem)
-					.rootTreeItem
-					.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
-					.getInterface(Components.interfaces.nsIDOMWindow);
+				return "QueryInterface" in win
+					? win.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+						.getInterface(Components.interfaces.nsIWebNavigation)
+						.QueryInterface(Components.interfaces.nsIDocShellTreeItem)
+						.rootTreeItem
+						.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+						.getInterface(Components.interfaces.nsIDOMWindow)
+					: win.docShell.rootTreeItem.domWindow; // Firefox 70+
 			}
 			catch(e) {
 				Components.utils.reportError(e);
@@ -3423,7 +3428,7 @@ function init() {
 				return;
 
 			var top = this.getTopWindow(node);
-			_log("Open DOM Inspector for <" + node.nodeName + ">");
+			_log("Open DOM Inspector for <" + node.nodeName + "> from " + top.location);
 			if(!_showFullTree || _nodePosition < 0 || this.fxVersion < 2) {
 				// See window.inspectDOMNode()
 				top.openDialog("chrome://inspector/content/", "_blank", "chrome,all,dialog=no", node);
