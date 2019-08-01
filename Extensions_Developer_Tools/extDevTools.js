@@ -1355,6 +1355,16 @@ var cmds = this.commands = {
 			}, Components.utils.reportError);
 			return;
 		}
+		if("then" in target) { // Firefox 69+
+			target.then(function(target) {
+				target.attach().then(function() {
+					target.getInspector().then(function(inspectorFront) {
+						inspectorFront.pickColorFromPage({ copyOnSelect: true, fromMenu: true });
+					}, Components.utils.reportError);
+				}, Components.utils.reportError);
+			}, Components.utils.reportError);
+			return;
+		}
 		var CommandUtils = require("devtools/client/shared/developer-toolbar").CommandUtils;
 		if("executeOnTarget" in CommandUtils) // Firefox 54+
 			CommandUtils.executeOnTarget(target, "eyedropper --frommenu");
