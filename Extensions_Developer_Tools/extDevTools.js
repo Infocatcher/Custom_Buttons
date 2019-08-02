@@ -695,7 +695,10 @@ var cmds = this.commands = {
 
 			tabs.forEach(function(tab) {
 				var isRemote = tab.linkedBrowser.getAttribute("remote") == "true";
-				var newTab = newBrowser.addTab(isRemote ? "about:blank" : "about:about");
+				var newTab = newBrowser.addTab(isRemote ? "about:blank" : "about:about", {
+					triggeringPrincipal: "Services" in window && Services.scriptSecurityManager
+						&& Services.scriptSecurityManager.getSystemPrincipal() // Firefox 64+
+				});
 				newBrowser.swapBrowsersAndCloseOther(newTab, tab);
 				if(tab == selectedTab) {
 					var initialTab = newBrowser.selectedTab;
