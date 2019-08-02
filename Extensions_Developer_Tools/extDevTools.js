@@ -695,10 +695,12 @@ var cmds = this.commands = {
 
 			tabs.forEach(function(tab) {
 				var isRemote = tab.linkedBrowser.getAttribute("remote") == "true";
-				var newTab = newBrowser.addTab(isRemote ? "about:blank" : "about:about", {
-					triggeringPrincipal: "Services" in window && Services.scriptSecurityManager
-						&& Services.scriptSecurityManager.getSystemPrincipal() // Firefox 64+
-				});
+				var newTab = "Services" in window && "cpmm" in Services // May be remote?
+					? newBrowser.addTab(isRemote ? "about:blank" : "about:about", {
+						triggeringPrincipal: "Services" in window && Services.scriptSecurityManager
+							&& Services.scriptSecurityManager.getSystemPrincipal() // Firefox 64+
+					})
+					: newBrowser.addTab();
 				newBrowser.swapBrowsersAndCloseOther(newTab, tab);
 				if(tab == selectedTab) {
 					var initialTab = newBrowser.selectedTab;
