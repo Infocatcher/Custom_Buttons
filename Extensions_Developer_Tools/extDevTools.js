@@ -707,6 +707,7 @@ var cmds = this.commands = {
 					newBrowser.selectedTab = newTab;
 					newBrowser.removeTab(initialTab);
 				}
+				tab.getAttribute("pinned") == "true" && win.gBrowser.pinTab && win.gBrowser.pinTab(newTab);
 			});
 		}, false);
 	},
