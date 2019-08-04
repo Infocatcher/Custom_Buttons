@@ -649,7 +649,7 @@ var cmds = this.commands = {
 				}
 			);
 			var selectedTab = gBrowser.selectedTab;
-			var newBrowser = win.gBrowser;
+			var gBrowserNew = win.gBrowser;
 
 			var hasUnloadedTabs = false;
 			tabs.forEach(function(tab) {
@@ -679,12 +679,12 @@ var cmds = this.commands = {
 					? selectedTab._tPos
 					: tabs.indexOf(selectedTab);
 				(function tstMoveTabs() {
-					if("treeStyleTab" in newBrowser) {
-						newBrowser.treeStyleTab.moveTabs(tabs);
+					if("treeStyleTab" in gBrowserNew) {
+						gBrowserNew.treeStyleTab.moveTabs(tabs);
 
-						var initialTab = newBrowser.selectedTab;
-						newBrowser.selectedTab = (newBrowser.tabs || newBrowser.tabContainer.childNodes)[selectedTabPos + 1];
-						newBrowser.removeTab(initialTab);
+						var initialTab = gBrowserNew.selectedTab;
+						gBrowserNew.selectedTab = (gBrowserNew.tabs || gBrowserNew.tabContainer.childNodes)[selectedTabPos + 1];
+						gBrowserNew.removeTab(initialTab);
 					}
 					else {
 						setTimeout(tstMoveTabs, 10);
@@ -696,18 +696,18 @@ var cmds = this.commands = {
 			tabs.forEach(function(tab) {
 				var isRemote = tab.linkedBrowser.getAttribute("remote") == "true";
 				var newTab = "Services" in window && "cpmm" in Services // May be remote?
-					? newBrowser.addTab(isRemote ? "about:blank" : "about:about", {
+					? gBrowserNew.addTab(isRemote ? "about:blank" : "about:about", {
 						triggeringPrincipal: "Services" in window && Services.scriptSecurityManager
 							&& Services.scriptSecurityManager.getSystemPrincipal() // Firefox 64+
 					})
-					: newBrowser.addTab();
-				newBrowser.swapBrowsersAndCloseOther(newTab, tab);
+					: gBrowserNew.addTab();
+				gBrowserNew.swapBrowsersAndCloseOther(newTab, tab);
 				if(tab == selectedTab) {
-					var initialTab = newBrowser.selectedTab;
-					newBrowser.selectedTab = newTab;
-					newBrowser.removeTab(initialTab);
+					var initialTab = gBrowserNew.selectedTab;
+					gBrowserNew.selectedTab = newTab;
+					gBrowserNew.removeTab(initialTab);
 				}
-				tab.getAttribute("pinned") == "true" && win.gBrowser.pinTab && win.gBrowser.pinTab(newTab);
+				tab.getAttribute("pinned") == "true" && gBrowserNew.pinTab && gBrowserNew.pinTab(newTab);
 			});
 		}, false);
 	},
