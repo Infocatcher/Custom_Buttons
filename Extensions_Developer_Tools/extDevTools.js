@@ -38,7 +38,7 @@ var options = {
 	},
 	showDebugPrefs: 3, // Sum of flags: 1 - extensions, 2 - application
 	debugPrefsTypes: -1, // -1 to show all or sum of flags: 1 - boolean, 2 - integer, 4 - string
-	debugPrefsInclude: /\.(?:debug|dev(?:el(?:opment)?)?Mode)(?:[-.]?\w+)?$/i,
+	debugPrefsInclude: /\.(?:debug|dev(?:el(?:opment)?)?_?Mode)(?:[-.]?\w+)?$/i,
 	debugPrefsExclude: /\.debugger/i,
 	debugPrefsTrimExtPrefix: true, // Remove leading "extensions." from labels
 	confirm: {
