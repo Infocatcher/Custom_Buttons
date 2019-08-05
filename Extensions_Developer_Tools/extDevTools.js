@@ -1402,8 +1402,8 @@ var cmds = this.commands = {
 	ensureMultiProcessMode: function(isMultiProcess) {
 		// It's enough to enable only using browser.tabs.remote.force-enable = true
 		// But to disable should be also browser.tabs.remote.autostart = false
-		this.setPref("browser.tabs.remote.autostart", isMultiProcess);
 		[
+			"browser.tabs.remote.autostart",
 			"browser.tabs.remote.autostart.1",
 			"browser.tabs.remote.autostart.2"
 		].forEach(function(pref) {
