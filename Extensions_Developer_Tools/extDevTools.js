@@ -486,7 +486,7 @@ var cmds = this.commands = {
 		mi.setAttribute(
 			"label",
 			_localize("Switch locale to “%S”")
-				.replace("%S", this.switchLocale(true))
+				.replace("%S", this.nextLocale)
 		);
 		mi.setAttribute(
 			"tooltiptext",
@@ -848,11 +848,12 @@ var cmds = this.commands = {
 			return locale;
 		return this.setLocale(locale);
 	},
+	get nextLocale() {
+		return this.switchLocale(true);
+	},
 	switchLocaleCustom: function() {
 		this.button.open = false;
-		var locale = {
-			value: this.switchLocale(true)
-		};
+		var locale = { value: this.nextLocale };
 		var ok = Services.prompt.prompt(
 			window,
 			_localize("Extensions Developer Tools"),
