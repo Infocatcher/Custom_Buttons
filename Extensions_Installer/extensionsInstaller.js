@@ -248,7 +248,8 @@ function setStyleForAddon(mi, addon) {
 		mi.style.fill = "#15c";
 	mi.setAttribute("image", icon || mp.icons.extension);
 	mi.style.color = color;
-	var icon = mi.ownerDocument.getAnonymousElementByAttribute(mi, "class", "menu-iconic-icon");
+	var icon = mi.ownerDocument.getAnonymousElementByAttribute(mi, "class", "menu-iconic-icon")
+		|| mi.getElementsByClassName("menu-iconic-icon")[0];
 	if(icon)
 		icon.style.opacity = iconOpacity;
 }
