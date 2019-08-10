@@ -99,7 +99,7 @@ function _localize(s, key) {
 if(!("AddonManager" in window))
 	Components.utils.import("resource://gre/modules/AddonManager.jsm");
 
-var mp = document.createElement("menupopup");
+var mp = document.createElementNS(xulns, "menupopup");
 mp.setAttribute("oncommand", "this.installExtension(event);");
 mp.setAttribute("onpopupshowing", "this.createMenu();");
 mp.setAttribute("onmousedown", "event.target.setAttribute('closemenu', event.shiftKey ? 'none' : 'auto');");
@@ -118,7 +118,7 @@ mp.createMenu = function() {
 
 	for(var uid in extensions) if(extensions.hasOwnProperty(uid)) {
 		var ext = extensions[uid];
-		var mi = document.createElement("menuitem");
+		var mi = document.createElementNS(xulns, "menuitem");
 		mi.className = "menuitem-iconic";
 		mi.setAttribute("cb_uid", uid);
 		mi.setAttribute("label", ext.name);
