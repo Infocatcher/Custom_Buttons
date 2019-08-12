@@ -131,8 +131,8 @@ window.editCustomButtonInTab = function(btn, newTab) { // Should be global to wo
 			if(loc.substr(0, editorBaseUriLength) != editorBaseUri)
 				continue;
 			let isSameEditor = loc == editorUriFull;
-			let win = browser.contentWindow;
-			if(!isSameEditor) {
+			let win = browser.contentWindow; // Will be null for unloaded tab
+			if(!isSameEditor && win) {
 				let rawWin = unwrap(win);
 				let winParam = "arguments" in rawWin && rawWin.arguments.length
 					? unwrap(rawWin.arguments[0])
@@ -141,7 +141,7 @@ window.editCustomButtonInTab = function(btn, newTab) { // Should be global to wo
 			}
 			if(isSameEditor) {
 				gBrowser.selectedTab = tab;
-				win.focus();
+				win && win.focus();
 				newTab && setTimeout(function() {
 					gBrowser.removeTab(newTab);
 				}, 0);
