@@ -92,7 +92,8 @@ window.editCustomButtonInTab = function(btn, newTab) { // Should be global to wo
 		btn = custombuttons.popupNode;
 	if(!btn)
 		return;
-	var link = custombuttons.makeButtonLink("edit", btn.id);
+	var btnId = btn.id;
+	var link = custombuttons.makeButtonLink("edit", btnId);
 	var cbService = "cbICustomButtonsService" in Components.interfaces
 		? Components.classes["@xsms.nm.ru/custombuttons/cbservice;1"]
 			.getService(Components.interfaces.cbICustomButtonsService)
@@ -102,7 +103,7 @@ window.editCustomButtonInTab = function(btn, newTab) { // Should be global to wo
 	var param = cbService.getButtonParameters(link);
 	var editorUriFull = editorBaseUri
 		+ "?window=" + cbService.getWindowId(document.documentURI)
-		+ "&id=" + btn.id;
+		+ "&id=" + btnId;
 	var editorUri = cbService.mode & 64 /*CB_MODE_SAVE_EDITOR_SIZE_SEPARATELY*/
 		|| !Object.create // Firefox 3.6 and older
 		? editorUriFull
@@ -130,7 +131,8 @@ window.editCustomButtonInTab = function(btn, newTab) { // Should be global to wo
 			let loc = browser.currentURI.spec;
 			if(loc.substr(0, editorBaseUriLength) != editorBaseUri)
 				continue;
-			let isSameEditor = loc == editorUriFull;
+			let isSameEditor = loc == editorUriFull
+				|| tab.getAttribute(cbIdTabAttr) == btnId;
 			let win = browser.contentWindow; // Will be null for unloaded tab
 			if(!isSameEditor && win) {
 				let rawWin = unwrap(win);
