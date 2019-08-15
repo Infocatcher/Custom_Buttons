@@ -559,6 +559,7 @@ var cmds = this.commands = {
 
 		var ss = this.ss;
 		var state = ss.getWindowState(window);
+		var sbId = "SidebarUI" in window && SidebarUI.isOpen && SidebarUI.lastOpenedId;
 
 		var win = this.openBrowserWindow();
 		win.addEventListener("load", function restoreSession(e) {
@@ -568,6 +569,8 @@ var cmds = this.commands = {
 			(function restore() {
 				try { // May fail in SeaMonkey
 					ss.setWindowState(win, state, true);
+					if(sbId && !win.SidebarUI.isOpen)
+						win.SidebarUI.show(sbId);
 				}
 				catch(e) {
 					Components.utils.reportError(e);
