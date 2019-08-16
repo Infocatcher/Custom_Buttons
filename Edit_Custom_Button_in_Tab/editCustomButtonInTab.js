@@ -4,8 +4,8 @@
 // Edit Custom Button in Tab button for Custom Buttons
 // (code for "initialization" section)
 
-// (c) Infocatcher 2012-2014
-// version 0.1.8.3 - 2014-01-12
+// (c) Infocatcher 2012-2014, 2017-2019
+// version 0.1.9 - 2019-08-16
 
 // Note:
 // In Firefox 3.6 and older:
