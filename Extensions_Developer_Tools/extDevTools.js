@@ -466,17 +466,15 @@ var cmds = this.commands = {
 				mi.setAttribute("default", cbId == defaultAction);
 				if(cbId == "switchLocale")
 					this.initSwitchLocaleItem(mi);
+				else if(cbId == "scratchpad")
+					this.setPartiallyAvailable(mi, !this.getPref("devtools.chrome.enabled"));
+				else if(cbId == "browserToolbox")
+					this.setPartiallyAvailable(mi, !this.getPref("devtools.debugger.remote-enabled"));
 				else if(cbId == "attrsInspector") {
 					this.setPartiallyAvailable(mi,
 						!("@mozilla.org/commandlinehandler/general-startup;1?type=inspector" in Components.classes)
 					);
 					this.setAttrsInspectorActive(mi);
-				}
-				else if(cbId == "scratchpad") {
-					this.setPartiallyAvailable(mi, !this.getPref("devtools.chrome.enabled"));
-				}
-				else if(cbId == "browserToolbox") {
-					this.setPartiallyAvailable(mi, !this.getPref("devtools.debugger.remote-enabled"));
 				}
 			},
 			this
