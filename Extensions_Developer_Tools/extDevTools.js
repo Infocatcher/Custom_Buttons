@@ -471,9 +471,8 @@ var cmds = this.commands = {
 				else if(cbId == "browserToolbox")
 					this.setPartiallyAvailable(mi, !this.getPref("devtools.debugger.remote-enabled"));
 				else if(cbId == "attrsInspector") {
-					this.setPartiallyAvailable(mi,
-						!("@mozilla.org/commandlinehandler/general-startup;1?type=inspector" in Components.classes)
-					);
+					var hasDOMi = "@mozilla.org/commandlinehandler/general-startup;1?type=inspector" in Components.classes;
+					this.setPartiallyAvailable(mi, !hasDOMi);
 					this.setAttrsInspectorActive(mi);
 				}
 			},
