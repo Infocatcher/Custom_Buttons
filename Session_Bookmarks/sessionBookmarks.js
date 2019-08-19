@@ -347,6 +347,12 @@ this.bookmarks = {
 	$: function(id) {
 		return document.getElementById(id);
 	},
+	get systemPrincipal() {
+		delete this.systemPrincipal;
+		return this.systemPrincipal = "Services" in window
+			&& Services.scriptSecurityManager
+			&& Services.scriptSecurityManager.getSystemPrincipal();
+	},
 
 	initProxy: function() {
 		// Trick: wait for XBL binding tor [type="menu"]
@@ -1175,7 +1181,9 @@ this.bookmarks = {
 			: e.type == "click" || this.hasModifier(e);
 
 		if(loadInNewTab) {
-			var tab = gBrowser.addTab(this.options.useSessions ? "about:blank" : uri);
+			var tab = gBrowser.addTab(this.options.useSessions ? "about:blank" : uri, {
+				triggeringPrincipal: this.systemPrincipal
+			});
 			if(!(this.options.loadInBackground ^ e.shiftKey))
 				gBrowser.selectedTab = tab;
 		}
@@ -1216,7 +1224,9 @@ this.bookmarks = {
 		}
 		Array.prototype.forEach.call(mis, function(mi) {
 			var uri = mi.getAttribute("cb_uri");
-			var tab = gBrowser.addTab(this.options.useSessions ? "about:blank" : uri);
+			var tab = gBrowser.addTab(this.options.useSessions ? "about:blank" : uri, {
+				triggeringPrincipal: this.systemPrincipal
+			});
 			if(this.options.useSessions)
 				this.setTabSession(tab, mi.getAttribute("cb_ssData"), uri, false, true);
 		}, this);
@@ -1282,7 +1292,10 @@ this.bookmarks = {
 				data.entries = tabHistory.concat(data.entries);
 				data.index += tabHistory.length;
 				if(this.options.replaceCurrentTab && tab.selected) {
-					let blankTab = gBrowser.addTab("about:blank", { skipAnimation: true });
+					let blankTab = gBrowser.addTab("about:blank", {
+						skipAnimation: true,
+						triggeringPrincipal: this.systemPrincipal
+					});
 					blankTab.linkedBrowser.stop();
 					gBrowser.moveTabTo(blankTab, gBrowser.tabContainer.selectedIndex + 1);
 					gBrowser.selectedTab = blankTab;
