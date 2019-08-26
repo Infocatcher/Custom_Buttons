@@ -217,7 +217,7 @@ if(!watcher) {
 
 			window.setTimeout(function() {
 				function appendNode(nodeName, id) {
-					var node = document.createElement(nodeName);
+					var node = document.createElementNS(xulns, nodeName);
 					node.id = id;
 					document.documentElement.appendChild(node);
 				}
@@ -359,7 +359,7 @@ if(!watcher) {
 					var se = new SourceEditor();
 				}
 				se.__isCodeMirror = isCodeMirror;
-				var seElt = document.createElement("hbox");
+				var seElt = document.createElementNS(xulns, "hbox");
 				if(cbEditor.id)
 					seElt.id = "sourceEditor-" + cbEditor.id;
 				seElt.className = "sourceEditor";
