@@ -163,15 +163,22 @@ if(!watcher) {
 				xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">\
 				<menupopup id="sourceEditorContext"\
 					onpopupshowing="goUpdateSourceEditorMenuItems()">\
-					<menuitem id="menu_undo" label="&undoCmd.label;" accesskey="&undoCmd.accesskey;" />\
-					<menuitem id="menu_redo" label="&redoCmd.label;" accesskey="&redoCmd.accesskey;" />\
+					<menuitem id="menu_undo" label="&undoCmd.label;" accesskey="&undoCmd.accesskey;"\
+						oncommand="goDoCommand(\'cmd_undo\')" />\
+					<menuitem id="menu_redo" label="&redoCmd.label;" accesskey="&redoCmd.accesskey;"\
+						oncommand="goDoCommand(\'cmd_redo\')" />\
 					<menuseparator/>\
-					<menuitem id="menu_cut" label="&cutCmd.label;" accesskey="&cutCmd.accesskey;" />\
-					<menuitem id="menu_copy" label="&copyCmd.label;" accesskey="&copyCmd.accesskey;" />\
-					<menuitem id="menu_paste" label="&pasteCmd.label;" accesskey="&pasteCmd.accesskey;" />\
-					<menuitem id="menu_delete" label="&deleteCmd.label;" accesskey="&deleteCmd.accesskey;" />\
+					<menuitem id="menu_cut" label="&cutCmd.label;" accesskey="&cutCmd.accesskey;"\
+						oncommand="goDoCommand(\'cmd_cut\')" />\
+					<menuitem id="menu_copy" label="&copyCmd.label;" accesskey="&copyCmd.accesskey;"\
+						oncommand="goDoCommand(\'cmd_copy\')" />\
+					<menuitem id="menu_paste" label="&pasteCmd.label;" accesskey="&pasteCmd.accesskey;"\
+						oncommand="goDoCommand(\'cmd_paste\')" />\
+					<menuitem id="menu_delete" label="&deleteCmd.label;" accesskey="&deleteCmd.accesskey;"\
+						oncommand="goDoCommand(\'cmd_delete\')" />\
 					<menuseparator/>\
-					<menuitem id="menu_selectAll" label="&selectAllCmd.label;" accesskey="&selectAllCmd.accesskey;" />\
+					<menuitem id="menu_selectAll" label="&selectAllCmd.label;" accesskey="&selectAllCmd.accesskey;"\
+						oncommand="goDoCommand(\'cmd_selectAll\')" />\
 					<menuseparator/>\
 					<menuitem id="menu_find" label="&findCmd.label;" accesskey="&findCmd.accesskey;" />\
 					<menuitem id="menu_findAgain" label="&findAgainCmd.label;" accesskey="&findAgainCmd.accesskey;" />\
