@@ -1341,8 +1341,8 @@ this.bookmarks = {
 			try {
 				var entriesCount = data && data.entries && data.entries.length;
 				if(entriesCount) try { // Broken at least in Firefox 62+
-					var sh = browser.sessionHistory
-						.QueryInterface(Components.interfaces.nsISHistory);
+					var sh = browser.sessionHistory;
+					sh && sh instanceof Components.interfaces.nsISHistory;
 					var maxLength = sh.maxLength;
 					if(entriesCount > maxLength) {
 						_log("Override nsISHistory.maxLength: " + maxLength + " -> " + entriesCount);
@@ -1370,6 +1370,7 @@ this.bookmarks = {
 						gBrowser.selectedTab = selTab;
 					}
 					else {
+						_log("Reload pending tab");
 						browser.reload();
 					}
 					// Show "Connecting…" instead of "New Tab"
