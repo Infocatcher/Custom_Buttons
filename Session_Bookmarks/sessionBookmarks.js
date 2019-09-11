@@ -1900,7 +1900,16 @@ this.bookmarks = {
 			return this.defaultInsPoint;
 		if(trg == this.mp || trg.id == this.sepId || trg.id == this.openAllId)
 			return this.$(this.sepId);
-		var bo = trg.boxObject;
+		var bo = trg.boxObject || (function() { // Firefox 69+
+			var rect = trg.getBoundingClientRect();
+			var win = trg.ownerDocument.defaultView;
+			return {
+				//screenX: rect.left + win.mozInnerScreenX,
+				screenY: rect.top + win.mozInnerScreenY,
+				//width: rect.right - rect.left,
+				height: rect.bottom - rect.top
+			};
+		})();
 		if(e.screenY - bo.screenY < bo.height/2)
 			return trg;
 		return trg.nextSibling;
