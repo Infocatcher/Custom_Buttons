@@ -1653,13 +1653,16 @@ this.bookmarks = {
 			</dialog>';
 
 		if("Services" in window && Services.prefs.getBoolPref.length > 1) { // Firefox 57+
-			let pref = "security.data_uri.unique_opaque_origin";
-			if(Services.prefs.getBoolPref(pref, false)) {
+			let togglePref = function(pref) {
+				if(!Services.prefs.getBoolPref(pref, false))
+					return;
 				Services.prefs.setBoolPref(pref, false);
 				setTimeout(function() {
 					Services.prefs.setBoolPref(pref, true);
 				}, 0);
-			}
+			};
+			togglePref("security.data_uri.unique_opaque_origin");
+			togglePref("security.data_uri.block_toplevel_data_uri_navigations");
 		}
 		window.openDialog(
 			"data:application/vnd.mozilla.xul+xml," + encodeURIComponent(dialog.replace(/^\s+/, "")),
