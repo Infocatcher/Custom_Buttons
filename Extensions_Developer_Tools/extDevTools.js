@@ -247,6 +247,9 @@ function _localize(s, key) {
 		"Don't inherit privileged context for data:": {
 			ru: "Не наследовать привилегированный контекст для data:"
 		},
+		"Block top level data: URI navigations": {
+			ru: "Блокировать переходы верхнего уровня на data: URI"
+		},
 		"Enable developer tools for chrome": {
 			ru: "Включить инструменты разработчика для chrome"
 		},
@@ -1926,6 +1929,10 @@ var mp = cmds.popup = this.appendChild(parseXULFromString('\
 					type="checkbox"\
 					label="' + _localize("Don't inherit privileged context for data:") + '"\
 					hidden="' + !cmds.prefHasDefaultValue("security.data_uri.unique_opaque_origin") + '" />\
+				<menuitem cb_pref="security.data_uri.block_toplevel_data_uri_navigations"\
+					type="checkbox"\
+					label="' + _localize("Block top level data: URI navigations") + '"\
+					hidden="' + !cmds.prefHasDefaultValue("security.data_uri.block_toplevel_data_uri_navigations") + '" />\
 				<menuitem cb_pref="devtools.chrome.enabled"\
 					type="checkbox"\
 					label="' + _localize("Enable developer tools for chrome") + '"\
