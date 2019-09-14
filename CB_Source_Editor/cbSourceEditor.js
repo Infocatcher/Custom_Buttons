@@ -424,6 +424,19 @@ if(!watcher) {
 					}
 					return this.__proto__.selectLine.apply(this, arguments);
 				};
+
+				// For edit_button() from chrome://custombuttons/content/editExternal.js
+				seElt.__cbEditor = cbEditor;
+				seElt.__defineGetter__("localName", function() {
+					return "cbeditor";
+				});
+				seElt.__defineGetter__("value", function() {
+					return this.__cbEditor.value;
+				});
+				seElt.__defineSetter__("value", function(val) {
+					this.__cbEditor.value = val;
+				});
+
 				se.__initialized = false;
 				se.__onLoadCallbacks = [];
 				se.__value = code;
@@ -693,6 +706,7 @@ if(!watcher) {
 					delete cbEditor.__sourceEditorElt;
 					delete cbEditor.__sourceEditor;
 					delete seElt.__sourceEditor;
+					delete seElt.__cbEditor;
 
 					cbEditor.value = val;
 					window.setTimeout(function() {
