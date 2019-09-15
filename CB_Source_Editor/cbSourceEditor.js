@@ -551,8 +551,9 @@ if(!watcher) {
 					});
 				}
 			}, this);
-			// Force select correct panel (prevent bugs, if selected "Button settings" tab)
-			tabs.selectedPanel = selectedPanel.__sourceEditorElt || selectedPanel;
+			// Trick to select correct tab (especially if was selected "Button settings" tab)
+			tabs.tabs.advanceSelectedTab(1, true);
+			tabs.tabs.advanceSelectedTab(-1, true);
 
 			var origExecCmd = window.editor.execute_oncommand_code;
 			window.editor.execute_oncommand_code = function() {
