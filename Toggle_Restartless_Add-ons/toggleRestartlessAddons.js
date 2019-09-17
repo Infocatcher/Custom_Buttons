@@ -366,7 +366,8 @@ function getRestartlessAddons(addonTypes, callback, context) {
 					!addon.hidden
 					|| options.showHidden > 0
 					|| options.showHidden == -1 && !addon.userDisabled
-				);
+				)
+				&& (addon.iconURL || "").substr(0, 29) != "resource://search-extensions/";
 		});
 		callback.call(context, restartless);
 	});
