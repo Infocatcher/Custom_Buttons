@@ -261,6 +261,7 @@ if(!watcher) {
 		addStyle: function(document) {
 			var style = '\
 				%box%[cbOnTopFloat] {\n\
+					display: block !important;\n\
 					position: fixed !important;\n\
 					top: 0 !important;\n\
 					right: 0 !important;\n\
