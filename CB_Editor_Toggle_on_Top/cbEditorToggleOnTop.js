@@ -315,12 +315,18 @@ if(!watcher) {
 			}
 		},
 		getXulWin: function(window) {
-			return window.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
-				.getInterface(Components.interfaces.nsIWebNavigation)
-				.QueryInterface(Components.interfaces.nsIDocShellTreeItem)
+			var docShell = "QueryInterface" in window
+				? window.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+					.getInterface(Components.interfaces.nsIWebNavigation)
+					.QueryInterface(Components.interfaces.nsIDocShellTreeItem)
+				: window.docShell; // Firefox 70+
+			return docShell
 				.treeOwner
 				.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
-				.getInterface(Components.interfaces.nsIXULWindow);
+				.getInterface(
+					Components.interfaces.nsIXULWindow
+					|| Components.interfaces.nsIAppWindow // Firefox 72+
+				);
 		},
 		setOnTop: function(btn, toggle) {
 			var document = btn.ownerDocument;
