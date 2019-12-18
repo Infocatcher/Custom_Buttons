@@ -132,9 +132,9 @@ if(!watcher) {
 			this.addStyle(document);
 			var box = document.getElementById(this.boxId);
 			box && box.parentNode.removeChild(box);
-			box = document.createElement("hbox");
+			box = document.createElementNS(xulns, "hbox");
 			box.id = this.boxId;
-			var btn = document.createElement(this.btnStyle);
+			var btn = document.createElementNS(xulns, this.btnStyle);
 			btn.id = this.btnId;
 			if(this.btnChecked) {
 				btn.setAttribute("type", "checkbox");
