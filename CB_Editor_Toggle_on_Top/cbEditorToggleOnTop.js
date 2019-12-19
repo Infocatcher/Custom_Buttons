@@ -153,7 +153,7 @@ if(!watcher) {
 					let tabbox = document.getElementById("custombuttons-editbutton-tabbox");
 					let tabs = tabbox.getElementsByTagName("tabs")[0];
 					tabs.parentNode.insertBefore(box, tabs);
-					box.style.marginBottom = -btn.boxObject.height + "px";
+					box.style.marginBottom = -(btn.boxObject || btn.getBoundingClientRect()).height + "px";
 				break;
 				case 2:
 					box.setAttribute("align", "center");
