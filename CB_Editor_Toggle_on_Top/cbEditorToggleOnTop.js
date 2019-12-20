@@ -126,6 +126,7 @@ if(!watcher) {
 				window.addEventListener("resize", this, false); // Can detect only maximize/restore
 				this.legacySizeModeChange(window);
 			}
+			this.restoreOnTopAttr(window);
 
 			var document = window.document;
 			this.removeStyle(document);
@@ -231,12 +232,17 @@ if(!watcher) {
 					this.checkWindowStatus(window);
 			}
 		},
+		get platformVersion() {
+			var appinfo = "Services" in window && Services.appinfo;
+			delete this.platformVersion;
+			return this.platformVersion = appinfo && parseFloat(appinfo.platformVersion);
+		},
 		get hasSizeModeChangeEvent() {
 			var appinfo = "Services" in window && Services.appinfo;
 			delete this.hasSizeModeChangeEvent;
 			return this.hasSizeModeChangeEvent = appinfo && (
 				appinfo.name == "Pale Moon"
-				|| parseFloat(appinfo.platformVersion) >= 8
+				|| this.platformVersion >= 8
 			);
 		},
 		legacySizeModeChange: function(window) {
@@ -247,6 +253,22 @@ if(!watcher) {
 					_this.checkWindowStatus(window);
 				lastState = state;
 			}, 150, window, this);
+		},
+		restoreOnTopAttr: function(win) {
+			var xs = this.platformVersion >= 71
+				&& "Services" in window && Services.xulStore;
+			if(!xs)
+				return this.restoreOnTopAttr = function() {};
+			var attr = this.onTopAttr;
+			var id = win.document.documentElement.id;
+			(this.restoreOnTopAttr = function(window) {
+				var de = window.document.documentElement;
+				if(de.hasAttribute(attr))
+					return;
+				var url = window.location.href;
+				if(xs.hasValue(url, id, attr))
+					de.setAttribute(attr, xs.getValue(url, id, attr));
+			})(win);
 		},
 		checkWindowStatus: function(window, box) {
 			if(!box)
