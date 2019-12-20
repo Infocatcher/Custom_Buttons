@@ -182,7 +182,7 @@ if(!watcher) {
 			else
 				window.removeEventListener("resize", this, false);
 			var document = window.document;
-			var btn = document.getElementById(this.btnId);
+			var btn = this.shadow(document).getElementById(this.btnId);
 			btn.removeEventListener("command", this, false);
 			if(reason == this.REASON_SHUTDOWN) {
 				let box = btn.parentNode;
@@ -272,7 +272,7 @@ if(!watcher) {
 		},
 		checkWindowStatus: function(window, box) {
 			if(!box)
-				box = window.document.getElementById(this.boxId);
+				box = this.shadow(window.document).getElementById(this.boxId);
 			var na = String(window.windowState != window.STATE_NORMAL);
 			if(box.getAttribute(this.naAttr) == na)
 				return;
@@ -319,13 +319,15 @@ if(!watcher) {
 				.replace(/%iconPinned%/g, this.iconPinned)
 				.replace(/%naAttr%/g, this.naAttr);
 
-			document.insertBefore(document.createProcessingInstruction(
+			this.shadow(document, style) || document.insertBefore(document.createProcessingInstruction(
 				"xml-stylesheet",
 				'id="' + this.styleId + '" href="' + "data:text/css,"
 					+ encodeURIComponent(style) + '" type="text/css"'
 			), document.documentElement);
 		},
 		removeStyle: function(document) {
+			if(this.shadow(document, false))
+				return;
 			var mark = 'id="' + this.styleId + '"';
 			for(var child = document.documentElement; child = child.previousSibling; ) {
 				if(
@@ -336,6 +338,29 @@ if(!watcher) {
 					break;
 				}
 			}
+		},
+		shadow: function(document, style) {
+			var sr = document.documentElement.shadowRoot || null;
+			if(!sr || this.btnPos != 2) {
+				return (this.shadow = function(document, style) {
+					return style === undefined ? document : false;
+				})(document, style);
+			}
+
+			// Firefox 71+
+			if(style === undefined)
+				return sr;
+			var st = sr.querySelector("style");
+			var id = this.styleId;
+			if(style) {
+				st.append(style);
+				st[id] = st.lastChild;
+			}
+			else if(id in st) {
+				st[id].remove();
+				delete st[id];
+			}
+			return true;
 		},
 		getXulWin: function(window) {
 			var docShell = "QueryInterface" in window
@@ -381,7 +406,7 @@ if(!watcher) {
 			this.checkButton(btn, onTop);
 		},
 		toggleOnTop: function(window) {
-			this.setOnTop(window.document.getElementById(this.btnId), true);
+			this.setOnTop(this.shadow(window.document).getElementById(this.btnId), true);
 		},
 		checkButton: function(btn, onTop) {
 			btn.setAttribute(this.onTopAttr, onTop);
