@@ -261,7 +261,7 @@ if(!watcher) {
 				return this.restoreOnTopAttr = function() {};
 			var attr = this.onTopAttr;
 			var id = win.document.documentElement.id;
-			(this.restoreOnTopAttr = function(window) {
+			return (this.restoreOnTopAttr = function(window) {
 				var de = window.document.documentElement;
 				if(de.hasAttribute(attr))
 					return;
