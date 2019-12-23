@@ -787,6 +787,7 @@ if(!watcher) {
 		isBrowserWindow: function(window) {
 			var loc = window.location.href;
 			return loc == "chrome://browser/content/browser.xul"
+				|| loc == "chrome://browser/content/browser.xhtml" // Firefox 69+
 				|| loc == "chrome://navigator/content/navigator.xul";
 		},
 		observe: function(subject, topic, data) {
