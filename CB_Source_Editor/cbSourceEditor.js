@@ -316,7 +316,19 @@ if(!watcher) {
 						css("resource://devtools/client/themes/variables.css");
 						css("resource://devtools/client/themes/common.css");
 						css("chrome://devtools/skin/tooltips.css");
-					},
+						if(this.platformVersion >= 68) window.setTimeout(function() {
+							var sheets = document.styleSheets;
+							for(var i = sheets.length - 1; i >= 0; --i) {
+								var sheet = sheets[i];
+								if(sheet.href != "resource://devtools/client/themes/common.css")
+									continue;
+								for(var j = 0, len = sheet.cssRules.length; j < len; ++j)
+									if(sheet.cssRules[j].selectorText == "::selection")
+										return !sheet.deleteRule(j);
+							}
+							return false;
+						}, 10);
+					}.bind(this),
 					["chrome://global/content/editMenuOverlay.xul", function check(window) {
 						return window.document.getElementById("editMenuCommands").hasChildNodes();
 					}],
