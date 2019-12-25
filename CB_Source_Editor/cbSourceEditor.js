@@ -214,6 +214,9 @@ if(!watcher) {
 			).replace(/>\s+</g, "><");
 
 			var ps = this.parseXULFromString(psXUL);
+            // "Edit Custom Button in Tab" button, Firefox 71+
+            if(isFrame && "parseFromSafeString" in window.DOMParser.prototype)
+                ps = window.MozXULElement.parseXULToFragment(ps.outerHTML);
 			document.documentElement.appendChild(ps);
 
 			window.setTimeout(function() {
