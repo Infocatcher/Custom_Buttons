@@ -48,8 +48,8 @@ var gifAnimation = {
 		if(mode === undefined)
 			mode = this.mode;
 		var btn = this.button;
-		var icon = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon")
-			|| btn.getElementsByClassName("toolbarbutton-icon")[0];
+		var icon = btn.icon
+			|| btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon");
 		icon.src = mode == Components.interfaces.imgIContainer.kDontAnimMode
 			? btn.image
 			: this.iconEnabled;

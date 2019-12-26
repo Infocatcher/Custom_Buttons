@@ -128,8 +128,8 @@ this.__defineSetter__("pluginDisabled", function(dis) {
 		|| style.hasOwnProperty("iconGrayscale")
 		|| style.hasOwnProperty("iconOpacity")
 	) {
-		var icon = this.ownerDocument.getAnonymousElementByAttribute(this, "class", "toolbarbutton-icon")
-			|| this.getElementsByClassName("toolbarbutton-icon")[0];
+		var icon = this.icon
+			|| this.ownerDocument.getAnonymousElementByAttribute(this, "class", "toolbarbutton-icon");
 		if(icon) {
 			if(style.hasOwnProperty("iconStyle"))
 				icon.style.cssText = style.iconStyle;

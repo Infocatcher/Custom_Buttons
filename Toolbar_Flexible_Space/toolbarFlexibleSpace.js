@@ -20,7 +20,7 @@ this.style.cssText = '\
 ';
 this.setAttribute("flex", "1");
 setTimeout(function() { // Force hide icon
-	var icon = self.ownerDocument.getAnonymousElementByAttribute(self, "class", "toolbarbutton-icon")
-		|| self.getElementsByClassName("toolbarbutton-icon")[0];
+	var icon = self.icon
+		|| self.ownerDocument.getAnonymousElementByAttribute(self, "class", "toolbarbutton-icon");
 	icon.style.display = "none";
 }, 50);

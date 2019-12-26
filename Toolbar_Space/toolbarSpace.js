@@ -17,7 +17,7 @@ this.style.cssText = '\
 	padding: 0 !important;\n\
 ';
 setTimeout(function() { // Force hide icon
-	var icon = self.ownerDocument.getAnonymousElementByAttribute(self, "class", "toolbarbutton-icon")
-		|| self.getElementsByClassName("toolbarbutton-icon")[0];
+	var icon = self.icon
+		|| self.ownerDocument.getAnonymousElementByAttribute(self, "class", "toolbarbutton-icon");
 	icon.style.display = "none";
 }, 50);

@@ -509,8 +509,8 @@ var cmds = this.commands = {
 		if(!this.options.changeButtonIcon)
 			return;
 		var btn = this.button;
-		var icon = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon")
-			|| btn.getElementsByClassName("toolbarbutton-icon")[0];
+		var icon = btn.icon
+			|| btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon");
 		icon.src = images[this.defaultAction] || btn.image;
 	},
 	setDefaultAction: function(e) {

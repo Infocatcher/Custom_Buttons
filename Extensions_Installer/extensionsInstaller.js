@@ -248,8 +248,8 @@ function setStyleForAddon(mi, addon) {
 		mi.style.fill = "#15c";
 	mi.setAttribute("image", icon || mp.icons.extension);
 	mi.style.color = color;
-	var icon = mi.ownerDocument.getAnonymousElementByAttribute(mi, "class", "menu-iconic-icon")
-		|| mi.getElementsByClassName("menu-iconic-icon")[0];
+	var icon = mi.getElementsByClassName && mi.getElementsByClassName("menu-iconic-icon")[0]
+		|| mi.ownerDocument.getAnonymousElementByAttribute(mi, "class", "menu-iconic-icon");
 	if(icon)
 		icon.style.opacity = iconOpacity;
 }
@@ -562,8 +562,8 @@ function ProgressIcon(btn) {
 			: "chrome://browser/skin/tabbrowser/loading.png";
 	}
 	var useAnimation = app == "Firefox" && pv >= 32;
-	var btnIcon = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon")
-		|| btn.getElementsByClassName("toolbarbutton-icon")[0];
+	var btnIcon = btn.icon
+		|| btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon");
 	var origIcon = btnIcon.src;
 	btnIcon.src = this.imgConnecting;
 	if(useAnimation) {
