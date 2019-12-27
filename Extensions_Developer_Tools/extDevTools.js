@@ -1297,7 +1297,7 @@ var cmds = this.commands = {
 		delete this.hasScratchpad;
 		return this.hasScratchpad = window && "Scratchpad" in window && "openScratchpad" in Scratchpad
 			|| window && !!window.document.getElementById("key_scratchpad")
-			|| this.app == "Firefox" && this.platformVersion >= 58
+			|| this.app == "Firefox" && this.platformVersion >= 58 && this.platformVersion < 72
 			|| this.app == "Pale Moon" && this.platformVersion >= 4.1
 			|| this.app == "Basilisk";
 	},
