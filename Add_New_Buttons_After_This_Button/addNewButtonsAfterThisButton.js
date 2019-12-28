@@ -28,7 +28,10 @@ var observer = {
 		if(!this.button.checked)
 			return;
 		var toolbar = this.button.parentNode;
-		toolbar.insertBefore(button, this.button.nextSibling);
+		toolbar.insertBefore(
+			custombuttons.cbCloneNode(button), // Prevent "The operation is insecure" in Firefox 71+
+			this.button.nextSibling
+		);
 		custombuttons.persistCurrentSets(toolbar.id, this.button.id, button.id || button.getAttribute("id"));
 	}
 };
