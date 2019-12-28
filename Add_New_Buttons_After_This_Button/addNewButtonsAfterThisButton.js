@@ -20,6 +20,17 @@ this.toggleEnabled = function() {
 };
 this.setAttribute("oncommand", "this.toggleEnabled();");
 
+if(!("persist" in document) && parseFloat(Services.appinfo.platformVersion) >= 71) {
+	var id = this.id;
+	var attr = "checked";
+	if(this.hasAttribute(attr))
+		return;
+	var xs = Services.xulStore;
+	var url = location.href;
+	if(xs.hasValue(url, id, attr))
+		this.setAttribute(attr, xs.getValue(url, id, attr));
+}
+
 var observer = {
 	button: this,
 	observe: function(button, topic, data) {
