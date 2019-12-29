@@ -9,7 +9,7 @@
 
 var cbs = custombuttons.cbService;
 var windowId = cbs.getWindowId(document.documentURI);
-var notificationPrefix = cbs.getNotificationPrefix(windowId);
+var cbInstall = cbs.getNotificationPrefix(windowId) + "installButton";
 
 this.toggleEnabled = function() {
 	this.checked = !this.checked;
@@ -34,7 +34,7 @@ if(!("persist" in document) && parseFloat(Services.appinfo.platformVersion) >= 7
 var observer = {
 	button: this,
 	observe: function(button, topic, data) {
-		if(topic != notificationPrefix + "installButton")
+		if(topic != cbInstall)
 			return;
 		if(!this.button.checked)
 			return;
@@ -48,13 +48,13 @@ var observer = {
 };
 var os = Components.classes["@mozilla.org/observer-service;1"]
 	.getService (Components.interfaces.nsIObserverService);
-os.addObserver(observer, notificationPrefix + "installButton", false);
+os.addObserver(observer, cbInstall, false);
 var hasObserver = true;
 
 this.onDestroy = function(reason) {
 	if(hasObserver) {
 		hasObserver = false;
-		os.removeObserver(observer, notificationPrefix + "installButton");
+		os.removeObserver(observer, cbInstall);
 	}
 	if(reason == "delete" && this.checked)
 		this.toggleEnabled();
