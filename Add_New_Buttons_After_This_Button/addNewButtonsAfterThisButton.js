@@ -4,8 +4,8 @@
 // (code for "initialization" section)
 // Note: button is disabled by default, click to enable
 
-// (c) Infocatcher 2012, 2014
-// version 0.1.2 - 2014-01-25
+// (c) Infocatcher 2012, 2014, 2018-2019
+// version 0.1.2.1 - 2019-12-30
 
 var cbs = custombuttons.cbService;
 var windowId = cbs.getWindowId(document.documentURI);
