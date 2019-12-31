@@ -153,15 +153,20 @@ mp.destroyMenu = function() {
 	}, 5000);
 };
 mp.icons = {
+	get platformVersion() {
+		delete this.platformVersion;
+		return this.platformVersion = parseFloat(Services.appinfo.platformVersion);
+	},
 	get useSVG() {
 		delete this.useSVG;
-		return this.useSVG = Services.appinfo.name == "Firefox"
-			&& parseFloat(Services.appinfo.version) >= 57;
+		return this.useSVG = Services.appinfo.name == "Firefox" && this.platformVersion >= 57;
 	},
 	get plugin() {
 		delete this.plugin;
 		return this.plugin = this.useSVG
-			? "chrome://mozapps/skin/plugins/pluginGeneric.svg"
+			? this.platformVersion >= 65
+				? "chrome://global/skin/plugins/pluginGeneric.svg"
+				: "chrome://mozapps/skin/plugins/pluginGeneric.svg"
 			: "chrome://mozapps/skin/plugins/pluginGeneric-16.png";
 	},
 	get extension() {
