@@ -13,8 +13,8 @@
 
 // See "var style = " to modify styles for specific add-ons
 
-// (c) Infocatcher 2013-2017
-// version 0.1.3pre3 - 2017-10-23
+// (c) Infocatcher 2013-2019
+// version 0.1.3pre4 - 2020-01-01
 
 var options = {
 	addonTypes: ["extension", "plugin"],
