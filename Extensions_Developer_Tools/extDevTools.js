@@ -1288,9 +1288,18 @@ var cmds = this.commands = {
 					_this.setPref(pref, false);
 			}, 100, this);
 		}
-		var btp = Components.utils["import"]("resource://devtools/client/framework/ToolboxProcess.jsm", {})
-			.BrowserToolboxProcess;
-		btp.init(/*onClose, onRun, options*/);
+		try {
+			var btp = Components.utils["import"]("resource://devtools/client/framework/ToolboxProcess.jsm", {})
+				.BrowserToolboxProcess;
+			btp.init(/*onClose, onRun, options*/);
+			return;
+		}
+		catch(e) {
+		}
+		// Firefox 72+
+		var btl = Components.utils["import"]("resource://devtools/client/framework/browser-toolbox/Launcher.jsm", {})
+			.BrowserToolboxLauncher;
+		btl.init(/*onClose, onRun, overwritePreferences, binaryPath*/);
 	},
 	get hasScratchpad() {
 		var window = this.browserWindow;
