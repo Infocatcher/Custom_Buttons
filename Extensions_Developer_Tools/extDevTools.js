@@ -1289,16 +1289,13 @@ var cmds = this.commands = {
 			}, 100, this);
 		}
 		try {
-			var btp = Components.utils["import"]("resource://devtools/client/framework/ToolboxProcess.jsm", {})
+			var btl = Components.utils["import"]("resource://devtools/client/framework/ToolboxProcess.jsm", {})
 				.BrowserToolboxProcess;
-			btp.init(/*onClose, onRun, options*/);
-			return;
 		}
-		catch(e) {
+		catch(e) { // Firefox 72+
+			btl = Components.utils["import"]("resource://devtools/client/framework/browser-toolbox/Launcher.jsm", {})
+				.BrowserToolboxLauncher;
 		}
-		// Firefox 72+
-		var btl = Components.utils["import"]("resource://devtools/client/framework/browser-toolbox/Launcher.jsm", {})
-			.BrowserToolboxLauncher;
 		btl.init(/*onClose, onRun, overwritePreferences, binaryPath*/);
 	},
 	get hasScratchpad() {
