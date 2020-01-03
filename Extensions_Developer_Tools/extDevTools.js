@@ -1374,7 +1374,10 @@ var cmds = this.commands = {
 		if("then" in target) { // Firefox 69+
 			target.then(function(target) {
 				target.attach().then(function() {
-					target.getInspector().then(function(inspectorFront) {
+					var getInspector = "getInspector" in target
+						? target.getInspector()
+						: target.getFront("inspector"); // Firefox 70+
+					getInspector.then(function(inspectorFront) {
 						inspectorFront.pickColorFromPage({ copyOnSelect: true, fromMenu: true });
 					}, Components.utils.reportError);
 				}, Components.utils.reportError);
