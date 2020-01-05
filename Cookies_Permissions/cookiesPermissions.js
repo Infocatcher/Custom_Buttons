@@ -873,7 +873,8 @@ this.permissions = {
 
 	get hasTempPermissions() {
 		delete this.hasTempPermissions;
-		return this.hasTempPermissions = "EXPIRE_SESSION" in this.pm && this.pm.add.length > 3;
+		return this.hasTempPermissions = "EXPIRE_SESSION" in this.pm
+			&& (!("add" in this.pm) || this.pm.add.length > 3);
 	},
 	testPermission: function(uri, permission) {
 		var pm = this.pm;
@@ -883,6 +884,17 @@ this.permissions = {
 			var principal = Services.scriptSecurityManager.createContentPrincipal(uri, {});
 			return pm.testPermissionFromPrincipal(principal, permission);
 		})(uri, permission);
+	},
+	add: function(uri, permission) {
+		var pm = this.pm;
+		if("add" in pm)
+			return (this.add = pm.add.bind(pm)).apply(pm, arguments);
+		return (this.add = function(uri, permission) { // Firefox 71+
+			var principal = Services.scriptSecurityManager.createContentPrincipal(uri, {});
+			var args = Array.from(arguments);
+			args[0] = principal;
+			return pm.addFromPrincipal.apply(pm, args);
+		}).apply(this, arguments);
 	},
 	addPermission: function(capability, temporary) {
 		// capability:
@@ -910,7 +922,7 @@ this.permissions = {
 			else
 				args.push(pm.EXPIRE_TIME, expire + Date.now());
 		}
-		pm.add.apply(pm, args);
+		this.add.apply(this, args);
 	},
 	removePermission: function() {
 		var host = this.currentHost;
