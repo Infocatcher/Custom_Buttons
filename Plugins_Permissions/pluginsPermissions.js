@@ -806,6 +806,15 @@ this.permissions = {
 		delete this.hasTempPermissions;
 		return this.hasTempPermissions = "EXPIRE_SESSION" in this.pm && this.pm.add.length > 3;
 	},
+	testPermission: function(uri, permission) {
+		var pm = this.pm;
+		if("testPermission" in pm)
+			return (this.testPermission = pm.testPermission.bind(pm))(uri, permission);
+		return (this.testPermission = function(uri, permission) { // Firefox 71+
+			var principal = Services.scriptSecurityManager.createContentPrincipal(uri, {});
+			return pm.testPermissionFromPrincipal(principal, permission);
+		})(uri, permission);
+	},
 	addPermission: function(capability, temporary) {
 		// capability:
 		//  this.pm.ALLOW_ACTION
@@ -841,9 +850,9 @@ this.permissions = {
 		this.updButtonState(this.pm.UNKNOWN_ACTION); // Faster than ProgressListener (70-80 ms for me)
 
 		var uri = this.getURI(host);
-		var permission = this.pm.testPermission(uri, this.permissionType);
+		var permission = this.testPermission(uri, this.permissionType);
 		this.removePermissionForHost(host);
-		while(this.pm.testPermission(uri, this.permissionType) == permission) {
+		while(this.testPermission(uri, this.permissionType) == permission) {
 			let parentHost = host.replace(/^[^.]*\./, "");
 			if(parentHost == host)
 				break;
@@ -883,7 +892,7 @@ this.permissions = {
 	getPermission: function() {
 		var host = this.currentHost;
 		return host
-			? this.pm.testPermission(this.getURI(host), this.permissionType)
+			? this.testPermission(this.getURI(host), this.permissionType)
 			: this.PERMISSIONS_NOT_SUPPORTED;
 	},
 	getPermissionEx: function() {
