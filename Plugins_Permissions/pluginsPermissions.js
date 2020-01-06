@@ -827,6 +827,17 @@ this.permissions = {
 			return pm.addFromPrincipal.apply(pm, args);
 		}).apply(this, arguments);
 	},
+	remove: function(uri, permission) {
+		var pm = this.pm;
+		if("remove" in pm)
+			return (this.remove = pm.remove.bind(pm))(uri, permission);
+		return (this.remove = function(uri, permission) { // Firefox 71+
+			var principal = Services.scriptSecurityManager.createContentPrincipal(uri, {});
+			var args = Array.from(arguments);
+			args[0] = principal;
+			return pm.removeFromPrincipal.apply(pm, args);
+		}).apply(this, arguments);
+	},
 	addPermission: function(capability, temporary) {
 		// capability:
 		//  this.pm.ALLOW_ACTION
@@ -941,13 +952,13 @@ this.permissions = {
 	},
 	removePermissionForHost: function(host) {
 		try {
-			this.pm.remove(host, this.permissionType);
+			this.remove(host, this.permissionType);
 		}
 		catch(e) {
 			// See https://bugzilla.mozilla.org/show_bug.cgi?id=1170200
 			if("Services" in window) try { // Firefox 42+
 				let uri = Services.io.newURI(this.currentProtocol + "://" + host, null, null);
-				this.pm.remove(uri, this.permissionType);
+				this.remove(uri, this.permissionType);
 				return;
 			}
 			catch(e2) {
@@ -958,7 +969,7 @@ this.permissions = {
 	},
 	removeRawPermission: function(permission) {
 		if("principal" in permission) // Firefox 42+
-			this.pm.remove(permission.principal.URI, this.permissionType);
+			this.remove(permission.principal.URI, this.permissionType);
 		else
 			this.removePermissionForHost(permission.host);
 	},
