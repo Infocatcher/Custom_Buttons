@@ -807,36 +807,30 @@ this.permissions = {
 		return this.hasTempPermissions = "EXPIRE_SESSION" in this.pm
 			&& (!("add" in this.pm) || this.pm.add.length > 3);
 	},
-	testPermission: function(uri, permission) {
+	get pmw() {
+		delete this.pmw;
 		var pm = this.pm;
-		if("testPermission" in pm)
-			return (this.testPermission = pm.testPermission.bind(pm))(uri, permission);
-		return (this.testPermission = function(uri, permission) { // Firefox 71+
-			var principal = Services.scriptSecurityManager.createContentPrincipal(uri, {});
-			return pm.testPermissionFromPrincipal(principal, permission);
-		})(uri, permission);
-	},
-	add: function(uri, permission) {
-		var pm = this.pm;
-		if("add" in pm)
-			return (this.add = pm.add.bind(pm)).apply(pm, arguments);
-		return (this.add = function(uri, permission) { // Firefox 71+
-			var principal = Services.scriptSecurityManager.createContentPrincipal(uri, {});
-			var args = Array.from(arguments);
-			args[0] = principal;
-			return pm.addFromPrincipal.apply(pm, args);
-		}).apply(this, arguments);
-	},
-	remove: function(uri, permission) {
-		var pm = this.pm;
-		if("remove" in pm)
-			return (this.remove = pm.remove.bind(pm))(uri, permission);
-		return (this.remove = function(uri, permission) { // Firefox 71+
-			var principal = Services.scriptSecurityManager.createContentPrincipal(uri, {});
-			var args = Array.from(arguments);
-			args[0] = principal;
-			return pm.removeFromPrincipal.apply(pm, args);
-		}).apply(this, arguments);
+		if("testPermission" in pm) {
+			return this.pmw = {
+				testPermission: pm.testPermission.bind(pm),
+				add:            pm.add           .bind(pm),
+				remove:         pm.remove        .bind(pm)
+			};
+		}
+		// Firefox 71+
+		var make = function(fn) {
+			return function(uri, permission) {
+				var principal = Services.scriptSecurityManager.createContentPrincipal(uri, {});
+				var args = Array.from(arguments);
+				args[0] = principal;
+				return fn.apply(pm, args);
+			};
+		};
+		return this.pmw = {
+			testPermission: make(pm.testPermissionFromPrincipal),
+			add:            make(pm.addFromPrincipal),
+			remove:         make(pm.removeFromPrincipal)
+		};
 	},
 	addPermission: function(capability, temporary) {
 		// capability:
@@ -863,7 +857,7 @@ this.permissions = {
 			else
 				args.push(pm.EXPIRE_TIME, expire + Date.now());
 		}
-		this.add.apply(this, args);
+		this.pmw.add.apply(this.pmw, args);
 	},
 	removePermission: function() {
 		var host = this.currentHost;
@@ -873,9 +867,9 @@ this.permissions = {
 		this.updButtonState(this.pm.UNKNOWN_ACTION); // Faster than ProgressListener (70-80 ms for me)
 
 		var uri = this.getURI(host);
-		var permission = this.testPermission(uri, this.permissionType);
+		var permission = this.pmw.testPermission(uri, this.permissionType);
 		this.removePermissionForHost(host);
-		while(this.testPermission(uri, this.permissionType) == permission) {
+		while(this.pmw.testPermission(uri, this.permissionType) == permission) {
 			let parentHost = host.replace(/^[^.]*\./, "");
 			if(parentHost == host)
 				break;
@@ -915,7 +909,7 @@ this.permissions = {
 	getPermission: function() {
 		var host = this.currentHost;
 		return host
-			? this.testPermission(this.getURI(host), this.permissionType)
+			? this.pmw.testPermission(this.getURI(host), this.permissionType)
 			: this.PERMISSIONS_NOT_SUPPORTED;
 	},
 	getPermissionEx: function() {
@@ -952,13 +946,13 @@ this.permissions = {
 	},
 	removePermissionForHost: function(host) {
 		try {
-			this.remove(host, this.permissionType);
+			this.pmw.remove(host, this.permissionType);
 		}
 		catch(e) {
 			// See https://bugzilla.mozilla.org/show_bug.cgi?id=1170200
 			if("Services" in window) try { // Firefox 42+
 				let uri = Services.io.newURI(this.currentProtocol + "://" + host, null, null);
-				this.remove(uri, this.permissionType);
+				this.pmw.remove(uri, this.permissionType);
 				return;
 			}
 			catch(e2) {
@@ -969,7 +963,7 @@ this.permissions = {
 	},
 	removeRawPermission: function(permission) {
 		if("principal" in permission) // Firefox 42+
-			this.remove(permission.principal.URI, this.permissionType);
+			this.pmw.remove(permission.principal.URI, this.permissionType);
 		else
 			this.removePermissionForHost(permission.host);
 	},
