@@ -683,7 +683,7 @@ if(!watcher) {
 		},
 		destroyWindow: function(window, reason, isFrame) {
 			if(reason == this.REASON_WINDOW_CLOSED)
-				window.removeEventListener("DOMContentLoaded", this, false); // Window can be closed before DOMContentLoaded
+				window.removeEventListener(this.loadEvent, this, false); // Window can be closed before DOMContentLoaded
 			if(this.isBrowserWindow(window)) {
 				this.destroyBrowserWindow(window, reason);
 				return;
@@ -805,17 +805,22 @@ if(!watcher) {
 				|| loc == "chrome://browser/content/browser.xhtml" // Firefox 69+
 				|| loc == "chrome://navigator/content/navigator.xul";
 		},
+		get loadEvent() { // "DOMContentLoaded" -> initWindow() may hang editor window (and browser)
+			delete this.loadEvent;
+			return this.loadEvent = this.platformVersion >= 73 ? "load" : "DOMContentLoaded";
+		},
 		observe: function(subject, topic, data) {
 			if(topic == "quit-application-granted")
 				this.destroy();
 			else if(topic == "domwindowopened")
-				subject.addEventListener("DOMContentLoaded", this, false);
+				subject.addEventListener(this.loadEvent, this, false);
 			else if(topic == "domwindowclosed")
 				this.destroyWindow(subject, this.REASON_WINDOW_CLOSED);
 		},
 		handleEvent: function(e) {
 			switch(e.type) {
 				case "DOMContentLoaded":
+				case "load":
 					//var window = e.currentTarget;
 					var window = e.target.defaultView || e.target;
 					window.removeEventListener(e.type, this, false);
