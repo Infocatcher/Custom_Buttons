@@ -1214,7 +1214,7 @@ this.permissions = {
 	},
 	removeCookies: function(types, checkHost) {
 		var cm = this.cm;
-		//var pm = this.pm;
+		var pm = this.pm;
 		var cookies = cm.enumerator;
 		while(cookies.hasMoreElements()) {
 			let cookie = cookies.getNext()
@@ -1229,7 +1229,10 @@ this.permissions = {
 				if(types.indexOf(permission) == -1)
 					continue;
 			}
-			cm.remove(cookieHost, cookie.name, cookie.path, false, cookie.originAttributes || undefined);
+			if("testPermission" in pm)
+				cm.remove(cookieHost, cookie.name, cookie.path, false, cookie.originAttributes || undefined);
+			else // Firefox 71+
+				cm.remove(cookieHost, cookie.name, cookie.path, cookie.originAttributes || undefined);
 		}
 	},
 
