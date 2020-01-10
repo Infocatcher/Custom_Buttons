@@ -883,7 +883,8 @@ this.permissions = {
 			return this.pmw = {
 				testPermission: pm.testPermission.bind(pm),
 				add:            pm.add           .bind(pm),
-				remove:         pm.remove        .bind(pm)
+				remove:         pm.remove        .bind(pm),
+				__proto__: pm
 			};
 		}
 		// Firefox 71+
@@ -896,10 +897,25 @@ this.permissions = {
 			};
 		};
 		return this.pmw = {
+			_context: this,
 			testPermission: make(pm.testPermissionFromPrincipal),
 			add:            make(pm.addFromPrincipal),
-			remove:         make(pm.removeFromPrincipal)
+			remove:         make(pm.removeFromPrincipal),
+			get enumerator() { // Firefox 72+
+				return pm.enumerator || this._context.arrayToEnumerator(pm.all);
+			}
 		};
+	},
+	arrayToEnumerator: function(arr) {
+		var i = 0, l = arr.length;
+		return {
+			hasMoreElements: function() {
+				return i < l;
+			},
+			getNext: function() {
+				return arr[i++];
+			}
+		}
 	},
 	addPermission: function(capability, temporary) {
 		// capability:
@@ -965,7 +981,7 @@ this.permissions = {
 		if(!this.hasTempPermissions)
 			return out;
 		var pm = this.pm;
-		var enumerator = pm.enumerator;
+		var enumerator = this.pmw.enumerator;
 		while(enumerator.hasMoreElements()) {
 			let permission = enumerator.getNext()
 				.QueryInterface(Components.interfaces.nsIPermission);
@@ -997,7 +1013,7 @@ this.permissions = {
 		var matchedPermission = pm.UNKNOWN_ACTION;
 		var protocol = this.currentProtocol;
 		var maxHostLen = -1;
-		var enumerator = pm.enumerator;
+		var enumerator = this.pmw.enumerator;
 		while(enumerator.hasMoreElements()) {
 			let permission = enumerator.getNext()
 				.QueryInterface(Components.interfaces.nsIPermission);
