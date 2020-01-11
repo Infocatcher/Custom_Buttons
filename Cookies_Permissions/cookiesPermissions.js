@@ -1231,7 +1231,7 @@ this.permissions = {
 	removeCookies: function(types, checkHost) {
 		var cm = this.cm;
 		var pm = this.pm;
-		var cookies = cm.enumerator;
+		var cookies = cm.enumerator || this.arrayToEnumerator(cm.cookies); // Firefox 73+
 		while(cookies.hasMoreElements()) {
 			let cookie = cookies.getNext()
 				.QueryInterface(Components.interfaces.nsICookie);
