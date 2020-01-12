@@ -157,7 +157,14 @@ if(!watcher) {
 					let tabbox = document.getElementById("custombuttons-editbutton-tabbox");
 					let tabs = tabbox.getElementsByTagName("tabs")[0];
 					tabs.parentNode.insertBefore(box, tabs);
-					box.style.marginBottom = -(btn.boxObject || btn.getBoundingClientRect()).height + "px";
+					let btnH = function() {
+						return (btn.boxObject || btn.getBoundingClientRect()).height;
+					};
+					let h = btnH();
+					box.style.marginBottom = -(h || 23) + "px";
+					!h && window.setTimeout(function() { // Check again for Firefox 73.0b3+
+						box.style.marginBottom = -btnH() + "px";
+					}, 100);
 				break;
 				case 2:
 					box.setAttribute("align", "center");
