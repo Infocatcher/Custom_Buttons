@@ -150,7 +150,10 @@ if(!watcher) {
 					document.documentElement.appendChild(box);
 				break;
 				case 1:
-					box.setAttribute("align", "right");
+					if(this.platformVersion >= 72)
+						box.setAttribute("pack", "end");
+					else
+						box.setAttribute("align", "right");
 					let tabbox = document.getElementById("custombuttons-editbutton-tabbox");
 					let tabs = tabbox.getElementsByTagName("tabs")[0];
 					tabs.parentNode.insertBefore(box, tabs);
