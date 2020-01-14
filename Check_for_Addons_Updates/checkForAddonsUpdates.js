@@ -169,8 +169,6 @@ function processAddonsTab(e) {
 	}
 
 	progressIcon.loading();
-	var inProgress = $("updates-progress");
-	btn.tooltipText = inProgress.getAttribute("value");
 
 	var origIcon = tab.image;
 	tab.image = image;
@@ -180,12 +178,47 @@ function processAddonsTab(e) {
 	if(!updEnabled)
 		Services.prefs.setBoolPref(updEnabledPref, true);
 
-	var notFound = $("updates-noneFound");
-	var updated = $("updates-installed");
+	var fu = $("cmd_findAllUpdates");
+	if(!fu) { // Firefox 72+
+		var win = doc.defaultView;
+		var vb = doc.getElementById("html-view-browser");
+		if(!vb) {
+			win.setTimeout(processAddonsTab, 20, win);
+			return;
+		}
+		var vbDoc = vb.contentDocument;
+		fu = vbDoc.querySelector('[action="check-for-updates"]');
+		var um = vbDoc.getElementById("updates-message");
+	}
+
+	var notFound = $("updates-noneFound") || {
+		get hidden() { return um.getAttribute("state") != "none-found"; },
+		set hidden(h) {},
+		getAttribute: function() {
+			return "No updates found!"; //~ todo
+		}
+	};
+	var updated = $("updates-installed") || {
+		get hidden() { return um.getAttribute("state") != "installed"; },
+		set hidden(h) {},
+		getAttribute: function() {
+			return "Updated!"; //~ todo
+		}
+	};
 	// Avoid getting false results from the past update check (may not be required for "noneFound")
 	notFound.hidden = updated.hidden = true;
 
-	$("cmd_findAllUpdates").doCommand();
+	//fu.doCommand();
+	fu.click();
+
+	var inProgress = $("updates-progress") || {
+		get hidden() { return um.getAttribute("state") != "updating"; },
+		set hidden(h) {},
+		getAttribute: function() {
+			return "Updating…"; //~ todo
+		}
+	};
+	btn.tooltipText = inProgress.getAttribute("value");
 
 	var waitTimer = setInterval(function() {
 		if(!doc.defaultView || doc.defaultView.closed) {
@@ -195,10 +228,14 @@ function processAddonsTab(e) {
 		}
 		if(!inProgress.hidden)
 			return;
-		var autoUpdate = $("utils-autoUpdateDefault");
-		var autoUpdateChecked = autoUpdate.getAttribute("checked") == "true";
+		var autoUpdate = $("utils-autoUpdateDefault")
+			|| vbDoc.querySelector('[action="set-update-automatically"]');
+		var autoUpdateChecked = autoUpdate.getAttribute("checked") == "true"
+			|| autoUpdate.checked;
 
-		var found = $("updates-manualUpdatesFound-btn");
+		var found = $("updates-manualUpdatesFound-btn") || {
+			get hidden() { return um.getAttribute("state") != "manual-updates-found"; }
+		};
 		if(
 			autoUpdateChecked
 				? notFound.hidden && updated.hidden
@@ -264,7 +301,8 @@ function processAddonsTab(e) {
 		setTimeout(function() {
 			tabWin.focus();
 			doc.defaultView.focus();
-			$("addon-list").focus();
+			var al = $("addon-list") || vb;
+			al.focus();
 		}, 0);
 	}, 50);
 	function $(id) {
