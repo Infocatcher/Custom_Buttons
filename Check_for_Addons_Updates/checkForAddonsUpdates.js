@@ -193,17 +193,11 @@ function processAddonsTab(e) {
 
 	var notFound = $("updates-noneFound") || {
 		get hidden() { return um.getAttribute("state") != "none-found"; },
-		set hidden(h) {},
-		getAttribute: function() {
-			return "No updates found!"; //~ todo
-		}
+		set hidden(h) {}
 	};
 	var updated = $("updates-installed") || {
 		get hidden() { return um.getAttribute("state") != "installed"; },
-		set hidden(h) {},
-		getAttribute: function() {
-			return "Updated!"; //~ todo
-		}
+		set hidden(h) {}
 	};
 	// Avoid getting false results from the past update check (may not be required for "noneFound")
 	notFound.hidden = updated.hidden = true;
@@ -211,14 +205,20 @@ function processAddonsTab(e) {
 	//fu.doCommand();
 	fu.click();
 
+	function localize(node, key, callback) {
+		if(vb) // Firefox 72+
+			doc.l10n.formatValue(key).then(callback, Components.utils.reportError);
+		else
+			callback(node.getAttribute("value"));
+	}
+
 	var inProgress = $("updates-progress") || {
 		get hidden() { return um.getAttribute("state") != "updating"; },
-		set hidden(h) {},
-		getAttribute: function() {
-			return "Updating…"; //~ todo
-		}
+		set hidden(h) {}
 	};
-	btn.tooltipText = inProgress.getAttribute("value");
+	localize(inProgress, "addon-updates-updating", function(s) {
+		btn.tooltipText = s;
+	});
 
 	var waitTimer = setInterval(function() {
 		if(!doc.defaultView || doc.defaultView.closed) {
@@ -282,12 +282,16 @@ function processAddonsTab(e) {
 
 		if(!notFound.hidden) {
 			removeTab();
-			notify(notFound.getAttribute("value"));
+			localize(notFound, "addon-updates-none-found", function(s) {
+				notify(s);
+			});
 			return;
 		}
 		if(autoUpdateChecked) {
 			removeTab();
-			notify(updated.getAttribute("value"));
+			localize(updated, "addon-updates-installed", function(s) {
+				notify(s);
+			});
 			return;
 		}
 
