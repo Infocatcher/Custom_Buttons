@@ -153,7 +153,7 @@ else {
 	return;
 }
 
-function processAddonsTab(e) {
+function processAddonsTab(e, again) {
 	var doc;
 	if(e && e instanceof Components.interfaces.nsIDOMWindow) {
 		doc = e.document;
@@ -184,6 +184,12 @@ function processAddonsTab(e) {
 		var vb = doc.getElementById("html-view-browser");
 		if(!vb) {
 			win.setTimeout(processAddonsTab, 20, win);
+			return;
+		}
+		if(!again) { // Strange errors happens
+			// chrome://mozapps/content/extensions/aboutaddons.js
+			// getTelemetryViewName() -> el.closest(...) is null
+			win.setTimeout(processAddonsTab, 20, win, true);
 			return;
 		}
 		var vbDoc = vb.contentDocument;
