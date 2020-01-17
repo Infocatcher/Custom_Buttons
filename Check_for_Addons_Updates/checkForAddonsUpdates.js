@@ -198,15 +198,19 @@ function processAddonsTab(e, again) {
 	}
 
 	var notFound = $("updates-noneFound") || {
-		get hidden() { return um.getAttribute("state") != "none-found"; },
-		set hidden(h) {}
+		get hidden() { return um.getAttribute("state") != "none-found"; }
 	};
 	var updated = $("updates-installed") || {
-		get hidden() { return um.getAttribute("state") != "installed"; },
-		set hidden(h) {}
+		get hidden() { return um.getAttribute("state") != "installed"; }
 	};
 	// Avoid getting false results from the past update check (may not be required for "noneFound")
-	notFound.hidden = updated.hidden = true;
+	if(vb) { // Firefox 72+
+		um.hidden = true;
+		um.removeAttribute("state");
+	}
+	else {
+		notFound.hidden = updated.hidden = true;
+	}
 
 	//fu.doCommand();
 	fu.click();
