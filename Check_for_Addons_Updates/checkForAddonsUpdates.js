@@ -204,7 +204,7 @@ function processAddonsTab(e, again) {
 		get hidden() { return um.getAttribute("state") != "installed"; }
 	};
 	// Avoid getting false results from the past update check (may not be required for "noneFound")
-	if(vb) { // Firefox 72+
+	if(um) { // Firefox 72+
 		um.hidden = true;
 		um.removeAttribute("state");
 	}
@@ -216,7 +216,7 @@ function processAddonsTab(e, again) {
 	fu.click();
 
 	function localize(node, key, callback) {
-		if(vb) // Firefox 72+
+		if(um) // Firefox 72+
 			doc.l10n.formatValue(key).then(callback, Components.utils.reportError);
 		else
 			callback(node.getAttribute("value"));
