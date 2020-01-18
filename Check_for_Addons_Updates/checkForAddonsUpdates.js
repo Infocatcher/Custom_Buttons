@@ -393,7 +393,9 @@ function ProgressIcon(btn) {
 		this.imgLoading = "chrome://messenger/skin/icons/loading.png";
 	}
 	else {
-		this.imgConnecting = "chrome://browser/skin/tabbrowser/connecting.png";
+		this.imgConnecting = app == "Firefox" && pv >= 58
+			? "chrome://browser/skin/tabbrowser/tab-connecting.png"
+			: "chrome://browser/skin/tabbrowser/connecting.png";
 		this.imgLoading = app == "Firefox" && pv >= 48
 			? "chrome://global/skin/icons/loading.png"
 			: "chrome://browser/skin/tabbrowser/loading.png";
