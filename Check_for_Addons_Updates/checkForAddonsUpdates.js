@@ -216,10 +216,13 @@ function processAddonsTab(e, again) {
 	fu.click();
 
 	function localize(node, key, callback) {
-		if(um) // Firefox 72+
-			doc.l10n.formatValue(key).then(callback, Components.utils.reportError);
-		else
-			callback(node.getAttribute("value"));
+		if(um) { // Firefox 72+
+			doc.l10n.formatValue(key).then(function(s) {
+				callback(s || key);
+			}, Components.utils.reportError);
+			return;
+		}
+		callback(node.getAttribute("value") || key);
 	}
 
 	var inProgress = $("updates-progress") || {
