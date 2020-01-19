@@ -400,7 +400,7 @@ function ProgressIcon(btn) {
 			? "chrome://global/skin/icons/loading.png"
 			: "chrome://browser/skin/tabbrowser/loading.png";
 	}
-	var useAnimation = app == "Firefox" && pv >= 32;
+	var useAnimation = app == "Firefox" && pv >= 32 && pv < 48;
 	var btnIcon = btn.icon
 		|| btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon");
 	var origIcon = btnIcon.src;
