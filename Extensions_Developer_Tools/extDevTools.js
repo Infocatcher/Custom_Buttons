@@ -1756,14 +1756,16 @@ function ProgressIcon(btn) {
 		this.imgLoading = "chrome://messenger/skin/icons/loading.png";
 	}
 	else {
-		this.imgConnecting = "chrome://browser/skin/tabbrowser/connecting.png";
+		this.imgConnecting = app == "Firefox" && pv >= 58
+			? "chrome://browser/skin/tabbrowser/tab-connecting.png"
+			: "chrome://browser/skin/tabbrowser/connecting.png";
 		this.imgLoading = app == "Firefox" && pv >= 48
 			? "chrome://global/skin/icons/loading.png"
 			: "chrome://browser/skin/tabbrowser/loading.png";
 	}
-	var useAnimation = app == "Firefox" && pv >= 32;
-	var btnIcon = btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon")
-		|| btn.getElementsByClassName("toolbarbutton-icon")[0];
+	var useAnimation = app == "Firefox" && pv >= 32 && pv < 48;
+	var btnIcon = btn.icon
+		|| btn.ownerDocument.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon");
 	var origIcon = btnIcon.src;
 	btnIcon.src = this.imgConnecting;
 	if(useAnimation) {
