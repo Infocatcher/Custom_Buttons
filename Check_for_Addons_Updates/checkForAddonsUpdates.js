@@ -309,7 +309,11 @@ function processAddonsTab(e, again) {
 		}
 
 		tab.collapsed = false;
-		$("categories").selectedItem = $("category-availableUpdates");
+		var cats = $("categories");
+		var upds = $("category-availableUpdates");
+		if(cats.selectedItem == upds)
+			cats.selectedItem = $("category-extension"); // Trick to force update
+		cats.selectedItem = upds;
 		var tabWin = tab.ownerDocument.defaultView;
 		if(tbTab)
 			tabmail.switchToTab(tbTabInfo);
