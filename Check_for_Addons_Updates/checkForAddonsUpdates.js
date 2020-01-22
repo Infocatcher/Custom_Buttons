@@ -311,7 +311,7 @@ function processAddonsTab(e, again) {
 		tab.collapsed = false;
 		var cats = $("categories");
 		var upds = $("category-availableUpdates");
-		if(cats.selectedItem == upds)
+		if(vb && cats.selectedItem == upds) // Only for Firefox 72+
 			cats.selectedItem = $("category-extension"); // Trick to force update
 		cats.selectedItem = upds;
 		var tabWin = tab.ownerDocument.defaultView;
