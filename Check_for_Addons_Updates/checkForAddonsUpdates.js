@@ -170,7 +170,9 @@ function processAddonsTab(e, again) {
 
 	progressIcon.loading();
 
-	var origIcon = tab.image;
+	var origAttr = "_cb_checkForAddonsUpdates_origImage";
+	if(!tab.hasAttribute(origAttr))
+		tab.setAttribute(origAttr, tab.image);
 	tab.image = image;
 
 	var updEnabledPref = "extensions.update.enabled";
@@ -334,7 +336,8 @@ function processAddonsTab(e, again) {
 		progressIcon.restore();
 		btn.tooltipText = tip;
 		if(tab.image == image)
-			tab.image = origIcon;
+			tab.image = tab.getAttribute(origAttr);
+		tab.removeAttribute(origAttr);
 		trgWindow.removeEventListener("TabSelect", dontSelectHiddenTab, false);
 		setTimeout(function() {
 			delete btn._cb_disabled;
