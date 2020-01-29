@@ -319,15 +319,24 @@ if(!watcher) {
 						css("resource://devtools/client/themes/variables.css");
 						css("resource://devtools/client/themes/common.css");
 						css("chrome://devtools/skin/tooltips.css");
-						if(this.platformVersion >= 68) window.setTimeout(function() {
+						if(this.platformVersion >= 68) window.setTimeout(function fixSelection() {
 							var sheets = document.styleSheets;
 							for(var i = sheets.length - 1; i >= 0; --i) {
 								var sheet = sheets[i];
 								if(sheet.href != "resource://devtools/client/themes/common.css")
 									continue;
-								for(var j = 0, len = sheet.cssRules.length; j < len; ++j)
-									if(sheet.cssRules[j].selectorText == "::selection")
+								try {
+									var rules = sheet.cssRules;
+								}
+								catch(e) {
+									// InvalidAccessError:
+									// A parameter or an operation is not supported by the underlying object
+									return window.setTimeout(fixSelection, 10);
+								}
+								for(var j = 0, len = rules.length; j < len; ++j)
+									if(rules[j].selectorText == "::selection")
 										return !sheet.deleteRule(j);
+								break;
 							}
 							return false;
 						}, 10);
