@@ -264,32 +264,32 @@ function processAddonsTab(e, again) {
 		function removeTab() {
 			if(!tab.collapsed)
 				return;
-			if(tbTab)
+			if(tbTab) {
 				tabmail.closeTab(tbTabInfo, true /*aNoUndo*/);
-			else {
-				gBrowser.removeTab(tab);
-				(function forgetClosedTab(isSecondTry) {
-					var ss = "nsISessionStore" in Components.interfaces
-						? (
-							Components.classes["@mozilla.org/browser/sessionstore;1"]
-							|| Components.classes["@mozilla.org/suite/sessionstore;1"]
-						).getService(Components.interfaces.nsISessionStore)
-						: SessionStore; // Firefox 61+ https://bugzilla.mozilla.org/show_bug.cgi?id=1450559
-					if(!("forgetClosedTab" in ss))
-						return;
-					var closedTabs = JSON.parse(ss.getClosedTabData(window));
-					for(let i = 0, l = closedTabs.length; i < l; ++i) {
-						let closedTab = closedTabs[i];
-						let state = closedTab.state;
-						if(state.entries[state.index - 1].url == ADDONS_URL) {
-							ss.forgetClosedTab(window, i);
-							return;
-						}
-					}
-					if(!isSecondTry) // May be needed in SeaMonkey
-						setTimeout(forgetClosedTab, 0, true);
-				})();
+				return;
 			}
+			gBrowser.removeTab(tab);
+			(function forgetClosedTab(isSecondTry) {
+				var ss = "nsISessionStore" in Components.interfaces
+					? (
+						Components.classes["@mozilla.org/browser/sessionstore;1"]
+						|| Components.classes["@mozilla.org/suite/sessionstore;1"]
+					).getService(Components.interfaces.nsISessionStore)
+					: SessionStore; // Firefox 61+ https://bugzilla.mozilla.org/show_bug.cgi?id=1450559
+				if(!("forgetClosedTab" in ss))
+					return;
+				var closedTabs = JSON.parse(ss.getClosedTabData(window));
+				for(let i = 0, l = closedTabs.length; i < l; ++i) {
+					let closedTab = closedTabs[i];
+					let state = closedTab.state;
+					if(state.entries[state.index - 1].url == ADDONS_URL) {
+						ss.forgetClosedTab(window, i);
+						return;
+					}
+				}
+				if(!isSecondTry) // May be needed in SeaMonkey
+					setTimeout(forgetClosedTab, 0, true);
+			})();
 		}
 
 		if(!updEnabled)
