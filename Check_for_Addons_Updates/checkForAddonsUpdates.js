@@ -275,7 +275,7 @@ function processAddonsTab(e, again) {
 						Components.classes["@mozilla.org/browser/sessionstore;1"]
 						|| Components.classes["@mozilla.org/suite/sessionstore;1"]
 					).getService(Components.interfaces.nsISessionStore)
-					: SessionStore; // Firefox 61+ https://bugzilla.mozilla.org/show_bug.cgi?id=1450559
+					: trgWindow.SessionStore; // Firefox 61+ https://bugzilla.mozilla.org/show_bug.cgi?id=1450559
 				if(!("forgetClosedTab" in ss))
 					return;
 				var closedTabs = JSON.parse(ss.getClosedTabData(window));
