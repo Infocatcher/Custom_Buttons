@@ -26,6 +26,7 @@ btn._cb_disabled = true;
 if(!("Services" in window))
 	Components.utils.import("resource://gre/modules/Services.jsm");
 var app = Services.appinfo.name;
+var pv = parseFloat(Services.appinfo.platformVersion);
 
 var ADDONS_URL = "about:addons";
 
@@ -129,7 +130,7 @@ else if("gBrowser" in trgWindow && trgWindow.gBrowser.tabs) {
 	if(isPending || browser.webProgress.isLoadingDocument) {
 		browser.addEventListener("load", processAddonsTab, true);
 		if(isPending) {
-			if(parseFloat(Services.appinfo.platformVersion) >= 41) {
+			if(pv >= 41) {
 				// Workaround to correctly restore pending tab
 				// See https://github.com/Infocatcher/Custom_Buttons/issues/39
 				let selTab = gBrowser.selectedTab;
@@ -347,7 +348,7 @@ function processAddonsTab(e, again) {
 		Components.classes["@mozilla.org/alerts-service;1"]
 			.getService(Components.interfaces.nsIAlertsService)
 			.showAlertNotification(
-				Services.appinfo.name == "Firefox" && parseFloat(Services.appinfo.version) >= 57
+				app == "Firefox" && pv >= 57
 					? "chrome://mozapps/skin/extensions/extensionGeneric.svg"
 					: "chrome://mozapps/skin/extensions/extensionGeneric.png",
 				btn.label,
