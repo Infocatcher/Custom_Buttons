@@ -229,8 +229,7 @@ function processAddonsTab(e, again) {
 	}
 
 	var inProgress = $("updates-progress") || {
-		get hidden() { return um.getAttribute("state") != "updating"; },
-		set hidden(h) {}
+		get hidden() { return um.getAttribute("state") != "updating"; }
 	};
 	localize(inProgress, "addon-updates-updating", function(s) {
 		btn.tooltipText = s;
