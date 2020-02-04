@@ -176,11 +176,6 @@ function processAddonsTab(e, again) {
 		tab.setAttribute(origAttr, tab.image);
 	tab.image = image;
 
-	var updEnabledPref = "extensions.update.enabled";
-	var updEnabled = Services.prefs.getBoolPref(updEnabledPref);
-	if(!updEnabled)
-		Services.prefs.setBoolPref(updEnabledPref, true);
-
 	var fu = $("cmd_findAllUpdates");
 	if(!fu) { // Firefox 72+
 		var win = doc.defaultView;
@@ -291,9 +286,6 @@ function processAddonsTab(e, again) {
 					setTimeout(forgetClosedTab, 0, true);
 			})();
 		}
-
-		if(!updEnabled)
-			Services.prefs.setBoolPref(updEnabledPref, false);
 
 		if(!notFound.hidden) {
 			removeTab();
