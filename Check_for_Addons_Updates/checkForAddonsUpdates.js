@@ -379,10 +379,6 @@ function dontSelectHiddenTab(e) {
 			return;
 }
 function ProgressIcon(btn) {
-	if(!(btn instanceof XULElement)) {
-		this.loading = this.restore = function() {};
-		return;
-	}
 	var app = Services.appinfo.name;
 	var pv = parseFloat(Services.appinfo.platformVersion);
 	if(app == "SeaMonkey")
@@ -398,6 +394,10 @@ function ProgressIcon(btn) {
 		this.imgLoading = app == "Firefox" && pv >= 48
 			? "chrome://global/skin/icons/loading.png"
 			: "chrome://browser/skin/tabbrowser/loading.png";
+	}
+	if(!(btn instanceof XULElement)) {
+		this.loading = this.restore = function() {};
+		return;
 	}
 	var useAnimation = app == "Firefox" && pv >= 32 && pv < 48;
 	var btnIcon = btn.icon
