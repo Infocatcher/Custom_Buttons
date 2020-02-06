@@ -172,8 +172,10 @@ function processAddonsTab(e, again) {
 	progressIcon.loading();
 
 	var origAttr = "_cb_checkForAddonsUpdates_origImage";
-	if(!tab.hasAttribute(origAttr))
-		tab.setAttribute(origAttr, tab.image);
+	if(!tab.hasAttribute(origAttr)) {
+		var link = doc.querySelector('link[rel="shortcut icon"]'); // Not loaded yet?
+		tab.setAttribute(origAttr, link && link.href || tab.image);
+	}
 	tab.image = image;
 
 	var fu = $("cmd_findAllUpdates");
