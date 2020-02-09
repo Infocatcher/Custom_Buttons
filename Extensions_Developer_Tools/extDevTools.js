@@ -229,6 +229,9 @@ function _localize(s, key) {
 		"Show strict warnings in debug builds": {
 			ru: "Показывать строгие предупреждения в тестовых сборках"
 		},
+		"Show stack for async calls": {
+			ru: "Показывать стек асинхронных вызовов"
+		},
 		"Show all exceptions": {
 			ru: "Показывать все исключения"
 		},
@@ -1918,6 +1921,10 @@ var mp = cmds.popup = this.appendChild(parseXULFromString('\
 					type="checkbox"\
 					label="' + _localize("Show strict warnings in debug builds") + '"\
 					cb_show="cmds.isDebugBuild" />\
+				<menuitem cb_pref="javascript.options.asyncstack"\
+					type="checkbox"\
+					label="' + _localize("Show stack for async calls") + '"\
+					hidden="' + !cmds.prefHasDefaultValue("javascript.options.asyncstack") + '" />\
 				<menuitem cb_pref="dom.report_all_js_exceptions"\
 					type="checkbox"\
 					label="' + _localize("Show all exceptions") + '"\
