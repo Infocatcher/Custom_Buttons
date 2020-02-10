@@ -343,13 +343,14 @@ this.permissions = {
 					.QueryInterface(Components.interfaces.nsIPrefBranch2 || Components.interfaces.nsIPrefBranch);
 			},
 			get: function(name) {
+				var dv = false;
 				try {
-					return this.branch.getBoolPref(name || "");
+					return this.branch.getBoolPref(name || "", dv);
 				}
 				catch(e) {
 					Components.utils.reportError(e);
 				}
-				return false;
+				return dv;
 			},
 			set: function(val, name) {
 				try {

@@ -345,13 +345,14 @@ this.permissions = {
 						.QueryInterface(Components.interfaces.nsIPrefBranch2 || Components.interfaces.nsIPrefBranch);
 				},
 				getIntPref: function(name) {
+					var dv = 0;
 					try {
-						return this.prefs.getIntPref(name);
+						return this.prefs.getIntPref(name, dv);
 					}
 					catch(e) {
 						Components.utils.reportError(e);
 					}
-					return 0;
+					return dv;
 				},
 				observe: function(subject, topic, data) {
 					if(topic != "nsPref:changed")
