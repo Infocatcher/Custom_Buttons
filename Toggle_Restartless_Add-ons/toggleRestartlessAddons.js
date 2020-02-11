@@ -179,7 +179,7 @@ mp.icons = {
 function isAskToActivateAddon(addon) {
 	return addon.type == "plugin"
 		&& "STATE_ASK_TO_ACTIVATE" in AddonManager
-		&& Services.prefs.getBoolPref("plugins.click_to_play");
+		&& Services.prefs.getBoolPref("plugins.click_to_play", true);
 }
 function setNewDisabled(addon) {
 	var newDis = getNewDisabled(addon);
