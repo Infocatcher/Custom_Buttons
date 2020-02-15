@@ -264,14 +264,14 @@ this.permissions = {
 		return this.tld = Components.classes["@mozilla.org/network/effective-tld-service;1"]
 			.getService(Components.interfaces.nsIEffectiveTLDService);
 	},
-	get appInfo() {
-		delete this.appInfo;
-		return this.appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
+	get app() {
+		delete this.app;
+		return this.app = Components.classes["@mozilla.org/xre/app-info;1"]
 			.getService(Components.interfaces.nsIXULAppInfo);
 	},
 	get platformVersion() {
-		var pv = parseFloat(this.appInfo.platformVersion);
-		if(this.appInfo.name == "Pale Moon" || this.appInfo.name == "Basilisk")
+		var pv = parseFloat(this.app.platformVersion);
+		if(this.app.name == "Pale Moon" || this.app.name == "Basilisk")
 			pv = pv >= 4.1 ? 56 : 28;
 		delete this.platformVersion;
 		return this.platformVersion = pv;
@@ -635,11 +635,6 @@ this.permissions = {
 		if(scheme == "https")
 			return scheme;
 		return "http";
-	},
-	get app() {
-		delete this.app;
-		return this.app = Components.classes["@mozilla.org/xre/app-info;1"]
-			.getService(Components.interfaces.nsIXULAppInfo);
 	},
 	getHost: function(useBaseDomain, host) {
 		if(host === undefined)
