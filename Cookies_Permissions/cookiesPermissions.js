@@ -1096,7 +1096,7 @@ this.permissions = {
 			return;
 		}
 		if(this.app.name == "Firefox" && parseFloat(this.app.version) >= 61) {
-			this.showSiteDate(host);
+			this.showSiteData(host);
 			return;
 		}
 		var win = this.wm.getMostRecentWindow("Browser:Cookies");
@@ -1158,7 +1158,7 @@ this.permissions = {
 			win.addEventListener("load", setFilter, false);
 		}
 	},
-	showSiteDate: function(host) {
+	showSiteData: function(host) {
 		var win = this.wm.getMostRecentWindow("Browser:SiteDataSettings");
 		var _this = this;
 		var setFilter = function setFilter(e) {
