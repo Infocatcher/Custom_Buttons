@@ -696,7 +696,8 @@ this.permissions = {
 			host && setFilter();
 		}
 		else {
-			win = window.openDialog("chrome://browser/content/preferences/permissions.xul", "_blank", "", params);
+			var ext = this.platformVersion >= 72 ? ".xhtml" : ".xul";
+			win = window.openDialog("chrome://browser/content/preferences/permissions" + ext, "_blank", "", params);
 			host && win.addEventListener("load", setFilter, false);
 		}
 

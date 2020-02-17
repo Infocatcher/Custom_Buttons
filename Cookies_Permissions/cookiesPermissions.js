@@ -800,7 +800,8 @@ this.permissions = {
 			host && setFilter();
 		}
 		else {
-			win = window.openDialog("chrome://browser/content/preferences/permissions.xul", "_blank", "", params);
+			var ext = this.platformVersion >= 72 ? ".xhtml" : ".xul";
+			win = window.openDialog("chrome://browser/content/preferences/permissions" + ext, "_blank", "", params);
 			host && win.addEventListener("load", setFilter, false);
 		}
 
@@ -1167,7 +1168,8 @@ this.permissions = {
 		else {
 			var {SiteDataManager} = Components.utils.import("resource:///modules/SiteDataManager.jsm", {});
 			SiteDataManager.updateSites().then(function() {
-				win = window.openDialog("chrome://browser/content/preferences/siteDataSettings.xul", "_blank", "");
+				var ext = _this.platformVersion >= 72 ? ".xhtml" : ".xul";
+				win = window.openDialog("chrome://browser/content/preferences/siteDataSettings" + ext, "_blank", "");
 				host && win.addEventListener("load", setFilter, false);
 			}, Components.utils.reportError);
 		}
