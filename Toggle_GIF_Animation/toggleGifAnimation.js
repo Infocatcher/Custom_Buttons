@@ -50,9 +50,18 @@ var gifAnimation = {
 				}
 				Array.prototype.forEach.call(win.frames, setMode);
 			})(content);
+			sendAsyncMessage("CB:ToggleGIFAnimation:mode", mode);
 		`;
 		var data = "data:application/javascript," + encodeURIComponent(code);
-		gBrowser.selectedBrowser.messageManager.loadFrameScript(data, false);
+
+		var mm = gBrowser.selectedBrowser.messageManager;
+		var _this = this;
+		mm.addMessageListener("CB:ToggleGIFAnimation:mode", function receiveMessage(msg) {
+			mm.removeMessageListener("CB:ToggleGIFAnimation:mode", receiveMessage);
+			if(msg.data != null)
+				_this.updateState(msg.data);
+		});
+		mm.loadFrameScript(data, false);
 	},
 	setMode: function(win, mode) {
 		Array.prototype.forEach.call(win.frames, function(win) {
