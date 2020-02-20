@@ -101,8 +101,10 @@ var gifAnimation = {
 	},
 	_updateStateTimer: 0,
 	updateStateDelayed: function() {
-		clearTimeout(this._updateStateTimer);
+		if(this._updateStateTimer)
+			return;
 		this._updateStateTimer = setTimeout(function(_this) {
+			_this._updateStateTimer = 0;
 			_this.updateState();
 		}, 20, this);
 	}
