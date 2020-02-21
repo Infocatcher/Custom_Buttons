@@ -15,7 +15,7 @@ var gifAnimation = {
 	remote: window.gMultiProcessBrowser,
 	button: this,
 	getUtils: function(win) {
-		return win.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+		return win.windowUtils || win.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
 			.getInterface(Components.interfaces.nsIDOMWindowUtils);
 	},
 	get mode() {
