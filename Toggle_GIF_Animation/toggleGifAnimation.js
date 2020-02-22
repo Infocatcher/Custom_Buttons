@@ -39,7 +39,7 @@ var gifAnimation = {
 			: ic.kNormalAnimMode;
 	},
 	toggleRemote: function() {
-		this.loadFrameScript(`
+		this.loadFrameScript(function() {
 			var ic = Components.interfaces.imgIContainer;
 			var mode = content.windowUtils.imageAnimationMode == ic.kNormalAnimMode ? ic.kDontAnimMode : ic.kNormalAnimMode;
 			(function setMode(win) {
@@ -51,7 +51,7 @@ var gifAnimation = {
 				Array.prototype.forEach.call(win.frames, setMode);
 			})(content);
 			sendAsyncMessage("CB:ToggleGIFAnimation:mode", mode);
-		`);
+		});
 	},
 	setMode: function(win, mode) {
 		Array.prototype.forEach.call(win.frames, function(win) {
@@ -79,16 +79,17 @@ var gifAnimation = {
 			: this.iconEnabled;
 	},
 	updateStateRemote: function() {
-		this.loadFrameScript(`
+		this.loadFrameScript(function() {
 			try {
 				var mode = content.windowUtils.imageAnimationMode;
 			}
 			catch(e) { // NS_ERROR_NOT_AVAILABLE
 			}
 			sendAsyncMessage("CB:ToggleGIFAnimation:mode", mode);
-		`);
+		});
 	},
-	loadFrameScript: function(code) {
+	loadFrameScript: function(fn) {
+		var code = "(" + fn + ")();";
 		var data = "data:application/javascript," + encodeURIComponent(code);
 		var mm = gBrowser.selectedBrowser.messageManager;
 		var _this = this;
