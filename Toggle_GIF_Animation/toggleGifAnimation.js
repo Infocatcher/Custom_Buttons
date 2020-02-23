@@ -22,13 +22,11 @@ var gifAnimation = {
 			.getInterface(Components.interfaces.nsIDOMWindowUtils);
 	},
 	get mode() {
-		var win = content;
-		var utils = this.getUtils(win);
+		var utils = this.getUtils(content);
 		return utils.imageAnimationMode;
 	},
 	set mode(mode) {
-		var win = content;
-		this.setMode(win, mode);
+		this.setMode(content, mode);
 		this.updateState(mode);
 	},
 	toggle: function() {
