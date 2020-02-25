@@ -11,7 +11,7 @@
 // Tip: use image.animation_mode = none to disable animation by default
 // http://kb.mozillazine.org/Firefox_:_Tips_:_Animated_Images#Image_animation_preference
 
-var gifAnimation = {
+var gifAnimation = this.gifAnimation = {
 	// Note: we use original button's icon to indicate disabled state
 	iconEnabled: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABlElEQVR4nI2SsUsCcRTHv+/yJGzS4kCRWqqpQ5xahYwER/8CGxoPh2rxP6itWXLQKQiXGiQh3JrUKYgIogbvQBwMTTB/r8XfeXde5BcOfvd+733e9/d+P2JmAEC5XN7MZrN3RKRiJiKCVzKfmZ81TctRt14Ro9uLxUwfhXLnWEkeSYipaVoUrXSYX/O77NTbic7MzO/HO654Kx1my7LYsiw2TbPLzAgAwPb1C9qHkYWO/Y8etgDXnjyClOItSj707fX38MeOOePMbIMCmHVwJtiA0RQA0EisgRRCZCPoKgYA6tYrontpLDXE6NkVWD+whxiLxaIkaaVSaT+TyTwB8+v75xrNeDweDTg3hBCuIu/A/EAugPyWdLAIkA4k5C8HzrgvwFvsB1twIIRwAZxyAprNJgaDAQA0CoXC/CFJB0IITKdTe+39b7fb6HQ6N7VaLW87MAyDUqkUCSGYZu39BggAk8nkMZFInOq6HioWi0NiZlSr1XUiyqmqukdEEQCrAEIAgo5aAeBrPB6PFEXpAfgEcP8LWVgYRnUM0zMAAAAASUVORK5CYII=",
 
@@ -112,10 +112,7 @@ var gifAnimation = {
 	}
 };
 
-this.toggleGifAnimation = function() {
-	gifAnimation.toggle();
-};
-this.setAttribute("oncommand", "this.toggleGifAnimation();");
+this.setAttribute("oncommand", "this.gifAnimation.toggle();");
 
 var progressListener = {
 	onLocationChange: function(aWebProgress, aRequest, aLocation) {
