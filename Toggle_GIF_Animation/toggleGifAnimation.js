@@ -5,8 +5,8 @@
 // Toggle GIF Animation button for Custom Buttons
 // (code for "initialization" section)
 
-// (c) Infocatcher 2013
-// version 0.2.0 - 2013-06-14
+// (c) Infocatcher 2013-2020
+// version 0.3.0 - 2020-02-25
 
 // Tip: use image.animation_mode = none to disable animation by default
 // http://kb.mozillazine.org/Firefox_:_Tips_:_Animated_Images#Image_animation_preference
