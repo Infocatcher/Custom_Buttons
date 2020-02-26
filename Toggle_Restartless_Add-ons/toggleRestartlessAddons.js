@@ -237,7 +237,12 @@ function setNewDisabledRaw(addon, newDis) {
 		let rawAddon = g.XPIDatabase.getAddons().find(function(rawAddon) {
 			return rawAddon.id == addon.id;
 		});
-		g.XPIDatabase.updateAddonDisabledState(rawAddon, newDis);
+		g.XPIDatabase.updateAddonDisabledState(
+			rawAddon,
+			g.XPIDatabase.updateAddonDisabledState.length == 1 // Firefox 74+
+				? { userDisabled: newDis }
+				: newDis
+		);
 	}
 	else if("eval" in g) { // See "set userDisabled(val)"
 		let addonFor = g.eval("addonFor");
