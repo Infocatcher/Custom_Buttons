@@ -212,6 +212,7 @@ function setNewDisabled(addon) {
 		}
 		addon.userDisabled = newDis;
 	}
+	ensureSpecialDisabled(addon, newDis);
 	return addon.userDisabled;
 }
 function getNewDisabled(addon) {
@@ -273,6 +274,10 @@ function setDisabled(mi, disabled) {
 	var cl = mi.classList;
 	cl.toggle("toggleRestartlessAddons-askToActivate", askToActivate);
 	cl.toggle("toggleRestartlessAddons-disabled", disabled && !askToActivate);
+}
+function ensureSpecialDisabled(addon, newDis) {
+	if(addon.id == "screenshots@mozilla.org")
+		Services.prefs.setBoolPref("extensions.screenshots.disabled", newDis);
 }
 
 if(
