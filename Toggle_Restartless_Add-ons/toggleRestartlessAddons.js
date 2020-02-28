@@ -396,7 +396,7 @@ function openAddonOptions(addon) {
 	if(addon.type == "plugin") // No options for now!
 		return false;
 	if(
-		addon.optionsType == AddonManager.OPTIONS_TYPE_INLINE
+		addon.optionsType == (AddonManager.OPTIONS_TYPE_INLINE || NaN)
 		|| addon.optionsType == (AddonManager.OPTIONS_TYPE_INLINE_INFO || NaN)
 		|| addon.optionsType == (AddonManager.OPTIONS_TYPE_INLINE_BROWSER || NaN)
 	)
