@@ -844,7 +844,7 @@ this.undoCloseTabsList = {
 		return this.crop(uri, crop);
 	},
 	losslessDecodeURI: function(uri) {
-		try {
+		if(uri) try {
 			return this._losslessDecodeURI(uri);
 		}
 		catch(e) {

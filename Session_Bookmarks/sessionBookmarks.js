@@ -846,7 +846,7 @@ this.bookmarks = {
 			label: label || "",
 			cb_uri: uri || "",
 			cb_ssData: ssData,
-			tooltiptext: this.decodeURI(uri || ""),
+			tooltiptext: this.losslessDecodeURI(uri || ""),
 			image: icon || "",
 			cb_bookmarkItem: "true"
 		});
@@ -855,14 +855,36 @@ this.bookmarks = {
 			mi.setAttribute("privateTab-isPrivate", "true");
 		return mi;
 	},
-	decodeURI: function(uri) {
+	losslessDecodeURI: function(uri) {
 		if(uri) try {
-			return losslessDecodeURI(makeURI(uri));
+			return this._losslessDecodeURI(uri);
 		}
 		catch(e) {
 			Components.utils.reportError(e);
 		}
 		return uri;
+	},
+	_losslessDecodeURI: function(uri) {
+		if("losslessDecodeURI" in window)
+			return losslessDecodeURI(makeURI(uri));
+		if(!("UrlbarInput" in window))
+			return decodeURI(uri);
+		// Firefox 75+
+		var nsvo = Components.utils.import("resource:///modules/UrlbarInput.jsm", {});
+		var key = "_cbUndoCloseTabsURI";
+		var url = URL.createObjectURL(new Blob([
+			"this." + key + " = losslessDecodeURI(this." + key + ");"
+		]));
+		addDestructor(function() {
+			URL.revokeObjectURL(url);
+		});
+		(this._losslessDecodeURI = function(uri) {
+			nsvo[key] = makeURI(uri);
+			Services.scriptloader.loadSubScript(url, nsvo);
+			uri = nsvo[key];
+			delete nsvo[key];
+			return uri;
+		})(uri);
 	},
 	getSeparator: function() {
 		return this.createElement("menuseparator", {
