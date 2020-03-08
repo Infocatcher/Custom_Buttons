@@ -840,15 +840,39 @@ this.undoCloseTabsList = {
 	convertURI: function(uri, crop) {
 		if(!uri || uri.indexOf("\n") != -1)
 			return uri;
+		uri = this.losslessDecodeURI(uri);
+		return this.crop(uri, crop);
+	},
+	losslessDecodeURI: function(uri) {
 		try {
-			uri = "losslessDecodeURI" in window
-				? losslessDecodeURI(makeURI(uri))
-				: decodeURI(uri);
+			return this._losslessDecodeURI(uri);
 		}
 		catch(e) {
 			Components.utils.reportError(e);
 		}
-		return this.crop(uri, crop);
+		return uri;
+	},
+	_losslessDecodeURI: function(uri) {
+		if("losslessDecodeURI" in window)
+			return losslessDecodeURI(makeURI(uri));
+		if(!("UrlbarInput" in window))
+			return decodeURI(uri);
+		// Firefox 75+
+		var nsvo = Components.utils.import("resource:///modules/UrlbarInput.jsm", {});
+		var key = "_cbUndoCloseTabsURI";
+		var url = URL.createObjectURL(new Blob([
+			"this." + key + " = losslessDecodeURI(this." + key + ");"
+		]));
+		addDestructor(function() {
+			URL.revokeObjectURL(url);
+		});
+		(this._losslessDecodeURI = function(uri) {
+			nsvo[key] = makeURI(uri);
+			Services.scriptloader.loadSubScript(url, nsvo);
+			uri = nsvo[key];
+			delete nsvo[key];
+			return uri;
+		})(uri);
 	},
 	cachedIcon: function(src) {
 		src = src.replace(/[&#]-moz-resolution=\d+,\d+$/, ""); // Firefox 22+
