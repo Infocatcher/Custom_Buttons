@@ -864,27 +864,18 @@ this.bookmarks = {
 		}
 		return uri;
 	},
-	_losslessDecodeURI: function(uri) {
+	get _losslessDecodeURI() {
+		var ldu;
 		if("losslessDecodeURI" in window)
-			return losslessDecodeURI(makeURI(uri));
-		if(!("UrlbarInput" in window))
-			return decodeURI(uri);
-		// Firefox 75+
-		var nsvo = Components.utils.import("resource:///modules/UrlbarInput.jsm", {});
-		var key = "_cbUndoCloseTabsURI";
-		var url = URL.createObjectURL(new Blob([
-			"this." + key + " = losslessDecodeURI(this." + key + ");"
-		]));
-		addDestructor(function() {
-			URL.revokeObjectURL(url);
-		});
-		(this._losslessDecodeURI = function(uri) {
-			nsvo[key] = makeURI(uri);
-			Services.scriptloader.loadSubScript(url, nsvo);
-			uri = nsvo[key];
-			delete nsvo[key];
-			return uri;
-		})(uri);
+			ldu = losslessDecodeURI;
+		else if("UrlbarInput" in window) // Firefox 75+
+			ldu = Components.utils.import("resource:///modules/UrlbarInput.jsm", {}).losslessDecodeURI;
+		delete this._losslessDecodeURI;
+		return this._losslessDecodeURI = ldu
+			? function(uri) {
+				return ldu(makeURI(uri));
+			}
+			: decodeURI;
 	},
 	getSeparator: function() {
 		return this.createElement("menuseparator", {
