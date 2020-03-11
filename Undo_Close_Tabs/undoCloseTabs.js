@@ -438,8 +438,7 @@ this.undoCloseTabsList = {
 			id: this.tipId,
 			orient: "vertical",
 			onpopupshowing: "return this.undoCloseTabsList.updTooltip(this, document.tooltipNode);",
-			onpopuphiding: "this.cancelUpdateTimer();",
-			style: "padding: 0;"
+			onpopuphiding: "this.cancelUpdateTimer();"
 		});
 		tip.undoCloseTabsList = this;
 		tip._updateTimer = 0;
@@ -932,7 +931,7 @@ this.undoCloseTabsList = {
 		var hasHeader = header && template.indexOf("header") != -1;
 		function item(key, val) {
 			var lbl = document.createElementNS(xulns, "label");
-			lbl.className = "cb-" + key;
+			lbl.className = "cb-" + key + " tooltip-label";
 			//lbl.setAttribute("value", val);
 			lbl.textContent = val;
 			lbl.setAttribute("maxwidth", "450"); // Trick to restore right border for long lines
