@@ -1098,6 +1098,8 @@ if(!sss.sheetRegistered(cssURI, sss.USER_SHEET))
 
 this.onDestroy = function(reason) {
 	this.undoCloseTabsList.destroy();
+	if(reason == "destructor") // May happens before "unload"
+		this.undoCloseTabsList.updUIGlobal();
 	if(reason == "update" || reason == "delete") {
 		let sss = this.sss;
 		let cssURI = this.cssURI;
