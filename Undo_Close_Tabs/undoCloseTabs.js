@@ -932,7 +932,6 @@ this.undoCloseTabsList = {
 		function item(key, val) {
 			var lbl = document.createElementNS(xulns, "label");
 			lbl.className = "cb-" + key + " tooltip-label";
-			//lbl.setAttribute("value", val);
 			lbl.textContent = val;
 			lbl.setAttribute("maxwidth", "450"); // Trick to restore right border for long lines
 			if(key == "closedAt" || hasHeader && key != "header")
@@ -983,12 +982,12 @@ this.undoCloseTabsList = {
 		const id = this.button.id;
 		while(ws.hasMoreElements()) {
 			let win = ws.getNext();
-			if(!isSeaMonkey || this.isBrowserWindow(win)) {
-				let btn = win.document.getElementById(id);
-				if(btn && "undoCloseTabsList" in btn) {
-					let ucl = btn.undoCloseTabsList;
-					ucl.ensureSessionsInitialized(ucl.updUI, ucl);
-				}
+			if(isSeaMonkey && !this.isBrowserWindow(win))
+				continue;
+			let btn = win.document.getElementById(id);
+			if(btn && "undoCloseTabsList" in btn) {
+				let ucl = btn.undoCloseTabsList;
+				ucl.ensureSessionsInitialized(ucl.updUI, ucl);
 			}
 		}
 	},
