@@ -45,7 +45,7 @@ var options = {
 		closedTabs: "",
 		closedWindows: ""
 	},
-	accesskeyPostfix: " ", // <accesskey><postfix><label>
+	accesskeySeparator: " ", // <accesskey><separator><label>
 	openMenuOnMouseover: false,
 	useMenu: false,
 	rightClickToUndoCloseTab: false // Useful with "useMenu: true"
@@ -811,7 +811,7 @@ this.undoCloseTabsList = {
 	},
 	getKey: function(keys, i) {
 		var key = keys && keys.charAt(i % keys.length);
-		var keyPrefix = keys && (key + this.options.accesskeyPostfix);
+		var keyPrefix = keys && (key + this.options.accesskeySeparator);
 		return [key, keyPrefix];
 	},
 	checkForMiddleClick: function(e, upd) {
