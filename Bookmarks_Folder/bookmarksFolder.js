@@ -464,14 +464,19 @@ if(options.hideDropMarker || options.showLabel != undefined) {
 	let doc = btn.ownerDocument;
 	let stopTime = Date.now() + 500;
 	setTimeout(function tweakButton() { // Wait for menu XBL binding
-		var dm = options.hideDropMarker
-			&& doc.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-menu-dropmarker");
-		var lb = options.showLabel != undefined
-			&& doc.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-text");
+		var dm = options.hideDropMarker && (
+			btn.dropmarker
+			|| doc.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-menu-dropmarker")
+		);
+		var lb = options.showLabel != undefined && (
+			btn.multilineLabel
+			|| doc.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-text")
+		);
 		if(dm) {
 			dm.hidden = true;
 			// Hack for Firefox 19 and large icons
-			let icon = doc.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon");
+			let icon = btn.icon
+				|| doc.getAnonymousElementByAttribute(btn, "class", "toolbarbutton-icon");
 			if(icon) {
 				let s = doc.defaultView.getComputedStyle(icon, null);
 				if(s.paddingRight != s.paddingLeft)
