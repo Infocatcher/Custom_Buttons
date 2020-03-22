@@ -146,12 +146,10 @@ this.bookmarks = {
 		btn.setAttribute("ondrop",      "this.bookmarks.onDrop(event);");
 		var mp = btn.getElementsByTagName("menupopup");
 		mp.length && mp[0].parentNode.removeChild(mp[0]);
-		mp = document.createElementNS(xulns, "menupopup");
+		mp = this.mp = document.createElementNS(xulns, "menupopup");
 		mp.setAttribute("context", "placesContext");
 		mp.setAttribute("placespopup", "true");
-		var placeURI = folder.substr(0, 6) == "place:"
-			? folder
-			: "place:folder=" + folder + "&excludeItems=0&expandQueries=0";
+		var placeURI = this.toPlaceURI(folder);
 		placeURI = placeURI.replace(/"/g, '\\"');
 		mp.setAttribute(
 			"onpopupshowing",
@@ -173,6 +171,11 @@ this.bookmarks = {
 		}, 0, this);
 
 		this.initialized = true;
+	},
+	toPlaceURI: function(folder) {
+		if(("" + folder).substr(0, 6) == "place:")
+			return folder;
+		return "place:folder=" + folder + "&excludeItems=0&expandQueries=0";
 	},
 	initMenu: function(event, placeURI) {
 		var btn = this.button;
@@ -217,11 +220,11 @@ this.bookmarks = {
 	initWithFolder: function(folder) {
 		this.destroy();
 		this.folder = folder;
-		var mp = this.button.firstChild;
+		var mp = this.mp;
 		mp.setAttribute(
 			"onpopupshowing",
 			mp.getAttribute("onpopupshowing")
-				.replace(/(place:folder=)\w+/, "$1" + folder)
+				.replace(/place:[^'"]+/, this.toPlaceURI(folder).replace(/"/g, '\\"'))
 		);
 	},
 	selectFolder: function() {
