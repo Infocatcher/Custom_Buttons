@@ -38,8 +38,10 @@ function _localize(s, key) {
 	var locale = (function() {
 		if("Services" in window && "locale" in Services) {
 			var locales = Services.locale.requestedLocales // Firefox 64+
-				|| Services.locale.getRequestedLocales && Services.locale.getRequestedLocales();			if(locales)
-				return locales[0];		}
+				|| Services.locale.getRequestedLocales && Services.locale.getRequestedLocales();
+			if(locales)
+				return locales[0];
+		}
 		var prefs = "Services" in window && Services.prefs
 			|| Components.classes["@mozilla.org/preferences-service;1"]
 				.getService(Components.interfaces.nsIPrefBranch);
@@ -437,6 +439,8 @@ this.bookmarks = {
 			PlacesMenuDNDHandler.onDrop(e);
 	},
 	getStringPref: function(name, defaultVal) {
+		if("getStringPref" in Services.prefs) // Firefox 58+
+			return Services.prefs.getStringPref(name, defaultVal);
 		try {
 			return Services.prefs.getComplexValue(name, Components.interfaces.nsISupportsString).data;
 		}
