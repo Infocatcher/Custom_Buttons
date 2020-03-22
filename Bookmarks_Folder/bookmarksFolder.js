@@ -449,6 +449,10 @@ this.bookmarks = {
 		return defaultVal;
 	},
 	setStringPref: function(name, val) {
+		if("setStringPref" in Services.prefs) { // Firefox 58+
+			Services.prefs.setStringPref(name, val);
+			return;
+		}
 		var ss = Components.interfaces.nsISupportsString;
 		var str = Components.classes["@mozilla.org/supports-string;1"]
 			.createInstance(ss);
