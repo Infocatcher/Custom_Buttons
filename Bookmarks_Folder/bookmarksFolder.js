@@ -146,7 +146,7 @@ this.bookmarks = {
 		btn.setAttribute("ondrop",      "this.bookmarks.onDrop(event);");
 		var mp = btn.getElementsByTagName("menupopup");
 		mp.length && mp[0].parentNode.removeChild(mp[0]);
-		mp = document.createElement("menupopup");
+		mp = document.createElementNS(xulns, "menupopup");
 		mp.setAttribute("context", "placesContext");
 		mp.setAttribute("placespopup", "true");
 		var placeURI = folder.substr(0, 6) == "place:"
