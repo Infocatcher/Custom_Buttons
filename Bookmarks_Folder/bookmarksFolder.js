@@ -228,6 +228,9 @@ this.bookmarks = {
 		);
 	},
 	selectFolder: function() {
+		if(parseFloat(Services.appinfo.platformVersion) >= 59)
+			return this.selectFolderNoUI();
+
 		var winType = this.button.id + ":dialog";
 		var win = Services.wm.getMostRecentWindow(winType);
 		if(win) {
@@ -380,6 +383,40 @@ this.bookmarks = {
 			btn.open = false;
 			mp.collapsed = false;
 		}, 100, this.button);
+		return folder;
+	},
+	selectFolderNoUI: function() {
+		var folder, clicker;
+
+		var btn = this.button;
+		btn.style.outline = "3px solid orange";
+		btn.style.outlineOffset = "-3px";
+		function stopClicker() {
+			btn.style.outline = btn.style.outlineOffset = "";
+			window.removeEventListener("click", clicker, true);
+		}
+		function isFolder(it) {
+			return it.classList
+				&& it.classList.contains("bookmark-item")
+				&& it.getAttribute("container") == "true"
+		}
+		window.addEventListener("click", clicker = function(e) {
+			var trg = e.originalTarget || e.target;
+			if(!isFolder(trg))
+				return;
+			if(!(e.button == 1 || e.button == 0 && hasModifier(e)))
+				return;
+			e.preventDefault();
+			e.stopPropagation();
+			e.stopImmediatePropagation && e.stopImmediatePropagation();
+			folder = trg._placesNode && trg._placesNode.uri
+				|| trg._placesView && trg._placesView._place;
+			stopClicker();
+		}, true);
+
+		var thread = Services.tm.currentThread;
+		while(folder === undefined) // Force sync magic
+			thread.processNextEvent(true);
 		return folder;
 	},
 	changeFolder: function() {
