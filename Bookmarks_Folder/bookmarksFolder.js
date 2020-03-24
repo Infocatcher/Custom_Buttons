@@ -395,6 +395,10 @@ this.bookmarks = {
 			btn.style.outline = btn.style.outlineOffset = "";
 			window.removeEventListener("click", clicker, true);
 		}
+		function cancelClicker() {
+			folder = "place:parent=menu________";
+			stopClicker();
+		}
 		function isFolder(it) {
 			return it.classList
 				&& it.classList.contains("bookmark-item")
@@ -402,6 +406,11 @@ this.bookmarks = {
 		}
 		window.addEventListener("click", clicker = function(e) {
 			var trg = e.originalTarget || e.target;
+			if(trg == btn) {
+				e.stopPropagation();
+				cancelClicker();
+				return;
+			}
 			if(!isFolder(trg))
 				return;
 			if(!(e.button == 1 || e.button == 0 && hasModifier(e)))
@@ -413,6 +422,8 @@ this.bookmarks = {
 				|| trg._placesView && trg._placesView._place;
 			stopClicker();
 		}, true);
+
+		setTimeout(cancelClicker, 60e3);
 
 		var thread = Services.tm.currentThread;
 		while(folder === undefined) // Force sync magic
