@@ -394,6 +394,8 @@ this.bookmarks = {
 		function stopClicker() {
 			btn.style.outline = btn.style.outlineOffset = "";
 			window.removeEventListener("click", clicker, true);
+			if(sss.sheetRegistered(cssURI, sss.USER_SHEET))
+				sss.unregisterSheet(cssURI, sss.USER_SHEET);
 		}
 		function cancelClicker() {
 			folder = "place:parent=menu________";
@@ -422,6 +424,20 @@ this.bookmarks = {
 				|| trg._placesView && trg._placesView._place;
 			stopClicker();
 		}, true);
+
+		var cssStr = '\
+			.bookmark-item[container="true"] {\n\
+				color: red !important;\n\
+			}\n\
+			.bookmark-item[container="true"]:hover {\n\
+				outline: 2px solid orange !important;\n\
+				outline-offset: -2px !important;\n\
+			}';
+		var cssURI = Services.io.newURI("data:text/css," + encodeURIComponent(cssStr), null, null);
+		var sss = Components.classes["@mozilla.org/content/style-sheet-service;1"]
+			.getService(Components.interfaces.nsIStyleSheetService);
+		if(!sss.sheetRegistered(cssURI, sss.USER_SHEET))
+			sss.loadAndRegisterSheet(cssURI, sss.USER_SHEET);
 
 		setTimeout(cancelClicker, 60e3);
 
