@@ -398,7 +398,8 @@ this.bookmarks = {
 				sss.unregisterSheet(cssURI, sss.USER_SHEET);
 		}
 		function cancelClicker() {
-			folder = "place:parent=menu________";
+			var id = PlacesUtils.bookmarks && PlacesUtils.bookmarks.rootGuid || "root________";
+			folder = "place:parent=" + id;
 			stopClicker();
 		}
 		function isFolder(it) {
