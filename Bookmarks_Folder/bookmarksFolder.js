@@ -403,9 +403,11 @@ this.bookmarks = {
 			stopClicker();
 		}
 		function isFolder(it) {
+			if(it.id == "bookmarksMenu")
+				return true;
 			return it.classList
 				&& it.classList.contains("bookmark-item")
-				&& it.getAttribute("container") == "true"
+				&& it.getAttribute("container") == "true";
 		}
 		window.addEventListener("click", clicker = function(e) {
 			var trg = e.originalTarget || e.target;
@@ -427,9 +429,11 @@ this.bookmarks = {
 		}, true);
 
 		var cssStr = '\
+			#bookmarksMenu,\n\
 			.bookmark-item[container="true"] {\n\
 				color: red !important;\n\
 			}\n\
+			#bookmarksMenu:hover,\n\
 			.bookmark-item[container="true"]:hover {\n\
 				outline: 2px solid orange !important;\n\
 				outline-offset: -2px !important;\n\
