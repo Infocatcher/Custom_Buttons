@@ -389,7 +389,6 @@ this.bookmarks = {
 		var folder, clicker;
 
 		var btn = this.button;
-		var mp = this.mp;
 		btn.style.outline = "3px solid orange";
 		btn.style.outlineOffset = "-3px";
 		function stopClicker() {
@@ -410,6 +409,10 @@ this.bookmarks = {
 				&& it.classList.contains("bookmark-item")
 				&& it.getAttribute("container") == "true";
 		}
+		function closeMenus(node) {
+			for(; node; node = node.parentNode)
+				"hidePopup" in node && node.hidePopup();
+		}
 		window.addEventListener("click", clicker = function(e) {
 			var trg = e.originalTarget || e.target;
 			if(trg == btn) {
@@ -427,7 +430,7 @@ this.bookmarks = {
 			folder = trg._placesNode && trg._placesNode.uri
 				|| trg._placesView && trg._placesView._place;
 			stopClicker();
-			mp.hidePopup(); // Clicked inside button itself?
+			closeMenus(trg);
 		}, true);
 
 		var cssStr = '\
