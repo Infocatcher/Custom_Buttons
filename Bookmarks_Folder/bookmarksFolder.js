@@ -418,6 +418,7 @@ this.bookmarks = {
 			for(; node; node = node.parentNode)
 				"hidePopup" in node && node.hidePopup();
 		}
+		var _this = this;
 		window.addEventListener("click", clicker = function(e) {
 			var trg = e.originalTarget || e.target;
 			if(trg == btn) {
@@ -436,6 +437,8 @@ this.bookmarks = {
 				|| trg._placesView && trg._placesView._place;
 			stopClicker();
 			closeMenus(trg);
+			// initMenu() -> ._placesView._resultNode.title returns "" sometimes
+			_this.setButtonTitle(trg.getAttribute("label"));
 		}, true);
 
 		var cssStr = '\
