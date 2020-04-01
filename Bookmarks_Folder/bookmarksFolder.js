@@ -196,6 +196,7 @@ this.bookmarks = {
 		}
 	},
 	destroy: function() {
+		this.stopClicker && this.stopClicker();
 		var btn = this.button;
 		if(!("_placesMenu" in btn))
 			return;
@@ -388,20 +389,22 @@ this.bookmarks = {
 	selectFolderNoUI: function() {
 		var folder, clicker;
 
+		var _this = this;
 		var btn = this.button;
 		btn.style.outline = "3px solid orange";
 		btn.style.outlineOffset = "-3px";
 		var menubar = document.getElementById("toolbar-menubar");
 		if(menubar && menubar.getAttribute("autohide") == "true")
 			menubar.setAttribute("autohide", "cb_bookmarksFolder");
-		function stopClicker() {
+		var stopClicker = this.stopClicker = function() {
+			_this.stopClicker = null;
 			btn.style.outline = btn.style.outlineOffset = "";
 			window.removeEventListener("click", clicker, true);
 			if(sss.sheetRegistered(cssURI, sss.USER_SHEET))
 				sss.unregisterSheet(cssURI, sss.USER_SHEET);
 			if(menubar && menubar.getAttribute("autohide") == "cb_bookmarksFolder")
 				menubar.setAttribute("autohide", "true");
-		}
+		};
 		function cancelClicker() {
 			var id = PlacesUtils.bookmarks && PlacesUtils.bookmarks.rootGuid || "root________";
 			folder = "place:parent=" + id;
@@ -418,7 +421,6 @@ this.bookmarks = {
 			for(; node; node = node.parentNode)
 				"hidePopup" in node && node.hidePopup();
 		}
-		var _this = this;
 		window.addEventListener("click", clicker = function(e) {
 			var trg = e.originalTarget || e.target;
 			if(trg == btn) {
