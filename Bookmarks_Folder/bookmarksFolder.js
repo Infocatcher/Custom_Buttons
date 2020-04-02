@@ -393,17 +393,22 @@ this.bookmarks = {
 		var btn = this.button;
 		btn.style.outline = "3px solid orange";
 		btn.style.outlineOffset = "-3px";
+		var cbAttr = "cb_bookmarksFolder";
 		var menubar = document.getElementById("toolbar-menubar");
 		if(menubar && menubar.getAttribute("autohide") == "true")
-			menubar.setAttribute("autohide", "cb_bookmarksFolder");
+			menubar.setAttribute("autohide", cbAttr);
+		var wAttr = cbAttr + "-" + Date.now();
+		var de = document.documentElement;
+		de.setAttribute(wAttr, "true");
 		var stopClicker = this.stopClicker = function() {
 			_this.stopClicker = null;
 			btn.style.outline = btn.style.outlineOffset = "";
 			window.removeEventListener("click", clicker, true);
 			if(sss.sheetRegistered(cssURI, sss.USER_SHEET))
 				sss.unregisterSheet(cssURI, sss.USER_SHEET);
-			if(menubar && menubar.getAttribute("autohide") == "cb_bookmarksFolder")
+			if(menubar && menubar.getAttribute("autohide") == cbAttr)
 				menubar.setAttribute("autohide", "true");
+			de.removeAttribute(wAttr);
 		};
 		function cancelClicker() {
 			var id = PlacesUtils.bookmarks && PlacesUtils.bookmarks.rootGuid || "root________";
@@ -444,15 +449,16 @@ this.bookmarks = {
 		}, true);
 
 		var cssStr = '\
-			#bookmarksMenu,\n\
-			.bookmark-item[container="true"] {\n\
+			:root[%wAttr%] #bookmarksMenu,\n\
+			:root[%wAttr%] .bookmark-item[container="true"] {\n\
 				color: red !important;\n\
 			}\n\
-			#bookmarksMenu:hover,\n\
-			.bookmark-item[container="true"]:hover {\n\
+			:root[%wAttr%] #bookmarksMenu:hover,\n\
+			:root[%wAttr%] .bookmark-item[container="true"]:hover {\n\
 				outline: 2px solid orange !important;\n\
 				outline-offset: -2px !important;\n\
-			}';
+			}'
+			.replace(/%wAttr%/g, wAttr);
 		var cssURI = Services.io.newURI("data:text/css," + encodeURIComponent(cssStr), null, null);
 		var sss = Components.classes["@mozilla.org/content/style-sheet-service;1"]
 			.getService(Components.interfaces.nsIStyleSheetService);
