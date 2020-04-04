@@ -397,6 +397,9 @@ this.bookmarks = {
 		var menubar = document.getElementById("toolbar-menubar");
 		if(menubar && menubar.getAttribute("autohide") == "true")
 			menubar.setAttribute("autohide", cbAttr);
+		var inFS = window.fullScreen;
+		if(inFS)
+			window.fullScreen = false;
 		var wAttr = cbAttr + "-" + Date.now();
 		var de = document.documentElement;
 		de.setAttribute(wAttr, "true");
@@ -408,6 +411,8 @@ this.bookmarks = {
 				sss.unregisterSheet(cssURI, sss.USER_SHEET);
 			if(menubar && menubar.getAttribute("autohide") == cbAttr)
 				menubar.setAttribute("autohide", "true");
+			if(inFS)
+				window.fullScreen = true;
 			de.removeAttribute(wAttr);
 		};
 		function cancelClicker() {
