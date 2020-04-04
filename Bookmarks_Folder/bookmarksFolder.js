@@ -428,9 +428,10 @@ this.bookmarks = {
 		}
 		window.addEventListener("click", clicker = function(e) {
 			var trg = e.originalTarget || e.target;
-			if(trg == btn) {
+			if(trg == btn && e.button < 2) {
 				e.stopPropagation();
 				cancelClicker();
+				closeMenus(_this.mp);
 				return;
 			}
 			if(!isFolder(trg))
