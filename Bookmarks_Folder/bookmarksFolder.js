@@ -436,7 +436,7 @@ this.bookmarks = {
 			if(trg == btn && e.button < 2) {
 				e.stopPropagation();
 				cancelClicker();
-				closeMenus(_this.mp);
+				_this.mp && closeMenus(_this.mp);
 				return;
 			}
 			if(!isFolder(trg))
