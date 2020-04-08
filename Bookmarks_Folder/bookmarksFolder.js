@@ -228,6 +228,7 @@ this.bookmarks = {
 				.replace(/place:[^'"]+/, this.toPlaceURI(folder).replace(/"/g, '\\"'))
 		);
 	},
+	updTitleDelay: 100,
 	selectFolder: function() {
 		if(parseFloat(Services.appinfo.platformVersion) >= 59)
 			return this.selectFolderNoUI();
@@ -383,7 +384,7 @@ this.bookmarks = {
 			btn.open = true;
 			btn.open = false;
 			mp.collapsed = false;
-		}, 100, this.button);
+		}, this.updTitleDelay, this.button);
 		return folder;
 	},
 	selectFolderNoUI: function() {
@@ -498,7 +499,7 @@ this.bookmarks = {
 				btn.bookmarks.initWithFolder(folder);
 				setTimeout(function(btn, _this) {
 					btn.tooltipText = _this.button.tooltipText;
-				}, 110, btn, this); // Will be updatetd after 100ms in selectFolder()
+				}, this.updTitleDelay + 10, btn, this); // See selectFolder()
 			}
 		}
 	},
