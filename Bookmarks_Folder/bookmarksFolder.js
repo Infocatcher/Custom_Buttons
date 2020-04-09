@@ -495,7 +495,7 @@ this.bookmarks = {
 			if(w == window)
 				continue;
 			let btn = w.document.getElementById(this.button.id);
-			if(btn) {
+			if(btn && btn.bookmarks) {
 				btn.bookmarks.initWithFolder(folder);
 				setTimeout(function(btn, _this) {
 					btn.tooltipText = _this.button.tooltipText;
