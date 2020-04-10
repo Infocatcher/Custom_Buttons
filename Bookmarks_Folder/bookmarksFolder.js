@@ -505,7 +505,7 @@ this.bookmarks = {
 	},
 	getFolderId: function(folder) {
 		if(/^\d+$/.test(folder))
-			return Number(folder);
+			return +folder;
 		var bmsvc = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"]
 			.getService(Components.interfaces.nsINavBookmarksService);
 		switch(folder) {
