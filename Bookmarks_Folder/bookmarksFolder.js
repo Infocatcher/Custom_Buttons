@@ -507,12 +507,19 @@ this.bookmarks = {
 			case "TOOLBAR":           return bmsvc.toolbarFolder;
 			case "UNFILED_BOOKMARKS": return bmsvc.unfiledBookmarksFolder;
 		}
+		if(/^place:parent=/.test(folder))
+			return folder;
 		return undefined;
 	},
 	placesDrop: function(event, folder) {
 		// Based on PlacesMenuDNDHandler.onDrop(event) function
 		try {
-		    var ip = new InsertionPoint(folder, PlacesUtils.bookmarks.DEFAULT_INDEX, Ci.nsITreeView.DROP_ON);
+			var ip = "InsertionPoint" in window
+				? new InsertionPoint(folder, PlacesUtils.bookmarks.DEFAULT_INDEX, Ci.nsITreeView.DROP_ON)
+				: new PlacesInsertionPoint({
+					parentId: this.button._placesView._resultNode.itemId,
+					parentGuid: this.button._placesView._resultNode.bookmarkGuid
+				});
 		    PlacesControllerDragHelper.onDrop(ip, event.dataTransfer);
 		    event.stopPropagation();
 	    }
