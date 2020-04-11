@@ -181,19 +181,13 @@ this.bookmarks = {
 		var btn = this.button;
 		if("_placesView" in btn)
 			return;
-		btn._placesMenu = new PlacesMenu(event, placeURI);
+		var pm = btn._placesMenu = new PlacesMenu(event, placeURI);
 		if(options.useFolderTitle)
 			this.setButtonTitle(btn._placesView._resultNode && btn._placesView._resultNode.title);
-		// Add "Open All in Tabs" menuitem
-		try {
-			btn._placesView._mayAddCommandsItems.call({
-				_rootElt: null,
-				__proto__: btn._placesView
-			}, btn.firstChild);
-		}
-		catch(e) {
-			PlacesViewBase.prototype._mayAddCommandsItems(btn.firstChild);
-		}
+		({ // Add "Open All in Tabs" menuitem
+			_rootElt: null,
+			__proto__: pm
+		})._mayAddCommandsItems(event.currentTarget);
 	},
 	destroy: function() {
 		this.stopClicker && this.stopClicker();
