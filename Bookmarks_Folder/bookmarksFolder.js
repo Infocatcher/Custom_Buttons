@@ -520,12 +520,12 @@ this.bookmarks = {
 					parentId: this.button._placesView._resultNode.itemId,
 					parentGuid: this.button._placesView._resultNode.bookmarkGuid
 				});
-		    PlacesControllerDragHelper.onDrop(ip, event.dataTransfer);
-		    event.stopPropagation();
-	    }
-	    catch(e) {
-	    	Components.utils.reportError(e);
-	    }
+			PlacesControllerDragHelper.onDrop(ip, event.dataTransfer);
+			event.stopPropagation();
+		}
+		catch(e) {
+			Components.utils.reportError(e);
+		}
 	},
 	onDrop: function(e) {
 		var folder = this.folder;
