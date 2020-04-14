@@ -140,10 +140,13 @@ this.bookmarks = {
 		}
 		var btn = this.button;
 		btn.setAttribute("ondragenter", "PlacesMenuDNDHandler.onDragEnter(event);");
-		btn.setAttribute("ondragover",  "PlacesMenuDNDHandler.onDragOver(event);");
-		btn.setAttribute("ondragexit",  "PlacesMenuDNDHandler.onDragExit(event);");
-		//btn.setAttribute("ondrop",      "PlacesMenuDNDHandler.onDrop(event);");
-		btn.setAttribute("ondrop",      "this.bookmarks.onDrop(event);");
+		btn.setAttribute("ondragover", "PlacesMenuDNDHandler.onDragOver(event);");
+		if("onDragExit" in PlacesMenuDNDHandler)
+			btn.setAttribute("ondragexit", "PlacesMenuDNDHandler.onDragExit(event);");
+		else
+			btn.setAttribute("ondragleave", "PlacesMenuDNDHandler.onDragLeave(event);");
+		//btn.setAttribute("ondrop", "PlacesMenuDNDHandler.onDrop(event);");
+		btn.setAttribute("ondrop", "this.bookmarks.onDrop(event);");
 		var mp = btn.getElementsByTagName("menupopup");
 		mp.length && mp[0].parentNode.removeChild(mp[0]);
 		mp = this.mp = document.createElementNS(xulns, "menupopup");
