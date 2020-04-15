@@ -503,15 +503,13 @@ this.bookmarks = {
 	getFolderId: function(folder) {
 		if(/^\d+$/.test(folder))
 			return +folder;
-		var bmsvc = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"]
-			.getService(Components.interfaces.nsINavBookmarksService);
-		switch(folder) {
-			case "BOOKMARKS_MENU":    return bmsvc.bookmarksMenuFolder;
-			case "TOOLBAR":           return bmsvc.toolbarFolder;
-			case "UNFILED_BOOKMARKS": return bmsvc.unfiledBookmarksFolder;
-		}
 		if(/^place:parent=/.test(folder))
 			return folder;
+		switch(folder) {
+			case "BOOKMARKS_MENU":    return PlacesUtils.bookmarks.bookmarksMenuFolder;
+			case "TOOLBAR":           return PlacesUtils.bookmarks.toolbarFolder;
+			case "UNFILED_BOOKMARKS": return PlacesUtils.bookmarks.unfiledBookmarksFolder;
+		}
 		return undefined;
 	},
 	placesDrop: function(event, folder) {
