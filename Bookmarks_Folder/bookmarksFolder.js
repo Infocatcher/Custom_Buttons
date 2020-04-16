@@ -149,9 +149,12 @@ this.bookmarks = {
 		btn.setAttribute("ondrop", "this.bookmarks.onDrop(event);");
 		var mp = btn.getElementsByTagName("menupopup");
 		mp.length && mp[0].parentNode.removeChild(mp[0]);
-		mp = this.mp = document.createElementNS(xulns, "menupopup");
+		mp = this.mp = "createXULElement" in document
+			? document.createXULElement("menupopup", { is: "places-popup" })
+			: document.createElementNS(xulns, "menupopup");
 		mp.setAttribute("context", "placesContext");
 		mp.setAttribute("placespopup", "true");
+		mp.setAttribute("is", "places-popup");
 		var placeURI = this.toPlaceURI(folder);
 		placeURI = placeURI.replace(/"/g, '\\"');
 		mp.setAttribute(
