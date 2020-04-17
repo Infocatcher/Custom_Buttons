@@ -172,7 +172,9 @@ mp.icons = {
 	get extension() {
 		delete this.extension;
 		return this.extension = this.useSVG
-			? "chrome://mozapps/skin/extensions/extensionGeneric-16.svg"
+			? this.platformVersion >= 76
+				? "chrome://mozapps/skin/extensions/extensionGeneric.svg" // Or chrome://mozapps/skin/extensions/extension.svg
+				: "chrome://mozapps/skin/extensions/extensionGeneric-16.svg"
 			: "chrome://mozapps/skin/extensions/extensionGeneric-16.png";
 	}
 };

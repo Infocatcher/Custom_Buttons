@@ -254,15 +254,20 @@ function setStyleForAddon(mi, addon) {
 		icon.style.opacity = iconOpacity;
 }
 mp.icons = {
+	get platformVersion() {
+		delete this.platformVersion;
+		return this.platformVersion = parseFloat(Services.appinfo.platformVersion);
+	},
 	get useSVG() {
 		delete this.useSVG;
-		return this.useSVG = Services.appinfo.name == "Firefox"
-			&& parseFloat(Services.appinfo.version) >= 57;
+		return this.useSVG = Services.appinfo.name == "Firefox" && this.platformVersion >= 57;
 	},
 	get extension() {
 		delete this.extension;
 		return this.extension = this.useSVG
-			? "chrome://mozapps/skin/extensions/extensionGeneric-16.svg"
+			? this.platformVersion >= 76
+				? "chrome://mozapps/skin/extensions/extensionGeneric.svg" // Or chrome://mozapps/skin/extensions/extension.svg
+				: "chrome://mozapps/skin/extensions/extensionGeneric-16.svg"
 			: "chrome://mozapps/skin/extensions/extensionGeneric-16.png";
 	}
 };
