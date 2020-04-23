@@ -9,10 +9,8 @@
 var event = {};
 var _phase = "init";
 
-var id = "__cb_someCustomButton"; //! Change to something unique
-
 CustomizableUI.createWidget({
-	id: id,
+	id: "__cb_someCustomButton", //! Change to something unique
 	type: "custom",
 	// https://developer.mozilla.org/en-US/docs/Mozilla/JavaScript_code_modules/CustomizableUI.jsm#Area_constants
 	defaultArea: CustomizableUI.AREA_NAVBAR, //! Default toolbar
@@ -20,7 +18,7 @@ CustomizableUI.createWidget({
 		var XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 		var btn = doc.createElementNS(XUL_NS, "toolbarbutton");
 		var attrs = {
-			id: id,
+			id: this.id,
 			class: "toolbarbutton-1 chromeclass-toolbar-additional",
 			label: "Button name", //! Set label here
 			tooltiptext: "Button tooltip", //! Set tooltip here
