@@ -7,7 +7,14 @@
 (function () {
 // Custom Buttons-like environment
 var event = {};
-var _phase = "init";
+var _id, _phase = "code";
+var xulns = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
+var xhtmlns = "http://www.w3.org/1999/xhtml";
+function LOG(msg) {
+	var head = "[Custom Buttons CustomizableUI.jsm: id: " + _id + "@" + _phase
+		+ ", line: " + Components.stack.caller.lineNumber + "]";
+	Services.console.logStringMessage(head + "\n" + msg);
+}
 
 CustomizableUI.createWidget({
 	id: "__cb_someCustomButton", //! Change to something unique
@@ -15,10 +22,9 @@ CustomizableUI.createWidget({
 	// https://developer.mozilla.org/en-US/docs/Mozilla/JavaScript_code_modules/CustomizableUI.jsm#Area_constants
 	defaultArea: CustomizableUI.AREA_NAVBAR, //! Default toolbar
 	onBuild: function(doc) {
-		var XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
-		var btn = doc.createElementNS(XUL_NS, "toolbarbutton");
+		var btn = doc.createElementNS(xulns, "toolbarbutton");
 		var attrs = {
-			id: this.id,
+			id: (_id = this.id),
 			class: "toolbarbutton-1 chromeclass-toolbar-additional",
 			label: "Button name", //! Set label here
 			tooltiptext: "Button tooltip", //! Set tooltip here
@@ -30,6 +36,7 @@ CustomizableUI.createWidget({
 		btn.addEventListener("command", cbCode.bind(btn), false);
 		doc.defaultView.setTimeout(function() {
 			try {
+				_phase = "init";
 				cbInitialization.call(btn);
 			}
 			finally {
