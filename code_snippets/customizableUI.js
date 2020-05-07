@@ -56,9 +56,6 @@ function cbEnv(id) {
 			Services.console.logStringMessage(head + "\n" + msg);
 		}
 	}).replace("#id", id).replace(/^[\s\S]+?\{|\}[^}]*?$/g, "");
-	Components.classes["@mozilla.org/consoleservice;1"]
-		.getService(Components.interfaces.nsIConsoleService)
-		.logStringMessage("xxx\n\n" + envCode);
 	return envCode;
 }
 
