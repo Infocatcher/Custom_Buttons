@@ -47,7 +47,7 @@ CustomizableUI.createWidget({
 function cbEnv(id) {
 	var envCode = ("" + function() {
 		// Custom Buttons-like environment
-		var event = {};
+		var event = arguments[0] || {};
 		var xulns = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 		var xhtmlns = "http://www.w3.org/1999/xhtml";
 		function LOG(msg) {
