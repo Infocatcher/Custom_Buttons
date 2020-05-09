@@ -36,7 +36,7 @@ CustomizableUI.createWidget({
 			new win.Function(
 				"("
 				+ cbInitialization.toString()
-					.replace("{", "{" + cbEnv(id).replace("@code", "@init"))
+					.replace("{", "{" + cbEnv(id).replace(/code/g, "init"))
 				+ ").call(document.getElementById('" + id + "'));"
 			)();
 		}, 0);
@@ -48,6 +48,7 @@ function cbEnv(id) {
 	var envCode = ("" + function() {
 		// Custom Buttons-like environment
 		var event = arguments[0] || {};
+		var _phase = "code";
 		var xulns = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 		var xhtmlns = "http://www.w3.org/1999/xhtml";
 		function LOG(msg) {
