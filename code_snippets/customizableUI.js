@@ -5,6 +5,37 @@
 // See "//!" comments
 
 (function () {
+
+var cbInitFile = "someCustomButton.js"; //! Relative path to script file (initialization)
+var cbCodeFile = ""; //! Relative path to script file (code)
+
+var cbEnv = {
+	_id: "?",
+	_phase: "?",
+	event: {},
+	xulns: "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul",
+	xhtmlns: "http://www.w3.org/1999/xhtml",
+	LOG: function(msg) {
+		var head = "[Custom Buttons CustomizableUI.jsm: id: " + this._id + "@" + this._phase
+			+ ", line: " + Components.stack.caller.lineNumber + "]";
+		Services.console.logStringMessage(head + "\n" + msg);
+	}
+};
+
+var path = new Error().fileName.replace(/[^\\\/]*$/, "");
+function cbExec(win, btn, codeEvent) {
+	// Note: be careful with global variables inside cb-script
+	var context = Object.assign(btn, cbEnv, {
+		_id: btn.id,
+		_phase: codeEvent ? "code" : "init",
+		event: codeEvent || {}
+	});
+	context.LOG = context.LOG.bind(context);
+	var file = path + (codeEvent ? cbCodeFile : cbInitFile);
+	context.LOG("cbExec()\n" + file);
+	Services.scriptloader.loadSubScript(file, context, "UTF-8");
+}
+
 CustomizableUI.createWidget({
 	id: "__cb_someCustomButton", //! Change to something unique
 	type: "custom",
@@ -12,7 +43,7 @@ CustomizableUI.createWidget({
 	defaultArea: CustomizableUI.AREA_NAVBAR, //! Default toolbar
 	onBuild: function(doc) {
 		var btn = doc.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "toolbarbutton");
-		var id = this.id;
+		var id = cbEnv._id = this.id;
 		var attrs = {
 			id: id,
 			class: "toolbarbutton-1 chromeclass-toolbar-additional",
@@ -23,50 +54,15 @@ CustomizableUI.createWidget({
 		};
 		for(var p in attrs)
 			btn.setAttribute(p, attrs[p]);
-		btn.addEventListener("command", function(e) {
-			new win.Function("e",
-				"("
-				+ cbCode.toString()
-					.replace("{", "{" + cbEnv(id))
-				+ ").call(document.getElementById('" + id + "'), e);"
-			)(e);
-		}, false);
 		var win = doc.defaultView;
-		win.setTimeout(function() {
-			new win.Function(
-				"("
-				+ cbInitialization.toString()
-					.replace("{", "{" + cbEnv(id).replace(/code/g, "init"))
-				+ ").call(document.getElementById('" + id + "'));"
-			)();
+		cbCodeFile && btn.addEventListener("command", function(e) {
+			cbExec(win, btn, e);
+		}, false);
+		cbInitFile && win.setTimeout(function() {
+			cbExec(win, btn, false);
 		}, 0);
 		return btn;
 	}
 });
-
-function cbEnv(id) {
-	var envCode = ("" + function() {
-		// Custom Buttons-like environment
-		var event = arguments[0] || {};
-		var _phase = "code";
-		var xulns = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
-		var xhtmlns = "http://www.w3.org/1999/xhtml";
-		function LOG(msg) {
-			var head = "[Custom Buttons CustomizableUI.jsm: id: #id@code"
-				+ ", line: " + Components.stack.caller.lineNumber + "]";
-			Services.console.logStringMessage(head + "\n" + msg);
-		}
-	}).replace("#id", id).replace(/^[\s\S]+?\{|\}[^}]*?$/g, "");
-	return envCode;
-}
-
-function cbCode() {
-	//! Place code here
-	LOG("cbCode()");
-}
-function cbInitialization() {
-	//! Place initialization here
-	LOG("cbInitialization()");
-}
 
 })();
