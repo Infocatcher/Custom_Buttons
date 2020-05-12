@@ -2,12 +2,20 @@
 // Dummy wrapper to create Custom Buttons using CustomizableUI.jsm
 // https://developer.mozilla.org/en-US/docs/Mozilla/JavaScript_code_modules/CustomizableUI.jsm
 
-// See "//!" comments
-
 (function () {
 
-var cbInitFile = "someCustomButton.js"; //! Relative path to script file (initialization)
-var cbCodeFile = ""; //! Relative path to script file (code)
+//== Configuration begin
+var cb = {
+	id: "someCustomButton", // Unique identifier
+	fileInit: "someCustomButton.js", // Relative path to script file or empty string ("")
+	fileCode: "", // Relative path to script file or empty string ("")
+	label: "Button name",
+	tooltip: "Button tooltip",
+	icon: "chrome://branding/content/icon16.png",
+	// https://developer.mozilla.org/en-US/docs/Mozilla/JavaScript_code_modules/CustomizableUI.jsm#Area_constants
+	defaultArea: CustomizableUI.AREA_NAVBAR // Default toolbar
+};
+//== Configuration end
 
 var cbEnv = {
 	_id: "?",
@@ -31,34 +39,33 @@ function cbExec(win, btn, codeEvent) {
 		event: codeEvent || {}
 	});
 	context.LOG = context.LOG.bind(context);
-	var file = path + (codeEvent ? cbCodeFile : cbInitFile);
+	var file = path + (codeEvent ? cb.fileCode : cb.fileInit);
 	context.LOG("cbExec()\n" + file);
 	Services.scriptloader.loadSubScript(file, context, "UTF-8");
 }
 
 CustomizableUI.createWidget({
-	id: "__cb_someCustomButton", //! Change to something unique
+	id: "__cb_" + cb.id,
 	type: "custom",
-	// https://developer.mozilla.org/en-US/docs/Mozilla/JavaScript_code_modules/CustomizableUI.jsm#Area_constants
-	defaultArea: CustomizableUI.AREA_NAVBAR, //! Default toolbar
+	defaultArea: cb.defaultArea,
 	onBuild: function(doc) {
 		var btn = doc.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "toolbarbutton");
 		var id = cbEnv._id = this.id;
 		var attrs = {
 			id: id,
 			class: "toolbarbutton-1 chromeclass-toolbar-additional",
-			label: "Button name", //! Set label here
-			tooltiptext: "Button tooltip", //! Set tooltip here
-			style: 'list-style-image: url("chrome://branding/content/icon16.png");', //! Set icon here
+			label: cb.label,
+			tooltiptext: cb.tooltip,
+			style: 'list-style-image: url("' + cb.icon + '");',
 			__proto__: null
 		};
 		for(var p in attrs)
 			btn.setAttribute(p, attrs[p]);
 		var win = doc.defaultView;
-		cbCodeFile && btn.addEventListener("command", function(e) {
+		cb.fileCode && btn.addEventListener("command", function(e) {
 			cbExec(win, btn, e);
 		}, false);
-		cbInitFile && win.setTimeout(function() {
+		cb.fileInit && win.setTimeout(function() {
 			cbExec(win, btn, false);
 		}, 0);
 		return btn;
