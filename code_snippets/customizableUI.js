@@ -39,6 +39,7 @@ function cbExec(win, btn, codeEvent) {
 		event: codeEvent || {}
 	});
 	context.LOG = context.LOG.bind(context);
+	Object.defineProperty(context, "top", { value: win.top });
 	var file = path + (codeEvent ? cb.fileCode : cb.fileInit);
 	context.LOG("cbExec()\n" + file);
 	Services.scriptloader.loadSubScript(file, context, "UTF-8");
