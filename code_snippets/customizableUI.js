@@ -18,9 +18,6 @@ var cb = {
 //== Configuration end
 
 var cbEnv = {
-	_id: "?",
-	_phase: "?",
-	event: {},
 	xulns: "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul",
 	xhtmlns: "http://www.w3.org/1999/xhtml",
 	LOG: function(msg) {
