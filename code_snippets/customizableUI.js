@@ -33,7 +33,7 @@ function cbExec(win, btn, codeEvent) {
 	var context = Object.assign(btn, cbEnv, {
 		_id: btn.id,
 		_phase: codeEvent ? "code" : "init",
-		event: codeEvent || {}
+		event: codeEvent || new win.Object()
 	});
 	context.LOG = context.LOG.bind(context);
 	Object.defineProperty(context, "top", { value: win.top });
