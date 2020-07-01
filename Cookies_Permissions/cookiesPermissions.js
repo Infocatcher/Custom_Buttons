@@ -801,7 +801,8 @@ this.permissions = {
 		}
 		else {
 			var ext = this.platformVersion >= 72 ? ".xhtml" : ".xul";
-			win = window.openDialog("chrome://browser/content/preferences/permissions" + ext, "_blank", "", params);
+			var sub = this.platformVersion >= 77 ? "dialogs/" : "";
+			win = window.openDialog("chrome://browser/content/preferences/" + sub + "permissions" + ext, "_blank", "", params);
 			host && win.addEventListener("load", setFilter, false);
 		}
 
@@ -1169,7 +1170,8 @@ this.permissions = {
 			var {SiteDataManager} = Components.utils.import("resource:///modules/SiteDataManager.jsm", {});
 			SiteDataManager.updateSites().then(function() {
 				var ext = _this.platformVersion >= 72 ? ".xhtml" : ".xul";
-				win = window.openDialog("chrome://browser/content/preferences/siteDataSettings" + ext, "_blank", "");
+				var sub = _this.platformVersion >= 77 ? "dialogs/" : "";
+				win = window.openDialog("chrome://browser/content/preferences/" + sub + "siteDataSettings" + ext, "_blank", "");
 				host && win.addEventListener("load", setFilter, false);
 			}, Components.utils.reportError);
 		}
