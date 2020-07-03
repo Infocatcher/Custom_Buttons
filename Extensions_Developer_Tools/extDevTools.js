@@ -1556,7 +1556,7 @@ var cmds = this.commands = {
 			node.parentNode.setAttribute("disabled", "true");
 	},
 	createPrefItem: function(pName, trimPrefix) {
-		var mi = document.createElement("menuitem");
+		var mi = document.createElementNS(XULNS, "menuitem");
 		mi.setAttribute("cb_pref", pName);
 		if(trimPrefix) {
 			mi.setAttribute("label", pName.substr(trimPrefix));
@@ -2032,7 +2032,7 @@ if(!cmds.onlyPopup) for(var kId in options.hotkeys) if(options.hotkeys.hasOwnPro
 			|| document.getElementById("mailKeys")
 			|| document.getElementsByTagName("keyset")[0];
 	}
-	keyElt = keyset.appendChild(document.createElement("key"));
+	keyElt = keyset.appendChild(document.createElementNS(XULNS, "key"));
 	var keyId = keyElt.id = keyCbId + "-" + kId;
 	keyElt.setAttribute("cb_id", keyCbId);
 
