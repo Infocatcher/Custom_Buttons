@@ -305,11 +305,18 @@ function processAddonsTab(e, again) {
 		}
 
 		tab.collapsed = false;
+
 		var cats = $("categories");
 		var upds = $("category-availableUpdates");
-		if(vb && cats.selectedItem == upds) // Only for Firefox 72+
-			cats.selectedItem = $("category-extension"); // Trick to force update
-		cats.selectedItem = upds;
+		if(cats && upds) {
+			if(vb && cats.selectedItem == upds) // Only for Firefox 72+
+				cats.selectedItem = $("category-extension"); // Trick to force update
+			cats.selectedItem = upds;
+		}
+		else { // Firefox 76+ ?
+			vbDoc.querySelector('.category[name="available-updates"]').click();
+		}
+
 		var tabWin = tab.ownerDocument.defaultView;
 		if(tbTab)
 			tabmail.switchToTab(tbTabInfo);
