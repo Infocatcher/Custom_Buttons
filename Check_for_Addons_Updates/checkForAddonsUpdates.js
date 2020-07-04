@@ -127,7 +127,11 @@ else if("gBrowser" in trgWindow && trgWindow.gBrowser.tabs) {
 		isPending = true;
 
 	browser = tab.linkedBrowser;
-	if(isPending || browser.webProgress.isLoadingDocument) {
+	if(
+		isPending
+		|| browser.webProgress.isLoadingDocument
+		|| browser.currentURI.spec == "about:blank" // Firefox 79+
+	) {
 		browser.addEventListener("load", processAddonsTab, true);
 		if(isPending) {
 			if(pv >= 41) {
