@@ -337,6 +337,10 @@ this.undoCloseTabsList = {
 		delete this.appVersion;
 		return this.appVersion = parseFloat(this.appInfo.version);
 	},
+	get platformVersion() {
+		delete this.platformVersion;
+		return this.platformVersion = parseFloat(this.appInfo.platformVersion);
+	},
 	get appName() {
 		delete this.appName;
 		return this.appName = this.appInfo.name;
@@ -869,7 +873,7 @@ this.undoCloseTabsList = {
 		if(
 			!/^https?:/.test(src)
 			// IDN, see https://bugzilla.mozilla.org/show_bug.cgi?id=311045
-			|| /^https?:\/\/[^.:\/]+\.[^a-z0-9-]+(?:\/|$)/.test(src)
+			|| /^https?:\/\/[^.:\/]+\.[^a-z0-9-]+(?:\/|$)/.test(src) && this.platformVersion < 46
 			|| this.appName == "SeaMonkey" && this.appVersion <= 2
 			|| this.appName == "Firefox"   && this.appVersion <= 3.5
 		)
