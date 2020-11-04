@@ -737,7 +737,8 @@ this.undoCloseTabsList = {
 			var tabs = undoItem.tabs;
 			var [key, keyPrefix] = this.getKey(keys, i);
 			var title = undoItem.title;
-			var selectedTab = tabs[undoItem.selected - 1];
+			var selected = undoItem.selected;
+			var selectedTab = tabs[selected && selected - 1];
 			var urls = [];
 			tabs.forEach(function(tab) {
 				if(!tab.entries || !tab.entries.length) // Can be [] for about:blank
