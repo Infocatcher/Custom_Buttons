@@ -1092,7 +1092,10 @@ this.permissions = {
 			this.showCookiesSM(host);
 			return;
 		}
-		if(this.app.name == "Firefox" && parseFloat(this.app.version) >= 61) {
+		if(
+			(this.app.name == "Firefox" || this.app.name == "Waterfox")
+			&& parseFloat(this.app.version) >= 61
+		) {
 			this.showSiteData(host);
 			return;
 		}
