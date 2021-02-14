@@ -1219,8 +1219,9 @@ this.permissions = {
 			return checkCookieHost(cookieHost, host);
 		});
 	},
-	checkCookieHost: function(cookieHost, host) {
-		var fn = this.checkCookieHost = "endsWith" in String.prototype // Firefox 17+
+	get checkCookieHost() {
+		delete this.checkCookieHost;
+		return this.checkCookieHost = "endsWith" in String.prototype // Firefox 17+
 			? function(cookieHost, host) {
 				return host == cookieHost
 					|| cookieHost.endsWith("." + host);
@@ -1229,7 +1230,6 @@ this.permissions = {
 				return host == cookieHost
 					|| cookieHost.substr(-host.length - 1) == "." + host;
 			};
-		return fn(cookieHost, host);
 	},
 	removeCookies: function(types, checkHost) {
 		var cm = this.cm;
