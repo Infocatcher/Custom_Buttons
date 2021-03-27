@@ -173,6 +173,7 @@ function processAddonsTab(e, again) {
 		doc = browser.contentDocument;
 	}
 
+	btn.tooltipText = "Process " + ADDONS_URL + "…";
 	progressIcon.loading();
 
 	var origAttr = "_cb_checkForAddonsUpdates_origImage";
