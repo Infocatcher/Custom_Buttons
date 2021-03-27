@@ -187,8 +187,11 @@ function processAddonsTab(e, again) {
 		var win = doc.defaultView;
 		var vb = doc.getElementById("html-view-browser");
 		if(!vb) {
-			win.setTimeout(processAddonsTab, 20, win);
-			return;
+			if(!HTMLHtmlElement.isInstance(doc.documentElement)) { // Firefox 87+
+				win.setTimeout(processAddonsTab, 20, win);
+				return;
+			}
+			vb = browser;
 		}
 		if(!again) { // Strange errors happens
 			// chrome://mozapps/content/extensions/aboutaddons.js
