@@ -47,7 +47,7 @@ var xulns = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
 var mp = document.createElementNS(xulns, "menupopup");
 mp.setAttribute("onpopupshowing", "this.updateMenu();");
-mp.setAttribute("oncommand", "this.handleEvent(event);");
+mp.setAttribute("oncommand", "if(!event.button) this.handleEvent(event);"); // Ignore middle-click in Firefox 89+
 mp.setAttribute("onmousedown", "if(event.button == 0) this.handleEvent(event);");
 mp.setAttribute("onclick", "if(event.button > 0) this.handleEvent(event);");
 mp.setAttribute("oncontextmenu", "return false;");
