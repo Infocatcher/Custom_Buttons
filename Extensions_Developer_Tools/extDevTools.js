@@ -1105,7 +1105,7 @@ var cmds = this.commands = {
 		try {
 			if(
 				"goQuitApplication" in window
-					? goQuitApplication()
+					? goQuitApplication({} /* Dummy event for Firefox 92+ */)
 					: this.appQuit()
 			) {
 				if(this.ss)
