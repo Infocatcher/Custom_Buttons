@@ -371,6 +371,12 @@ this.onmousedown = function(e) {
 	if(e.target == this && e.button == 0 && this.commands.hasModifier(e))
 		e.preventDefault();
 };
+addEventListener("command", function(e) {
+	if(e.button == 1) { // Firefox 89+
+		e.preventDefault();
+		e.stopPropagation();
+	}
+}, true, this);
 
 var Services = window.Services || {
 	get prefs() {
