@@ -1371,7 +1371,25 @@ var cmds = this.commands = {
 		}
 		// Firefox 50+, based on code from resource://devtools/client/menus.js
 		var require = Components.utils["import"]("resource://devtools/shared/Loader.jsm", {}).require;
-		var TargetFactory = require("devtools/client/framework/target").TargetFactory;
+		try {
+			var TargetFactory = require("devtools/client/framework/target").TargetFactory;
+		}
+		catch(e) { // Firefox 92+
+			var fn = function() {
+				var CommandsFactory = require("devtools/shared/commands/commands-factory").CommandsFactory;
+				var commands = await& CommandsFactory.forTab(gBrowser.selectedTab);
+				await& commands.targetCommand.startListening();
+				var target = commands.targetCommand.targetFront;
+				var inspectorFront = await& target.getFront("inspector");
+				inspectorFront.pickColorFromPage({ copyOnSelect: true, fromMenu: true });
+			};
+			eval( // Backward compatibility with async/await syntax
+				"(async "
+				+ fn.toString().replace(/await&/g, "await")
+				+ ")();"
+			);
+			return;
+		}
 		var target = TargetFactory.forTab(gBrowser.selectedTab);
 		if("getFront" in target) { // Firefox 64+
 			target.makeRemote().then(function() {
