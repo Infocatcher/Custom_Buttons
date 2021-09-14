@@ -1383,11 +1383,12 @@ var cmds = this.commands = {
 				var inspectorFront = await& target.getFront("inspector");
 				inspectorFront.pickColorFromPage({ copyOnSelect: true, fromMenu: true });
 			};
-			eval( // Backward compatibility with async/await syntax
+			new Function( // Backward compatibility to use async/await syntax
+				"require",
 				"(async "
 				+ fn.toString().replace(/await&/g, "await")
 				+ ")();"
-			);
+			)(require);
 			return;
 		}
 		var target = TargetFactory.forTab(gBrowser.selectedTab);
