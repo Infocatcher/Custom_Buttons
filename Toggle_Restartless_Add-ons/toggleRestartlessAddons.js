@@ -165,7 +165,9 @@ mp.icons = {
 		delete this.plugin;
 		return this.plugin = this.useSVG
 			? this.platformVersion >= 65
-				? "chrome://global/skin/plugins/pluginGeneric.svg"
+				? this.platformVersion >= 88
+					? "chrome://global/skin/icons/plugin.svg"
+					: "chrome://global/skin/plugins/pluginGeneric.svg"
 				: "chrome://mozapps/skin/plugins/pluginGeneric.svg"
 			: "chrome://mozapps/skin/plugins/pluginGeneric-16.png";
 	},
