@@ -571,43 +571,43 @@ this.bookmarks = {
 				onpopupshowing="\
 					if(event.target != this)\
 						return true;\
-					document.popupNode = this.parentNode.triggerNode || document.popupNode;\
-					return this.bookmarks.initContextMenu(this.parentNode.triggerNode || document.popupNode);"\
+					document.popupNode = this.triggerNode || document.popupNode;\
+					return this.bookmarks.initContextMenu(this.triggerNode || document.popupNode);"\
 				onpopuphidden="if(event.target == this) document.popupNode = null;">\
 				<menuitem id="' + this.addBookmarkId + '"\
 					closemenu="single"\
-					oncommand="this.parentNode.bookmarks.addBookmark(this.parentNode.triggerNode || document.popupNode);"\
+					oncommand="this.parentNode.bookmarks.addBookmark(this.triggerNode || document.popupNode);"\
 					label="' + this.getLabel("placesContext_new:bookmark", "New Bookmark").replace(/…$/, "") + '"\
 					accesskey="' + this.getAccesskey("placesContext_new:bookmark", "B") + '" />\
 				<menuitem id="' + this.addSepId + '"\
 					closemenu="single"\
-					oncommand="this.parentNode.bookmarks.addSeparator(this.parentNode.triggerNode || document.popupNode);"\
+					oncommand="this.parentNode.bookmarks.addSeparator(this.triggerNode || document.popupNode);"\
 					label="' + this.getLabel("placesContext_new:separator", "New Separator") + '"\
 					accesskey="' + this.getAccesskey("placesContext_new:separator", "S") + '" />\
 				\
 				<menuseparator id="' + this.bmAllSepId + '" />\
 				<menuitem id="' + this.bmAllId + '"\
 					closemenu="single"\
-					oncommand="this.parentNode.bookmarks.bookmarkAllTabs(this.parentNode.triggerNode || document.popupNode);"\
+					oncommand="this.parentNode.bookmarks.bookmarkAllTabs(this.triggerNode || document.popupNode);"\
 					label="' + _localize("Bookmark All Tabs") + '"\
 					accesskey="' + _localize("T", "bookmarkAllTabsKey") + '" />\
 				\
 				<menuseparator id="' + this.updateSepId + '" />\
 				<menuitem id="' + this.updateId + '"\
 					closemenu="single"\
-					oncommand="this.parentNode.bookmarks.updateBookmark(this.parentNode.triggerNode || document.popupNode);"\
+					oncommand="this.parentNode.bookmarks.updateBookmark(this.triggerNode || document.popupNode);"\
 					label="' + _localize("Update") + '"\
 					accesskey="' + _localize("p", "updateKey") + '" />\
 				<menuitem id="' + this.updateURIId + '"\
 					closemenu="single"\
-					oncommand="this.parentNode.bookmarks.updateBookmark(this.parentNode.triggerNode || document.popupNode, true);"\
+					oncommand="this.parentNode.bookmarks.updateBookmark(this.triggerNode || document.popupNode, true);"\
 					label="' + _localize("Update Location") + '"\
 					accesskey="' + _localize("L", "updateLocationKey") + '" />\
 				\
 				<menuseparator id="' + this.deleteSepId + '" />\
 				<menuitem id="' + this.deleteId + '"\
 					closemenu="single"\
-					oncommand="this.parentNode.bookmarks.deleteBookmark(this.parentNode.triggerNode || document.popupNode);"\
+					oncommand="this.parentNode.bookmarks.deleteBookmark(this.triggerNode || document.popupNode);"\
 					label="' + this.getLabel("placesContext_delete", "Delete") + '"\
 					accesskey="' + this.getAccesskey("placesContext_delete", "D") + '" />\
 				<menuitem id="' + this.deleteAllId + '"\
@@ -669,7 +669,7 @@ this.bookmarks = {
 				\
 				<menuseparator id="' + this.propsSepId + '" />\
 				<menuitem id="' + this.propsId + '"\
-					oncommand="this.parentNode.bookmarks.properties(this.parentNode.triggerNode || document.popupNode);"\
+					oncommand="this.parentNode.bookmarks.properties(this.triggerNode || document.popupNode);"\
 					label="' + this.getLabel("placesContext_show:info", "Properties") + '"\
 					accesskey="' + this.getAccesskey("placesContext_show:info", "i") + '" />\
 				\
