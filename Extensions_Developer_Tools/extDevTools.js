@@ -377,6 +377,12 @@ addEventListener("command", function(e) {
 		e.stopPropagation();
 	}
 }, true, this);
+addEventListener("mouseup", function(e) { // Prevent menu closing in Firefox 89+
+	if(e.button == 1) {
+		e.preventDefault();
+		e.stopPropagation();
+	}
+}, true, this);
 
 var Services = window.Services || {
 	get prefs() {
