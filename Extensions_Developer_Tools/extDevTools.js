@@ -371,7 +371,8 @@ this.onmousedown = function(e) {
 	if(e.target == this && e.button == 0 && this.commands.hasModifier(e))
 		e.preventDefault();
 };
-addEventListener("command", function(e) {
+
+addEventListener("command", function(e) { // Prevent middle-click commands in Firefox 89+
 	if(e.button == 1) { // Firefox 89+
 		e.preventDefault();
 		e.stopPropagation();
