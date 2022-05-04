@@ -372,18 +372,14 @@ this.onmousedown = function(e) {
 		e.preventDefault();
 };
 
-addEventListener("command", function(e) { // Prevent middle-click commands in Firefox 89+
-	if(e.button == 1) { // Firefox 89+
+function middleClickFixer(e) {
+	if(e.button == 1) { // Also for "command" event in Firefox 89+
 		e.preventDefault();
 		e.stopPropagation();
 	}
-}, true, this);
-addEventListener("mouseup", function(e) { // Prevent menu closing in Firefox 89+
-	if(e.button == 1) {
-		e.preventDefault();
-		e.stopPropagation();
-	}
-}, true, this);
+}
+this.addEventListener("command", middleClickFixer, true); // Prevent middle-click commands in Firefox 89+
+this.addEventListener("mouseup", middleClickFixer, true); // Prevent menu closing in Firefox 89+
 
 var Services = window.Services || {
 	get prefs() {
@@ -4141,5 +4137,7 @@ this.onDestroy = function(reason) {
 	if(reason != "constructor") {
 		if(!cmds.onlyPopup)
 			mp.removeEventListener("command", cmds, true);
+		this.removeEventListener("command", middleClickFixer, true);
+		this.removeEventListener("mouseup", middleClickFixer, true);
 	}
 };
