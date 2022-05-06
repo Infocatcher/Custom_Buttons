@@ -3121,6 +3121,13 @@ function init() {
 			if(e) {
 				x = e.screenX;
 				y = e.screenY;
+				if(this.fxVersion >= 99) {
+					var k = e.view.devicePixelRatio/(tt.ownerGlobal && tt.ownerGlobal.devicePixelRatio);
+					if(k && isFinite(k)) {
+						x *= k;
+						y *= k;
+					}
+				}
 				if(
 					"_lastScreenX" in this
 					&& x == this._lastScreenX
