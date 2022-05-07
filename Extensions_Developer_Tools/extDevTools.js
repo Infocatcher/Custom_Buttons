@@ -1193,7 +1193,7 @@ var cmds = this.commands = {
 	},
 	openBrowserConsole: function() {
 		try { // For Firefox 60+
-			var require = Components.utils["import"]("resource://devtools/shared/Loader.jsm", {}).require;
+			var require = this.require;
 			var HUDService = require("devtools/client/webconsole/hudservice").HUDService;
 			HUDService.openBrowserConsoleOrFocus();
 			return;
@@ -1234,6 +1234,14 @@ var cmds = this.commands = {
 			Components.utils.reportError(e);
 		}
 		return null;
+	},
+	get require() {
+		try { // ~Firefox 99+
+			return Components.utils["import"]("resource://devtools/shared/loader/Loader.jsm", {}).require;
+		}
+		catch(e) {
+			return Components.utils["import"]("resource://devtools/shared/Loader.jsm", {}).require;
+		}
 	},
 	_restoreErrorConsoleObserver: null,
 	initErrorConsoleRestoring: function() {
@@ -1378,7 +1386,7 @@ var cmds = this.commands = {
 			return;
 		}
 		// Firefox 50+, based on code from resource://devtools/client/menus.js
-		var require = Components.utils["import"]("resource://devtools/shared/Loader.jsm", {}).require;
+		var require = this.require;
 		try {
 			var TargetFactory = require("devtools/client/framework/target").TargetFactory;
 		}
