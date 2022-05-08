@@ -578,28 +578,32 @@ var cmds = this.commands = {
 		var state = ss.getWindowState(window);
 		var sbId = "SidebarUI" in window && SidebarUI.isOpen && SidebarUI.lastOpenedId;
 
-		var win = this.openBrowserWindow();
-		win.addEventListener("load", function restoreSession(e) {
-			win.removeEventListener(e.type, restoreSession, false);
-			win.focus();
+		function restoreSession(e) {
+			window.removeEventListener(e.type, restoreSession, false);
+			window.focus();
 			var tryCount = 10;
 			(function restore() {
 				try { // May fail in SeaMonkey
-					ss.setWindowState(win, state, true);
-					if(sbId && !win.SidebarUI.isOpen)
-						win.SidebarUI.show(sbId);
+					ss.setWindowState(window, state, true);
+					if(sbId && !window.SidebarUI.isOpen)
+						window.SidebarUI.show(sbId);
 				}
 				catch(e) {
 					Components.utils.reportError(e);
 					if(!--tryCount)
 						return;
 					LOG("nsISessionStore.setWindowState() failed, will try again…");
-					win.setTimeout(restore, 50);
+					window.setTimeout(restore, 50);
 				}
 			})();
-			if(!window.closed)
-				window.close();
-		}, false);
+			if(!oldWindow.closed)
+				oldWindow.close();
+		}
+		var win = this.openBrowserWindow();
+		var winFn = new win.Function( // Prevent forced garbage collection in Firefox 99+
+			"ss, sbId, state, oldWindow, LOG" , "return " + restoreSession
+		)(ss, sbId, state, window, LOG);
+		win.addEventListener("load", winFn, false);
 
 		// Try remove closed window from undo history
 		var canForget = "forgetClosedWindow" in ss;
