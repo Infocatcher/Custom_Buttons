@@ -2123,8 +2123,8 @@ this.attrsInspector = function(event) {
 // https://forum.mozilla-russia.org/viewtopic.php?id=56041
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Attributes_Inspector
 
-// (c) Infocatcher 2010-2019
-// version 0.6.5pre2 - 2019-07-31
+// (c) Infocatcher 2010-2022
+// version 0.6.5pre3 - 2022-05-11
 
 //===================
 // Attributes Inspector button for Custom Buttons
