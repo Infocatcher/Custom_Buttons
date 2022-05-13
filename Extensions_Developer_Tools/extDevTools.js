@@ -1056,7 +1056,7 @@ var cmds = this.commands = {
 					progressIcon.loading();
 					install.install();
 				},
-				"application/x-xpinstall"
+				new String("application/x-xpinstall") // getInstallForURL(aUrl, aOptions = {}) in Firefox 99+
 			);
 		});
 	},
