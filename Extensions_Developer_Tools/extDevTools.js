@@ -963,10 +963,16 @@ var cmds = this.commands = {
 				promise.then(callback, Components.utils.reportError);
 		}
 		function getInstallForURL(url, callback, mimeType) {
-			if(AddonManager.getInstallForURL.length == 3)
+			if(AddonManager.getInstallForURL.length >= 3)
 				AddonManager.getInstallForURL(url, callback, mimeType);
-			else // Firefox 61+
-				AddonManager.getInstallForURL(url, mimeType).then(callback, Components.utils.reportError);
+			else { // Firefox 61+
+				try { // getInstallForURL(aUrl, aOptions = {}) in Firefox 99+
+					AddonManager.getInstallForURL(url, {}).then(callback, Components.utils.reportError);
+				}
+				catch(e) {
+					AddonManager.getInstallForURL(url, mimeType).then(callback, Components.utils.reportError);
+				}
+			}
 		}
 		getAddonByID(id, function(addon) {
 			if(addon && addon.isCompatible && !_this.alwaysUpdateLocale) {
@@ -1056,7 +1062,7 @@ var cmds = this.commands = {
 					progressIcon.loading();
 					install.install();
 				},
-				new String("application/x-xpinstall") // getInstallForURL(aUrl, aOptions = {}) in Firefox 99+
+				"application/x-xpinstall"
 			);
 		});
 	},
