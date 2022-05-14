@@ -838,11 +838,12 @@ var cmds = this.commands = {
 		return this.getLocale(true);
 	},
 	getLocale: function(getDefault) {
+		var localePref = "intl.locale.requested";
 		if(
 			"Services" in window && "locale" in Services
 			&& ("getRequestedLocales" in Services.locale || "requestedLocales" in Services.locale)
+			&& this.getPref(localePref, null) !== null
 		) {
-			var localePref = "intl.locale.requested";
 			if(getDefault && Services.prefs.prefHasUserValue(localePref)) {
 				var origLocales = this.getPref(localePref);
 				this.resetPref(localePref);
