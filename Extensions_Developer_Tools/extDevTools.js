@@ -853,14 +853,12 @@ var cmds = this.commands = {
 				this.setPref(localePref, origLocales);
 			return locales && locales[0];
 		}
+		localePref = "general.useragent.locale";
 		var prefs = getDefault ? this.defaultBranch : Services.prefs;
-		var locale = this.getPref("general.useragent.locale", "", prefs);
+		var locale = this.getPref(localePref, "", prefs);
 		if(locale && locale.substr(0, 9) != "chrome://")
 			return locale;
-		return prefs.getComplexValue(
-			"general.useragent.locale",
-			Components.interfaces.nsIPrefLocalizedString
-		);
+		return prefs.getComplexValue(localePref, Components.interfaces.nsIPrefLocalizedString);
 	},
 	switchLocale: function(onlyGet) {
 		var curLocale = this.currentLocale;
