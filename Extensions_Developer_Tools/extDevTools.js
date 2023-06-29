@@ -841,11 +841,9 @@ var cmds = this.commands = {
 		var localePref = "intl.locale.requested";
 		if(
 			"Services" in window && "locale" in Services
-			&& ("getRequestedLocales" in Services.locale || "requestedLocales" in Services.locale)
 			&& (
-				"requestedLocales" in Services.locale
-					? this.getPref(localePref, null) !== null
-					: this.prefHasDefaultValue(localePref)
+				"getRequestedLocales" in Services.locale && this.prefHasDefaultValue(localePref)
+				|| "requestedLocales" in Services.locale
 			)
 		) {
 			if(getDefault && Services.prefs.prefHasUserValue(localePref)) {
