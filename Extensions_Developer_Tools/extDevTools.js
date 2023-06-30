@@ -572,10 +572,10 @@ var cmds = this.commands = {
 		return this.confirm("reopen", "_reopenWindow", arguments);
 	},
 	_reopenWindow: function(flushCaches) {
-		this.button.disabled = true;
-
 		var ss = this.ss;
 		var state = ss.getWindowState(window);
+
+		this.button.disabled = true;
 		var sbId = "SidebarUI" in window && SidebarUI.isOpen && SidebarUI.lastOpenedId;
 
 		function restoreSession(e) {
