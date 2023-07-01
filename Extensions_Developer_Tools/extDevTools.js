@@ -718,6 +718,9 @@ var cmds = this.commands = {
 			}
 
 			tabs.forEach(function(tab) {
+				setTimeout(swapTab, 0, tab);
+			});
+			function swapTab(tab) {
 				var isRemote = tab.linkedBrowser.getAttribute("remote") == "true";
 				var newTab = "Services" in window && "cpmm" in Services // May be remote?
 					? gBrowserNew.addTab(isRemote ? "about:blank" : "about:about", {
@@ -732,7 +735,7 @@ var cmds = this.commands = {
 					gBrowserNew.removeTab(initialTab);
 				}
 				tab.getAttribute("pinned") == "true" && gBrowserNew.pinTab && gBrowserNew.pinTab(newTab);
-			});
+			}
 		}, false);
 	},
 	openBrowserWindow: function() {
