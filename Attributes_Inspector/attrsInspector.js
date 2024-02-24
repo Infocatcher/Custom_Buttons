@@ -1391,8 +1391,9 @@ function init() {
 			_log("DOM Inspector not installed!");
 			var label = this.context.button && this.context.button.label
 				|| "Attributes Inspector";
-			Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
-				.getService(Components.interfaces.nsIPromptService)
+			var ps = Components.classes["@mozilla.org/prompter;1"]
+				|| Components.classes["@mozilla.org/embedcomp/prompt-service;1"];
+			ps.getService(Components.interfaces.nsIPromptService)
 				.alert(null, label, "DOM Inspector not found!");
 			return false;
 		},
