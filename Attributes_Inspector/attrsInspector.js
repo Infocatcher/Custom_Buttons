@@ -1604,8 +1604,10 @@ function init() {
 			var html = Array.prototype.map.call(_tt.childNodes, function(node) {
 				return new XMLSerializer().serializeToString(node);
 			}).join("\n");
+			var td = text.replace(/\r\n?|\n/g, this.lineBreak);
 			this.setClipboardData({
-				"text/unicode": text.replace(/\r\n?|\n/g, this.lineBreak),
+				"text/plain":   td,
+				"text/unicode": td,
 				"text/html":    html.replace(/\r\n?|\n/g, this.lineBreak)
 			}, sourceWindow);
 
