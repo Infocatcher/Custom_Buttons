@@ -399,9 +399,10 @@ var Services = window.Services || {
 			.getService(Components.interfaces.nsIXULAppInfo);
 	},
 	get prompt() {
+		var ps = Components.classes["@mozilla.org/prompter;1"]
+			|| Components.classes["@mozilla.org/embedcomp/prompt-service;1"];
 		delete this.prompt;
-		return this.prompt = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
-			.getService(Components.interfaces.nsIPromptService);
+		return this.prompt = ps.getService(Components.interfaces.nsIPromptService);
 	},
 	get wm() {
 		delete this.wm;
