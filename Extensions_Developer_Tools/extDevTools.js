@@ -2134,8 +2134,8 @@ this.attrsInspector = function(event) {
 // https://forum.mozilla-russia.org/viewtopic.php?id=56041
 // https://github.com/Infocatcher/Custom_Buttons/tree/master/Attributes_Inspector
 
-// (c) Infocatcher 2010-2022
-// version 0.6.5pre3 - 2022-05-11
+// (c) Infocatcher 2010-2024
+// version 0.6.5pre4 - 2024-02-27
 
 //===================
 // Attributes Inspector button for Custom Buttons
@@ -3523,8 +3523,9 @@ function init() {
 			_log("DOM Inspector not installed!");
 			var label = this.context.button && this.context.button.label
 				|| "Attributes Inspector";
-			Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
-				.getService(Components.interfaces.nsIPromptService)
+			var ps = Components.classes["@mozilla.org/prompter;1"]
+				|| Components.classes["@mozilla.org/embedcomp/prompt-service;1"];
+			ps.getService(Components.interfaces.nsIPromptService)
 				.alert(null, label, "DOM Inspector not found!");
 			return false;
 		},
@@ -3736,8 +3737,10 @@ function init() {
 			var html = Array.prototype.map.call(_tt.childNodes, function(node) {
 				return new XMLSerializer().serializeToString(node);
 			}).join("\n");
+			var td = text.replace(/\r\n?|\n/g, this.lineBreak);
 			this.setClipboardData({
-				"text/unicode": text.replace(/\r\n?|\n/g, this.lineBreak),
+				"text/plain":   td,
+				"text/unicode": td,
 				"text/html":    html.replace(/\r\n?|\n/g, this.lineBreak)
 			}, sourceWindow);
 
