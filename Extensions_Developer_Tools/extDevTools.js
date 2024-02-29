@@ -1863,193 +1863,196 @@ function ProgressIcon(btn) {
 }
 
 var mp = cmds.popup = this.appendChild(parseXULFromString('\
-	<menupopup xmlns="' + XULNS + '"\
-		onpopupshowing="if(event.target == this) this.parentNode.commands.initMenu(this);"\
-		onmousedown="this.parentNode.commands.setCloseMenu(event);"\
-		onclick="this.parentNode.commands.setDefaultAction(event);">\
-		<menuitem cb_id="reopenWindow"\
-			oncommand="this.parentNode.parentNode.commands.reopenWindow();"\
-			cb_show="canReopenWindow"\
-			label="' + _localize("Reopen window") + '"\
-			accesskey="' + _localize("w", "reopenWindowKey") + '"\
-			class="menuitem-iconic"\
-			image="' + images.reopenWindow + '" />\
-		<menuitem cb_id="moveTabsToNewWindow"\
-			oncommand="this.parentNode.parentNode.commands.moveTabsToNewWindow();"\
-			cb_show="canMoveTabsToNewWindow"\
-			label="' + _localize("Move tabs to new window") + '"\
-			accesskey="' + _localize("t", "moveTabsToNewWindowKey") + '"\
-			class="menuitem-iconic"\
-			image="' + images.moveTabsToNewWindow + '" />\
-		<menuitem cb_id="restart"\
-			oncommand="this.parentNode.parentNode.commands.restart();"\
-			label="' + _localize("Restart") + '"\
-			accesskey="' + _localize("R", "restartKey") + '"\
-			class="menuitem-iconic"\
-			image="' + images.restart + '" />\
-		<menuitem cb_id="cleanAndRestart"\
-			oncommand="this.parentNode.parentNode.commands.cleanAndRestart();"\
-			label="' + _localize("Clean and restart") + '"\
-			accesskey="' + _localize("C", "cleanAndRestartKey") + '"\
-			class="menuitem-iconic"\
-			image="' + images.cleanAndRestart + '" />\
-		<menuitem cb_id="flushCaches"\
-			oncommand="this.parentNode.parentNode.commands.flushCaches();"\
-			label="' + _localize("Flush caches") + '"\
-			accesskey="' + _localize("F", "flushCachesKey") + '"\
-			class="menuitem-iconic"\
-			image="' + images.flushCaches + '" />\
-		<menuitem cb_id="switchLocale"\
-			oncommand="this.parentNode.parentNode.commands.switchLocale();"\
-			onclick="if(event.button == 2) { this.parentNode.parentNode.commands.switchLocaleCustom(); }"\
-			oncontextmenu="return false;"\
-			accesskey="' + _localize("S", "switchLocaleKey") + '"\
-			class="menuitem-iconic"\
-			image="' + images.switchLocale + '" />\
-		<menuitem cb_id="saveSessionAndExit"\
-			oncommand="this.parentNode.parentNode.commands.saveSessionAndExit();"\
-			label="' + _localize("Save session and exit") + '"\
-			accesskey="' + _localize("x", "saveSessionAndExitKey") + '"\
-			class="menuitem-iconic"\
-			image="' + images.saveSessionAndExit + '"\
-			cb_show="canSaveSessionAndExit" />\
-		<menuseparator />\
-		<menuitem cb_id="errorConsole"\
-			oncommand="this.parentNode.parentNode.commands.openErrorConsole();"\
-			key="key_errorConsole"\
-			label="' + _localize("Error console") + '"\
-			accesskey="' + _localize("E", "errorConsoleKey") + '"\
-			class="menuitem-iconic"\
-			image="' + images.errorConsole + '"\
-			cb_show="hasErrorConsole" />\
-		<menuitem cb_id="browserConsole"\
-			oncommand="this.parentNode.parentNode.commands.openBrowserConsole();"\
-			key="key_browserConsole"\
-			label="' + _localize("Browser console") + '"\
-			accesskey="' + _localize("B", "browserConsoleKey") + '"\
-			class="menuitem-iconic"\
-			image="' + images.browserConsole + '"\
-			cb_show="canOpenBrowserConsole" />\
-		<menuitem cb_id="attrsInspector"\
-			oncommand="this.parentNode.parentNode.commands.attrsInspector(event);"\
-			label="' + _localize("Attributes Inspector") + '"\
-			accesskey="' + _localize("A", "attrsInspectorKey") + '"\
-			class="menuitem-iconic"\
-			image="' + images.attrsInspector + '" />\
-		<menuitem cb_id="browserToolbox"\
-			oncommand="this.parentNode.parentNode.commands.openBrowserToolbox();"\
-			key="key_browserToolbox"\
-			label="' + _localize("Browser Toolbox") + '"\
-			accesskey="' + _localize("e", "browserToolboxKey") + '"\
-			class="menuitem-iconic"\
-			image="' + (cmds.hasBrowserToolbox ? images.browserToolbox : "") + '"\
-			cb_show="hasBrowserToolbox" />\
-		<menuitem cb_id="scratchpad"\
-			oncommand="this.parentNode.parentNode.commands.openScratchpad();"\
-			label="' + _localize("Scratchpad") + '"\
-			accesskey="' + _localize("p", "scratchpadKey") + '"\
-			class="menuitem-iconic"\
-			image="' + images.scratchpad + '"\
-			cb_show="hasScratchpad" />\
-		<menuitem cb_id="eyedropper"\
-			oncommand="this.parentNode.parentNode.commands.openEyedropper();"\
-			label="' + _localize("Grab a color from the page") + '"\
-			accesskey="' + _localize("G", "eyedropperKey") + '"\
-			class="menuitem-iconic"\
-			image="' + images.eyedropper + '"\
-			cb_show="hasEyedropper" />\
-		<menuseparator />\
-		<menu\
-			label="' + _localize("Options") + '"\
-			accesskey="' + _localize("O", "optionsKey") + '">\
-			<menupopup\
-				onpopupshowing="if(event.target == this) this.parentNode.parentNode.parentNode.commands.initPrefsMenu(this);"\
-				onpopuphidden="if(event.target == this) this.parentNode.parentNode.parentNode.commands.savePrefFile();"\
-				oncommand="this.parentNode.parentNode.parentNode.commands.doPrefsMenuCommand(event.target);"\
-				onclick="if(event.button == 1) closeMenus(this);">\
-				<menuitem cb_pref="javascript.options.showInConsole"\
-					type="checkbox"\
-					label="' + _localize("Show errors in chrome files") + '" />\
-				<menuitem cb_pref="javascript.options.strict"\
-					type="checkbox"\
-					label="' + _localize("Show strict warnings") + '" />\
-				<menuitem cb_pref="javascript.options.strict.debug"\
-					type="checkbox"\
-					label="' + _localize("Show strict warnings in debug builds") + '"\
-					cb_show="cmds.isDebugBuild" />\
-				<menuitem cb_pref="javascript.options.asyncstack"\
-					type="checkbox"\
-					label="' + _localize("Show stack for async calls") + '"\
-					hidden="' + !cmds.prefHasDefaultValue("javascript.options.asyncstack") + '" />\
-				<menuitem cb_pref="dom.report_all_js_exceptions"\
-					type="checkbox"\
-					label="' + _localize("Show all exceptions") + '"\
-					hidden="' + (cmds.platformVersion < 1.9) + '" />\
-				<menuitem cb_pref="extensions.logging.enabled"\
-					type="checkbox"\
-					label="' + _localize("Show information about extensions update") + '" />\
-				<menuseparator />\
-				<menuitem cb_pref="browser.dom.window.dump.enabled"\
-					type="checkbox"\
-					label="' + _localize("Enable window.dump()") + '" />\
-				<menuitem cb_pref="nglayout.debug.disable_xul_cache"\
-					type="checkbox"\
-					label="' + _localize("Disable XUL cache") + '" />\
-				<menuitem cb_pref="dom.allow_XUL_XBL_for_file"\
-					type="checkbox"\
-					label="' + _localize("Allow XUL and XBL for file://") + '"\
-					hidden="' + (cmds.platformVersion < 2) + '" />\
-				<menuitem cb_pref="security.data_uri.unique_opaque_origin"\
-					type="checkbox"\
-					label="' + _localize("Don't inherit privileged context for data:") + '"\
-					hidden="' + !cmds.prefHasDefaultValue("security.data_uri.unique_opaque_origin") + '" />\
-				<menuitem cb_pref="security.data_uri.block_toplevel_data_uri_navigations"\
-					type="checkbox"\
-					label="' + _localize("Block top level data: URI navigations") + '"\
-					hidden="' + !cmds.prefHasDefaultValue("security.data_uri.block_toplevel_data_uri_navigations") + '" />\
-				<menuitem cb_pref="devtools.chrome.enabled"\
-					type="checkbox"\
-					label="' + _localize("Enable developer tools for chrome") + '"\
-					hidden="' + !cmds.prefHasDefaultValue("devtools.chrome.enabled") + '" />\
-				<menuitem cb_pref="devtools.debugger.remote-enabled"\
-					type="checkbox"\
-					label="' + _localize("Enable remove debugger (and Browser Toolbox)") + '"\
-					hidden="' + !cmds.prefHasDefaultValue("devtools.debugger.remote-enabled") + '" />\
-				<menuitem cb_pref="extensions.autoDisableScopes"\
-					tooltiptext="extensions.autoDisableScopes"\
-					type="checkbox"\
-					label="' + _localize("Silently install extensions from browser profile") + '"\
-					hidden="' + !cmds.prefHasDefaultValue("extensions.autoDisableScopes") + '" />\
-				<menuseparator cb_show="canDisableE4X" />\
-				<menuitem cb_pref="javascript.options.xml.chrome"\
-					type="checkbox"\
-					label="' + _localize("Enable E4X for chrome") + '"\
-					cb_show="canDisableE4X" />\
-				<menuitem cb_pref="javascript.options.xml.content"\
-					type="checkbox"\
-					label="' + _localize("Enable E4X for content") + '"\
-					cb_show="canDisableE4X" />\
-				<menuseparator cb_show="hasMultiProcessMode" />\
-				<menuitem cb_pref="browser.tabs.remote.force-enable"\
-					type="checkbox"\
-					label="' + _localize("Enable multi-process mode") + '"\
-					oncommand="this.parentNode.parentNode.parentNode.parentNode.commands.ensureMultiProcessMode(this.getAttribute(\'checked\') == \'true\');"\
-					cb_show="hasMultiProcessMode" />\
-				<menuseparator cb_id="debugPrefsSeparator" hidden="true" />\
-				<menu cb_id="debugPrefsExtMenu" hidden="true"\
-					label="' + _localize("Debug extensions") + '"\
-					accesskey="' + _localize("e", "debugExtKey") + '">\
-					<menupopup cb_id="debugPrefsExtPopup" />\
-				</menu>\
-				<menu cb_id="debugPrefsAppMenu" hidden="true"\
-					label="' + _localize("Debug application") + '"\
-					accesskey="' + _localize("a", "debugAppKey") + '">\
-					<menupopup cb_id="debugPrefsAppPopup" />\
-				</menu>\
-			</menupopup>\
+	<menupopup xmlns="' + XULNS + '"\n\
+		onpopupshowing="if(event.target == this) this.parentNode.commands.initMenu(this);"\n\
+		onmousedown="this.parentNode.commands.setCloseMenu(event);"\n\
+		onclick="this.parentNode.commands.setDefaultAction(event);">\n\
+		<menuitem cb_id="reopenWindow"\n\
+			oncommand="this.parentNode.parentNode.commands.reopenWindow();"\n\
+			cb_show="canReopenWindow"\n\
+			label="' + _localize("Reopen window") + '"\n\
+			accesskey="' + _localize("w", "reopenWindowKey") + '"\n\
+			class="menuitem-iconic"\n\
+			image="' + images.reopenWindow + '" />\n\
+		<menuitem cb_id="moveTabsToNewWindow"\n\
+			oncommand="this.parentNode.parentNode.commands.moveTabsToNewWindow();"\n\
+			cb_show="canMoveTabsToNewWindow"\n\
+			label="' + _localize("Move tabs to new window") + '"\n\
+			accesskey="' + _localize("t", "moveTabsToNewWindowKey") + '"\n\
+			class="menuitem-iconic"\n\
+			image="' + images.moveTabsToNewWindow + '" />\n\
+		<menuitem cb_id="restart"\n\
+			oncommand="this.parentNode.parentNode.commands.restart();"\n\
+			label="' + _localize("Restart") + '"\n\
+			accesskey="' + _localize("R", "restartKey") + '"\n\
+			class="menuitem-iconic"\n\
+			image="' + images.restart + '" />\n\
+		<menuitem cb_id="cleanAndRestart"\n\
+			oncommand="this.parentNode.parentNode.commands.cleanAndRestart();"\n\
+			label="' + _localize("Clean and restart") + '"\n\
+			accesskey="' + _localize("C", "cleanAndRestartKey") + '"\n\
+			class="menuitem-iconic"\n\
+			image="' + images.cleanAndRestart + '" />\n\
+		<menuitem cb_id="flushCaches"\n\
+			oncommand="this.parentNode.parentNode.commands.flushCaches();"\n\
+			label="' + _localize("Flush caches") + '"\n\
+			accesskey="' + _localize("F", "flushCachesKey") + '"\n\
+			class="menuitem-iconic"\n\
+			image="' + images.flushCaches + '" />\n\
+		<menuitem cb_id="switchLocale"\n\
+			oncommand="this.parentNode.parentNode.commands.switchLocale();"\n\
+			onclick="if(event.button == 2) { this.parentNode.parentNode.commands.switchLocaleCustom(); }"\n\
+			oncontextmenu="return false;"\n\
+			accesskey="' + _localize("S", "switchLocaleKey") + '"\n\
+			class="menuitem-iconic"\n\
+			image="' + images.switchLocale + '" />\n\
+		<menuitem cb_id="saveSessionAndExit"\n\
+			oncommand="this.parentNode.parentNode.commands.saveSessionAndExit();"\n\
+			label="' + _localize("Save session and exit") + '"\n\
+			accesskey="' + _localize("x", "saveSessionAndExitKey") + '"\n\
+			class="menuitem-iconic"\n\
+			image="' + images.saveSessionAndExit + '"\n\
+			cb_show="canSaveSessionAndExit" />\n\
+		<menuseparator />\n\
+		<menuitem cb_id="errorConsole"\n\
+			oncommand="this.parentNode.parentNode.commands.openErrorConsole();"\n\
+			key="key_errorConsole"\n\
+			label="' + _localize("Error console") + '"\n\
+			accesskey="' + _localize("E", "errorConsoleKey") + '"\n\
+			class="menuitem-iconic"\n\
+			image="' + images.errorConsole + '"\n\
+			cb_show="hasErrorConsole" />\n\
+		<menuitem cb_id="browserConsole"\n\
+			oncommand="this.parentNode.parentNode.commands.openBrowserConsole();"\n\
+			key="key_browserConsole"\n\
+			label="' + _localize("Browser console") + '"\n\
+			accesskey="' + _localize("B", "browserConsoleKey") + '"\n\
+			class="menuitem-iconic"\n\
+			image="' + images.browserConsole + '"\n\
+			cb_show="canOpenBrowserConsole" />\n\
+		<menuitem cb_id="attrsInspector"\n\
+			oncommand="this.parentNode.parentNode.commands.attrsInspector(event);"\n\
+			label="' + _localize("Attributes Inspector") + '"\n\
+			accesskey="' + _localize("A", "attrsInspectorKey") + '"\n\
+			class="menuitem-iconic"\n\
+			image="' + images.attrsInspector + '" />\n\
+		<menuitem cb_id="browserToolbox"\n\
+			oncommand="this.parentNode.parentNode.commands.openBrowserToolbox();"\n\
+			key="key_browserToolbox"\n\
+			label="' + _localize("Browser Toolbox") + '"\n\
+			accesskey="' + _localize("e", "browserToolboxKey") + '"\n\
+			class="menuitem-iconic"\n\
+			image="' + (cmds.hasBrowserToolbox ? images.browserToolbox : "") + '"\n\
+			cb_show="hasBrowserToolbox" />\n\
+		<menuitem cb_id="scratchpad"\n\
+			oncommand="this.parentNode.parentNode.commands.openScratchpad();"\n\
+			label="' + _localize("Scratchpad") + '"\n\
+			accesskey="' + _localize("p", "scratchpadKey") + '"\n\
+			class="menuitem-iconic"\n\
+			image="' + images.scratchpad + '"\n\
+			cb_show="hasScratchpad" />\n\
+		<menuitem cb_id="eyedropper"\n\
+			oncommand="this.parentNode.parentNode.commands.openEyedropper();"\n\
+			label="' + _localize("Grab a color from the page") + '"\n\
+			accesskey="' + _localize("G", "eyedropperKey") + '"\n\
+			class="menuitem-iconic"\n\
+			image="' + images.eyedropper + '"\n\
+			cb_show="hasEyedropper" />\n\
+		<menuseparator />\n\
+		<menu\n\
+			label="' + _localize("Options") + '"\n\
+			accesskey="' + _localize("O", "optionsKey") + '">\n\
+			<menupopup\n\
+				onpopupshowing="if(event.target == this) this.parentNode.parentNode.parentNode.commands.initPrefsMenu(this);"\n\
+				onpopuphidden="if(event.target == this) this.parentNode.parentNode.parentNode.commands.savePrefFile();"\n\
+				oncommand="this.parentNode.parentNode.parentNode.commands.doPrefsMenuCommand(event.target);"\n\
+				onclick="if(event.button == 1) closeMenus(this);">\n\
+				<menuitem cb_pref="javascript.options.showInConsole"\n\
+					type="checkbox"\n\
+					label="' + _localize("Show errors in chrome files") + '" />\n\
+				<menuitem cb_pref="javascript.options.strict"\n\
+					type="checkbox"\n\
+					label="' + _localize("Show strict warnings") + '" />\n\
+				<menuitem cb_pref="javascript.options.strict.debug"\n\
+					type="checkbox"\n\
+					label="' + _localize("Show strict warnings in debug builds") + '"\n\
+					cb_show="cmds.isDebugBuild" />\n\
+				<menuitem cb_pref="javascript.options.asyncstack"\n\
+					type="checkbox"\n\
+					label="' + _localize("Show stack for async calls") + '"\n\
+					hidden="' + !cmds.prefHasDefaultValue("javascript.options.asyncstack") + '" />\n\
+				<menuitem cb_pref="dom.report_all_js_exceptions"\n\
+					type="checkbox"\n\
+					label="' + _localize("Show all exceptions") + '"\n\
+					hidden="' + (cmds.platformVersion < 1.9) + '" />\n\
+				<menuitem cb_pref="extensions.logging.enabled"\n\
+					type="checkbox"\n\
+					label="' + _localize("Show information about extensions update") + '" />\n\
+				<menuseparator />\n\
+				<menuitem cb_pref="browser.dom.window.dump.enabled"\n\
+					type="checkbox"\n\
+					label="' + _localize("Enable window.dump()") + '" />\n\
+				<menuitem cb_pref="nglayout.debug.disable_xul_cache"\n\
+					type="checkbox"\n\
+					label="' + _localize("Disable XUL cache") + '" />\n\
+				<menuitem cb_pref="dom.allow_XUL_XBL_for_file"\n\
+					type="checkbox"\n\
+					label="' + _localize("Allow XUL and XBL for file://") + '"\n\
+					hidden="' + (cmds.platformVersion < 2) + '" />\n\
+				<menuitem cb_pref="security.data_uri.unique_opaque_origin"\n\
+					type="checkbox"\n\
+					label="' + _localize("Don't inherit privileged context for data:") + '"\n\
+					hidden="' + !cmds.prefHasDefaultValue("security.data_uri.unique_opaque_origin") + '" />\n\
+				<menuitem cb_pref="security.data_uri.block_toplevel_data_uri_navigations"\n\
+					type="checkbox"\n\
+					label="' + _localize("Block top level data: URI navigations") + '"\n\
+					hidden="' + !cmds.prefHasDefaultValue("security.data_uri.block_toplevel_data_uri_navigations") + '" />\n\
+				<menuitem cb_pref="devtools.chrome.enabled"\n\
+					type="checkbox"\n\
+					label="' + _localize("Enable developer tools for chrome") + '"\n\
+					hidden="' + !cmds.prefHasDefaultValue("devtools.chrome.enabled") + '" />\n\
+				<menuitem cb_pref="devtools.debugger.remote-enabled"\n\
+					type="checkbox"\n\
+					label="' + _localize("Enable remove debugger (and Browser Toolbox)") + '"\n\
+					hidden="' + !cmds.prefHasDefaultValue("devtools.debugger.remote-enabled") + '" />\n\
+				<menuitem cb_pref="extensions.autoDisableScopes"\n\
+					tooltiptext="extensions.autoDisableScopes"\n\
+					type="checkbox"\n\
+					label="' + _localize("Silently install extensions from browser profile") + '"\n\
+					hidden="' + !cmds.prefHasDefaultValue("extensions.autoDisableScopes") + '" />\n\
+				<menuseparator cb_show="canDisableE4X" />\n\
+				<menuitem cb_pref="javascript.options.xml.chrome"\n\
+					type="checkbox"\n\
+					label="' + _localize("Enable E4X for chrome") + '"\n\
+					cb_show="canDisableE4X" />\n\
+				<menuitem cb_pref="javascript.options.xml.content"\n\
+					type="checkbox"\n\
+					label="' + _localize("Enable E4X for content") + '"\n\
+					cb_show="canDisableE4X" />\n\
+				<menuseparator cb_show="hasMultiProcessMode" />\n\
+				<menuitem cb_pref="browser.tabs.remote.force-enable"\n\
+					type="checkbox"\n\
+					label="' + _localize("Enable multi-process mode") + '"\n\
+					oncommand="this.parentNode.parentNode.parentNode.parentNode.commands.ensureMultiProcessMode(this.getAttribute(\'checked\') == \'true\');"\n\
+					cb_show="hasMultiProcessMode" />\n\
+				<menuseparator cb_id="debugPrefsSeparator" hidden="true" />\n\
+				<menu cb_id="debugPrefsExtMenu" hidden="true"\n\
+					label="' + _localize("Debug extensions") + '"\n\
+					accesskey="' + _localize("e", "debugExtKey") + '">\n\
+					<menupopup cb_id="debugPrefsExtPopup" />\n\
+				</menu>\n\
+				<menu cb_id="debugPrefsAppMenu" hidden="true"\n\
+					label="' + _localize("Debug application") + '"\n\
+					accesskey="' + _localize("a", "debugAppKey") + '">\n\
+					<menupopup cb_id="debugPrefsAppPopup" />\n\
+				</menu>\n\
+			</menupopup>\n\
 		</menu>\
 	</menupopup>'
 ));
+
+if(mp.nodeName == "parsererror")
+	Components.utils.reportError(mp.textContent);
 
 var tb = this.parentNode;
 if(tb.getAttribute("orient") == "vertical") {
