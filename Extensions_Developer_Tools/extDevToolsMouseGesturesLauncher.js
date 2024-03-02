@@ -13,7 +13,7 @@
 const popupsetId = "mgLauncherForExtDevTools-popupset";
 var ps = document.getElementById(popupsetId);
 ps && ps.parentNode.removeChild(ps);
-ps = document.createElement("popupset");
+ps = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "popupset");
 ps.id = popupsetId;
 document.documentElement.appendChild(ps);
 
@@ -30,7 +30,7 @@ var e;
 if(typeof event == "object" && event instanceof Event && "screenX" in event) // FireGestures
 	e = event;
 else if(
-	this instanceof Components.interfaces.nsIDOMChromeWindow
+	this instanceof (Components.interfaces.nsIDOMChromeWindow || Components.interfaces.nsIDOMWindow)
 	&& "mgGestureState" in window && "endEvent" in mgGestureState // Mouse Gestures Redox
 )
 	e = mgGestureState.endEvent;
@@ -46,6 +46,12 @@ else {
 		};
 		if(this instanceof XULElement)
 			e.screenY += bo.height;
+	}
+	else {
+		e = {
+			screenX: anchor.screenX || 0,
+			screenY: anchor.screenY || 0
+		};
 	}
 }
 
