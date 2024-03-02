@@ -2120,7 +2120,10 @@ if(options.restoreErrorConsole && !cmds.onlyPopup)
 function parseXULFromString(xul) {
 	xul = xul.replace(/>\s+</g, "><");
 	try {
-		return new DOMParser().parseFromString(xul, "application/xml").documentElement;
+		var parser = new DOMParser();
+		parser.forceEnableXULXBL && parser.forceEnableXULXBL();
+		var parse = parser.parseFromSafeString || parser.parseFromString;
+		return parse.call(parser, xul, "application/xml").documentElement;
 	}
 	catch(e) {
 		// See http://custombuttons.sourceforge.net/forum/viewtopic.php?f=5&t=3720
