@@ -10,6 +10,8 @@
 // (c) Infocatcher 2012-2013, 2016
 // version 0.1.1 - 2016-12-02
 
+(function() {
+
 const popupsetId = "mgLauncherForExtDevTools-popupset";
 var ps = document.getElementById(popupsetId);
 ps && ps.parentNode.removeChild(ps);
@@ -90,3 +92,5 @@ function extDevTools() {
 
 //=== Extensions Developer Tools end
 }
+
+}).call(this);
