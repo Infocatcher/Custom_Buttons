@@ -57,8 +57,13 @@ else {
 	}
 }
 
-if(!popup || !e || !("screenX" in e)) {
-	alert("Mouse Gestures Launcher for Extensions Developer Tools:\nNo popup or can't get event object");
+var okEvt = e && ("screenX" in e);
+if(!popup || !okEvt) {
+	alert(
+		"Mouse Gestures Launcher for Extensions Developer Tools:"
+		+ (!popup ? "\nNo popup! Missing or failed Extensions Developer Tools code." : "")
+		+ (!okEvt ? "\nCan't get event object!" : "")
+	);
 	destroy();
 }
 else {
