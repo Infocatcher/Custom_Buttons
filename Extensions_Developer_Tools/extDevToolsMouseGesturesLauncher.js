@@ -7,8 +7,8 @@
 // https://github.com/Infocatcher/Custom_Buttons/blob/master/Extensions_Developer_Tools/extDevTools.js
 // after "//=== Extensions Developer Tools begin"
 
-// (c) Infocatcher 2012-2013, 2016
-// version 0.1.1 - 2016-12-02
+// (c) Infocatcher 2012-2024
+// version 0.1.2 - 2024-03-06
 
 (function() {
 
